@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/resources">
+        <file>Sounds/06-caught-a-pokemon.mp3</file>
+        <file>UI/Mapping.png</file>
+        <file>UI/NoVideo.png</file>
+    </qresource>
+</RCC>
