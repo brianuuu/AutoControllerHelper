@@ -1061,6 +1061,11 @@ void RemoteControllerWindow::on_PB_SendCommand_clicked()
     }
 }
 
+void RemoteControllerWindow::on_CB_DetailLog_toggled(bool checked)
+{
+    SmartProgramBase::m_detailLog = checked;
+}
+
 void RemoteControllerWindow::on_PB_SaveLog_clicked()
 {
     QString nameWithTime = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") + "_Log.log";

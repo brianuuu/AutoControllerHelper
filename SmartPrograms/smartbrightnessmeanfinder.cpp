@@ -61,7 +61,7 @@ void SmartBrightnessMeanFinder::runNextState()
             minHSV.setHsv(m_spinBoxes[4]->value(), m_spinBoxes[5]->value(), m_spinBoxes[6]->value());
             maxHSV.setHsv(m_spinBoxes[7]->value(), m_spinBoxes[8]->value(), m_spinBoxes[9]->value());
 
-            double mean = checkBrightnessMean(rect, HSVRange(minHSV,maxHSV));
+            double mean = getBrightnessMean(rect, HSVRange(minHSV,maxHSV));
             m_meanOutput->setText("Brightness Mean = " + QString::number(mean));
 
             m_substage = SS_Init;

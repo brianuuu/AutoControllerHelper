@@ -93,8 +93,8 @@ void SmartDelayCalibrator::runNextState()
     {
         if (state == S_CaptureReady)
         {
-            bool buttonShowUp = checkBrightnessMean(A_TestButtons[m_count].m_rect, C_Color_TestButton) > 40;
-            bool buttonShowUp2 = checkBrightnessMean(A_TestButtons[m_count].m_rect, C_Color_TestButton2) > 40;
+            bool buttonShowUp = checkBrightnessMeanTarget(A_TestButtons[m_count].m_rect, C_Color_TestButton, 40);
+            bool buttonShowUp2 = checkBrightnessMeanTarget(A_TestButtons[m_count].m_rect, C_Color_TestButton2, 40);
             if (buttonShowUp || buttonShowUp2)
             {
                 // A button shows up!

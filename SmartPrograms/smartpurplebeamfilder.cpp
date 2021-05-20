@@ -148,7 +148,7 @@ void SmartPurpleBeamFilder::runNextState()
                 // Check again if it still thinks it is purple beam
                 if (!m_beamFound)
                 {
-                    m_beamFound = checkBrightnessMean(m_denHoleRect, C_Color_Beam) > 20;
+                    m_beamFound = checkBrightnessMeanTarget(m_denHoleRect, C_Color_Beam, 20);
                 }
 
                 // keep checking until we get to Home
@@ -251,11 +251,11 @@ QString SmartPurpleBeamFilder::getCommandToOption()
         for (int x = 0; x < 5; x++)
         {
             QRect rect = A_MenuIcons[y * 5 + x].m_rect;
-            if (checkBrightnessMean(rect, C_Color_CursorOn) > 20)
+            if (checkBrightnessMeanTarget(rect, C_Color_CursorOn, 20))
             {
                 cursor = QPoint(x,y);
             }
-            if (checkBrightnessMean(rect, C_Color_Option) > 20)
+            if (checkBrightnessMeanTarget(rect, C_Color_Option, 20))
             {
                 option = QPoint(x,y);
             }

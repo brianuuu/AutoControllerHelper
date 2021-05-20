@@ -144,6 +144,8 @@ public:
         }
     }
 
+    static bool m_detailLog;
+
     bool run();
     virtual void stop();
     virtual SmartProgram getProgramEnum() = 0;
@@ -198,7 +200,8 @@ protected:
     bool checkPixelColorMatch(QPoint pixelPos, QColor targetColor, int threshold = 10);
     QColor getAverageColor(QRect rectPos);
     bool checkAverageColorMatch(QRect rectPos, QColor targetColor, int threshold = 10);
-    double checkBrightnessMean(QRect rectPos, HSVRange hsvRange);
+    double getBrightnessMean(QRect rectPos, HSVRange hsvRange);
+    bool checkBrightnessMeanTarget(QRect rectPos, HSVRange hsvRange, double target);
 
     typedef int Command;
     bool inializeCommands(int size);

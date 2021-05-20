@@ -2,6 +2,8 @@
 
 #include "autocontrollerwindow.h"
 
+bool SmartProgramBase::m_detailLog = false;
+
 SmartProgramBase::SmartProgramBase(SmartProgramParameter parameter)
     : QWidget(parameter.parent)
     , m_parameters(parameter)
@@ -156,11 +158,24 @@ bool SmartProgramBase::checkPixelColorMatch(QPoint pixelPos, QColor targetColor,
     // m_frameAnalyze must be ready before calling this!
 
     QColor testColor = m_capture.pixelColor(pixelPos);
-    return checkColorMatch(testColor, targetColor, threshold);
+    bool success = checkColorMatch(testColor, targetColor, threshold);
+
+    if (m_detailLog)
+    {
+        QString logStr = "Pixel(" + QString::number(testColor.red()) + "," + QString::number(testColor.green()) + "," + QString::number(testColor.blue()) + ")";
+        logStr += "~= Target(" + QString::number(targetColor.red()) + "," + QString::number(targetColor.green()) + "," + QString::number(targetColor.blue()) + ") = ";
+        logStr += success ? "TRUE" : "FALSE";
+
+        emit printLog(logStr, success ? LOG_SUCCESS : LOG_ERROR);
+    }
+
+    return success;
 }
 
 QColor SmartProgramBase::getAverageColor(QRect rectPos)
 {
+    // m_frameAnalyze must be ready before calling this!
+
     QImage cropped = m_capture.copy(rectPos);
     qreal r = 0;
     qreal g = 0;
@@ -189,13 +204,23 @@ QColor SmartProgramBase::getAverageColor(QRect rectPos)
 bool SmartProgramBase::checkAverageColorMatch(QRect rectPos, QColor targetColor, int threshold)
 {
     // m_frameAnalyze must be ready before calling this!
-    QColor avgColor = getAverageColor(rectPos);
 
-    //qDebug() << "Average color: " << "(" + QString::number(testColor.red()) + "," + QString::number(testColor.green()) + "," + QString::number(testColor.blue()) + ")";
-    return checkColorMatch(avgColor, targetColor, threshold);
+    QColor avgColor = getAverageColor(rectPos);
+    bool success = checkColorMatch(avgColor, targetColor, threshold);
+
+    if (m_detailLog)
+    {
+        QString logStr = "Average(" + QString::number(avgColor.red()) + "," + QString::number(avgColor.green()) + "," + QString::number(avgColor.blue()) + ")";
+        logStr += ", Target(" + QString::number(targetColor.red()) + "," + QString::number(targetColor.green()) + "," + QString::number(targetColor.blue()) + ") = ";
+        logStr += success ? "TRUE" : "FALSE";
+
+        emit printLog(logStr, success ? LOG_SUCCESS : LOG_ERROR);
+    }
+
+    return success;
 }
 
-double SmartProgramBase::checkBrightnessMean(QRect rectPos, HSVRange hsvRange)
+double SmartProgramBase::getBrightnessMean(QRect rectPos, HSVRange hsvRange)
 {
     // m_frameAnalyze must be ready before calling this!
 
@@ -238,8 +263,28 @@ double SmartProgramBase::checkBrightnessMean(QRect rectPos, HSVRange hsvRange)
 
     // Get average value of brightness
     mean /= (cropped.height() * cropped.width());
-    qDebug() << "Brightness mean =" << mean;
     return mean;
+}
+
+bool SmartProgramBase::checkBrightnessMeanTarget(QRect rectPos, SmartProgramBase::HSVRange hsvRange, double target)
+{
+    // m_frameAnalyze must be ready before calling this!
+
+    double mean = getBrightnessMean(rectPos, hsvRange);
+    bool success = mean > target;
+
+    QString logStr = "Mean (" + QString::number(mean) + ") > target (" + QString::number(target) + ") = ";
+    logStr += success ? "TRUE" : "FALSE";
+    if (m_detailLog)
+    {
+        emit printLog(logStr, success ? LOG_SUCCESS : LOG_ERROR);
+    }
+    else
+    {
+        qDebug() << logStr;
+    }
+
+    return success;
 }
 
 bool SmartProgramBase::inializeCommands(int size)

@@ -99,6 +99,7 @@ private slots:
     void on_LE_CommandSender_textChanged(const QString &arg1);
     void on_LE_CommandSender_returnPressed();
     void on_PB_SendCommand_clicked();
+    void on_CB_DetailLog_toggled(bool checked);
     void on_PB_SaveLog_clicked();
     void on_PB_ClearLog_clicked();
 

@@ -43,7 +43,7 @@ void SmartYCommGlitch::runNextState()
         if (state == S_CaptureReady)
         {
             // not connected = 71.1, connected = 184.8
-            m_internetConnected = checkBrightnessMean(A_Internet, C_Color_Internet) > 150;
+            m_internetConnected = checkBrightnessMeanTarget(A_Internet, C_Color_Internet, 150);
             m_substage = SS_GotoYComm;
             setState_runCommand(C_GotoYComm);
 

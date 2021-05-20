@@ -78,7 +78,7 @@ void SmartSurpriseTrade::runNextState()
         if (state == S_CaptureReady)
         {
             // not connected = 71.1, connected = 184.8
-            m_internetConnected = checkBrightnessMean(A_YComm.m_rect, C_Color_Internet) > 150;
+            m_internetConnected = checkBrightnessMeanTarget(A_YComm.m_rect, C_Color_Internet, 150);
             m_substage = SS_GotoYComm;
             setState_runCommand(C_GotoYComm);
 
@@ -300,7 +300,7 @@ void SmartSurpriseTrade::runNextState()
         {
             // Check if y-comm logo appears again
             // Trade evolution may be falsely detected to blue background!
-            bool animFinished = checkBrightnessMean(A_YComm.m_rect, C_Color_Internet) > 40;
+            bool animFinished = checkBrightnessMeanTarget(A_YComm.m_rect, C_Color_Internet, 40);
             if (animFinished)
             {
                 if (isLastPokemon())
