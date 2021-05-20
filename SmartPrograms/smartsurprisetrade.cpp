@@ -22,7 +22,7 @@ void SmartSurpriseTrade::tradeCompleteCalibrate()
     }
     else
     {
-        emit printLog("Please wait until trade started before calibrating", QColor(255,0,0));
+        emit printLog("Please wait until trade started before calibrating", LOG_ERROR);
     }
 }
 

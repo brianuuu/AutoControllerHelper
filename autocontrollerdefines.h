@@ -21,4 +21,8 @@
 
 #define COMMAND_MAX 30
 
+#define LOG_SUCCESS QColor(0,170,0)
+#define LOG_WARNING QColor(255,120,0)
+#define LOG_ERROR QColor(255,0,0)
+
 #endif // AUTOCONTROLLERDEFINES_H

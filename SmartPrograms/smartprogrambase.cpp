@@ -21,7 +21,7 @@ bool SmartProgramBase::run()
     }
 
     // S_Error
-    emit printLog(m_errorMsg, QColor(255,0,0));
+    emit printLog(m_errorMsg, LOG_ERROR);
     return false;
 }
 
@@ -73,7 +73,7 @@ void SmartProgramBase::imageError(int id, QCameraImageCapture::Error error, cons
         }
         else
         {
-            emit printLog("Error ouccured cpaturing frame (" + errorString + ")", QColor(255,0,0));
+            emit printLog("Error ouccured cpaturing frame (" + errorString + ")", LOG_ERROR);
             stop();
         }
     }
@@ -354,7 +354,7 @@ void SmartProgramBase::runNextState()
     case S_NotStarted:
     {
         stop();
-        emit printLog(m_errorMsg, QColor(255,0,0));
+        emit printLog(m_errorMsg, LOG_ERROR);
         emit completed();
         break;
     }

@@ -368,7 +368,7 @@ void RemoteControllerWindow::DisplayNextCommand()
             {
                 if (command.second == 0)
                 {
-                    PrintLog("Looping indefinitely, send new commands or any virtual controller input to stop it", QColor(255,120,0));
+                    PrintLog("Looping indefinitely, send new commands or any virtual controller input to stop it", LOG_WARNING);
                 }
                 else
                 {
@@ -531,7 +531,7 @@ void RemoteControllerWindow::SerialConnect(const QString &port)
 
     if (!m_serialPort.open(QIODevice::ReadWrite))
     {
-        PrintLog("Serial failed to connect", QColor(255, 0, 0));
+        PrintLog("Serial failed to connect", LOG_ERROR);
         QMessageBox::critical(this, "Error", "Failed to connect serial port!", QMessageBox::Ok);
         m_serialState = SS_Disconnect;
 
@@ -572,8 +572,8 @@ void RemoteControllerWindow::SerialConnectComplete()
     if (m_serialState == SS_FeedbackOK)
     {
         m_serialState = SS_Connect;
-        PrintLog("Serial connected", QColor(0, 170, 0));
-        UpdateStatus("Connected", QColor(0, 170, 0));
+        PrintLog("Serial connected", LOG_SUCCESS);
+        UpdateStatus("Connected", LOG_SUCCESS);
         ui->PB_Connect->setEnabled(true);
         ui->PB_Connect->setText("Disconnect");
         ui->PB_Refresh->setEnabled(false);
@@ -606,10 +606,10 @@ void RemoteControllerWindow::SerialDisconnect()
 
         m_readTimer.stop();
         m_serialPort.close();
-        PrintLog("Serial disconnected", QColor(255, 0, 0));
+        PrintLog("Serial disconnected", LOG_ERROR);
     }
 
-    UpdateStatus("Disconnected", QColor(255, 0, 0));
+    UpdateStatus("Disconnected", LOG_ERROR);
     ui->PB_Connect->setEnabled(true);
     ui->PB_Connect->setText("Connect");
     ui->PB_Refresh->setEnabled(true);
@@ -643,7 +643,7 @@ void RemoteControllerWindow::SerialWrite(const QString &msg)
     }
     else
     {
-        PrintLog("Command not sent: Serial not connected", QColor(255,0,0));
+        PrintLog("Command not sent: Serial not connected", LOG_ERROR);
     }
 }
 
@@ -1030,7 +1030,7 @@ void RemoteControllerWindow::on_PB_SendCommand_clicked()
 
     if (m_smartProgram)
     {
-        PrintLog("Cannot send custom command while Smart Program is running", QColor(255,0,0));
+        PrintLog("Cannot send custom command while Smart Program is running", LOG_ERROR);
         return;
     }
 
@@ -1057,7 +1057,7 @@ void RemoteControllerWindow::on_PB_SendCommand_clicked()
 
         ui->LE_CommandSender->setEnabled(true);
         ui->PB_SendCommand->setText("Send");
-        PrintLog("Command stopped by user", QColor(255,120,0));
+        PrintLog("Command stopped by user", LOG_WARNING);
     }
 }
 
@@ -1166,7 +1166,7 @@ bool RemoteControllerWindow::SendCommand(const QString &commands)
 {
     if (!m_serialPort.isOpen())
     {
-        PrintLog("Command not sent: Serial not connected", QColor(255,0,0));
+        PrintLog("Command not sent: Serial not connected", LOG_ERROR);
         return false;
     }
 
@@ -1174,7 +1174,7 @@ bool RemoteControllerWindow::SendCommand(const QString &commands)
     QString errorMsg;
     if (!ValidateCommand(commands, errorMsg))
     {
-        PrintLog(errorMsg, QColor(255,0,0));
+        PrintLog(errorMsg, LOG_ERROR);
         return false;
     }
 
@@ -1235,7 +1235,7 @@ bool RemoteControllerWindow::SendCommand(const QString &commands)
             // Infinite loop, ignore everything afterwards
             if (command.first.toLower() == "loop" && command.second == 0 && i < list.size() - 1)
             {
-                PrintLog("Commands after [Loop,0] will be discarded!", QColor(255,0,0));
+                PrintLog("Commands after [Loop,0] will be discarded!", LOG_ERROR);
                 break;
             }
         }
@@ -1364,7 +1364,7 @@ void RemoteControllerWindow::on_VLCState_changed(VLCWrapper::VLCState state)
     }
     case VLCWrapper::VLCState::PLAYING:
     {
-        PrintLog("Camera on", QColor(0, 170, 0));
+        PrintLog("Camera on", LOG_SUCCESS);
         ui->PB_StartCamera->setText("Stop Camera");
         ui->PB_StartCamera->setEnabled(true);
         EnableSmartProgram();
@@ -1374,7 +1374,7 @@ void RemoteControllerWindow::on_VLCState_changed(VLCWrapper::VLCState state)
     case VLCWrapper::VLCState::ERROR:
     {
         CameraToggle(false);
-        PrintLog("Failed to start camera", QColor(255,0,0));
+        PrintLog("Failed to start camera", LOG_ERROR);
         QMessageBox::critical(this, "Error", "An error occured when starting camera!", QMessageBox::Ok);
         break;
     }
@@ -1451,12 +1451,12 @@ void RemoteControllerWindow::CameraToggle(bool on)
                 delete m_cameraCapture;
                 m_cameraCapture = Q_NULLPTR;
 
-                PrintLog("Failed to start camera", QColor(255,0,0));
+                PrintLog("Failed to start camera", LOG_ERROR);
                 QMessageBox::critical(this, "Error", "Failed to start camera!", QMessageBox::Ok);
             }
             else
             {
-                PrintLog("Camera on", QColor(0, 170, 0));
+                PrintLog("Camera on", LOG_SUCCESS);
                 ui->PB_StartCamera->setText("Stop Camera");
 
                 ui->CB_Cameras->setEnabled(false);
@@ -1470,7 +1470,7 @@ void RemoteControllerWindow::CameraToggle(bool on)
         {
             on_PB_RefreshCamera_clicked();
 
-            PrintLog("Camera not found, refreshing list...", QColor(255,0,0));
+            PrintLog("Camera not found, refreshing list...", LOG_ERROR);
             QMessageBox::critical(this, "Error", "Selected camera no longer exist, list is now refreshed.", QMessageBox::Ok);
         }
         */
@@ -1533,7 +1533,7 @@ void RemoteControllerWindow::CameraCaptureToFile(QString name)
     }
     else
     {
-        PrintLog("Screenshot failed, please try again later", QColor(255,0,0));
+        PrintLog("Screenshot failed, please try again later", LOG_ERROR);
     }
     */
 
@@ -1548,7 +1548,7 @@ void RemoteControllerWindow::CameraCaptureToFile(QString name)
     }
     else
     {
-        PrintLog("Screenshot failed, please try again later", QColor(255,0,0));
+        PrintLog("Screenshot failed, please try again later", LOG_ERROR);
     }
     */
 }
@@ -1819,7 +1819,7 @@ void RemoteControllerWindow::LoadSmartProgramCommands()
                 QString error;
                 if (!ValidateCommand(commandString, error))
                 {
-                    PrintLog(programName + " " + commandName + " Error: " + error, QColor(255,0,0));
+                    PrintLog(programName + " " + commandName + " Error: " + error, LOG_ERROR);
                     m_smartProgramCommandsValid = false;
                 }
             }
@@ -1828,11 +1828,11 @@ void RemoteControllerWindow::LoadSmartProgramCommands()
 
     if (!m_smartProgramCommandsValid)
     {
-        PrintLog("Cannot enable Smart Programs due to invalid SmartCommands.xml!", QColor(255,0,0));
+        PrintLog("Cannot enable Smart Programs due to invalid SmartCommands.xml!", LOG_ERROR);
     }
     else
     {
-        PrintLog("SmartProgramCommands.xml validation completed!", QColor(0,170,0));
+        PrintLog("SmartProgramCommands.xml validation completed!", LOG_SUCCESS);
     }
 }
 
@@ -1861,7 +1861,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
 {
     if (!CanRunSmartProgram())
     {
-        PrintLog("Cannot start smart program, this require serial port connected AND camera on", QColor(255,0,0));
+        PrintLog("Cannot start smart program, this require serial port connected AND camera on", LOG_ERROR);
         return;
     }
 
@@ -1956,7 +1956,7 @@ void RemoteControllerWindow::StopSmartProgram()
     // Stopped by user/program
     if (m_smartProgram)
     {
-        PrintLog("[" + m_smartProgram->getProgramName() + "]: Stopped by user or program", QColor(255,120,0));
+        PrintLog("[" + m_smartProgram->getProgramName() + "]: Stopped by user or program", LOG_WARNING);
 
         m_smartProgram->stop();
         delete m_smartProgram;
