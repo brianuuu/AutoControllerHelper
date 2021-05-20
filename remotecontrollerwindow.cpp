@@ -1517,11 +1517,6 @@ void RemoteControllerWindow::CameraToggle(bool on)
 
 void RemoteControllerWindow::CameraCaptureToFile(QString name)
 {
-    if (!QDir(SCREENSHOT_PATH).exists())
-    {
-        QDir().mkdir(SCREENSHOT_PATH);
-    }
-
     QString nameWithTime = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") + "_" + name + ".png";
 
     // Grab frame and save from QT draw
