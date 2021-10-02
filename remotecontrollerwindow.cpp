@@ -1930,6 +1930,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartDaySkipper(ui->SP5_SB_Skips->value(), ui->SP5_TimeLeft, parameter);
         break;
     }
+    case SP_BattleTower:
+    {
+        m_smartProgram = new SmartBattleTower(parameter);
+        break;
+    }
     default:
     {
         QMessageBox::critical(this, "Error", "No code exist for this Smart Program!");

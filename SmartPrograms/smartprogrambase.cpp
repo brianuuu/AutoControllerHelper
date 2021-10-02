@@ -2,8 +2,6 @@
 
 #include "autocontrollerwindow.h"
 
-bool SmartProgramBase::m_detailLog = false;
-
 SmartProgramBase::SmartProgramBase(SmartProgramParameter parameter)
     : QWidget(parameter.parent)
     , m_parameters(parameter)
@@ -160,7 +158,7 @@ bool SmartProgramBase::checkPixelColorMatch(QPoint pixelPos, QColor targetColor,
     QColor testColor = m_capture.pixelColor(pixelPos);
     bool success = checkColorMatch(testColor, targetColor, threshold);
 
-    if (m_detailLog)
+    if (m_parameters.settings->isLogDebugColor())
     {
         QString logStr = "Pixel(" + QString::number(testColor.red()) + "," + QString::number(testColor.green()) + "," + QString::number(testColor.blue()) + ")";
         logStr += "~= Target(" + QString::number(targetColor.red()) + "," + QString::number(targetColor.green()) + "," + QString::number(targetColor.blue()) + ") = ";
@@ -208,7 +206,7 @@ bool SmartProgramBase::checkAverageColorMatch(QRect rectPos, QColor targetColor,
     QColor avgColor = getAverageColor(rectPos);
     bool success = checkColorMatch(avgColor, targetColor, threshold);
 
-    if (m_detailLog)
+    if (m_parameters.settings->isLogDebugColor())
     {
         QString logStr = "Average(" + QString::number(avgColor.red()) + "," + QString::number(avgColor.green()) + "," + QString::number(avgColor.blue()) + ")";
         logStr += ", Target(" + QString::number(targetColor.red()) + "," + QString::number(targetColor.green()) + "," + QString::number(targetColor.blue()) + ") = ";
@@ -275,7 +273,7 @@ bool SmartProgramBase::checkBrightnessMeanTarget(QRect rectPos, SmartProgramBase
 
     QString logStr = "Mean (" + QString::number(mean) + ") > target (" + QString::number(target) + ") = ";
     logStr += success ? "TRUE" : "FALSE";
-    if (m_detailLog)
+    if (m_parameters.settings->isLogDebugColor())
     {
         emit printLog(logStr, success ? LOG_SUCCESS : LOG_ERROR);
     }
@@ -414,16 +412,27 @@ void SmartProgramBase::runNextState()
     {
         // If sequence failed to run, the client is responsible to stop this smart program
         // otherwise it will stuck in this state forever
+        QString command;
         if (m_customCommand.isEmpty())
         {
-            qDebug() << m_commands[m_commandIndex];
-            emit runSequence(m_commands[m_commandIndex]);
+            command = m_commands[m_commandIndex];
         }
         else
         {
-            qDebug() << m_customCommand;
-            emit runSequence(m_customCommand);
+            command = m_customCommand;
         }
+
+        QString const logStr = "Running command: [" + command + "]";
+        if (m_parameters.settings->isLogDebugCommand())
+        {
+            emit printLog(logStr);
+        }
+        else
+        {
+            qDebug() << logStr;
+        }
+
+        emit runSequence(command);
         break;
     }
     case S_TakeScreenshot:

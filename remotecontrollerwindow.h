@@ -36,6 +36,7 @@
 #include "SmartPrograms/smartsurprisetrade.h"
 #include "SmartPrograms/smartmaxraidbattler.h"
 #include "SmartPrograms/smartdayskipper.h"
+#include "SmartPrograms/smartbattletower.h"
 
 namespace Ui {
 class RemoteControllerWindow;
