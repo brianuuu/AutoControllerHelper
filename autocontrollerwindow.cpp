@@ -351,7 +351,7 @@ void autocontrollerwindow::CheckVersion()
 //---------------------------------------------------------------------------
 void autocontrollerwindow::on_NetworkManager_Finished(QNetworkReply *reply)
 {
-    QString link = "https://drive.google.com/file/d/1BR1ekm2gvtMGBKlSVWNlt_BkQj-KDu7U/view?usp=sharing";
+    QString link = "https://github.com/brianuuu/AutoController_swsh/releases";
 
     if (reply->error())
     {
