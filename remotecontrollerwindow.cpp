@@ -1594,6 +1594,11 @@ void RemoteControllerWindow::on_SP2_SB_Y_valueChanged(int arg1)
     m_vlcWrapper->setDefaultArea(rect);
 }
 
+void RemoteControllerWindow::on_SP6_CB_Skips_clicked()
+{
+    ui->SP6_SB_Skips->setEnabled(ui->SP6_CB_Skips->isChecked());
+}
+
 void RemoteControllerWindow::on_SmartProgram_printLog(const QString log, QColor color)
 {
     if (!CanRunSmartProgram()) return;
@@ -1935,6 +1940,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartBattleTower(parameter);
         break;
     }
+    case SP_Loto:
+    {
+        m_smartProgram = new SmartLoto(ui->SP6_CB_Skips->isChecked() ? ui->SP6_SB_Skips->value() : 0, parameter);
+        break;
+    }
     default:
     {
         QMessageBox::critical(this, "Error", "No code exist for this Smart Program!");
@@ -1956,6 +1966,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     if (m_smartProgram->run())
     {
         ui->PB_StartSmartProgram->setText("Stop");
+        ui->PB_SmartSettings->setEnabled(false);
         ui->LW_SmartProgram->setEnabled(false);
         ui->PB_ReloadSmartCommands->setEnabled(false);
 
@@ -1994,6 +2005,7 @@ void RemoteControllerWindow::StopSmartProgram()
     }
 
     ui->PB_StartSmartProgram->setText("Start");
+    ui->PB_SmartSettings->setEnabled(true);
     ui->LW_SmartProgram->setEnabled(true);
     ui->PB_ReloadSmartCommands->setEnabled(true);
 

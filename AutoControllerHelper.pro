@@ -22,6 +22,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     SmartPrograms/smartbattletower.cpp \
+    SmartPrograms/smartloto.cpp \
     commandsender.cpp \
     main.cpp \
     autocontrollerwindow.cpp \
@@ -40,6 +41,7 @@ SOURCES += \
 
 HEADERS += \
     SmartPrograms/smartbattletower.h \
+    SmartPrograms/smartloto.h \
     autocontrollerdefines.h \
     autocontrollerwindow.h \
     commandsender.h \

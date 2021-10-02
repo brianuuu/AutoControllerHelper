@@ -37,6 +37,7 @@
 #include "SmartPrograms/smartmaxraidbattler.h"
 #include "SmartPrograms/smartdayskipper.h"
 #include "SmartPrograms/smartbattletower.h"
+#include "SmartPrograms/smartloto.h"
 
 namespace Ui {
 class RemoteControllerWindow;
@@ -119,6 +120,8 @@ private slots:
 
     void on_SP2_SB_X_valueChanged(int arg1);
     void on_SP2_SB_Y_valueChanged(int arg1);
+
+    void on_SP6_CB_Skips_clicked();
 
     void on_SmartProgram_printLog(QString const log, QColor color);
     void on_SmartProgram_completed();

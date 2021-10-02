@@ -26,6 +26,7 @@ enum SmartProgram
     SP_MaxRaidBattler,
     SP_DaySkipper,
     SP_BattleTower,
+    SP_Loto,
 
     SP_COUNT
 };
@@ -75,6 +76,7 @@ public:
             case SP_MaxRaidBattler:         return "Max Raid Battler";
             case SP_DaySkipper:             return "Auto Day Skipper";
             case SP_BattleTower:            return "Auto Battle Tower";
+            case SP_Loto:                   return "Auto Loto";
             case SP_COUNT:                  return "Invalid";
         }
     }
@@ -89,6 +91,7 @@ public:
         if (sp == "Max Raid Battler")               return SP_MaxRaidBattler;
         if (sp == "Auto Day Skipper")               return SP_DaySkipper;
         if (sp == "Auto Battle Tower")              return SP_BattleTower;
+        if (sp == "Auto Loto")                      return SP_Loto;
 
         return SP_COUNT;
     }
@@ -105,6 +108,7 @@ public:
             case SP_MaxRaidBattler:         return "SmartMaxRaidBattler";
             case SP_DaySkipper:             return "SmartDaySkipper";
             case SP_BattleTower:            return "SmartBattleTower";
+            case SP_Loto:                   return "SmartLoto";
             case SP_COUNT:                  return "Invalid";
         }
     }
@@ -122,6 +126,7 @@ public:
             case SP_MaxRaidBattler:         return 4;
             case SP_DaySkipper:             return 5;
             case SP_BattleTower:            return 0;
+            case SP_Loto:                   return 6;
             case SP_COUNT:                  return -1;
         }
     }

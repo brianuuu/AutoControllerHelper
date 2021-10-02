@@ -31,7 +31,7 @@ void SmartBattleTower::runNextState()
     {
         m_substage = SS_Loop;
         setState_runCommand(C_Loop);
-        emit printLog("WARNING: This program will not stop on it's own!", LOG_WARNING);
+        emit printLog("WARNING: This program will not stop on its own!", LOG_WARNING);
         break;
     }
     case SS_Loop:
