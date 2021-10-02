@@ -1794,7 +1794,14 @@ void RemoteControllerWindow::LoadSmartProgramCommands()
     }
 
     m_smartProgramCommandsValid = true;
-    QFile file(QString(BOT_PATH) + "RemoteControl/SmartCommands.xml");
+    QFile file
+    (
+#if DEBUG_ENABLED
+        "../AutoControllerHelper/Database/SmartCommands.xml"
+#else
+        QString(BOT_PATH) + "RemoteControl/SmartCommands.xml"
+#endif
+    );
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         QMessageBox::critical(this, "Error", "Fail to load SmartCommands.xml!", QMessageBox::Ok);
