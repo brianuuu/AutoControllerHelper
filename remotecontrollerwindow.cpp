@@ -1061,23 +1061,9 @@ void RemoteControllerWindow::on_PB_SendCommand_clicked()
     }
 }
 
-void RemoteControllerWindow::on_CB_DetailLog_toggled(bool checked)
-{
-    SmartProgramBase::m_detailLog = checked;
-}
-
 void RemoteControllerWindow::on_PB_SaveLog_clicked()
 {
-    QString nameWithTime = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") + "_Log.log";
-    QFile file(LOG_PATH + nameWithTime);
-    if(file.open(QIODevice::WriteOnly))
-    {
-        QTextStream stream(&file);
-        stream << ui->TB_Log->toPlainText();
-        file.close();
-
-        PrintLog("Log file saved: " + nameWithTime);
-    }
+    SaveLog();
 }
 
 void RemoteControllerWindow::on_PB_ClearLog_clicked()
@@ -1312,6 +1298,20 @@ bool RemoteControllerWindow::SendCommand(const QString &commands)
     m_commandMutex->unlock();
 
     return true;
+}
+
+void RemoteControllerWindow::SaveLog(const QString name)
+{
+    QString nameWithTime = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") + "_" + name + ".log";
+    QFile file(LOG_PATH + nameWithTime);
+    if(file.open(QIODevice::WriteOnly))
+    {
+        QTextStream stream(&file);
+        stream << ui->TB_Log->toPlainText();
+        file.close();
+
+        PrintLog("Log file saved: " + nameWithTime);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -1610,6 +1610,9 @@ void RemoteControllerWindow::on_SmartProgram_completed()
     {
     default: break;
     }
+
+    // Save log
+    SaveLog(m_smartProgram->getProgramInternalName());
 
     delete m_smartProgram;
     m_smartProgram = Q_NULLPTR;
@@ -1931,6 +1934,12 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     connect(m_smartProgram, &SmartProgramBase::completed, this, &RemoteControllerWindow::on_SmartProgram_completed);
     connect(m_smartProgram, &SmartProgramBase::runSequence, this, &RemoteControllerWindow::on_SmartProgram_runSequence);
     connect(this, &RemoteControllerWindow::commandFinished, m_smartProgram, &SmartProgramBase::commandFinished);
+
+    // Clear log
+    if (m_smartSetting->isLogAutosave())
+    {
+        ui->TB_Log->clear();
+    }
 
     if (m_smartProgram->run())
     {

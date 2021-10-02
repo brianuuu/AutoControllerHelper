@@ -1287,13 +1287,6 @@
             </spacer>
            </item>
            <item>
-            <widget class="QCheckBox" name="CB_DetailLog">
-             <property name="text">
-              <string>Detailed Log</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QPushButton" name="PB_SaveLog">
              <property name="text">
               <string>Save as .log</string>

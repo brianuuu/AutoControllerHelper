@@ -35,6 +35,9 @@ SmartProgramSetting::SmartProgramSetting(QWidget *parent) :
     ui->LE_Prefix->setText(m_settings->value("TextFilePrefix", QString()).toString());
     ui->LE_File->setText(m_settings->value("TextFileDirectory", QString()).toString());
     ReadCounterFromText();
+
+    // Logging
+    ui->CB_LogSave->setChecked(m_settings->value("LogAutosave", true).toBool());
 }
 
 SmartProgramSetting::~SmartProgramSetting()
@@ -63,33 +66,14 @@ void SmartProgramSetting::closeEvent(QCloseEvent *event)
     m_settings->setValue("StreamCounterEnable", ui->GB_Stream->isChecked());
     m_settings->setValue("TextFilePrefix", ui->LE_Prefix->text());
     m_settings->setValue("TextFileDirectory", ui->LE_File->text());
+
+    // Logging
+    m_settings->setValue("LogAutosave", ui->CB_LogSave->isChecked());
 }
 
 DateArrangement SmartProgramSetting::getDateArrangement()
 {
     return (DateArrangement)ui->CB_DateArrangement->currentIndex();
-}
-
-void SmartProgramSetting::on_CB_DateArrangement_currentIndexChanged(int index)
-{
-    DateArrangement da = (DateArrangement)index;
-    switch (da)
-    {
-    case DA_JP:
-        ui->CurrentDate->setDisplayFormat("yyyy/MM/dd");
-        break;
-    case DA_EU:
-        ui->CurrentDate->setDisplayFormat("dd/MM/yyyy");
-        break;
-    case DA_US:
-        ui->CurrentDate->setDisplayFormat("MM/dd/yyyy");
-        break;
-    }
-}
-
-void SmartProgramSetting::on_PB_CurrentDate_clicked()
-{
-    ui->CurrentDate->setDate(QDate::currentDate());
 }
 
 bool SmartProgramSetting::isSoundEnabled()
@@ -132,6 +116,43 @@ void SmartProgramSetting::playSound()
 bool SmartProgramSetting::isStreamCounterEnabled()
 {
     return ui->GB_Stream->isChecked();
+}
+
+bool SmartProgramSetting::isLogAutosave()
+{
+    return ui->CB_LogSave->isChecked();
+}
+
+bool SmartProgramSetting::isLogDebugCommand()
+{
+    return ui->CB_LogDebugCommands->isChecked();
+}
+
+bool SmartProgramSetting::isLogDebugColor()
+{
+    return ui->CB_LogDebugColor->isChecked();
+}
+
+void SmartProgramSetting::on_CB_DateArrangement_currentIndexChanged(int index)
+{
+    DateArrangement da = (DateArrangement)index;
+    switch (da)
+    {
+    case DA_JP:
+        ui->CurrentDate->setDisplayFormat("yyyy/MM/dd");
+        break;
+    case DA_EU:
+        ui->CurrentDate->setDisplayFormat("dd/MM/yyyy");
+        break;
+    case DA_US:
+        ui->CurrentDate->setDisplayFormat("MM/dd/yyyy");
+        break;
+    }
+}
+
+void SmartProgramSetting::on_PB_CurrentDate_clicked()
+{
+    ui->CurrentDate->setDate(QDate::currentDate());
 }
 
 void SmartProgramSetting::on_RB_DefaultSound_clicked()

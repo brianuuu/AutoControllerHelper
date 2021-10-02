@@ -40,10 +40,19 @@ public:
     bool isSoundEnabled();
     void playSound();
 
-    //Stream Counter
+    // Stream Counter
     bool isStreamCounterEnabled();
 
+    // Logging
+    bool isLogAutosave();
+    bool isLogDebugCommand();
+    bool isLogDebugColor();
+
 private slots:
+    // System
+    void on_CB_DateArrangement_currentIndexChanged(int index);
+    void on_PB_CurrentDate_clicked();
+
     // Sound
     void on_RB_DefaultSound_clicked();
     void on_RB_CustomSound_clicked();
@@ -52,10 +61,6 @@ private slots:
 
     // Stream Counter
     void on_PB_File_clicked();
-
-    void on_PB_CurrentDate_clicked();
-
-    void on_CB_DateArrangement_currentIndexChanged(int index);
 
 private:
     // Sound
