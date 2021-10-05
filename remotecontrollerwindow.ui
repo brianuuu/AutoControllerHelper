@@ -1632,7 +1632,7 @@
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>6</number>
+             <number>5</number>
             </property>
             <widget class="QWidget" name="page">
              <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -2255,8 +2255,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>317</height>
+                   <width>199</width>
+                   <height>49</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -2509,6 +2509,12 @@ check the manual</string>
               </property>
               <item>
                <widget class="QScrollArea" name="scrollArea_6">
+                <property name="frameShape">
+                 <enum>QFrame::Panel</enum>
+                </property>
+                <property name="lineWidth">
+                 <number>2</number>
+                </property>
                 <property name="widgetResizable">
                  <bool>true</bool>
                 </property>
@@ -2517,8 +2523,8 @@ check the manual</string>
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>430</width>
-                   <height>319</height>
+                   <width>428</width>
+                   <height>317</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_19">

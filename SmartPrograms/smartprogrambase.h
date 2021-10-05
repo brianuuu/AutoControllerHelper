@@ -27,6 +27,7 @@ enum SmartProgram
     SP_DaySkipper,
     SP_BattleTower,
     SP_Loto,
+    SP_DailyHighlight,
 
     SP_COUNT
 };
@@ -77,6 +78,7 @@ public:
             case SP_DaySkipper:             return "Auto Day Skipper";
             case SP_BattleTower:            return "Auto Battle Tower";
             case SP_Loto:                   return "Auto Loto";
+            case SP_DailyHighlight:         return "Daily Highlight Farmer";
             case SP_COUNT:                  return "Invalid";
         }
     }
@@ -92,6 +94,7 @@ public:
         if (sp == "Auto Day Skipper")               return SP_DaySkipper;
         if (sp == "Auto Battle Tower")              return SP_BattleTower;
         if (sp == "Auto Loto")                      return SP_Loto;
+        if (sp == "Daily Highlight Farmer")         return SP_DailyHighlight;
 
         return SP_COUNT;
     }
@@ -109,6 +112,7 @@ public:
             case SP_DaySkipper:             return "SmartDaySkipper";
             case SP_BattleTower:            return "SmartBattleTower";
             case SP_Loto:                   return "SmartLoto";
+            case SP_DailyHighlight:         return "SmartDailyHighlight";
             case SP_COUNT:                  return "Invalid";
         }
     }
@@ -127,6 +131,7 @@ public:
             case SP_DaySkipper:             return 5;
             case SP_BattleTower:            return 0;
             case SP_Loto:                   return 6;
+            case SP_DailyHighlight:         return 6;
             case SP_COUNT:                  return -1;
         }
     }

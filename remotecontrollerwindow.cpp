@@ -1945,6 +1945,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartLoto(ui->SP6_CB_Skips->isChecked() ? ui->SP6_SB_Skips->value() : 0, parameter);
         break;
     }
+    case SP_DailyHighlight:
+    {
+        m_smartProgram = new SmartDailyHighlight(ui->SP6_CB_Skips->isChecked() ? ui->SP6_SB_Skips->value() : 0, parameter);
+        break;
+    }
     default:
     {
         QMessageBox::critical(this, "Error", "No code exist for this Smart Program!");
