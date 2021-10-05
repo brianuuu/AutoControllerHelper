@@ -25,6 +25,7 @@ SOURCES += \
     SmartPrograms/smartberryfarmer.cpp \
     SmartPrograms/smartdailyhighlight.cpp \
     SmartPrograms/smartloto.cpp \
+    SmartPrograms/smartwattfarmer.cpp \
     commandsender.cpp \
     main.cpp \
     autocontrollerwindow.cpp \
@@ -46,6 +47,7 @@ HEADERS += \
     SmartPrograms/smartberryfarmer.h \
     SmartPrograms/smartdailyhighlight.h \
     SmartPrograms/smartloto.h \
+    SmartPrograms/smartwattfarmer.h \
     autocontrollerdefines.h \
     autocontrollerwindow.h \
     commandsender.h \

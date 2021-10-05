@@ -29,6 +29,7 @@ enum SmartProgram
     SP_Loto,
     SP_DailyHighlight,
     SP_BerryFarmer,
+    SP_WattFarmer,
 
     SP_COUNT
 };
@@ -81,6 +82,7 @@ public:
             case SP_Loto:                   return "Auto Loto";
             case SP_DailyHighlight:         return "Daily Highlight Farmer";
             case SP_BerryFarmer:            return "Berry Farmer";
+            case SP_WattFarmer:             return "Watt Farmer";
             case SP_COUNT:                  return "Invalid";
         }
     }
@@ -98,6 +100,7 @@ public:
         if (sp == "Auto Loto")                      return SP_Loto;
         if (sp == "Daily Highlight Farmer")         return SP_DailyHighlight;
         if (sp == "Berry Farmer")                   return SP_BerryFarmer;
+        if (sp == "Watt Farmer")                    return SP_WattFarmer;
 
         return SP_COUNT;
     }
@@ -117,6 +120,7 @@ public:
             case SP_Loto:                   return "SmartLoto";
             case SP_DailyHighlight:         return "SmartDailyHighlight";
             case SP_BerryFarmer:            return "SmartBerryFarmer";
+            case SP_WattFarmer:             return "SmartWattFarmer";
             case SP_COUNT:                  return "Invalid";
         }
     }
@@ -137,6 +141,7 @@ public:
             case SP_Loto:                   return 6;
             case SP_DailyHighlight:         return 6;
             case SP_BerryFarmer:            return 6;
+            case SP_WattFarmer:             return 6;
             case SP_COUNT:                  return -1;
         }
     }
