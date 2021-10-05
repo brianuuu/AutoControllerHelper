@@ -39,6 +39,7 @@
 #include "SmartPrograms/smartbattletower.h"
 #include "SmartPrograms/smartloto.h"
 #include "SmartPrograms/smartdailyhighlight.h"
+#include "SmartPrograms/smartberryfarmer.h"
 
 namespace Ui {
 class RemoteControllerWindow;
