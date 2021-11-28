@@ -22,6 +22,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     SmartPrograms/smartbattletower.cpp \
+    SmartPrograms/smartbdspdialgapalkia.cpp \
     SmartPrograms/smartberryfarmer.cpp \
     SmartPrograms/smartdailyhighlight.cpp \
     SmartPrograms/smartloto.cpp \
@@ -44,6 +45,7 @@ SOURCES += \
 
 HEADERS += \
     SmartPrograms/smartbattletower.h \
+    SmartPrograms/smartbdspdialgapalkia.h \
     SmartPrograms/smartberryfarmer.h \
     SmartPrograms/smartdailyhighlight.h \
     SmartPrograms/smartloto.h \

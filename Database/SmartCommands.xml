@@ -90,4 +90,8 @@
 	<C_BackToGame>A,1,Nothing,2,Home,1,Nothing,16,Home,1,Nothing,16</C_BackToGame>
 	<C_Loop>A,1,BSpam,26</C_Loop>
   </SmartWattFarmer>
+  <SmartBDSPDialgaPalkia>
+	<C_Restart>Home,1,Nothing,21,X,1,ASpam,850,LUp,6,ASpam,120,Nothing,200</C_Restart>
+	<C_Capture>Capture,22</C_Capture>
+  </SmartBDSPDialgaPalkia>
 </SmartProgramCommands>

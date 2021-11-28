@@ -200,7 +200,8 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     ui->SP2_Frame_Hide->setVisible(false);
 
     // Call this after all smart program values are set up above
-    ui->LW_SmartProgram->setCurrentRow(0);
+    //ui->LW_SmartProgram->setCurrentRow(0);
+    on_TW_SmartProgram_currentChanged(0);
 
     // Load previous settings
     m_settings = new QSettings("brianuuu", "AutoControllerHelper", this);
@@ -1715,7 +1716,7 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
     int tabIndex = SmartProgramBase::getProgramTabID(sp);
     if (tabIndex < 0 || tabIndex >= ui->SW_Settings->count())
     {
-        QMessageBox::critical(this, "Error", "Invalid tab ID for this Smark Program!");
+        QMessageBox::critical(this, "Error", "Invalid tab ID for this Smart Program!");
         m_vlcWrapper->setDefaultAreaEnabled(false);
         return;
     }
@@ -1743,6 +1744,27 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
     }
 
     m_vlcWrapper->setDefaultAreaEnabled(useArea);
+}
+
+void RemoteControllerWindow::on_TW_SmartProgram_currentChanged(int index)
+{
+    for (int row = 0; row < ui->LW_SmartProgram->count(); ++row)
+    {
+        QListWidgetItem* item = ui->LW_SmartProgram->item(row);
+        SmartProgram const sp = SmartProgramBase::getProgramEnumFromName(item->text());
+        item->setHidden(ui->TW_SmartProgram->tabText(index) != SmartProgramBase::getProgramGamePrefix(sp));
+    }
+
+    // Force set to first smart program in the list
+    for (int row = 0; row < ui->LW_SmartProgram->count(); ++row)
+    {
+        QListWidgetItem const* item = ui->LW_SmartProgram->item(row);
+        if (!item->isHidden())
+        {
+            ui->LW_SmartProgram->setCurrentRow(row);
+            break;
+        }
+    }
 }
 
 void RemoteControllerWindow::SetCaptureAreaPos(QMouseEvent *event)
@@ -1958,6 +1980,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     case SP_WattFarmer:
     {
         m_smartProgram = new SmartWattFarmer(ui->SP6_CB_Skips->isChecked() ? ui->SP6_SB_Skips->value() : 0, parameter);
+        break;
+    }
+    case SP_BDSP_DialgaPalkia:
+    {
+        m_smartProgram = new SmartBDSPDialgaPalkia(parameter);
         break;
     }
     default:

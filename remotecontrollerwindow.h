@@ -41,6 +41,7 @@
 #include "SmartPrograms/smartdailyhighlight.h"
 #include "SmartPrograms/smartberryfarmer.h"
 #include "SmartPrograms/smartwattfarmer.h"
+#include "SmartPrograms/smartbdspdialgapalkia.h"
 
 namespace Ui {
 class RemoteControllerWindow;
@@ -133,6 +134,7 @@ private slots:
     void on_PB_SmartSettings_clicked();
     void on_PB_ReloadSmartCommands_clicked();
     void on_LW_SmartProgram_currentTextChanged(const QString &currentText);
+    void on_TW_SmartProgram_currentChanged(int index);
 
 private:
     // Others

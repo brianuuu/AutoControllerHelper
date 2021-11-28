@@ -31,6 +31,8 @@ enum SmartProgram
     SP_BerryFarmer,
     SP_WattFarmer,
 
+    SP_BDSP_DialgaPalkia,
+
     SP_COUNT
 };
 
@@ -83,6 +85,9 @@ public:
             case SP_DailyHighlight:         return "Daily Highlight Farmer";
             case SP_BerryFarmer:            return "Berry Farmer";
             case SP_WattFarmer:             return "Watt Farmer";
+
+            case SP_BDSP_DialgaPalkia:      return "Reset Dialga/Palkia";
+
             case SP_COUNT:                  return "Invalid";
         }
     }
@@ -101,6 +106,8 @@ public:
         if (sp == "Daily Highlight Farmer")         return SP_DailyHighlight;
         if (sp == "Berry Farmer")                   return SP_BerryFarmer;
         if (sp == "Watt Farmer")                    return SP_WattFarmer;
+
+        if (sp == "Reset Dialga/Palkia")            return SP_BDSP_DialgaPalkia;
 
         return SP_COUNT;
     }
@@ -121,6 +128,9 @@ public:
             case SP_DailyHighlight:         return "SmartDailyHighlight";
             case SP_BerryFarmer:            return "SmartBerryFarmer";
             case SP_WattFarmer:             return "SmartWattFarmer";
+
+            case SP_BDSP_DialgaPalkia:      return "SmartBDSPDialgaPalkia";
+
             case SP_COUNT:                  return "Invalid";
         }
     }
@@ -142,6 +152,9 @@ public:
             case SP_DailyHighlight:         return 6;
             case SP_BerryFarmer:            return 6;
             case SP_WattFarmer:             return 6;
+
+            case SP_BDSP_DialgaPalkia:      return 0;
+
             case SP_COUNT:                  return -1;
         }
     }
@@ -166,6 +179,20 @@ public:
             return true;
         default:
             return false;
+        }
+    }
+
+    static QString getProgramGamePrefix(SmartProgram sp)
+    {
+        switch (sp)
+        {
+        case SP_BDSP_DialgaPalkia:
+            return "BDSP";
+        case SP_DelayCalibrator:
+        case SP_BrightnessMeanFinder:
+            return "Others";
+        default:
+            return "SwSh";
         }
     }
 
