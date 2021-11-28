@@ -32,6 +32,7 @@ enum SmartProgram
     SP_WattFarmer,
 
     SP_BDSP_DialgaPalkia,
+    SP_BDSP_Starter,
 
     SP_COUNT
 };
@@ -87,6 +88,7 @@ public:
             case SP_WattFarmer:             return "Watt Farmer";
 
             case SP_BDSP_DialgaPalkia:      return "Reset Dialga/Palkia";
+            case SP_BDSP_Starter:           return "Reset Starter";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -108,6 +110,7 @@ public:
         if (sp == "Watt Farmer")                    return SP_WattFarmer;
 
         if (sp == "Reset Dialga/Palkia")            return SP_BDSP_DialgaPalkia;
+        if (sp == "Reset Starter")                  return SP_BDSP_Starter;
 
         return SP_COUNT;
     }
@@ -130,6 +133,7 @@ public:
             case SP_WattFarmer:             return "SmartWattFarmer";
 
             case SP_BDSP_DialgaPalkia:      return "SmartBDSPDialgaPalkia";
+            case SP_BDSP_Starter:           return "SmartBDSPStarter";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -154,6 +158,7 @@ public:
             case SP_WattFarmer:             return 6;
 
             case SP_BDSP_DialgaPalkia:      return 0;
+            case SP_BDSP_Starter:           return 7;
 
             case SP_COUNT:                  return -1;
         }
@@ -187,6 +192,7 @@ public:
         switch (sp)
         {
         case SP_BDSP_DialgaPalkia:
+        case SP_BDSP_Starter:
             return "BDSP";
         case SP_DelayCalibrator:
         case SP_BrightnessMeanFinder:

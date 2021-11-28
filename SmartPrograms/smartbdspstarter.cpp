@@ -1,21 +1,23 @@
-#include "smartbdspdialgapalkia.h"
+#include "smartbdspstarter.h"
 
-SmartBDSPDialgaPalkia::SmartBDSPDialgaPalkia
+SmartBDSPStarter::SmartBDSPStarter
 (
+    int starterIndex,
     SmartProgramParameter parameter
 )
     : SmartProgramBase(parameter)
+    , m_starterIndex(starterIndex)
 {
     init();
 }
 
-void SmartBDSPDialgaPalkia::init()
+void SmartBDSPStarter::init()
 {
     SmartProgramBase::init();
     inializeCommands(C_COUNT);
 }
 
-void SmartBDSPDialgaPalkia::reset()
+void SmartBDSPStarter::reset()
 {
     SmartProgramBase::reset();
 
@@ -24,7 +26,7 @@ void SmartBDSPDialgaPalkia::reset()
     m_noShinyTimer = 0.0;
 }
 
-void SmartBDSPDialgaPalkia::runNextState()
+void SmartBDSPStarter::runNextState()
 {
     State const state = getState();
     switch (m_substage)
@@ -35,7 +37,7 @@ void SmartBDSPDialgaPalkia::runNextState()
         setState_runCommand(C_Restart);
 
         m_parameters.vlcWrapper->clearCaptures();
-        m_parameters.vlcWrapper->setAreas({A_Battle, A_Pokemon});
+        m_parameters.vlcWrapper->setAreas({A_Battle, A_HP});
 
         if (m_parameters.settings->isStreamCounterEnabled())
         {
@@ -49,6 +51,32 @@ void SmartBDSPDialgaPalkia::runNextState()
         break;
     }
     case SS_Restart:
+    {
+        // Now pick the starter
+        if (state == S_CommandFinished)
+        {
+            m_substage = SS_Select;
+            switch (m_starterIndex)
+            {
+            case 1: setState_runCommand("LRight,1"); break;
+            case 2: setState_runCommand("LLeft,1"); break;
+            default: setState_runCommand("Nothing,1"); break;
+            }
+            emit printLog("Picking starter and starting battle...");
+        }
+        break;
+    }
+    case SS_Select:
+    {
+        // Confirm choosing starter
+        if (state == S_CommandFinished)
+        {
+            m_substage = SS_Choose;
+            setState_runCommand(C_Choose);
+        }
+        break;
+    }
+    case SS_Choose:
     {
         if (state == S_CommandFinished)
         {
@@ -71,7 +99,7 @@ void SmartBDSPDialgaPalkia::runNextState()
     {
         if (state == S_CaptureReady)
         {
-            if (checkBrightnessMeanTarget(A_Battle.m_rect, C_Color_Battle, 160) && checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Pokemon, 160))
+            if (checkBrightnessMeanTarget(A_Battle.m_rect, C_Color_Battle, 160) && checkBrightnessMeanTarget(A_HP.m_rect, C_Color_HP, 160))
             {
                 // increment counter
                 m_encounter++;

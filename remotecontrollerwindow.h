@@ -42,6 +42,7 @@
 #include "SmartPrograms/smartberryfarmer.h"
 #include "SmartPrograms/smartwattfarmer.h"
 #include "SmartPrograms/smartbdspdialgapalkia.h"
+#include "SmartPrograms/smartbdspstarter.h"
 
 namespace Ui {
 class RemoteControllerWindow;
