@@ -105,6 +105,10 @@ void SmartBDSPDialgaPalkia::runNextState()
                     }
                 }
             }
+            else if (m_elapsedTimer.elapsed() > m_noShinyTimer + 10000)
+            {
+                setState_error("Unable to detect battle UI for too long, the game might have crashed");
+            }
             else
             {
                 setState_frameAnalyzeRequest();
