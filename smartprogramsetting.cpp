@@ -14,6 +14,7 @@ SmartProgramSetting::SmartProgramSetting(QWidget *parent) :
 
     // System
     ui->CB_DateArrangement->setCurrentIndex(m_settings->value("DateArrangement", 0).toInt());
+    ui->CurrentDate->setDate(QDate::currentDate());
 
     // Sound
     m_defaultPlayer.setMedia(QUrl("qrc:/resources/Sounds/06-caught-a-pokemon.mp3"));
@@ -83,6 +84,8 @@ bool SmartProgramSetting::isSoundEnabled()
 
 void SmartProgramSetting::playSound()
 {
+    if (!isSoundEnabled()) return;
+
     // Stop sound
     if (m_customSound)
     {
@@ -116,6 +119,19 @@ void SmartProgramSetting::playSound()
 bool SmartProgramSetting::isStreamCounterEnabled()
 {
     return ui->GB_Stream->isChecked();
+}
+
+int SmartProgramSetting::getStreamCounterCount()
+{
+    return ui->SB_Count->value();
+}
+
+void SmartProgramSetting::setStreamCounterCount(int count)
+{
+    if (isStreamCounterEnabled())
+    {
+        ui->SB_Count->setValue(count);
+    }
 }
 
 bool SmartProgramSetting::isLogAutosave()
@@ -212,6 +228,29 @@ void SmartProgramSetting::on_PB_File_clicked()
     if (index == -1) index = file.lastIndexOf('/');
 
     ReadCounterFromText();
+}
+
+void SmartProgramSetting::on_SB_Count_valueChanged(int arg1)
+{
+    QString file = ui->LE_File->text();
+    if (file.isEmpty()) return;
+
+    QFile textFile(file);
+    if(!textFile.open(QIODevice::WriteOnly))
+    {
+        ui->LE_File->setText("");
+        return;
+    }
+
+    QString number = QString::number(arg1);
+    QTextStream textStream(&textFile);
+    textStream << ui->LE_Prefix->text() << number;
+    textFile.close();
+}
+
+void SmartProgramSetting::on_LE_Prefix_textEdited(const QString &arg1)
+{
+    on_SB_Count_valueChanged(ui->SB_Count->value());
 }
 
 void SmartProgramSetting::SetCustomSoundEnabled()

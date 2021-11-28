@@ -42,6 +42,8 @@ public:
 
     // Stream Counter
     bool isStreamCounterEnabled();
+    int getStreamCounterCount();
+    void setStreamCounterCount(int count);
 
     // Logging
     bool isLogAutosave();
@@ -61,6 +63,8 @@ private slots:
 
     // Stream Counter
     void on_PB_File_clicked();
+    void on_SB_Count_valueChanged(int arg1);
+    void on_LE_Prefix_textEdited(const QString &arg1);
 
 private:
     // Sound
