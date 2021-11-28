@@ -55,6 +55,8 @@ private slots:
     void on_CompileErrorReady();
     void on_CompileFinished();
 
+    void on_TW_Bots_currentChanged(int index);
+
     void on_DaySkipper_DateArrangement_currentIndexChanged(int index);
     void on_DaySkipper_DaysToSkip_valueChanged(int arg1);
     void on_DaySkipper_Date_dateChanged(const QDate &date);
@@ -143,7 +145,8 @@ private:
 
     enum Program : int
     {
-        P_DaySkipper,
+        // SwSh Programs
+        P_DaySkipper = 0,
         P_DaySkipper_Unlimited,
         P_WattFarmer,
         P_FriendDeleteAdd,
@@ -169,6 +172,10 @@ private:
         P_AutoBattleTower,
         P_AutoTournament,
         P_PurpleBeamFinder,
+
+        // BDSP Programs
+        P_BDSP_ResetDialgaPalkia,
+        P_BDSP_ResetStarter,
 
         P_INVALID
     };

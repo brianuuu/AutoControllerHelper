@@ -35,11 +35,14 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_programEnumMap["ShinySwordTrio"]          = P_ShinySwordTrio;
     m_programEnumMap["DailyHighlightFarmer"]    = P_DailyHighlightFarmer;
     m_programEnumMap["ShinyRegigigas"]          = P_ShinyRegigigas;
-    m_programEnumMap["RemoteControl"]           = P_RemoteControl;
-    m_programEnumMap["TurboA"]                  = P_TurboA;
+    m_programEnumMap["Others_RemoteControl"]    = P_RemoteControl;
+    m_programEnumMap["Others_TurboA"]           = P_TurboA;
     m_programEnumMap["AutoBattleTower"]         = P_AutoBattleTower;
     m_programEnumMap["AutoTournament"]          = P_AutoTournament;
     m_programEnumMap["PurpleBeamFinder"]        = P_PurpleBeamFinder;
+
+    m_programEnumMap["BDSP_ResetDialgaPalkia"]  = P_BDSP_ResetDialgaPalkia;
+    m_programEnumMap["BDSP_ResetStarter"]       = P_BDSP_ResetStarter;
 
     m_tabID[P_DaySkipper]           = 1;
     m_tabID[P_DaySkipper_Unlimited] = 2;
@@ -67,6 +70,9 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_tabID[P_AutoBattleTower]      = 0;
     m_tabID[P_AutoTournament]       = 0;
     m_tabID[P_PurpleBeamFinder]     = 0;
+
+    m_tabID[P_BDSP_ResetDialgaPalkia]   = 0;
+    m_tabID[P_BDSP_ResetStarter]        = 20;
 
     if (!QDir(HEX_PATH).exists())
     {
@@ -119,7 +125,7 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
             bool startWithAlphabet = (start >= 'a' && start <= 'z') || (start >= 'A' && start <= 'Z');
             if (program.contains(" ") || !startWithAlphabet)
             {
-                QString warning = "Bot \"" + program + "\" cannot contain spaces and must start with an alphabet, please change the folder and .c file name and restart this program.";
+                QString warning = "Bots \"" + program + "\" cannot contain spaces and must start with an alphabet, please change the folder and .c file name and restart this program.";
                 QMessageBox::warning(this, "Warning", warning, QMessageBox::Ok);
             }
             else
@@ -149,6 +155,13 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
 
     // Load previous settings
     m_settings = new QSettings("brianuuu", "AutoControllerHelper", this);
+
+    // Load bots for current game
+    ui->TW_Bots->blockSignals(true);
+    ui->TW_Bots->setCurrentIndex(m_settings->value("GameIndex", 0).toInt());
+    ui->TW_Bots->blockSignals(false);
+    on_TW_Bots_currentChanged(ui->TW_Bots->currentIndex());
+
     QString const savedProgram = m_settings->value("Bots", "DaySkipper").toString();
     for (int i = 0; i < ui->LW_Bots->count(); i++)
     {
@@ -186,6 +199,7 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
 //---------------------------------------------------------------------------
 autocontrollerwindow::~autocontrollerwindow()
 {
+    m_settings->setValue("GameIndex", ui->TW_Bots->currentIndex());
     if (ui->LW_Bots->currentRow() != -1)
     {
         m_settings->setValue("Bots", ui->LW_Bots->currentItem()->text());
@@ -236,7 +250,7 @@ void autocontrollerwindow::on_PB_Log_clicked()
 
 void autocontrollerwindow::on_PB_Unsync_clicked()
 {
-    QString str = "Pokemon Sword/Shield only allows one controller, to disconnect the current controller, ";
+    QString str = "Pokemon games only allows one controller, to disconnect the current controller, ";
     str += "press the sync button or unplug any wired controller, then plug the Arduino/Teensy to the Switch.";
     QMessageBox::information(this, "What is this?", str, QMessageBox::Ok);
 }
@@ -520,6 +534,40 @@ void autocontrollerwindow::on_CompileFinished()
     ui->PB_Log->setEnabled(true);
     ui->LW_Bots->setEnabled(true);
     ui->CB_MCU->setEnabled(true);
+}
+
+//---------------------------------------------------------------------------
+// Change game
+//---------------------------------------------------------------------------
+void autocontrollerwindow::on_TW_Bots_currentChanged(int index)
+{
+    for (int row = 0; row < ui->LW_Bots->count(); ++row)
+    {
+        QListWidgetItem* item = ui->LW_Bots->item(row);
+        if (item->text().startsWith("Others"))
+        {
+            item->setHidden(ui->TW_Bots->tabText(index) != "Others");
+        }
+        else if (item->text().startsWith("BDSP"))
+        {
+            item->setHidden(ui->TW_Bots->tabText(index) != "BDSP");
+        }
+        else
+        {
+            item->setHidden(index != 0);
+        }
+    }
+
+    // Force set to first bot in the list
+    for (int row = 0; row < ui->LW_Bots->count(); ++row)
+    {
+        QListWidgetItem const* item = ui->LW_Bots->item(row);
+        if (!item->isHidden())
+        {
+            ui->LW_Bots->setCurrentRow(row);
+            break;
+        }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -1483,7 +1531,32 @@ void autocontrollerwindow::LoadConfig()
         break;
     }
 
+    //--------------------------------------------------------
+    case P_BDSP_ResetDialgaPalkia:
+    {
+        break;
+    }
 
+    //--------------------------------------------------------
+    case P_BDSP_ResetStarter:
+    {
+        QTextStream in(&configFile);
+        while (!in.atEnd())
+        {
+            QString line = in.readLine();
+            if (line.indexOf("m_starter = ") != -1)
+            {
+                int m_starter = GetVariableString(line).toInt();
+                if (m_starter >= 0 && m_starter <= 2)
+                {
+                    ui->BDSPStarter_Type->setCurrentIndex(m_starter);
+                }
+            }
+        }
+        break;
+    }
+
+    //--------------------------------------------------------
     case P_INVALID:
     {
         if (configExist)
@@ -1722,6 +1795,12 @@ void autocontrollerwindow::SaveConfig()
         out << "bool m_shinyAware = " << (ui->ShinyRegigigas_Aware->isChecked() ? "true" : "false") << ";\n";
         out << "int m_leppaBerry = " << QString::number(ui->ShinyRegigigas_Berry->value()) << ";\n";
         out << "uint16_t m_battleWaitTicks = " << QString::number(ui->ShinyRegigigas_Time->value()) << ";\n";
+        break;
+    }
+
+    case P_BDSP_ResetStarter:
+    {
+        out << "uint8_t m_starter = " << QString::number(ui->BDSPStarter_Type->currentIndex()) << ";\n";
         break;
     }
 
@@ -2042,7 +2121,7 @@ void autocontrollerwindow::UpdateInfo()
         else
         {
             info += "\nKeep an eye or listen to shiny effects when the battle starts.";
-            info += "\nIf it is shiny unplug the board or take the Switch out from dock immediately!!";
+            info += "\nIf shiny is found unplug the board or take the Switch out from dock IMMEDIATELY!!";
             if (ui->ShinyRegi_Slow->isChecked())
             {
                 info += "\nSLOW MODE you are allowed to use any Pokemon.";
@@ -2071,7 +2150,7 @@ void autocontrollerwindow::UpdateInfo()
         else
         {
             info += "\nKeep an eye or listen to shiny effects when the battle starts.";
-            info += "\nIf it is shiny unplug the board or take the Switch out from dock immediately!!";
+            info += "\nIf shiny is found unplug the board or take the Switch out from dock IMMEDIATELY!!";
             if (ui->ShinySword_Slow->isChecked())
             {
                 info += "\n\nSLOW MODE you are allowed to use any Pokemon.";
@@ -2122,7 +2201,7 @@ void autocontrollerwindow::UpdateInfo()
         {
             info = "Time per encounter: " + GetTimeString(name + "0", 0);
             info += "\nKeep an eye on Regigigas's color (blue) when the battle starts.";
-            info += "\nIf it is shiny unplug the board or take the Switch out from dock immediately!!";
+            info += "\nIf shiny is found unplug the board or take the Switch out from dock IMMEDIATELY!!";
         }
         info += "\n\nContributed by: Yeray Arroyo";
         break;
@@ -2135,6 +2214,24 @@ void autocontrollerwindow::UpdateInfo()
         info += "\nYou are REQUIRED to also have CP2014 chip and a capture card for this.";
         info += "\nYou can also use this to run Smart Programs without recompiling.";
         info += "\nFor more details, please read Remote Control section of the manual.";
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_BDSP_ResetDialgaPalkia:
+    {
+        info = "Time per soft-reset: " + GetTimeString(name, 0);
+        info += "\nThis program DOES NOT stop by itself, you MUST keep an eye on encounters.";
+        info += "\nIf shiny is found unplug the board or take the Switch out from dock IMMEDIATELY!!";
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_BDSP_ResetStarter:
+    {
+        info = "Time per soft-reset: " + GetTimeString(name, 0);
+        info += "\nThis program DOES NOT stop by itself, you MUST keep an eye on encounters.";
+        info += "\nIf shiny is found unplug the board or take the Switch out from dock IMMEDIATELY!!";
         break;
     }
 
