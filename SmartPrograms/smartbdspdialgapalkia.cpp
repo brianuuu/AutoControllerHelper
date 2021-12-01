@@ -98,6 +98,9 @@ void SmartBDSPDialgaPalkia::runNextState()
                     }
                     else
                     {
+                        // update timer in case delay has shifted
+                        m_noShinyTimer = elapsed;
+
                         // reset
                         m_substage = SS_Restart;
                         setState_runCommand(C_Restart);
