@@ -201,6 +201,7 @@ private:
     // Serials
     QSerialPort m_serialPort;
     QTimer m_readTimer;
+    qint64 m_readTickCount;
     enum SerialState
     {
         SS_Disconnect,

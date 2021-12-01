@@ -9,6 +9,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     connect(&m_serialPort, &QSerialPort::readyRead, this, &RemoteControllerWindow::on_SerialPort_readyRead);
     connect(&m_serialPort, &QSerialPort::errorOccurred, this, &RemoteControllerWindow::on_SerialPort_errorOccurred);
     connect(&m_readTimer, &QTimer::timeout, this, &RemoteControllerWindow::on_ReadTimer_timeout);
+    m_readTickCount = 0;
 
     m_serialState = SS_Disconnect;
 
@@ -381,6 +382,9 @@ void RemoteControllerWindow::DisplayNextCommand()
                 PrintLog("Executing command: [" + command.first + "," + QString::number(command.second) + "]");
             }
         }
+
+        // For detecting disconnection (tick = 48.05, but we bump it up to 60)
+        m_readTickCount = m_executeCommands.front().second * 60;
     }
     m_commandMutex->unlock();
 
@@ -490,6 +494,16 @@ void RemoteControllerWindow::on_SerialPort_errorOccurred(QSerialPort::SerialPort
 void RemoteControllerWindow::on_ReadTimer_timeout()
 {
     m_serialPort.waitForReadyRead(1);
+
+    if (m_readTickCount > 0)
+    {
+        m_readTickCount--;
+        if (m_readTickCount == 0 && !m_executeCommands.isEmpty())
+        {
+            PrintLog("Unable to receive command completion feedback, Arduino/Teensy might have fully/briefly disconnected from the Switch", LOG_ERROR);
+            SerialDisconnect();
+        }
+    }
 }
 
 //---------------------------------------------------------------------------
