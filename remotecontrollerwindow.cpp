@@ -2014,6 +2014,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     {
         ui->PB_StartSmartProgram->setText("Stop");
         ui->PB_SmartSettings->setEnabled(false);
+        ui->TW_SmartProgram->setEnabled(false);
         ui->LW_SmartProgram->setEnabled(false);
         ui->PB_ReloadSmartCommands->setEnabled(false);
 
@@ -2053,6 +2054,7 @@ void RemoteControllerWindow::StopSmartProgram()
 
     ui->PB_StartSmartProgram->setText("Start");
     ui->PB_SmartSettings->setEnabled(true);
+    ui->TW_SmartProgram->setEnabled(true);
     ui->LW_SmartProgram->setEnabled(true);
     ui->PB_ReloadSmartCommands->setEnabled(true);
 

@@ -1706,7 +1706,7 @@
                   <item>
                    <widget class="QLabel" name="label_25">
                     <property name="text">
-                     <string>No setting available for current Smart Program</string>
+                     <string>No settings available for the current Smart Program</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
@@ -1755,8 +1755,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>317</height>
+                   <width>322</width>
+                   <height>190</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -2441,8 +2441,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>317</height>
+                   <width>405</width>
+                   <height>158</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -2594,8 +2594,8 @@ check the manual</string>
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>317</height>
+                   <width>318</width>
+                   <height>56</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_19">
