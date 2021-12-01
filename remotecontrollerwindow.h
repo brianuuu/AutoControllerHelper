@@ -161,6 +161,7 @@ private:
     bool ValidateCommand(QString const& commands, QString& errorMsg);
     bool SendCommand(QString const& commands);
     void SaveLog(QString const name = "Log");
+    void UpdateLogStat();
 
     // Camera
     void CameraToggle(bool on);
@@ -176,6 +177,11 @@ private:
     Ui::RemoteControllerWindow *ui;
     QSettings *m_settings;
     bool m_pauseKeyEventFilter;
+
+    // Logging
+    int m_successCount;
+    int m_warningCount;
+    int m_errorCount;
 
     // Buttons
     typedef uint32_t ButtonFlag;

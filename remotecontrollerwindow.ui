@@ -1274,6 +1274,16 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_10">
            <item>
+            <widget class="QLabel" name="L_LogStat">
+             <property name="text">
+              <string>&lt;font color=&quot;#FF00AA00&quot;&gt;Success: 0&lt;/font&gt;&amp;nbsp;&amp;nbsp;&lt;font color=&quot;#FFFF7800&quot;&gt;Warning: 0&lt;/font&gt;&amp;nbsp;&amp;nbsp;&lt;font color=&quot;#FFFF0000&quot;&gt;Error: 0&lt;/font&gt;</string>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::RichText</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
             <spacer name="horizontalSpacer">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -1698,8 +1708,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>317</height>
+                   <width>240</width>
+                   <height>25</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_20">

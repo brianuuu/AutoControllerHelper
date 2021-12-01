@@ -140,6 +140,11 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     validCommands.sort();
     ui->LE_CommandSender->InitCompleter(validCommands);
 
+    // Logging
+    m_successCount = 0;
+    m_warningCount = 0;
+    m_errorCount = 0;
+
     // Buttons
     on_PB_MapDefault_clicked();
     m_buttonFlag = 0;
@@ -401,6 +406,11 @@ void RemoteControllerWindow::PrintLog(const QString &log, QColor color)
     QString str = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + "&nbsp;&nbsp;&nbsp;&nbsp;" + log;
     str = "<font color=\"#FF" + r + g + b + "\">" + str + "</font>";
     ui->TB_Log->append(str);
+
+    if (color == LOG_SUCCESS) m_successCount++;
+    if (color == LOG_WARNING) m_warningCount++;
+    if (color == LOG_ERROR) m_errorCount++;
+    UpdateLogStat();
 }
 
 void RemoteControllerWindow::UpdateStatus(QString status, QColor color)
@@ -1084,6 +1094,11 @@ void RemoteControllerWindow::on_PB_SaveLog_clicked()
 void RemoteControllerWindow::on_PB_ClearLog_clicked()
 {
     ui->TB_Log->clear();
+
+    m_successCount = 0;
+    m_warningCount = 0;
+    m_errorCount = 0;
+    UpdateLogStat();
 }
 
 bool RemoteControllerWindow::ValidateCommand(const QString &commands, QString &errorMsg)
@@ -1327,6 +1342,14 @@ void RemoteControllerWindow::SaveLog(const QString name)
 
         PrintLog("Log file saved: " + nameWithTime);
     }
+}
+
+void RemoteControllerWindow::UpdateLogStat()
+{
+    QString stat = "<font color=\"#FF00AA00\">Success: " + QString::number(m_successCount) + "</font>";
+    stat += "&nbsp;&nbsp;<font color=\"#FFFF7800\">Warning: " + QString::number(m_warningCount) + "</font>";
+    stat += "&nbsp;&nbsp;<font color=\"#FFFF0000\">Error: " + QString::number(m_errorCount) + "</font>";
+    ui->L_LogStat->setText(stat);
 }
 
 //---------------------------------------------------------------------------
@@ -2021,7 +2044,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     // Clear log
     if (m_smartSetting->isLogAutosave())
     {
-        ui->TB_Log->clear();
+        on_PB_ClearLog_clicked();
     }
 
     if (m_smartProgram->run())
