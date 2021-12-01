@@ -138,7 +138,9 @@ void SmartBDSPStarter::runNextState()
             }
             else if (m_noShinyTimer > 0.0 && m_elapsedTimer.elapsed() > m_noShinyTimer + 10000)
             {
-                setState_error("Unable to detect battle UI for too long, the game might have crashed");
+                emit printLog("Unable to detect battle UI for too long, restarting sequence...", LOG_ERROR);
+                m_substage = SS_Restart;
+                setState_runCommand(C_Restart);
             }
             else
             {
