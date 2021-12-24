@@ -89,7 +89,7 @@ void SmartBDSPDialgaPalkia::runNextState()
                 else
                 {
                     double elapsed = m_elapsedTimer.elapsed();
-                    if (elapsed > m_noShinyTimer + 1000)
+                    if (elapsed > m_noShinyTimer + 2000)
                     {
                         // shiny found!
                         m_substage = SS_Finish;
