@@ -370,9 +370,9 @@ void autocontrollerwindow::on_NetworkManager_Finished(QNetworkReply *reply)
     if (reply->error())
     {
         QString errorDebug;
-        errorDebug += "\nBuild Ver: " + QSslSocket::sslLibraryBuildVersionString();
-        errorDebug += QString("\nOpenSSL Suported: ") + (QSslSocket::supportsSsl() ? "true" : "false");
-        errorDebug += "\nRuntime Ver: " + QSslSocket::sslLibraryVersionString();
+        //errorDebug += "\nBuild Ver: " + QSslSocket::sslLibraryBuildVersionString();
+        //errorDebug += QString("\nOpenSSL Suported: ") + (QSslSocket::supportsSsl() ? "true" : "false");
+        //errorDebug += "\nRuntime Ver: " + QSslSocket::sslLibraryVersionString();
 
         QString message = "Update check failed: " + reply->errorString() + errorDebug;
         message += "\n\nDo you want to check download page for newest version?";
@@ -385,7 +385,7 @@ void autocontrollerwindow::on_NetworkManager_Finished(QNetworkReply *reply)
             QDesktopServices::openUrl(QUrl(link));
         }
 
-        ui->L_Update->setText("Update check failed.");
+        ui->L_Update->setText("<html><head/><body><p>Update check failed: <a href=\"" + link + "\"><span style=\" text-decoration: underline; color:#0000ff;\">Download Page</span></a>!</p></body></html>");
         return;
     }
 
