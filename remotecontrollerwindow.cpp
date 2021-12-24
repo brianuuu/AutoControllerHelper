@@ -413,6 +413,28 @@ void RemoteControllerWindow::PrintLog(const QString &log, QColor color)
     UpdateLogStat();
 }
 
+void RemoteControllerWindow::SaveLog(const QString name)
+{
+    QString nameWithTime = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") + "_" + name + ".log";
+    QFile file(LOG_PATH + nameWithTime);
+    if(file.open(QIODevice::WriteOnly))
+    {
+        QTextStream stream(&file);
+        stream << ui->TB_Log->toPlainText();
+        file.close();
+
+        PrintLog("Log file saved: " + nameWithTime);
+    }
+}
+
+void RemoteControllerWindow::UpdateLogStat()
+{
+    QString stat = "<font color=\"#FF00AA00\">Success: " + QString::number(m_successCount) + "</font>";
+    stat += "&nbsp;&nbsp;<font color=\"#FFFF7800\">Warning: " + QString::number(m_warningCount) + "</font>";
+    stat += "&nbsp;&nbsp;<font color=\"#FFFF0000\">Error: " + QString::number(m_errorCount) + "</font>";
+    ui->L_LogStat->setText(stat);
+}
+
 void RemoteControllerWindow::UpdateStatus(QString status, QColor color)
 {
     ui->L_Status->setText("Status: " + status);
@@ -1330,28 +1352,6 @@ bool RemoteControllerWindow::SendCommand(const QString &commands)
     return true;
 }
 
-void RemoteControllerWindow::SaveLog(const QString name)
-{
-    QString nameWithTime = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") + "_" + name + ".log";
-    QFile file(LOG_PATH + nameWithTime);
-    if(file.open(QIODevice::WriteOnly))
-    {
-        QTextStream stream(&file);
-        stream << ui->TB_Log->toPlainText();
-        file.close();
-
-        PrintLog("Log file saved: " + nameWithTime);
-    }
-}
-
-void RemoteControllerWindow::UpdateLogStat()
-{
-    QString stat = "<font color=\"#FF00AA00\">Success: " + QString::number(m_successCount) + "</font>";
-    stat += "&nbsp;&nbsp;<font color=\"#FFFF7800\">Warning: " + QString::number(m_warningCount) + "</font>";
-    stat += "&nbsp;&nbsp;<font color=\"#FFFF0000\">Error: " + QString::number(m_errorCount) + "</font>";
-    ui->L_LogStat->setText(stat);
-}
-
 //---------------------------------------------------------------------------
 // Camera slots
 //---------------------------------------------------------------------------
@@ -1642,6 +1642,23 @@ void RemoteControllerWindow::on_SmartProgram_printLog(const QString log, QColor 
     if (!CanRunSmartProgram()) return;
 
     PrintLog("[" + m_smartProgram->getProgramName() + "]: " + log, color);
+
+    QString const logFileName = m_smartProgram->getLogFileName();
+    if (!logFileName.isEmpty())
+    {
+        QFile file(LOG_PATH + logFileName);
+        if(file.open(QIODevice::Append))
+        {
+            QTextStream stream(&file);
+
+            if (color == LOG_SUCCESS) stream << "[SUCCESS] ";
+            if (color == LOG_WARNING) stream << "[WARNING] ";
+            if (color == LOG_ERROR) stream << "[ERROR] ";
+            stream << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss - ") + log + "\n";
+
+            file.close();
+        }
+    }
 }
 
 void RemoteControllerWindow::on_SmartProgram_completed()
@@ -1654,8 +1671,12 @@ void RemoteControllerWindow::on_SmartProgram_completed()
     default: break;
     }
 
-    // Save log
-    SaveLog(m_smartProgram->getProgramInternalName());
+    // Tell user where log file has been saved
+    QString const logFileName = m_smartProgram->getLogFileName();
+    if (!logFileName.isEmpty())
+    {
+        PrintLog("Log file saved: " + logFileName);
+    }
 
     delete m_smartProgram;
     m_smartProgram = Q_NULLPTR;

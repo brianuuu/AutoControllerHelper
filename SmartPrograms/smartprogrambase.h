@@ -207,6 +207,7 @@ public:
     virtual SmartProgram getProgramEnum() = 0;
     QString getProgramName() { return getProgramNameFromEnum(getProgramEnum()); }
     QString getProgramInternalName() { return getProgramInternalNameFromEnum(getProgramEnum()); }
+    QString getLogFileName() { return m_logFileName; }
 
 signals:
     void printLog(QString const log, QColor color = QColor(0,0,0));
@@ -295,6 +296,7 @@ protected:
     QString m_screenshotName;
 
 private:
+    QString m_logFileName;
     QString m_errorMsg;
     State m_state;
     bool m_runNextState;

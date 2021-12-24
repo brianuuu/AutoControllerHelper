@@ -13,6 +13,8 @@ bool SmartProgramBase::run()
 {
     if (m_state == S_NotStarted)
     {
+        m_logFileName = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") + "_" + getProgramInternalName() + ".log";
+
         emit printLog("-----------Started-----------");
         m_runNextState = true;
         m_runStateTimer.start();
@@ -83,6 +85,7 @@ void SmartProgramBase::init()
 {
     reset();
 
+    m_logFileName.clear();
     m_errorMsg = "An error has occured";
     m_commands.clear();
 

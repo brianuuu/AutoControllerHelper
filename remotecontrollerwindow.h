@@ -140,6 +140,8 @@ private slots:
 private:
     // Others
     void PrintLog(QString const& log, QColor color = QColor(0,0,0));
+    void SaveLog(QString const name = "Log");
+    void UpdateLogStat();
     void UpdateStatus(QString status, QColor color = QColor(0,0,0));
 
     // Serial
@@ -160,8 +162,6 @@ private:
     // Command sender
     bool ValidateCommand(QString const& commands, QString& errorMsg);
     bool SendCommand(QString const& commands);
-    void SaveLog(QString const name = "Log");
-    void UpdateLogStat();
 
     // Camera
     void CameraToggle(bool on);
