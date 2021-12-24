@@ -134,25 +134,73 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="PB_Manual">
+        <property name="minimumSize">
+         <size>
+          <width>110</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Open Manual</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_26">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto Controller Playlist: &lt;a href=&quot;https://www.youtube.com/playlist?list=PLrAfKLfOSiGFv6wjohlEXQqYjEIoBOkfX&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Click Here&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::TextBrowserInteraction</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_37">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;GitHub Repro: &lt;a href=&quot;https://github.com/brianuuu/AutoController_swsh&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;AutoController_swsh&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::TextBrowserInteraction</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_38">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Discord Link: &lt;a href=&quot;https://discord.gg/GWEurpGZNM&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Click Here&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::TextBrowserInteraction</set>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_38">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_28">
-        <item>
-         <widget class="QLabel" name="label_26">
-          <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto Controller Video Tutorial Playlist: &lt;a href=&quot;https://www.youtube.com/playlist?list=PLrAfKLfOSiGFv6wjohlEXQqYjEIoBOkfX&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Click Here&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="openExternalLinks">
-           <bool>true</bool>
-          </property>
-          <property name="textInteractionFlags">
-           <set>Qt::TextBrowserInteraction</set>
-          </property>
-         </widget>
-        </item>
         <item>
          <spacer name="horizontalSpacer_35">
           <property name="orientation">
@@ -257,7 +305,7 @@
           <item>
            <widget class="QStackedWidget" name="SW_Settings">
             <property name="currentIndex">
-             <number>20</number>
+             <number>19</number>
             </property>
             <widget class="QWidget" name="page">
              <layout class="QHBoxLayout" name="horizontalLayout_10">
@@ -2798,7 +2846,7 @@
                  </size>
                 </property>
                 <property name="text">
-                 <string>Launch RemoteController Tool</string>
+                 <string>Launch Smart Program Manager</string>
                 </property>
                </widget>
               </item>
@@ -2934,19 +2982,6 @@
                   </spacer>
                  </item>
                 </layout>
-               </item>
-               <item>
-                <widget class="QPushButton" name="PB_Manual">
-                 <property name="minimumSize">
-                  <size>
-                   <width>110</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Open Manual &amp;&amp; Check Detail Instructions</string>
-                 </property>
-                </widget>
                </item>
               </layout>
              </item>
