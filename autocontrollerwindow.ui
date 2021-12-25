@@ -150,7 +150,7 @@
       <item>
        <widget class="QLabel" name="label_26">
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto Controller Playlist: &lt;a href=&quot;https://www.youtube.com/playlist?list=PLrAfKLfOSiGFv6wjohlEXQqYjEIoBOkfX&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Click Here&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://www.youtube.com/playlist?list=PLrAfKLfOSiGFv6wjohlEXQqYjEIoBOkfX&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Auto Controller Youtube Playlist&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="textFormat">
          <enum>Qt::RichText</enum>
@@ -166,7 +166,7 @@
       <item>
        <widget class="QLabel" name="label_37">
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;GitHub Repro: &lt;a href=&quot;https://github.com/brianuuu/AutoController_swsh&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;AutoController_swsh&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/brianuuu/AutoController_swsh&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;AutoController_swsh GitHub Link&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="textFormat">
          <enum>Qt::RichText</enum>
@@ -180,9 +180,22 @@
        </widget>
       </item>
       <item>
+       <widget class="QLabel" name="label_39">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/brianuuu/AutoControllerHelper&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;AutoControllerHelper GitHub Link&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::TextBrowserInteraction</set>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="label_38">
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Discord Link: &lt;a href=&quot;https://discord.gg/GWEurpGZNM&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Click Here&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://discord.gg/GWEurpGZNM&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Discord Server Link (Support)&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="textFormat">
          <enum>Qt::RichText</enum>
@@ -266,7 +279,7 @@
           </item>
           <item>
            <property name="text">
-            <string>atmega32u4 (Arduino Micro/Teensy 2.0)</string>
+            <string>atmega32u4 (Arduino Micro/Leonardo &amp; Teensy 2.0)</string>
            </property>
           </item>
           <item>
