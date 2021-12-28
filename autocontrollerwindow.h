@@ -166,7 +166,7 @@ private:
         P_ShinySwordTrio,
         P_DailyHighlightFarmer,
         P_ShinyRegigigas,
-        P_RemoteControl,
+        P_SmartProgram,
 
         P_TurboA,
         P_AutoBattleTower,

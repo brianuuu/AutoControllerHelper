@@ -35,7 +35,7 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_programEnumMap["ShinySwordTrio"]          = P_ShinySwordTrio;
     m_programEnumMap["DailyHighlightFarmer"]    = P_DailyHighlightFarmer;
     m_programEnumMap["ShinyRegigigas"]          = P_ShinyRegigigas;
-    m_programEnumMap["Others_RemoteControl"]    = P_RemoteControl;
+    m_programEnumMap["Others_SmartProgram"]     = P_SmartProgram;
     m_programEnumMap["Others_TurboA"]           = P_TurboA;
     m_programEnumMap["AutoBattleTower"]         = P_AutoBattleTower;
     m_programEnumMap["AutoTournament"]          = P_AutoTournament;
@@ -64,7 +64,7 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_tabID[P_ShinySwordTrio]       = 16;
     m_tabID[P_DailyHighlightFarmer] = 17;
     m_tabID[P_ShinyRegigigas]       = 18;
-    m_tabID[P_RemoteControl]        = 19;
+    m_tabID[P_SmartProgram]         = 19;
 
     m_tabID[P_TurboA]               = 0;
     m_tabID[P_AutoBattleTower]      = 0;
@@ -1525,7 +1525,7 @@ void autocontrollerwindow::LoadConfig()
     }
 
     //--------------------------------------------------------
-    case P_RemoteControl:
+    case P_SmartProgram:
     {
         // TODO:
         break;
@@ -1820,7 +1820,7 @@ void autocontrollerwindow::UpdateInstruction()
 
     // Save and delete all current checklists
     QLayout* vBox = ui->VL_Checklist->layout();
-    while (vBox->count() > 2)
+    while (vBox->count() > 1)
     {
         delete vBox->takeAt(0)->widget();
     }
@@ -2208,12 +2208,12 @@ void autocontrollerwindow::UpdateInfo()
     }
 
     //--------------------------------------------------------
-    case P_RemoteControl:
+    case P_SmartProgram:
     {
         info = "This is an advanced program that allows you to control the game on PC.";
         info += "\nYou are REQUIRED to also have CP2014 chip and a capture card for this.";
         info += "\nYou can also use this to run Smart Programs without recompiling.";
-        info += "\nFor more details, please read Remote Control section of the manual.";
+        info += "\nFor more details, please read Smart Program section of the manual.";
         break;
     }
 
