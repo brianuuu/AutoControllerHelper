@@ -13,7 +13,10 @@ bool SmartProgramBase::run()
 {
     if (m_state == S_NotStarted)
     {
-        m_logFileName = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") + "_" + getProgramInternalName() + ".log";
+        if (m_parameters.settings->isLogAutosave())
+        {
+            m_logFileName = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") + "_" + getProgramInternalName() + ".log";
+        }
 
         emit printLog("-----------Started-----------");
         m_runNextState = true;

@@ -634,8 +634,8 @@ void RemoteControllerWindow::SerialConnectComplete()
     else
     {
         QString msg = "Failed to receive feedback from Arduino/Teensy, make sure you have done the following:";
-        msg += "\n1. Installed RemoteControl.hex to the board";
-        msg += "\n2. Have correct wire connection between board and CP210X chip";
+        msg += "\n1. Installed SmartProgram.hex to the board";
+        msg += "\n2. Have correct wire connections between board and CP210x chip";
         msg += "\n3. Board connect to Switch after disconnecting other controllers";
         msg += "\nFor more information please read the manual.";
         QMessageBox::critical(this, "Error", msg, QMessageBox::Ok);
@@ -2063,10 +2063,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     connect(this, &RemoteControllerWindow::commandFinished, m_smartProgram, &SmartProgramBase::commandFinished);
 
     // Clear log
-    if (m_smartSetting->isLogAutosave())
-    {
-        on_PB_ClearLog_clicked();
-    }
+    on_PB_ClearLog_clicked();
 
     if (m_smartProgram->run())
     {
