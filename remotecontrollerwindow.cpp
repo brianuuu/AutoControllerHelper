@@ -1168,7 +1168,7 @@ bool RemoteControllerWindow::ValidateCommand(const QString &commands, QString &e
                 int duration = str.toInt(&durationValid);
                 if (!durationValid)
                 {
-                    errorMsg = "Duration is not a number";
+                    errorMsg = "Duration is not an integer";
                     valid = false;
                     break;
                 }
@@ -1884,7 +1884,7 @@ void RemoteControllerWindow::LoadSmartProgramCommands()
 #if DEBUG_ENABLED
         "../AutoControllerHelper/Database/SmartCommands.xml"
 #else
-        QString(BOT_PATH) + "RemoteControl/SmartCommands.xml"
+        QString(BOT_PATH) + "Others_SmartProgram/SmartCommands.xml"
 #endif
     );
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
