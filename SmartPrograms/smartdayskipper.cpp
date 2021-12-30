@@ -181,7 +181,9 @@ void SmartDaySkipper::runSyncTime()
     bool is1159 = is1159PM();
     if (is1159)
     {
-        emit printLog("Current time is 11:59PM, waiting it turns 12:00AM to prevent accidental skip");
+        emit printLog("Current time is 11:59PM, waiting it turns 12:00AM for a natural skip");
+        m_skipsLeft--;
+        m_skippedDays++;
     }
 
     setState_runCommand(is1159 ? C_SyncTimeWait : C_SyncTime);

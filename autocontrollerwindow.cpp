@@ -375,7 +375,7 @@ void autocontrollerwindow::on_NetworkManager_Finished(QNetworkReply *reply)
         //errorDebug += "\nRuntime Ver: " + QSslSocket::sslLibraryVersionString();
 
         QString message = "Update check failed: " + reply->errorString() + errorDebug;
-        message += "\n\nDo you want to check download page for newest version?";
+        message += "\nDo you want to check download page for newest version?";
 
         QMessageBox::StandardButton resBtn = QMessageBox::Yes;
         resBtn = QMessageBox::question(this, "Error", message, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
