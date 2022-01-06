@@ -260,7 +260,7 @@ void SmartProgramSetting::on_LE_Prefix_textEdited(const QString &arg1)
     on_SB_Count_valueChanged(ui->SB_Count->value());
 }
 
-void SmartProgramSetting::on_CB_BypassFeedback_toggled(bool checked)
+void SmartProgramSetting::on_CB_BypassFeedback_clicked(bool checked)
 {
     if (checked)
     {

@@ -68,7 +68,7 @@ private slots:
     void on_LE_Prefix_textEdited(const QString &arg1);
 
     // Others
-    void on_CB_BypassFeedback_toggled(bool checked);
+    void on_CB_BypassFeedback_clicked(bool checked);
 
 private:
     // Sound
