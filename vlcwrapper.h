@@ -123,7 +123,7 @@ private:
     QImage m_frame;
     QTimer m_timer;
     VLCState m_state;
-    QSlider* m_volumnSlider;
+    QSlider* m_volumeSlider;
     QLabel* m_videoWidget;
 
     bool m_defaultAreaEnable;

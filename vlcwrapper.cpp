@@ -34,7 +34,7 @@ static void display(void *opaque, void *picture)
 
 VLCWrapper::VLCWrapper(QLabel* videoWidget, QSlider* volumeSlider, QWidget *parent)
     : QWidget(parent)
-    , m_volumnSlider(volumeSlider)
+    , m_volumeSlider(volumeSlider)
     , m_videoWidget(videoWidget)
 {
     const char* const vlc_args[] = {
@@ -215,6 +215,8 @@ void VLCWrapper::timeout()
 
 void VLCWrapper::setVolume(int volume)
 {
-    libvlc_audio_set_volume(m_mediaPlayer, volume);
+    if (m_isStarted)
+    {
+        libvlc_audio_set_volume(m_mediaPlayer, volume);
+    }
 }
-

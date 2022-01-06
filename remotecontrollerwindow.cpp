@@ -1732,7 +1732,7 @@ void RemoteControllerWindow::on_PB_StartSmartProgram_clicked()
 
     if (border)
     {
-        QMessageBox::critical(this, "Error", "Black border detected, please goto Settings->TV Settings->Adjust Screen Size and set to 100%.");
+        QMessageBox::critical(this, "Error", "Black border detected, please go to Switch Settings->TV Settings->Adjust Screen Size and set to 100%.");
         return;
     }
 

@@ -264,7 +264,7 @@ void SmartProgramSetting::on_CB_BypassFeedback_clicked(bool checked)
 {
     if (checked)
     {
-        QMessageBox::warning(this, "Warning", "Enabling this will unable to detect serial disconnection while commands are running, only enable this if it is false disconnecting!", QMessageBox::Ok);
+        QMessageBox::warning(this, "Warning", "Enabling this will prevent Smart Program Manager from detecting if the serial disconnects while commands are running. Only enable this if your controller is false disconnecting!", QMessageBox::Ok);
     }
 }
 
