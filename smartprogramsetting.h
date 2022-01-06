@@ -45,10 +45,11 @@ public:
     int getStreamCounterCount();
     void setStreamCounterCount(int count);
 
-    // Logging
+    // Others
     bool isLogAutosave();
     bool isLogDebugCommand();
     bool isLogDebugColor();
+    bool isBypassFeedback();
 
 private slots:
     // System
@@ -65,6 +66,9 @@ private slots:
     void on_PB_File_clicked();
     void on_SB_Count_valueChanged(int arg1);
     void on_LE_Prefix_textEdited(const QString &arg1);
+
+    // Others
+    void on_CB_BypassFeedback_toggled(bool checked);
 
 private:
     // Sound

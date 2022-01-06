@@ -37,8 +37,9 @@ SmartProgramSetting::SmartProgramSetting(QWidget *parent) :
     ui->LE_File->setText(m_settings->value("TextFileDirectory", QString()).toString());
     ReadCounterFromText();
 
-    // Logging
+    // Others
     ui->CB_LogSave->setChecked(m_settings->value("LogAutosave", true).toBool());
+    ui->CB_BypassFeedback->setChecked(m_settings->value("BypassFeedback", false).toBool());
 }
 
 SmartProgramSetting::~SmartProgramSetting()
@@ -68,8 +69,9 @@ void SmartProgramSetting::closeEvent(QCloseEvent *event)
     m_settings->setValue("TextFilePrefix", ui->LE_Prefix->text());
     m_settings->setValue("TextFileDirectory", ui->LE_File->text());
 
-    // Logging
+    // Others
     m_settings->setValue("LogAutosave", ui->CB_LogSave->isChecked());
+    m_settings->setValue("BypassFeedback", ui->CB_BypassFeedback->isChecked());
 }
 
 DateArrangement SmartProgramSetting::getDateArrangement()
@@ -147,6 +149,11 @@ bool SmartProgramSetting::isLogDebugCommand()
 bool SmartProgramSetting::isLogDebugColor()
 {
     return ui->CB_LogDebugColor->isChecked();
+}
+
+bool SmartProgramSetting::isBypassFeedback()
+{
+    return ui->CB_BypassFeedback->isChecked();
 }
 
 void SmartProgramSetting::on_CB_DateArrangement_currentIndexChanged(int index)
@@ -251,6 +258,14 @@ void SmartProgramSetting::on_SB_Count_valueChanged(int arg1)
 void SmartProgramSetting::on_LE_Prefix_textEdited(const QString &arg1)
 {
     on_SB_Count_valueChanged(ui->SB_Count->value());
+}
+
+void SmartProgramSetting::on_CB_BypassFeedback_toggled(bool checked)
+{
+    if (checked)
+    {
+        QMessageBox::warning(this, "Warning", "Enabling this will unable to detect serial disconnection while commands are running, only enable this if it is false disconnecting!", QMessageBox::Ok);
+    }
 }
 
 void SmartProgramSetting::SetCustomSoundEnabled()

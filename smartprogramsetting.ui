@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>485</width>
-    <height>516</height>
+    <width>486</width>
+    <height>507</height>
    </rect>
   </property>
   <property name="font">
@@ -348,7 +348,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Logging</string>
+      <string>Others</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
       <item>
@@ -372,6 +372,13 @@
        <widget class="QCheckBox" name="CB_LogDebugColor">
         <property name="text">
          <string>DEBUG: Show color matching tests</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="CB_BypassFeedback">
+        <property name="text">
+         <string>Bypass command feedback checking</string>
         </property>
        </widget>
       </item>

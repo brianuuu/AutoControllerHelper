@@ -527,7 +527,7 @@ void RemoteControllerWindow::on_ReadTimer_timeout()
 {
     m_serialPort.waitForReadyRead(1);
 
-    if (m_readTickCount > 0)
+    if (!m_smartSetting->isBypassFeedback() && m_readTickCount > 0)
     {
         m_readTickCount--;
         if (m_readTickCount == 0 && !m_executeCommands.isEmpty())
