@@ -42,6 +42,7 @@ SOURCES += \
     SmartPrograms/smartsurprisetrade.cpp \
     SmartPrograms/smartycommglitch.cpp \
     smartprogramsetting.cpp \
+    videoeffectsetting.cpp \
     vlcwrapper.cpp
 
 HEADERS += \
@@ -66,12 +67,14 @@ HEADERS += \
     SmartPrograms/smartsurprisetrade.h \
     SmartPrograms/smartycommglitch.h \
     smartprogramsetting.h \
+    videoeffectsetting.h \
     vlcwrapper.h
 
 FORMS += \
     autocontrollerwindow.ui \
     remotecontrollerwindow.ui \
-    smartprogramsetting.ui
+    smartprogramsetting.ui \
+    videoeffectsetting.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

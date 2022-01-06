@@ -27,6 +27,7 @@
 #include "pushbuttonmapping.h"
 
 #include "vlcwrapper.h"
+#include "videoeffectsetting.h"
 #include "smartprogramsetting.h"
 #include "SmartPrograms/smartprogrambase.h"
 #include "SmartPrograms/smartdelaycalibrator.h"
@@ -115,6 +116,7 @@ private slots:
     void on_PB_RefreshCamera_clicked();
     void on_PB_StartCamera_clicked();
     void on_PB_Screenshot_clicked();
+    void on_PB_AdjustVideo_clicked();
     void on_VLCState_changed(VLCWrapper::VLCState state);
 
     // Smart program
@@ -229,6 +231,7 @@ private:
     QDomDocument m_smartProgramCommands;
     SmartProgramBase* m_smartProgram = Q_NULLPTR;
     SmartProgramSetting* m_smartSetting = Q_NULLPTR;
+    VideoEffectSetting* m_videoEffectSetting = Q_NULLPTR;
 
     // Smart program
     void LoadSmartProgramCommands();

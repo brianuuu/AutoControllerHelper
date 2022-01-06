@@ -163,6 +163,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     QVBoxLayout* layout = reinterpret_cast<QVBoxLayout*>(ui->GB_CameraView->layout());
     layout->insertWidget(0, m_vlcWidget);
 
+
     /*
     m_cameraView = new QCameraViewfinder(this);
     m_cameraView->setMinimumSize(640,360);
@@ -233,11 +234,16 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     ui->S_Volume->setValue(m_settings->value("Volume", 100).toInt());
 
     m_smartSetting = new SmartProgramSetting();
+    m_videoEffectSetting = new VideoEffectSetting();
+    connect(m_videoEffectSetting, &VideoEffectSetting::hueChanged, m_vlcWrapper, &VLCWrapper::setHue);
+    connect(m_videoEffectSetting, &VideoEffectSetting::saturationChanged, m_vlcWrapper, &VLCWrapper::setSaturation);
+    connect(m_videoEffectSetting, &VideoEffectSetting::contrastChanged, m_vlcWrapper, &VLCWrapper::setContrast);
 }
 
 RemoteControllerWindow::~RemoteControllerWindow()
 {
     delete m_smartSetting;
+    delete m_videoEffectSetting;
     delete m_commandMutex;
     delete ui;
 }
@@ -313,6 +319,11 @@ void RemoteControllerWindow::closeEvent(QCloseEvent *event)
     if (m_smartSetting->isVisible())
     {
         m_smartSetting->close();
+    }
+
+    if (m_videoEffectSetting->isVisible())
+    {
+        m_videoEffectSetting->close();
     }
 
     emit closeWindowSignal();
@@ -1396,6 +1407,12 @@ void RemoteControllerWindow::on_PB_Screenshot_clicked()
     CameraCaptureToFile();
 }
 
+void RemoteControllerWindow::on_PB_AdjustVideo_clicked()
+{
+    m_videoEffectSetting->show();
+    m_videoEffectSetting->raise();
+}
+
 void RemoteControllerWindow::on_VLCState_changed(VLCWrapper::VLCState state)
 {
     switch (state)
@@ -1453,8 +1470,14 @@ void RemoteControllerWindow::CameraToggle(bool on)
             ui->GB_DetectedDevice->setEnabled(false);
             ui->GB_CustomDevice->setEnabled(false);
             ui->PB_Screenshot->setEnabled(true);
+            ui->PB_AdjustVideo->setEnabled(true);
             ui->L_NoVideo->setHidden(true);
             m_vlcWidget->show();
+
+            // set initial HSC
+            m_vlcWrapper->setHue(m_videoEffectSetting->getHue());
+            m_vlcWrapper->setSaturation(m_videoEffectSetting->getSaturation());
+            m_vlcWrapper->setContrast(m_videoEffectSetting->getContrast());
         }
         else
         {
@@ -1547,7 +1570,18 @@ void RemoteControllerWindow::CameraToggle(bool on)
         ui->GB_DetectedDevice->setEnabled(true);
         ui->GB_CustomDevice->setEnabled(true);
         ui->PB_Screenshot->setEnabled(false);
+        ui->PB_AdjustVideo->setEnabled(false);
         ui->L_NoVideo->setHidden(false);
+
+        if (m_smartSetting->isVisible())
+        {
+            m_smartSetting->close();
+        }
+
+        if (m_videoEffectSetting->isVisible())
+        {
+            m_videoEffectSetting->close();
+        }
     }
 
     EnableSmartProgram();

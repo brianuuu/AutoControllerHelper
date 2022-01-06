@@ -104,6 +104,11 @@ private slots:
     void timeout();
     void setVolume(int volume);
 
+public slots:
+    void setHue(double value);
+    void setSaturation(double value);
+    void setContrast(double value);
+
 signals:
     void stateChanged(VLCState);
 

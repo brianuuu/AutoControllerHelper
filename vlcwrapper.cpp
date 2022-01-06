@@ -123,6 +123,8 @@ bool VLCWrapper::start(const QString &vdev, const QString &adev)
         // ~60fps (actual: 62.5fps)
         m_timer.start(16);
         m_isStarted = true;
+
+        libvlc_video_set_adjust_int(m_mediaPlayer, libvlc_video_adjust_option_t::libvlc_adjust_Enable, true);
         return true;
     }
 }
@@ -218,5 +220,29 @@ void VLCWrapper::setVolume(int volume)
     if (m_isStarted)
     {
         libvlc_audio_set_volume(m_mediaPlayer, volume);
+    }
+}
+
+void VLCWrapper::setHue(double value)
+{
+    if (m_isStarted)
+    {
+        libvlc_video_set_adjust_float(m_mediaPlayer, libvlc_video_adjust_option_t::libvlc_adjust_Hue, (float)value);
+    }
+}
+
+void VLCWrapper::setSaturation(double value)
+{
+    if (m_isStarted)
+    {
+        libvlc_video_set_adjust_float(m_mediaPlayer, libvlc_video_adjust_option_t::libvlc_adjust_Saturation, (float)value);
+    }
+}
+
+void VLCWrapper::setContrast(double value)
+{
+    if (m_isStarted)
+    {
+        libvlc_video_set_adjust_float(m_mediaPlayer, libvlc_video_adjust_option_t::libvlc_adjust_Contrast, (float)value);
     }
 }
