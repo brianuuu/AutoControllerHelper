@@ -96,7 +96,7 @@
   </SmartBDSPDialgaPalkia>
   <SmartBDSPStarter>
 	<C_Restart>Home,1,Nothing,21,X,1,ASpam,850,LUp,6,BSpam,900</C_Restart>
-	<C_Choose>Nothing,1,A,22,LUp,1,A,1,Nothing,200</C_Choose>
+	<C_Choose>Nothing,1,A,22,LUp,1,A,1,Nothing,150</C_Choose>
 	<C_Capture>Capture,22</C_Capture>
   </SmartBDSPStarter>
 </SmartProgramCommands>

@@ -23,7 +23,7 @@ void SmartBDSPStarter::reset()
 
     m_substage = SS_Init;
     m_encounter = 0;
-    m_noShinyTimer = 0.0;
+    m_dialogWasFound = false;
 }
 
 void SmartBDSPStarter::runNextState()
@@ -35,9 +35,6 @@ void SmartBDSPStarter::runNextState()
     {
         m_substage = SS_Restart;
         setState_runCommand(C_Restart);
-
-        m_parameters.vlcWrapper->clearCaptures();
-        m_parameters.vlcWrapper->setAreas({A_Battle, A_HP});
 
         if (m_parameters.settings->isStreamCounterEnabled())
         {
@@ -81,71 +78,99 @@ void SmartBDSPStarter::runNextState()
         if (state == S_CommandFinished)
         {
             setState_frameAnalyzeRequest();
-            if (m_noShinyTimer == 0.0)
-            {
-                emit printLog("Using first battle to calibrate time until Battle UI shows up...");
-                m_substage = SS_Calibrate;
-            }
-            else
-            {
-                m_substage = SS_TestShiny;
-            }
+            m_substage = SS_Detect1;
+
+            m_parameters.vlcWrapper->clearCaptures();
+            m_parameters.vlcWrapper->setAreas({A_Dialog, A_DialogFalse});
+
+            m_dialogWasFound = false;
             m_elapsedTimer.restart();
         }
         break;
     }
-    case SS_Calibrate:
-    case SS_TestShiny:
+
+    case SS_Detect1: // wild starly appeared
+    case SS_Detect2: // Go! Starter!
+    case SS_Detect3: // Battle UI
     {
         if (state == S_CaptureReady)
         {
-            if (checkBrightnessMeanTarget(A_Battle.m_rect, C_Color_Battle, 160) && checkBrightnessMeanTarget(A_HP.m_rect, C_Color_HP, 160))
+            double elapsed = m_elapsedTimer.elapsed();
+            if (elapsed > 15000)
             {
-                // increment counter
-                m_encounter++;
-                m_parameters.settings->setStreamCounterCount(m_encounter);
-                emit printLog("Current Encounter: " + QString::number(m_encounter));
+                emit printLog("Unable to detect dialog or battle UI for too long, restarting sequence...", LOG_ERROR);
+                m_substage = SS_Restart;
+                setState_runCommand(C_Restart);
 
-                if (m_noShinyTimer == 0.0)
+                break;
+            }
+            else if (m_substage == SS_Detect1 || m_substage == SS_Detect2)
+            {
+                bool foundDialog = checkBrightnessMeanTarget(A_Dialog.m_rect, C_Color_Dialog, 230) && !checkBrightnessMeanTarget(A_DialogFalse.m_rect, C_Color_Dialog, 100);
+                if (m_dialogWasFound && !foundDialog)
                 {
-                    m_noShinyTimer = m_elapsedTimer.elapsed();
-                    emit printLog("Calibrated time = " + QString::number(m_noShinyTimer) + "ms");
+                    // dialog closed, goto next state
+                    m_elapsedTimer.restart();
 
-                    m_substage = SS_Restart;
-                    setState_runCommand(C_Restart);
+                    if (m_substage == SS_Detect1)
+                    {
+                        m_substage = SS_Detect2;
+                    }
+                    else
+                    {
+                        m_parameters.vlcWrapper->clearCaptures();
+                        m_parameters.vlcWrapper->setAreas({A_Battle});
+                        m_substage = SS_Detect3;
+                    }
                 }
-                else
+                else if (!m_dialogWasFound && foundDialog)
                 {
-                    double elapsed = m_elapsedTimer.elapsed();
-                    if (elapsed > m_noShinyTimer + 2000)
+                    if (m_substage == SS_Detect1)
+                    {
+                        emit printLog("\"You encountered wild Starly\" dialog detected");
+                    }
+                    else
+                    {
+                        emit printLog("\"Go! Starter!\" dialog detected, time taken: " + QString::number(elapsed) + "ms");
+                        if (elapsed > 2000)
+                        {
+                            emit printLog("A SHINY Starly was found.....", LOG_WARNING);
+                        }
+                    }
+                }
+
+                m_dialogWasFound = foundDialog;
+            }
+            else if (m_substage == SS_Detect3)
+            {
+                if (checkBrightnessMeanTarget(A_Battle.m_rect, C_Color_Battle, 160))
+                {
+                    // increment counter
+                    m_encounter++;
+                    m_parameters.settings->setStreamCounterCount(m_encounter);
+                    emit printLog("Current Encounter: " + QString::number(m_encounter));
+
+                    if (elapsed > 2000)
                     {
                         // shiny found!
                         m_substage = SS_Finish;
                         setState_runCommand(C_Capture);
-                        emit printLog("Time taken: " + QString::number(elapsed) + "ms, SHINY FOUND!", LOG_SUCCESS);
+                        emit printLog("Battle UI detected, time taken: " + QString::number(elapsed) + "ms, SHINY FOUND!", LOG_SUCCESS);
                     }
                     else
                     {
-                        // update timer in case delay has shifted
-                        m_noShinyTimer = elapsed;
-
                         // reset
                         m_substage = SS_Restart;
                         setState_runCommand(C_Restart);
-                        emit printLog("Time taken: " + QString::number(elapsed) + "ms, not shiny, restarting...");
+                        emit printLog("Battle UI detected, time taken: " + QString::number(elapsed) + "ms, not shiny, restarting...");
                     }
+
+                    m_parameters.vlcWrapper->clearCaptures();
+                    break;
                 }
             }
-            else if (m_noShinyTimer > 0.0 && m_elapsedTimer.elapsed() > m_noShinyTimer + 10000)
-            {
-                emit printLog("Unable to detect battle UI for too long, restarting sequence...", LOG_ERROR);
-                m_substage = SS_Restart;
-                setState_runCommand(C_Restart);
-            }
-            else
-            {
-                setState_frameAnalyzeRequest();
-            }
+
+            setState_frameAnalyzeRequest();
         }
         break;
     }
