@@ -13,6 +13,7 @@ SmartProgramSetting::SmartProgramSetting(QWidget *parent) :
     m_path = m_settings->value("DefaultDirectory", QString()).toString();
 
     // System
+    ui->CB_PreventUpdate->setChecked(m_settings->value("PreventUpdate", false).toBool());
     ui->CB_DateArrangement->setCurrentIndex(m_settings->value("DateArrangement", 0).toInt());
     ui->CurrentDate->setDate(QDate::currentDate());
 
@@ -51,6 +52,7 @@ void SmartProgramSetting::closeEvent(QCloseEvent *event)
     m_settings->setValue("DefaultDirectory", m_path);
 
     // System
+    m_settings->setValue("PreventUpdate", ui->CB_PreventUpdate->isChecked());
     m_settings->setValue("DateArrangement", ui->CB_DateArrangement->currentIndex());
 
     // Sound
@@ -70,6 +72,11 @@ void SmartProgramSetting::closeEvent(QCloseEvent *event)
 
     // Others
     m_settings->setValue("LogAutosave", ui->CB_LogSave->isChecked());
+}
+
+bool SmartProgramSetting::isPreventUpdate()
+{
+    return ui->CB_PreventUpdate->isChecked();
 }
 
 DateArrangement SmartProgramSetting::getDateArrangement()

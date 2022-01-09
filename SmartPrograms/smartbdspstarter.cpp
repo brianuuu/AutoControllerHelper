@@ -34,7 +34,7 @@ void SmartBDSPStarter::runNextState()
     case SS_Init:
     {
         m_substage = SS_Restart;
-        setState_runCommand(C_Restart);
+        runRestartCommand();
 
         if (m_parameters.settings->isStreamCounterEnabled())
         {
@@ -75,7 +75,7 @@ void SmartBDSPStarter::runNextState()
             {
                 emit printLog("Unable to detect game start after title screen, the game might have froze or crashed. restarting...", LOG_ERROR);
                 m_substage = SS_Restart;
-                setState_runCommand(C_Restart);
+                runRestartCommand();
             }
             else if (!checkAverageColorMatch(A_Title.m_rect, QColor(0,0,0)))
             {
@@ -152,7 +152,7 @@ void SmartBDSPStarter::runNextState()
             {
                 emit printLog("Unable to detect dialog or battle UI for too long, restarting sequence...", LOG_ERROR);
                 m_substage = SS_Restart;
-                setState_runCommand(C_Restart);
+                runRestartCommand();
 
                 break;
             }
@@ -213,7 +213,7 @@ void SmartBDSPStarter::runNextState()
                     {
                         // reset
                         m_substage = SS_Restart;
-                        setState_runCommand(C_Restart);
+                        runRestartCommand();
                         emit printLog("Battle UI detected, time taken: " + QString::number(elapsed) + "ms, not shiny, restarting...");
                     }
 
@@ -237,4 +237,9 @@ void SmartBDSPStarter::runNextState()
     }
 
     SmartProgramBase::runNextState();
+}
+
+void SmartBDSPStarter::runRestartCommand()
+{
+    setState_runCommand(m_parameters.settings->isPreventUpdate() ? C_RestartNoUpdate : C_Restart);
 }

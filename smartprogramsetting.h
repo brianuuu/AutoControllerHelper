@@ -34,6 +34,7 @@ public:
     void closeEvent(QCloseEvent *event);
 
     // System
+    bool isPreventUpdate();
     DateArrangement getDateArrangement();
 
     // Sound

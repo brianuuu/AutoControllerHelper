@@ -19,6 +19,7 @@ private:
     virtual void init();
     virtual void reset();
     virtual void runNextState();
+    void runRestartCommand();
 
     // Command indices
     Command const C_Restart = 0;

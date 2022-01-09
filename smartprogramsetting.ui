@@ -26,6 +26,13 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
+       <widget class="QCheckBox" name="CB_PreventUpdate">
+        <property name="text">
+         <string>Prevent Game Update after Restart (BDSP only)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_16">
         <item>
          <widget class="QLabel" name="label_12">
