@@ -49,7 +49,6 @@ public:
     bool isLogAutosave();
     bool isLogDebugCommand();
     bool isLogDebugColor();
-    bool isBypassFeedback();
 
 private slots:
     // System
@@ -66,9 +65,6 @@ private slots:
     void on_PB_File_clicked();
     void on_SB_Count_valueChanged(int arg1);
     void on_LE_Prefix_textEdited(const QString &arg1);
-
-    // Others
-    void on_CB_BypassFeedback_clicked(bool checked);
 
 private:
     // Sound

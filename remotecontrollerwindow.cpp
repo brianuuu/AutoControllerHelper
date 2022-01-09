@@ -538,7 +538,8 @@ void RemoteControllerWindow::on_ReadTimer_timeout()
 {
     m_serialPort.waitForReadyRead(1);
 
-    if (!m_smartSetting->isBypassFeedback() && m_readTickCount > 0)
+    /* This is not working for number of people, removing for now
+    if (m_readTickCount > 0)
     {
         m_readTickCount--;
         if (m_readTickCount == 0 && !m_executeCommands.isEmpty())
@@ -547,6 +548,7 @@ void RemoteControllerWindow::on_ReadTimer_timeout()
             SerialDisconnect();
         }
     }
+    */
 }
 
 //---------------------------------------------------------------------------

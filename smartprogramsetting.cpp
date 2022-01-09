@@ -39,7 +39,6 @@ SmartProgramSetting::SmartProgramSetting(QWidget *parent) :
 
     // Others
     ui->CB_LogSave->setChecked(m_settings->value("LogAutosave", true).toBool());
-    ui->CB_BypassFeedback->setChecked(m_settings->value("BypassFeedback", false).toBool());
 }
 
 SmartProgramSetting::~SmartProgramSetting()
@@ -71,7 +70,6 @@ void SmartProgramSetting::closeEvent(QCloseEvent *event)
 
     // Others
     m_settings->setValue("LogAutosave", ui->CB_LogSave->isChecked());
-    m_settings->setValue("BypassFeedback", ui->CB_BypassFeedback->isChecked());
 }
 
 DateArrangement SmartProgramSetting::getDateArrangement()
@@ -149,11 +147,6 @@ bool SmartProgramSetting::isLogDebugCommand()
 bool SmartProgramSetting::isLogDebugColor()
 {
     return ui->CB_LogDebugColor->isChecked();
-}
-
-bool SmartProgramSetting::isBypassFeedback()
-{
-    return ui->CB_BypassFeedback->isChecked();
 }
 
 void SmartProgramSetting::on_CB_DateArrangement_currentIndexChanged(int index)
@@ -258,14 +251,6 @@ void SmartProgramSetting::on_SB_Count_valueChanged(int arg1)
 void SmartProgramSetting::on_LE_Prefix_textEdited(const QString &arg1)
 {
     on_SB_Count_valueChanged(ui->SB_Count->value());
-}
-
-void SmartProgramSetting::on_CB_BypassFeedback_clicked(bool checked)
-{
-    if (checked)
-    {
-        QMessageBox::warning(this, "Warning", "Enabling this will prevent Smart Program Manager from detecting if the serial disconnects while commands are running. Only enable this if your controller is false disconnecting!", QMessageBox::Ok);
-    }
 }
 
 void SmartProgramSetting::SetCustomSoundEnabled()
