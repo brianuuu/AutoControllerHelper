@@ -49,6 +49,58 @@ void SmartBDSPStarter::runNextState()
     }
     case SS_Restart:
     {
+        if (state == S_CommandFinished)
+        {
+            setState_frameAnalyzeRequest();
+            m_substage = SS_Intro;
+
+            m_parameters.vlcWrapper->clearCaptures();
+            m_parameters.vlcWrapper->setAreas({A_Title});
+
+            m_elapsedTimer.restart();
+        }
+        break;
+    }
+    case SS_Intro:
+    case SS_Title:
+    case SS_GameStart:
+    {
+        if (state == S_CommandFinished)
+        {
+            setState_frameAnalyzeRequest();
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (m_elapsedTimer.elapsed() > 30000)
+            {
+                emit printLog("Unable to detect game start after title screen, the game might have froze or crashed. restarting...", LOG_ERROR);
+                m_substage = SS_Restart;
+                setState_runCommand(C_Restart);
+            }
+            else if (!checkAverageColorMatch(A_Title.m_rect, QColor(0,0,0)))
+            {
+                if (m_substage == SS_GameStart)
+                {
+                    m_substage = SS_Talk;
+                    setState_runCommand(C_Talk);
+                    m_parameters.vlcWrapper->clearCaptures();
+                }
+                else
+                {
+                    setState_runCommand("Nothing,21,A,1,Nothing,50");
+                    m_elapsedTimer.restart();
+                    m_substage = (m_substage == SS_Intro) ? SS_Title : SS_GameStart;
+                }
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
+            }
+        }
+        break;
+    }
+    case SS_Talk:
+    {
         // Now pick the starter
         if (state == S_CommandFinished)
         {
@@ -127,7 +179,7 @@ void SmartBDSPStarter::runNextState()
                 {
                     if (m_substage == SS_Detect1)
                     {
-                        emit printLog("\"You encountered wild Starly\" dialog detected");
+                        emit printLog("\"You encountered wild Starly!\" dialog detected");
                     }
                     else
                     {

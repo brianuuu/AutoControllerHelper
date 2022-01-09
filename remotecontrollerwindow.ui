@@ -2723,7 +2723,8 @@ check the manual</string>
                   <item>
                    <widget class="QLabel" name="label_43">
                     <property name="text">
-                     <string>Note: This program also detects Shiny Starly......</string>
+                     <string>Note: This program also detects Shiny Starly, but will not stop.
+You can check for number of warnings in Log to see if you have got any.</string>
                     </property>
                    </widget>
                   </item>
