@@ -32,10 +32,7 @@ void SmartBDSPDialgaPalkia::runNextState()
     case SS_Init:
     {
         m_substage = SS_Restart;
-        setState_runCommand(C_Restart);
-
-        m_parameters.vlcWrapper->clearCaptures();
-        m_parameters.vlcWrapper->setAreas({A_Battle, A_Pokemon});
+        runRestartCommand();
 
         if (m_parameters.settings->isStreamCounterEnabled())
         {
@@ -52,6 +49,61 @@ void SmartBDSPDialgaPalkia::runNextState()
     {
         if (state == S_CommandFinished)
         {
+            setState_frameAnalyzeRequest();
+            m_substage = SS_Intro;
+
+            m_parameters.vlcWrapper->clearCaptures();
+            m_parameters.vlcWrapper->setAreas({A_Title});
+
+            m_elapsedTimer.restart();
+        }
+        break;
+    }
+    case SS_Intro:
+    case SS_Title:
+    case SS_GameStart:
+    {
+        if (state == S_CommandFinished)
+        {
+            setState_frameAnalyzeRequest();
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (m_elapsedTimer.elapsed() > 30000)
+            {
+                emit printLog("Unable to detect game start after title screen, the game might have froze or crashed. restarting...", LOG_ERROR);
+                m_substage = SS_Restart;
+                runRestartCommand();
+            }
+            else if (!checkAverageColorMatch(A_Title.m_rect, QColor(0,0,0)))
+            {
+                if (m_substage == SS_GameStart)
+                {
+                    m_substage = SS_Talk;
+                    setState_runCommand(C_Talk);
+                    m_parameters.vlcWrapper->clearCaptures();
+                }
+                else
+                {
+                    setState_runCommand("Nothing,21,A,1,Nothing,50");
+                    m_elapsedTimer.restart();
+                    m_substage = (m_substage == SS_Intro) ? SS_Title : SS_GameStart;
+                }
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
+            }
+        }
+        break;
+    }
+    case SS_Talk:
+    {
+        if (state == S_CommandFinished)
+        {
+            m_parameters.vlcWrapper->clearCaptures();
+            m_parameters.vlcWrapper->setAreas({A_Battle,A_Pokemon});
+
             setState_frameAnalyzeRequest();
             if (m_noShinyTimer == 0.0)
             {
@@ -84,7 +136,7 @@ void SmartBDSPDialgaPalkia::runNextState()
                     emit printLog("Calibrated time = " + QString::number(m_noShinyTimer) + "ms");
 
                     m_substage = SS_Restart;
-                    setState_runCommand(C_Restart);
+                    runRestartCommand();
                 }
                 else
                 {
@@ -103,16 +155,20 @@ void SmartBDSPDialgaPalkia::runNextState()
 
                         // reset
                         m_substage = SS_Restart;
-                        setState_runCommand(C_Restart);
+                        runRestartCommand();
                         emit printLog("Time taken: " + QString::number(elapsed) + "ms, not shiny, restarting...");
                     }
                 }
+
+                m_parameters.vlcWrapper->clearCaptures();
             }
             else if (m_noShinyTimer > 0.0 && m_elapsedTimer.elapsed() > m_noShinyTimer + 10000)
             {
                 emit printLog("Unable to detect battle UI for too long, restarting sequence...", LOG_ERROR);
                 m_substage = SS_Restart;
-                setState_runCommand(C_Restart);
+                runRestartCommand();
+
+                m_parameters.vlcWrapper->clearCaptures();
             }
             else
             {
@@ -132,4 +188,9 @@ void SmartBDSPDialgaPalkia::runNextState()
     }
 
     SmartProgramBase::runNextState();
+}
+
+void SmartBDSPDialgaPalkia::runRestartCommand()
+{
+    setState_runCommand(m_parameters.settings->isPreventUpdate() ? C_RestartNoUpdate : C_Restart);
 }
