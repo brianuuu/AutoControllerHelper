@@ -29,8 +29,11 @@
 #include "vlcwrapper.h"
 #include "videoeffectsetting.h"
 #include "smartprogramsetting.h"
+
 #include "SmartPrograms/smartprogrambase.h"
 #include "SmartPrograms/smartdelaycalibrator.h"
+#include "SmartPrograms/smartcolorcalibrator.h"
+
 #include "SmartPrograms/smartbrightnessmeanfinder.h"
 #include "SmartPrograms/smartpurplebeamfilder.h"
 #include "SmartPrograms/smartycommglitch.h"
@@ -42,6 +45,7 @@
 #include "SmartPrograms/smartdailyhighlight.h"
 #include "SmartPrograms/smartberryfarmer.h"
 #include "SmartPrograms/smartwattfarmer.h"
+
 #include "SmartPrograms/smartbdspdialgapalkia.h"
 #include "SmartPrograms/smartbdspstarter.h"
 

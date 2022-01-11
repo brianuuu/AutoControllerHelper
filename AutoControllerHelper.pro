@@ -25,6 +25,7 @@ SOURCES += \
     SmartPrograms/smartbdspdialgapalkia.cpp \
     SmartPrograms/smartbdspstarter.cpp \
     SmartPrograms/smartberryfarmer.cpp \
+    SmartPrograms/smartcolorcalibrator.cpp \
     SmartPrograms/smartdailyhighlight.cpp \
     SmartPrograms/smartloto.cpp \
     SmartPrograms/smartwattfarmer.cpp \
@@ -50,6 +51,7 @@ HEADERS += \
     SmartPrograms/smartbdspdialgapalkia.h \
     SmartPrograms/smartbdspstarter.h \
     SmartPrograms/smartberryfarmer.h \
+    SmartPrograms/smartcolorcalibrator.h \
     SmartPrograms/smartdailyhighlight.h \
     SmartPrograms/smartloto.h \
     SmartPrograms/smartwattfarmer.h \

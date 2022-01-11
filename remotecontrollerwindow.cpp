@@ -2031,6 +2031,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartPurpleBeamFilder(pos, parameter);
         break;
     }
+    case SP_ColorCalibrator:
+    {
+        m_smartProgram = new SmartColorCalibrator(ui->SP8_L_Battle, ui->SP8_L_Pokemon, ui->SP8_L_Bag, ui->SP8_L_Run, parameter);
+        break;
+    }
     case SP_YCommGlitch:
     {
         m_smartProgram = new SmartYCommGlitch(parameter);

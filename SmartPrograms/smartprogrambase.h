@@ -20,6 +20,8 @@ enum SmartProgram
 {
     SP_DelayCalibrator = 0,
     SP_BrightnessMeanFinder,
+    SP_ColorCalibrator,
+
     SP_PurpleBeamFinder,
     SP_YCommGlitch,
     SP_SurpriseTrade,
@@ -76,6 +78,8 @@ public:
         {
             case SP_DelayCalibrator:        return "Dev: Camera Delay Checker";
             case SP_BrightnessMeanFinder:   return "Dev: Brightness Mean Finder";
+            case SP_ColorCalibrator:        return "Dev: Color Calibrator";
+
             case SP_PurpleBeamFinder:       return "Purple Beam Finder";
             case SP_YCommGlitch:            return "Y-Comm Glitch";
             case SP_SurpriseTrade:          return "Auto Surprise Trade";
@@ -98,6 +102,8 @@ public:
     {
         if (sp == "Dev: Camera Delay Checker")      return SP_DelayCalibrator;
         if (sp == "Dev: Brightness Mean Finder")    return SP_BrightnessMeanFinder;
+        if (sp == "Dev: Color Calibrator")          return SP_ColorCalibrator;
+
         if (sp == "Purple Beam Finder")             return SP_PurpleBeamFinder;
         if (sp == "Y-Comm Glitch")                  return SP_YCommGlitch;
         if (sp == "Auto Surprise Trade")            return SP_SurpriseTrade;
@@ -121,6 +127,8 @@ public:
         {
             case SP_DelayCalibrator:        return "SmartDelayCalibrator";
             case SP_BrightnessMeanFinder:   return "SmartBrightnessMeanFinder";
+            case SP_ColorCalibrator:        return "SmartColorCalibrator";
+
             case SP_PurpleBeamFinder:       return "SmartPurpleBeamFilder";
             case SP_YCommGlitch:            return "SmartYCommGlitch";
             case SP_SurpriseTrade:          return "SmartSurpriseTrade";
@@ -146,6 +154,8 @@ public:
         {
             case SP_DelayCalibrator:        return 0;
             case SP_BrightnessMeanFinder:   return 1;
+            case SP_ColorCalibrator:        return 8;
+
             case SP_PurpleBeamFinder:       return 2;
             case SP_YCommGlitch:            return 0;
             case SP_SurpriseTrade:          return 3;
@@ -196,6 +206,7 @@ public:
             return "BDSP";
         case SP_DelayCalibrator:
         case SP_BrightnessMeanFinder:
+        case SP_ColorCalibrator:
             return "Others";
         default:
             return "SwSh";
