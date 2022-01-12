@@ -103,4 +103,7 @@
 	<C_Choose>Nothing,1,A,22,LUp,1,A,1,Nothing,150</C_Choose>
 	<C_Capture>Capture,22</C_Capture>
   </SmartBDSPStarter>
+  <SmartBDSPMenuGlitch113>
+	<C_Loop>DRight,3,Nothing,1,DRightR,3,Nothing,10,A,1,Nothing,20,DRight,5,Nothing,10,A,10,X,20,A,1</C_Loop>
+  </SmartBDSPMenuGlitch113>
 </SmartProgramCommands>

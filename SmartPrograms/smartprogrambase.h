@@ -16,7 +16,7 @@
 #include "../vlcwrapper.h"
 #include "../smartprogramsetting.h"
 
-enum SmartProgram
+enum SmartProgram : uint32_t
 {
     SP_DelayCalibrator = 0,
     SP_BrightnessMeanFinder,
@@ -35,6 +35,7 @@ enum SmartProgram
 
     SP_BDSP_DialgaPalkia,
     SP_BDSP_Starter,
+    SP_BDSP_MenuGlitch113,
 
     SP_COUNT
 };
@@ -93,6 +94,7 @@ public:
 
             case SP_BDSP_DialgaPalkia:      return "Reset Dialga/Palkia";
             case SP_BDSP_Starter:           return "Reset Starter";
+            case SP_BDSP_MenuGlitch113:     return "Menu Glitch v1.1.3";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -117,6 +119,7 @@ public:
 
         if (sp == "Reset Dialga/Palkia")            return SP_BDSP_DialgaPalkia;
         if (sp == "Reset Starter")                  return SP_BDSP_Starter;
+        if (sp == "Menu Glitch v1.1.3")             return SP_BDSP_MenuGlitch113;
 
         return SP_COUNT;
     }
@@ -142,6 +145,7 @@ public:
 
             case SP_BDSP_DialgaPalkia:      return "SmartBDSPDialgaPalkia";
             case SP_BDSP_Starter:           return "SmartBDSPStarter";
+            case SP_BDSP_MenuGlitch113:     return "SmartBDSPMenuGlitch113";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -169,6 +173,7 @@ public:
 
             case SP_BDSP_DialgaPalkia:      return 0;
             case SP_BDSP_Starter:           return 7;
+            case SP_BDSP_MenuGlitch113:     return 0;
 
             case SP_COUNT:                  return -1;
         }
@@ -199,17 +204,17 @@ public:
 
     static QString getProgramGamePrefix(SmartProgram sp)
     {
-        switch (sp)
+        if (sp >= SP_BDSP_DialgaPalkia)
         {
-        case SP_BDSP_DialgaPalkia:
-        case SP_BDSP_Starter:
             return "BDSP";
-        case SP_DelayCalibrator:
-        case SP_BrightnessMeanFinder:
-        case SP_ColorCalibrator:
-            return "Others";
-        default:
+        }
+        else if (sp >= SP_PurpleBeamFinder)
+        {
             return "SwSh";
+        }
+        else
+        {
+            return "Others";
         }
     }
 

@@ -2129,6 +2129,12 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartBDSPStarter(ui->SP7_CB_Starter->currentIndex(), parameter);
         break;
     }
+
+    case SP_BDSP_MenuGlitch113:
+    {
+        m_smartProgram = new SmartSimpleProgram(SP_BDSP_MenuGlitch113, false, parameter);
+        break;
+    }
     default:
     {
         QMessageBox::critical(this, "Error", "No code exist for this Smart Program!");
