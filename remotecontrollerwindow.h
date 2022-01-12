@@ -31,6 +31,7 @@
 #include "smartprogramsetting.h"
 
 #include "SmartPrograms/smartprogrambase.h"
+#include "SmartPrograms/smartsimpleprogram.h"
 #include "SmartPrograms/smartdelaycalibrator.h"
 #include "SmartPrograms/smartcolorcalibrator.h"
 
@@ -40,7 +41,6 @@
 #include "SmartPrograms/smartsurprisetrade.h"
 #include "SmartPrograms/smartmaxraidbattler.h"
 #include "SmartPrograms/smartdayskipper.h"
-#include "SmartPrograms/smartbattletower.h"
 #include "SmartPrograms/smartloto.h"
 #include "SmartPrograms/smartdailyhighlight.h"
 #include "SmartPrograms/smartberryfarmer.h"

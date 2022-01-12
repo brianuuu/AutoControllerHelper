@@ -1,17 +1,19 @@
-#ifndef SMARTBATTLETOWER_H
-#define SMARTBATTLETOWER_H
+#ifndef SMARTSIMPLEPROGRAM_H
+#define SMARTSIMPLEPROGRAM_H
 
 #include <QWidget>
 #include "smartprogrambase.h"
 
-class SmartBattleTower : public SmartProgramBase
+class SmartSimpleProgram : public SmartProgramBase
 {
 public:
-    explicit SmartBattleTower(
+    explicit SmartSimpleProgram(
+            SmartProgram programEnum,
+            bool isLoop,
             SmartProgramParameter parameter
             );
 
-    virtual SmartProgram getProgramEnum() { return SP_BattleTower; }
+    virtual SmartProgram getProgramEnum() { return m_programEnum; }
 
 private:
     virtual void init();
@@ -20,7 +22,7 @@ private:
 
     // Command indices
     Command const C_Loop  = 0;
-    Command const C_COUNT   = 1;
+    Command const C_COUNT = 1;
 
     // List of test color
 
@@ -35,6 +37,8 @@ private:
     Substage m_substage;
 
     // Members
+    SmartProgram m_programEnum;
+    bool m_isLoop;
 };
 
-#endif // SMARTBATTLETOWER_H
+#endif // SMARTSIMPLEPROGRAM_H

@@ -2096,7 +2096,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     }
     case SP_BattleTower:
     {
-        m_smartProgram = new SmartBattleTower(parameter);
+        m_smartProgram = new SmartSimpleProgram(SP_BattleTower, true, parameter);
         break;
     }
     case SP_Loto:

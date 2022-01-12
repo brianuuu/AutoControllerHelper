@@ -21,13 +21,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    SmartPrograms/smartbattletower.cpp \
     SmartPrograms/smartbdspdialgapalkia.cpp \
     SmartPrograms/smartbdspstarter.cpp \
     SmartPrograms/smartberryfarmer.cpp \
     SmartPrograms/smartcolorcalibrator.cpp \
     SmartPrograms/smartdailyhighlight.cpp \
     SmartPrograms/smartloto.cpp \
+    SmartPrograms/smartsimpleprogram.cpp \
     SmartPrograms/smartwattfarmer.cpp \
     commandsender.cpp \
     main.cpp \
@@ -47,13 +47,13 @@ SOURCES += \
     vlcwrapper.cpp
 
 HEADERS += \
-    SmartPrograms/smartbattletower.h \
     SmartPrograms/smartbdspdialgapalkia.h \
     SmartPrograms/smartbdspstarter.h \
     SmartPrograms/smartberryfarmer.h \
     SmartPrograms/smartcolorcalibrator.h \
     SmartPrograms/smartdailyhighlight.h \
     SmartPrograms/smartloto.h \
+    SmartPrograms/smartsimpleprogram.h \
     SmartPrograms/smartwattfarmer.h \
     autocontrollerdefines.h \
     autocontrollerwindow.h \
