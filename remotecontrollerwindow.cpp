@@ -90,6 +90,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     m_flagToCharMap.insert(m_PBToFlagMap[ui->PB_LUp] | m_PBToFlagMap[ui->PB_A], 'm');
     m_flagToCharMap.insert(m_PBToFlagMap[ui->PB_LDown] | m_PBToFlagMap[ui->PB_A], ',');
     m_flagToCharMap.insert(m_PBToFlagMap[ui->PB_LRight] | m_PBToFlagMap[ui->PB_A], '.');
+    m_flagToCharMap.insert(m_PBToFlagMap[ui->PB_DRight] | m_PBToFlagMap[ui->PB_R], '/');
 
     m_commandToFlagMap.insert("Nothing", 0);
     m_commandToFlagMap.insert("A", m_PBToFlagMap[ui->PB_A]);
@@ -126,6 +127,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     m_commandToFlagMap.insert("LUpA", m_PBToFlagMap[ui->PB_LUp] | m_PBToFlagMap[ui->PB_A]);
     m_commandToFlagMap.insert("LDownA", m_PBToFlagMap[ui->PB_LDown] | m_PBToFlagMap[ui->PB_A]);
     m_commandToFlagMap.insert("LRightA", m_PBToFlagMap[ui->PB_LRight] | m_PBToFlagMap[ui->PB_A]);
+    m_commandToFlagMap.insert("DRightR", m_PBToFlagMap[ui->PB_DRight] | m_PBToFlagMap[ui->PB_R]);
 
     // Special case
     m_commandToFlagMap.insert("ASpam", m_PBToFlagMap[ui->PB_A] | m_turboFlag);
@@ -468,7 +470,21 @@ void RemoteControllerWindow::on_SerialPort_readyRead()
     {
         if (!ba.isEmpty())
         {
-            m_serialState = SS_FeedbackOK;
+            m_hexVersion = (uint8_t)ba.front();
+            if (m_hexVersion == 120)
+            {
+                m_hexVersion = 1;
+            }
+
+            // Version checking
+            if (m_hexVersion == SMART_HEX_VERSION)
+            {
+                m_serialState = SS_FeedbackOK;
+            }
+            else
+            {
+                m_serialState = SS_WrongVersion;
+            }
         }
         return;
     }
@@ -478,15 +494,29 @@ void RemoteControllerWindow::on_SerialPort_readyRead()
     {
         for (int i = 0; i < ba.size(); i++)
         {
-            // Command is finished, remove
-            m_executeCommands.pop_front();
-
-            // Check if any command is loop
-            // Only set this once, reset when sending new command
-            if (!m_executeCommands.isEmpty() && !m_infiniteLoop)
+            uint8_t const byte = (uint8_t)ba.at(i);
+            if (m_hexVersion != byte)
             {
-                CommandPair const& command = m_executeCommands.front();
-                m_infiniteLoop = (command.first.toLower() == "loop" && command.second == 0);
+                PrintLog("Unexpected byte (" + QString::number(byte) + ") returned from serial! ", LOG_ERROR);
+            }
+
+            if (m_executeCommands.empty())
+            {
+                PrintLog("Unexpected extra " + QString::number(ba.size() - i) + "byte(s) returned from serial, ignoring...", LOG_ERROR);
+                break;
+            }
+            else
+            {
+                // Command is finished, remove
+                m_executeCommands.pop_front();
+
+                // Check if any command is loop
+                // Only set this once, reset when sending new command
+                if (!m_executeCommands.isEmpty() && !m_infiniteLoop)
+                {
+                    CommandPair const& command = m_executeCommands.front();
+                    m_infiniteLoop = (command.first.toLower() == "loop" && command.second == 0);
+                }
             }
         }
 
@@ -632,7 +662,7 @@ void RemoteControllerWindow::SerialConnectComplete()
     if (m_serialState == SS_FeedbackOK)
     {
         m_serialState = SS_Connect;
-        PrintLog("Serial connected", LOG_SUCCESS);
+        PrintLog("Serial connected (Version: " + QString::number(m_hexVersion) + ")", LOG_SUCCESS);
         UpdateStatus("Connected", LOG_SUCCESS);
         ui->PB_Connect->setEnabled(true);
         ui->PB_Connect->setText("Disconnect");
@@ -643,6 +673,14 @@ void RemoteControllerWindow::SerialConnectComplete()
         ui->PB_SendCommand->setEnabled(!ui->LE_CommandSender->text().isEmpty());
 
         EnableSmartProgram();
+    }
+    else if (m_serialState == SS_WrongVersion)
+    {
+        QString msg = "SmartProgram.hex version is not matching, please compile it and install with the newest version.";
+        msg += "\nVersion Detected: " + QString::number(m_hexVersion);
+        msg += "\nCurrent Version: " + QString::number(SMART_HEX_VERSION);
+        QMessageBox::critical(this, "Error", msg, QMessageBox::Ok);
+        SerialDisconnect();
     }
     else
     {

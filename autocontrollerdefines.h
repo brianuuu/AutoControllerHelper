@@ -20,6 +20,7 @@
 #endif
 
 #define COMMAND_MAX 30
+#define SMART_HEX_VERSION 2
 
 #define LOG_SUCCESS QColor(0,170,0)
 #define LOG_WARNING QColor(255,120,0)

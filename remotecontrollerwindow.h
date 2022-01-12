@@ -214,11 +214,13 @@ private:
     QSerialPort m_serialPort;
     QTimer m_readTimer;
     qint64 m_readTickCount;
+    uint8_t m_hexVersion;
     enum SerialState
     {
         SS_Disconnect,
         SS_TestFeedback,
         SS_FeedbackOK,
+        SS_WrongVersion,
         SS_Connect
     } m_serialState;
 
