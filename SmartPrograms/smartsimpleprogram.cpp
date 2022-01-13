@@ -44,6 +44,10 @@ void SmartSimpleProgram::runNextState()
         {
             emit printLog("WARNING: This program will not stop on its own!", LOG_WARNING);
         }
+        else
+        {
+            emit printLog("Loop remaining: " + QString::number(m_loopCount));
+        }
         break;
     }
     case SS_Loop:

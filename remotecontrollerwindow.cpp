@@ -2129,10 +2129,14 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartBDSPStarter(ui->SP7_CB_Starter->currentIndex(), parameter);
         break;
     }
-
     case SP_BDSP_MenuGlitch113:
     {
         m_smartProgram = new SmartSimpleProgram(SP_BDSP_MenuGlitch113, 1, parameter);
+        break;
+    }
+    case SP_BDSP_BoxDuplication:
+    {
+        m_smartProgram = new SmartSimpleProgram(SP_BDSP_BoxDuplication, ui->SP9_SB_Box->value(), parameter);
         break;
     }
     default:

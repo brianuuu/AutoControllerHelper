@@ -36,6 +36,7 @@ enum SmartProgram : uint32_t
     SP_BDSP_DialgaPalkia,
     SP_BDSP_Starter,
     SP_BDSP_MenuGlitch113,
+    SP_BDSP_BoxDuplication,
 
     SP_COUNT
 };
@@ -95,6 +96,7 @@ public:
             case SP_BDSP_DialgaPalkia:      return "Reset Dialga/Palkia";
             case SP_BDSP_Starter:           return "Reset Starter";
             case SP_BDSP_MenuGlitch113:     return "Menu Glitch v1.1.3";
+            case SP_BDSP_BoxDuplication:    return "Box Duplication Glitch";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -120,6 +122,7 @@ public:
         if (sp == "Reset Dialga/Palkia")            return SP_BDSP_DialgaPalkia;
         if (sp == "Reset Starter")                  return SP_BDSP_Starter;
         if (sp == "Menu Glitch v1.1.3")             return SP_BDSP_MenuGlitch113;
+        if (sp == "Box Duplication Glitch")         return SP_BDSP_BoxDuplication;
 
         return SP_COUNT;
     }
@@ -146,6 +149,7 @@ public:
             case SP_BDSP_DialgaPalkia:      return "SmartBDSPDialgaPalkia";
             case SP_BDSP_Starter:           return "SmartBDSPStarter";
             case SP_BDSP_MenuGlitch113:     return "SmartBDSPMenuGlitch113";
+            case SP_BDSP_BoxDuplication:    return "SmartBDSPBoxDuplication";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -174,6 +178,7 @@ public:
             case SP_BDSP_DialgaPalkia:      return 0;
             case SP_BDSP_Starter:           return 7;
             case SP_BDSP_MenuGlitch113:     return 0;
+            case SP_BDSP_BoxDuplication:    return 9;
 
             case SP_COUNT:                  return -1;
         }
