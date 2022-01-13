@@ -3,14 +3,19 @@
 SmartSimpleProgram::SmartSimpleProgram
 (
     SmartProgram programEnum,
-    bool isLoop,
+    int loopCount,
     SmartProgramParameter parameter
 )
     : SmartProgramBase(parameter)
     , m_programEnum(programEnum)
-    , m_isLoop(isLoop)
+    , m_loopCount(loopCount)
 {
     init();
+
+    if (m_loopCount == 0)
+    {
+        setState_error("loopCount cannot be 0!");
+    }
 }
 
 void SmartSimpleProgram::init()
@@ -35,7 +40,7 @@ void SmartSimpleProgram::runNextState()
     {
         m_substage = SS_Loop;
         setState_runCommand(C_Loop);
-        if (m_isLoop)
+        if (m_loopCount == -1)
         {
             emit printLog("WARNING: This program will not stop on its own!", LOG_WARNING);
         }
@@ -46,14 +51,19 @@ void SmartSimpleProgram::runNextState()
         // Loops forever or run once
         if (state == S_CommandFinished)
         {
-            if (m_isLoop)
+            if (m_loopCount > 0)
             {
-                setState_runCommand(C_Loop);
+                m_loopCount--;
+                if (m_loopCount == 0)
+                {
+                    setState_completed();
+                    break;
+                }
+
+                emit printLog("Loop remaining: " + QString::number(m_loopCount));
             }
-            else
-            {
-                setState_completed();
-            }
+
+            setState_runCommand(C_Loop);
         }
         break;
     }

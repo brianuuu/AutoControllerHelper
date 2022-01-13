@@ -9,7 +9,7 @@ class SmartSimpleProgram : public SmartProgramBase
 public:
     explicit SmartSimpleProgram(
             SmartProgram programEnum,
-            bool isLoop,
+            int loopCount,
             SmartProgramParameter parameter
             );
 
@@ -38,7 +38,7 @@ private:
 
     // Members
     SmartProgram m_programEnum;
-    bool m_isLoop;
+    int m_loopCount;
 };
 
 #endif // SMARTSIMPLEPROGRAM_H

@@ -2096,7 +2096,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     }
     case SP_BattleTower:
     {
-        m_smartProgram = new SmartSimpleProgram(SP_BattleTower, true, parameter);
+        m_smartProgram = new SmartSimpleProgram(SP_BattleTower, -1, parameter);
         break;
     }
     case SP_Loto:
@@ -2132,7 +2132,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
 
     case SP_BDSP_MenuGlitch113:
     {
-        m_smartProgram = new SmartSimpleProgram(SP_BDSP_MenuGlitch113, false, parameter);
+        m_smartProgram = new SmartSimpleProgram(SP_BDSP_MenuGlitch113, 1, parameter);
         break;
     }
     default:
