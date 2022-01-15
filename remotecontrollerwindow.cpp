@@ -2139,6 +2139,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartSimpleProgram(SP_BDSP_BoxDuplication, ui->SP9_SB_Box->value(), parameter);
         break;
     }
+    case SP_BDSP_BoxOperation:
+    {
+        m_smartProgram = new SmartBDSPBoxOperation((SmartBDSPBoxOperation::BoxOperationType)ui->SP10_CB_Operation->currentIndex(), ui->SP10_SB_Box->value(), parameter);
+        break;
+    }
     default:
     {
         QMessageBox::critical(this, "Error", "No code exist for this Smart Program!");

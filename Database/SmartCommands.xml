@@ -109,4 +109,12 @@
   <SmartBDSPBoxDuplication>
 	<C_Loop>B,40,R,40,A,1,X,22,A,40,R,50,Y,2,Nothing,1,Y,2,A,2,Loop,1,DRight,1,Nothing,4,Loop,5,DDown,1,Nothing,4,Loop,4,A,10,R,20,A,5,Loop,1,B,1,Nothing,30,Loop,3,DDown,1,A,40,B,40,R,22</C_Loop>
   </SmartBDSPBoxDuplication>
+  <SmartBDSPBoxOperation>
+	<C_Start>B,40,R,40</C_Start>
+	<C_StartItem>B,40,R,40,X,2</C_StartItem>
+	<C_Release>A,8,DUp,1,Nothing,1,DUp,1,A,8,DUp,1,A,20,B,5</C_Release>
+	<C_BagItem>A,8,DDown,1,A,8,Nothing,1,A,20,B,10</C_BagItem>
+	<C_DupItemStart>A,1,X,22,A,40,R,50,X,2</C_DupItemStart>
+	<C_DupItemEnd>Nothing,5,B,1,Nothing,25,Loop,3,DDown,1,A,40,B,40</C_DupItemEnd>
+  </SmartBDSPBoxOperation>
 </SmartProgramCommands>

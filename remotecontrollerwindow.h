@@ -48,6 +48,7 @@
 
 #include "SmartPrograms/smartbdspdialgapalkia.h"
 #include "SmartPrograms/smartbdspstarter.h"
+#include "SmartPrograms/smartbdspboxoperation.h"
 
 namespace Ui {
 class RemoteControllerWindow;

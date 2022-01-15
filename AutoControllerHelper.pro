@@ -21,6 +21,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    SmartPrograms/smartbdspboxoperation.cpp \
     SmartPrograms/smartbdspdialgapalkia.cpp \
     SmartPrograms/smartbdspstarter.cpp \
     SmartPrograms/smartberryfarmer.cpp \
@@ -47,6 +48,7 @@ SOURCES += \
     vlcwrapper.cpp
 
 HEADERS += \
+    SmartPrograms/smartbdspboxoperation.h \
     SmartPrograms/smartbdspdialgapalkia.h \
     SmartPrograms/smartbdspstarter.h \
     SmartPrograms/smartberryfarmer.h \

@@ -1718,8 +1718,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>317</height>
+                   <width>240</width>
+                   <height>25</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -1775,8 +1775,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>317</height>
+                   <width>322</width>
+                   <height>190</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -2038,8 +2038,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>317</height>
+                   <width>252</width>
+                   <height>125</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -2213,8 +2213,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>317</height>
+                   <width>279</width>
+                   <height>102</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -2346,8 +2346,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>317</height>
+                   <width>199</width>
+                   <height>49</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -2461,8 +2461,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>317</height>
+                   <width>405</width>
+                   <height>158</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -2614,8 +2614,8 @@ check the manual</string>
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>317</height>
+                   <width>318</width>
+                   <height>56</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_19">
@@ -2715,8 +2715,8 @@ check the manual</string>
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>317</height>
+                   <width>334</width>
+                   <height>70</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_22">
@@ -2820,8 +2820,8 @@ You can check for number of warnings in Log to see if you have got any.</string>
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>317</height>
+                   <width>392</width>
+                   <height>137</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_24">
@@ -3029,11 +3029,19 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_27">
                   <item>
+                   <widget class="QLabel" name="label_52">
+                    <property name="text">
+                     <string>Note: You MUST have Menu Glitch active, which can be patched by Nintendo at some point.
+This is for duplicating Pokemon, for items, use Box Operation program instead.</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_26">
                     <item>
                      <widget class="QLabel" name="label_49">
                       <property name="text">
-                       <string>No. of Boxes:</string>
+                       <string>No. of Boxes to Duplicate:</string>
                       </property>
                      </widget>
                     </item>
@@ -3076,7 +3084,157 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                     <property name="sizeHint" stdset="0">
                      <size>
                       <width>20</width>
-                      <height>275</height>
+                      <height>258</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="page_10">
+             <layout class="QVBoxLayout" name="verticalLayout_28">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QScrollArea" name="scrollArea_11">
+                <property name="frameShape">
+                 <enum>QFrame::Panel</enum>
+                </property>
+                <property name="lineWidth">
+                 <number>2</number>
+                </property>
+                <property name="widgetResizable">
+                 <bool>true</bool>
+                </property>
+                <widget class="QWidget" name="scrollAreaWidgetContents_11">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>428</width>
+                   <height>317</height>
+                  </rect>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_29">
+                  <item>
+                   <widget class="QLabel" name="label_54">
+                    <property name="text">
+                     <string>For &quot;Duplicate Item&quot; you MUST have Menu Glitch active!</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_27">
+                    <item>
+                     <widget class="QLabel" name="label_53">
+                      <property name="text">
+                       <string>No. of Boxes:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QSpinBox" name="SP10_SB_Box">
+                      <property name="minimumSize">
+                       <size>
+                        <width>55</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                      <property name="minimum">
+                       <number>1</number>
+                      </property>
+                      <property name="maximum">
+                       <number>40</number>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer_10">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_28">
+                    <item>
+                     <widget class="QLabel" name="label_55">
+                      <property name="text">
+                       <string>Operation: </string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QComboBox" name="SP10_CB_Operation">
+                      <property name="minimumSize">
+                       <size>
+                        <width>90</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                      <item>
+                       <property name="text">
+                        <string>Release</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string>Bag Item</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string>Duplicate Item</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer_11">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <spacer name="verticalSpacer_9">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>230</height>
                      </size>
                     </property>
                    </spacer>
