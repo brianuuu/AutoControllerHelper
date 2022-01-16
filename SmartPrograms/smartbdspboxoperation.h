@@ -9,7 +9,7 @@ class SmartBDSPBoxOperation : public SmartProgramBase
 public:
     enum BoxOperationType : uint8_t
     {
-        BOT_Release,
+        BOT_Release = 0,
         BOT_BagItem,
         BOT_DupItem,
         BOT_COUNT,

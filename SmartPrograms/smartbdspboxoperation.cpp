@@ -165,12 +165,12 @@ void SmartBDSPBoxOperation::gotoNextPokemon()
             if (m_pos.x() == 6)
             {
                 m_pos.ry()++;
-                setState_runCommand("DDown,1,Nothing,4");
+                setState_runCommand("DDown,1,Nothing,6");
             }
             else
             {
                 m_pos.rx()++;
-                setState_runCommand("DRight,1,Nothing,4");
+                setState_runCommand("DRight,1,Nothing,6");
             }
         }
         else
@@ -178,12 +178,12 @@ void SmartBDSPBoxOperation::gotoNextPokemon()
             if (m_pos.x() == 1)
             {
                 m_pos.ry()++;
-                setState_runCommand("DDown,1,Nothing,4");
+                setState_runCommand("DDown,1,Nothing,6");
             }
             else
             {
                 m_pos.rx()--;
-                setState_runCommand("DLeft,1,Nothing,4");
+                setState_runCommand("DLeft,1,Nothing,6");
             }
         }
     }
