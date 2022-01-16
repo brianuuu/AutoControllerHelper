@@ -126,6 +126,11 @@ private slots:
 
     void on_RemoteControl_Tool_clicked();
 
+    void on_BDSPBoxDuplication_Count_valueChanged(int arg1);
+
+    void on_BDSPBoxOperation_Count_valueChanged(int arg1);
+    void on_BDSPBoxOperation_Type_currentIndexChanged(int index);
+
 private:
     QString GetVariableString(QString const& _str);
     void LoadConfig();
@@ -176,6 +181,9 @@ private:
         // BDSP Programs
         P_BDSP_ResetDialgaPalkia,
         P_BDSP_ResetStarter,
+        P_BDSP_MenuGlitch113,
+        P_BDSP_BoxDuplication,
+        P_BDSP_BoxOperation,
 
         P_INVALID
     };

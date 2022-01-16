@@ -43,6 +43,9 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
 
     m_programEnumMap["BDSP_ResetDialgaPalkia"]  = P_BDSP_ResetDialgaPalkia;
     m_programEnumMap["BDSP_ResetStarter"]       = P_BDSP_ResetStarter;
+    m_programEnumMap["BDSP_MenuGlitch113"]      = P_BDSP_MenuGlitch113;
+    m_programEnumMap["BDSP_BoxDuplication"]     = P_BDSP_BoxDuplication;
+    m_programEnumMap["BDSP_BoxOperation"]       = P_BDSP_BoxOperation;
 
     m_tabID[P_DaySkipper]           = 1;
     m_tabID[P_DaySkipper_Unlimited] = 2;
@@ -73,6 +76,9 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
 
     m_tabID[P_BDSP_ResetDialgaPalkia]   = 0;
     m_tabID[P_BDSP_ResetStarter]        = 20;
+    m_tabID[P_BDSP_MenuGlitch113]       = 0;
+    m_tabID[P_BDSP_BoxDuplication]      = 21;
+    m_tabID[P_BDSP_BoxOperation]        = 22;
 
     if (!QDir(HEX_PATH).exists())
     {
@@ -964,6 +970,27 @@ void autocontrollerwindow::on_RemoteControl_Tool_clicked()
 }
 
 //---------------------------------------------------------------------------
+// BDSP Box Duplication signals
+//---------------------------------------------------------------------------
+void autocontrollerwindow::on_BDSPBoxDuplication_Count_valueChanged(int arg1)
+{
+    UpdateInfo();
+}
+
+//---------------------------------------------------------------------------
+// BDSP Box Operation signals
+//---------------------------------------------------------------------------
+void autocontrollerwindow::on_BDSPBoxOperation_Count_valueChanged(int arg1)
+{
+    UpdateInfo();
+}
+
+void autocontrollerwindow::on_BDSPBoxOperation_Type_currentIndexChanged(int index)
+{
+    UpdateInfo();
+}
+
+//---------------------------------------------------------------------------
 // Get <variable> from "xxxxx = <variable>;"
 //---------------------------------------------------------------------------
 QString autocontrollerwindow::GetVariableString(const QString &_str)
@@ -1527,7 +1554,6 @@ void autocontrollerwindow::LoadConfig()
     //--------------------------------------------------------
     case P_SmartProgram:
     {
-        // TODO:
         break;
     }
 
@@ -1551,6 +1577,46 @@ void autocontrollerwindow::LoadConfig()
                 {
                     ui->BDSPStarter_Type->setCurrentIndex(m_starter);
                 }
+            }
+        }
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_BDSP_MenuGlitch113:
+    {
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_BDSP_BoxDuplication:
+    {
+        QTextStream in(&configFile);
+        while (!in.atEnd())
+        {
+            QString line = in.readLine();
+            if (line.indexOf("m_boxCount = ") != -1)
+            {
+                ui->BDSPBoxDuplication_Count->setValue(GetVariableString(line).toInt());
+            }
+        }
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_BDSP_BoxOperation:
+    {
+        QTextStream in(&configFile);
+        while (!in.atEnd())
+        {
+            QString line = in.readLine();
+            if (line.indexOf("m_boxCount = ") != -1)
+            {
+                ui->BDSPBoxOperation_Count->setValue(GetVariableString(line).toInt());
+            }
+            else if (line.indexOf("m_operationType = ") != -1)
+            {
+                ui->BDSPBoxOperation_Type->setCurrentIndex(GetVariableString(line).toInt());
             }
         }
         break;
@@ -1798,9 +1864,25 @@ void autocontrollerwindow::SaveConfig()
         break;
     }
 
+    //--------------------------------------------------------
     case P_BDSP_ResetStarter:
     {
         out << "uint8_t m_starter = " << QString::number(ui->BDSPStarter_Type->currentIndex()) << ";\n";
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_BDSP_BoxDuplication:
+    {
+        out << "int m_boxCount = " << QString::number(ui->BDSPBoxDuplication_Count->value()) << ";\n";
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_BDSP_BoxOperation:
+    {
+        out << "int m_boxCount = " << QString::number(ui->BDSPBoxOperation_Count->value()) << ";\n";
+        out << "int m_operationType = " << QString::number(ui->BDSPBoxOperation_Type->currentIndex()) << ";\n";
         break;
     }
 
@@ -2170,7 +2252,7 @@ void autocontrollerwindow::UpdateInfo()
     {
         if (ui->Farmer_Count->value() > 0)
         {
-            info = " Program Duration: " + GetTimeString(name, ui->Farmer_Count->value());
+            info = "Program Duration: " + GetTimeString(name, ui->Farmer_Count->value());
         }
         else
         {
@@ -2232,6 +2314,29 @@ void autocontrollerwindow::UpdateInfo()
         info = "Time per soft-reset: " + GetTimeString(name, 0);
         info += "\nThis program DOES NOT stop by itself, you MUST keep an eye on encounters.";
         info += "\nIf shiny is found unplug the board or take the Switch out from dock IMMEDIATELY!!";
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_BDSP_MenuGlitch113:
+    {
+        info = "WARNING: This glitch maybe patched by Nintendo and may not work in later versions!";
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_BDSP_BoxDuplication:
+    {
+        info = "Program Duration: " + GetTimeString(name, ui->BDSPBoxDuplication_Count->value());
+        info += "\nFor item duplication, use BDSP_BoxOperation instead.";
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_BDSP_BoxOperation:
+    {
+        int index = ui->BDSPBoxOperation_Type->currentIndex();
+        info = "Program Duration: " + GetTimeString(name + QString::number(index), ui->BDSPBoxOperation_Count->value());
         break;
     }
 

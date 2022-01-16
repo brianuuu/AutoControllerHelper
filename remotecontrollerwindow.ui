@@ -1575,7 +1575,7 @@
      <item>
       <widget class="QGroupBox" name="GB_SmartProgram">
        <property name="enabled">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -1686,7 +1686,7 @@
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>9</number>
+             <number>10</number>
             </property>
             <widget class="QWidget" name="page">
              <layout class="QVBoxLayout" name="verticalLayout_7">
