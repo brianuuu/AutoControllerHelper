@@ -37,7 +37,6 @@ private:
     CaptureArea const A_Title = CaptureArea(400,380,520,100);
     CaptureArea const A_Battle = CaptureArea(1128,422,48,48);
     CaptureArea const A_Dialog = CaptureArea(990,620,200,48);
-    CaptureArea const A_DialogFalse = CaptureArea(990,520,200,48);
 
     // Substages
     enum Substage : int

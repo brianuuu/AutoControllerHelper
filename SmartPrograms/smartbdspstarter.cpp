@@ -133,7 +133,7 @@ void SmartBDSPStarter::runNextState()
             m_substage = SS_Detect1;
 
             m_parameters.vlcWrapper->clearCaptures();
-            m_parameters.vlcWrapper->setAreas({A_Dialog, A_DialogFalse});
+            m_parameters.vlcWrapper->setAreas({A_Dialog});
 
             m_dialogWasFound = false;
             m_elapsedTimer.restart();
@@ -158,7 +158,7 @@ void SmartBDSPStarter::runNextState()
             }
             else if (m_substage == SS_Detect1 || m_substage == SS_Detect2)
             {
-                bool foundDialog = checkBrightnessMeanTarget(A_Dialog.m_rect, C_Color_Dialog, 230) && !checkBrightnessMeanTarget(A_DialogFalse.m_rect, C_Color_Dialog, 100);
+                bool foundDialog = checkBrightnessMeanTarget(A_Dialog.m_rect, C_Color_Dialog, 230);
                 if (m_dialogWasFound && !foundDialog)
                 {
                     // dialog closed, goto next state
