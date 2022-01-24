@@ -239,7 +239,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     m_videoEffectSetting = new VideoEffectSetting();
     connect(m_videoEffectSetting, &VideoEffectSetting::hueChanged, m_vlcWrapper, &VLCWrapper::setHue);
     connect(m_videoEffectSetting, &VideoEffectSetting::saturationChanged, m_vlcWrapper, &VLCWrapper::setSaturation);
-    connect(m_videoEffectSetting, &VideoEffectSetting::contrastChanged, m_vlcWrapper, &VLCWrapper::setContrast);
+    connect(m_videoEffectSetting, &VideoEffectSetting::gammaChanged, m_vlcWrapper, &VLCWrapper::setGamma);
 }
 
 RemoteControllerWindow::~RemoteControllerWindow()
@@ -1517,7 +1517,7 @@ void RemoteControllerWindow::CameraToggle(bool on)
             // set initial HSC
             m_vlcWrapper->setHue(m_videoEffectSetting->getHue());
             m_vlcWrapper->setSaturation(m_videoEffectSetting->getSaturation());
-            m_vlcWrapper->setContrast(m_videoEffectSetting->getContrast());
+            m_vlcWrapper->setGamma(m_videoEffectSetting->getGamma());
         }
         else
         {

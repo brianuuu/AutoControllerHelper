@@ -107,7 +107,7 @@ private slots:
 public slots:
     void setHue(double value);
     void setSaturation(double value);
-    void setContrast(double value);
+    void setGamma(double value);
 
 signals:
     void stateChanged(VLCState);

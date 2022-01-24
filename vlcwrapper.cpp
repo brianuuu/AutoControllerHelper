@@ -239,10 +239,10 @@ void VLCWrapper::setSaturation(double value)
     }
 }
 
-void VLCWrapper::setContrast(double value)
+void VLCWrapper::setGamma(double value)
 {
     if (m_isStarted)
     {
-        libvlc_video_set_adjust_float(m_mediaPlayer, libvlc_video_adjust_option_t::libvlc_adjust_Contrast, (float)value);
+        libvlc_video_set_adjust_float(m_mediaPlayer, libvlc_video_adjust_option_t::libvlc_adjust_Gamma, (float)value);
     }
 }

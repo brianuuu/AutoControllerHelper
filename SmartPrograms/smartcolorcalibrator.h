@@ -26,9 +26,9 @@ private:
     // Command indices
 
     // List of test color
-    HSVRange const C_Color_Battle = HSVRange(343,168,184,3,178,204);
-    HSVRange const C_Color_Pokemon = HSVRange(101,144,191,131,164,211);
-    HSVRange const C_Color_Bag = HSVRange(41,176,193,71,196,213);
+    HSVRange const C_Color_Battle = HSVRange(343,168,184,3,188,204);
+    HSVRange const C_Color_Pokemon = HSVRange(101,144,191,121,164,211);
+    HSVRange const C_Color_Bag = HSVRange(41,176,193,61,196,213);
     HSVRange const C_Color_Run = HSVRange(229,113,204,249,133,224);
 
     // List of test point/area

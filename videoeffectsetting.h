@@ -23,18 +23,18 @@ public:
     // value
     double getHue();
     double getSaturation();
-    double getContrast();
+    double getGamma();
 
 private slots:
     void on_S_Hue_valueChanged(int value);
     void on_S_Saturation_valueChanged(int value);
-    void on_S_Contrast_valueChanged(int value);
+    void on_S_Gamma_valueChanged(int value);
     void on_PB_Default_clicked();
 
 signals:
     void hueChanged(double);
     void saturationChanged(double);
-    void contrastChanged(double);
+    void gammaChanged(double);
 
 private:
     Ui::VideoEffectSetting *ui;
