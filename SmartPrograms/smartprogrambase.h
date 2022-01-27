@@ -216,11 +216,11 @@ public:
     {
         if (sp >= SP_BDSP_DialgaPalkia)
         {
-            return "BDSP";
+            return "Pokemon BDSP";
         }
         else if (sp >= SP_PurpleBeamFinder)
         {
-            return "SwSh";
+            return "Pokemon Sword/Shield";
         }
         else
         {

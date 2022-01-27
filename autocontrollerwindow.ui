@@ -100,6 +100,30 @@
        </widget>
       </item>
       <item>
+       <widget class="QComboBox" name="CB_Bots">
+        <item>
+         <property name="text">
+          <string>Pokemon Sword/Shield</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Pokemon BDSP</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Pokemon Legends: Arceus</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Others</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
        <widget class="QListWidget" name="LW_Bots">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
@@ -186,6 +210,9 @@
         </property>
         <property name="textFormat">
          <enum>Qt::RichText</enum>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
         </property>
         <property name="textInteractionFlags">
          <set>Qt::TextBrowserInteraction</set>
@@ -292,7 +319,7 @@
        </layout>
       </item>
       <item>
-       <widget class="QScrollArea" name="scrollArea">
+       <widget class="QScrollArea" name="SA_Settings">
         <property name="frameShape">
          <enum>QFrame::Panel</enum>
         </property>

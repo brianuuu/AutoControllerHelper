@@ -163,10 +163,10 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_settings = new QSettings("brianuuu", "AutoControllerHelper", this);
 
     // Load bots for current game
-    ui->TW_Bots->blockSignals(true);
-    ui->TW_Bots->setCurrentIndex(m_settings->value("GameIndex", 0).toInt());
-    ui->TW_Bots->blockSignals(false);
-    on_TW_Bots_currentChanged(ui->TW_Bots->currentIndex());
+    ui->CB_Bots->blockSignals(true);
+    ui->CB_Bots->setCurrentIndex(m_settings->value("GameIndex", 0).toInt());
+    ui->CB_Bots->blockSignals(false);
+    on_CB_Bots_currentIndexChanged(ui->CB_Bots->currentIndex());
 
     QString const savedProgram = m_settings->value("Bots", "DaySkipper").toString();
     for (int i = 0; i < ui->LW_Bots->count(); i++)
@@ -205,7 +205,7 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
 //---------------------------------------------------------------------------
 autocontrollerwindow::~autocontrollerwindow()
 {
-    m_settings->setValue("GameIndex", ui->TW_Bots->currentIndex());
+    m_settings->setValue("GameIndex", ui->CB_Bots->currentIndex());
     if (ui->LW_Bots->currentRow() != -1)
     {
         m_settings->setValue("Bots", ui->LW_Bots->currentItem()->text());
@@ -338,11 +338,6 @@ void autocontrollerwindow::on_PB_Generate_clicked()
 //---------------------------------------------------------------------------
 // Switch program
 //---------------------------------------------------------------------------
-void autocontrollerwindow::on_CB_Bots_currentIndexChanged(const QString &arg1)
-{
-    LoadConfig();
-}
-
 void autocontrollerwindow::on_LW_Bots_currentTextChanged(const QString &currentText)
 {
     LoadConfig();
@@ -545,22 +540,26 @@ void autocontrollerwindow::on_CompileFinished()
 //---------------------------------------------------------------------------
 // Change game
 //---------------------------------------------------------------------------
-void autocontrollerwindow::on_TW_Bots_currentChanged(int index)
+void autocontrollerwindow::on_CB_Bots_currentIndexChanged(int index)
 {
     for (int row = 0; row < ui->LW_Bots->count(); ++row)
     {
         QListWidgetItem* item = ui->LW_Bots->item(row);
         if (item->text().startsWith("Others"))
         {
-            item->setHidden(ui->TW_Bots->tabText(index) != "Others");
+            item->setHidden(ui->CB_Bots->currentText() != "Others");
         }
         else if (item->text().startsWith("BDSP"))
         {
-            item->setHidden(ui->TW_Bots->tabText(index) != "BDSP");
+            item->setHidden(ui->CB_Bots->currentText() != "Pokemon BDSP");
+        }
+        else if (item->text().startsWith("PLA"))
+        {
+            item->setHidden(ui->CB_Bots->currentText() != "Pokemon Legends: Arceus");
         }
         else
         {
-            item->setHidden(index != 0);
+            item->setHidden(ui->CB_Bots->currentText() != "Pokemon Sword/Shield");
         }
     }
 
@@ -570,10 +569,15 @@ void autocontrollerwindow::on_TW_Bots_currentChanged(int index)
         QListWidgetItem const* item = ui->LW_Bots->item(row);
         if (!item->isHidden())
         {
+            ui->SA_Settings->setEnabled(true);
             ui->LW_Bots->setCurrentRow(row);
-            break;
+            return;
         }
     }
+
+    // if we are here, not bots exist for the current game
+    ui->SA_Settings->setEnabled(false);
+    ui->PB_Generate->setEnabled(false);
 }
 
 //---------------------------------------------------------------------------

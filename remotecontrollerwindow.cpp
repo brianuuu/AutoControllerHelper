@@ -210,7 +210,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
 
     // Call this after all smart program values are set up above
     //ui->LW_SmartProgram->setCurrentRow(0);
-    on_TW_SmartProgram_currentChanged(0);
+    on_CB_SmartProgram_currentIndexChanged(0);
 
     // Load previous settings
     m_settings = new QSettings("brianuuu", "AutoControllerHelper", this);
@@ -1829,10 +1829,14 @@ void RemoteControllerWindow::on_PB_SmartSettings_clicked()
     m_smartSetting->raise();
 }
 
-void RemoteControllerWindow::on_PB_ReloadSmartCommands_clicked()
+void RemoteControllerWindow::on_PB_ModifySmartCommands_clicked()
 {
-    LoadSmartProgramCommands();
-    EnableSmartProgram();
+    QMessageBox::information(this, "Modify SmartCommands.xml", "When you finish editing and save, close Smart Program Manager and reopen to refresh commands.");
+    QString sourceFolder = QString(BOT_PATH) + "Others_SmartProgram";
+    QDesktopServices::openUrl(QUrl::fromLocalFile(sourceFolder));
+
+    //LoadSmartProgramCommands();
+    //EnableSmartProgram();
 }
 
 void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString &currentText)
@@ -1878,13 +1882,13 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
     m_vlcWrapper->setDefaultAreaEnabled(useArea);
 }
 
-void RemoteControllerWindow::on_TW_SmartProgram_currentChanged(int index)
+void RemoteControllerWindow::on_CB_SmartProgram_currentIndexChanged(int index)
 {
     for (int row = 0; row < ui->LW_SmartProgram->count(); ++row)
     {
         QListWidgetItem* item = ui->LW_SmartProgram->item(row);
         SmartProgram const sp = SmartProgramBase::getProgramEnumFromName(item->text());
-        item->setHidden(ui->TW_SmartProgram->tabText(index) != SmartProgramBase::getProgramGamePrefix(sp));
+        item->setHidden(ui->CB_SmartProgram->currentText() != SmartProgramBase::getProgramGamePrefix(sp));
     }
 
     // Force set to first smart program in the list
@@ -1893,10 +1897,14 @@ void RemoteControllerWindow::on_TW_SmartProgram_currentChanged(int index)
         QListWidgetItem const* item = ui->LW_SmartProgram->item(row);
         if (!item->isHidden())
         {
+            ui->SW_Settings->setEnabled(true);
             ui->LW_SmartProgram->setCurrentRow(row);
-            break;
+            return;
         }
     }
+
+    // If we are here, no program
+    ui->SW_Settings->setEnabled(false);
 }
 
 void RemoteControllerWindow::SetCaptureAreaPos(QMouseEvent *event)
@@ -1953,14 +1961,7 @@ void RemoteControllerWindow::LoadSmartProgramCommands()
     }
 
     m_smartProgramCommandsValid = true;
-    QFile file
-    (
-#if DEBUG_ENABLED
-        "../AutoControllerHelper/Database/SmartCommands.xml"
-#else
-        QString(BOT_PATH) + "Others_SmartProgram/SmartCommands.xml"
-#endif
-    );
+    QFile file(SMART_COMMAND_XML);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         QMessageBox::critical(this, "Error", "Fail to load SmartCommands.xml!", QMessageBox::Ok);
@@ -2163,9 +2164,9 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     {
         ui->PB_StartSmartProgram->setText("Stop");
         //ui->PB_SmartSettings->setEnabled(false);
-        ui->TW_SmartProgram->setEnabled(false);
+        ui->CB_SmartProgram->setEnabled(false);
         ui->LW_SmartProgram->setEnabled(false);
-        ui->PB_ReloadSmartCommands->setEnabled(false);
+        ui->PB_ModifySmartCommands->setEnabled(false);
 
         ui->SW_Settings->setEnabled(enableUI);
         SetEnableNonExceptionButtons(false);
@@ -2203,9 +2204,9 @@ void RemoteControllerWindow::StopSmartProgram()
 
     ui->PB_StartSmartProgram->setText("Start");
     //ui->PB_SmartSettings->setEnabled(true);
-    ui->TW_SmartProgram->setEnabled(true);
+    ui->CB_SmartProgram->setEnabled(true);
     ui->LW_SmartProgram->setEnabled(true);
-    ui->PB_ReloadSmartCommands->setEnabled(true);
+    ui->PB_ModifySmartCommands->setEnabled(true);
 
     ui->SW_Settings->setEnabled(true);
     SetEnableNonExceptionButtons(true);

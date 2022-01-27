@@ -10,6 +10,7 @@
     #define BOT_PATH "C:/Users/User/Documents/GitHub/AutoController_swsh/SourceCode/Bots/"
     #define SCREENSHOT_PATH "C:/Users/User/Documents/GitHub/AutoController_swsh/Screenshots/"
     #define LOG_PATH "C:/Users/User/Documents/GitHub/AutoController_swsh/Logs/"
+    #define SMART_COMMAND_XML "../AutoControllerHelper/Database/SmartCommands.xml"
 #else
     #define ROOT_PATH "../"
     #define HEX_PATH "../Hex/"
@@ -17,6 +18,7 @@
     #define BOT_PATH "../SourceCode/Bots/"
     #define SCREENSHOT_PATH "../Screenshots/"
     #define LOG_PATH "../Logs/"
+    #define SMART_COMMAND_XML "../SourceCode/Bots/Others_SmartProgram/SmartCommands.xml"
 #endif
 
 #define COMMAND_MAX 30

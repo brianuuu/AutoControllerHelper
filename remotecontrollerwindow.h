@@ -11,6 +11,7 @@
 #include <QColorDialog>
 #include <QDateTime>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QDir>
 #include <QDomDocument>
 #include <QGraphicsScene>
@@ -140,9 +141,9 @@ private slots:
     void on_SmartProgram_runSequence(QString const sequence);
     void on_PB_StartSmartProgram_clicked();
     void on_PB_SmartSettings_clicked();
-    void on_PB_ReloadSmartCommands_clicked();
+    void on_PB_ModifySmartCommands_clicked();
     void on_LW_SmartProgram_currentTextChanged(const QString &currentText);
-    void on_TW_SmartProgram_currentChanged(int index);
+    void on_CB_SmartProgram_currentIndexChanged(int index);
 
 private:
     // Others

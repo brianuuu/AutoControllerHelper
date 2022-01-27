@@ -44,7 +44,6 @@ private slots:
     void on_PB_Generate_clicked();
     void on_PB_Log_clicked();
     void on_PB_Unsync_clicked();
-    void on_CB_Bots_currentIndexChanged(const QString &arg1);
     void on_LW_Bots_currentTextChanged(const QString &currentText);
     void on_Debug_dimension();
 
@@ -55,7 +54,7 @@ private slots:
     void on_CompileErrorReady();
     void on_CompileFinished();
 
-    void on_TW_Bots_currentChanged(int index);
+    void on_CB_Bots_currentIndexChanged(int index);
 
     void on_DaySkipper_DateArrangement_currentIndexChanged(int index);
     void on_DaySkipper_DaysToSkip_valueChanged(int arg1);
