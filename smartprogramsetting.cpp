@@ -34,6 +34,7 @@ SmartProgramSetting::SmartProgramSetting(QWidget *parent) :
 
     // Stream Counter
     ui->GB_Stream->setChecked(m_settings->value("StreamCounterEnable", false).toBool());
+    ui->CB_ExcludePrefix->setChecked(m_settings->value("StreamCounterExcludePrefix", false).toBool());
 
     // Others
     ui->CB_LogSave->setChecked(m_settings->value("LogAutosave", true).toBool());
@@ -64,6 +65,7 @@ void SmartProgramSetting::closeEvent(QCloseEvent *event)
 
     // Stream Counter
     m_settings->setValue("StreamCounterEnable", ui->GB_Stream->isChecked());
+    m_settings->setValue("StreamCounterExcludePrefix", ui->CB_ExcludePrefix->isChecked());
 
     // Others
     m_settings->setValue("LogAutosave", ui->CB_LogSave->isChecked());
@@ -121,6 +123,11 @@ void SmartProgramSetting::playSound()
 bool SmartProgramSetting::isStreamCounterEnabled()
 {
     return ui->GB_Stream->isChecked();
+}
+
+bool SmartProgramSetting::isStreamCounterExcludePrefix()
+{
+    return ui->CB_ExcludePrefix->isChecked();
 }
 
 bool SmartProgramSetting::isLogAutosave()

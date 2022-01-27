@@ -517,7 +517,11 @@ void RemoteControllerWindow::UpdateStats(const SmartProgram sp, bool reset)
                 if(file.open(QIODevice::WriteOnly))
                 {
                     QTextStream stream(&file);
-                    stream << key + ": " << count;
+                    if (!m_smartSetting->isStreamCounterExcludePrefix())
+                    {
+                        stream << key + ": ";
+                    }
+                    stream << count;
                     file.close();
                 }
             }

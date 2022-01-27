@@ -43,6 +43,7 @@ public:
 
     // Stream Counter
     bool isStreamCounterEnabled();
+    bool isStreamCounterExcludePrefix();
 
     // Others
     bool isLogAutosave();

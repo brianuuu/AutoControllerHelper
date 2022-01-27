@@ -266,6 +266,13 @@ each stat in &quot;Current Stats&quot; in &quot;StreamCounters&quot; folder.</st
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="CB_ExcludePrefix">
+        <property name="text">
+         <string>Exclude Stat Prefix (Show Numbers Only)</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

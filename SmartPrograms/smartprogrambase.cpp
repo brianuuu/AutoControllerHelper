@@ -568,7 +568,11 @@ void SmartProgramBase::updateStats()
                 if(file.open(QIODevice::WriteOnly))
                 {
                     QTextStream stream(&file);
-                    stream << key + ": " << count;
+                    if (!m_parameters.settings->isStreamCounterExcludePrefix())
+                    {
+                        stream << key + ": ";
+                    }
+                    stream << count;
                     file.close();
                 }
             }
