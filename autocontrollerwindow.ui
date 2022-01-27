@@ -55,51 +55,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QTabWidget" name="TW_Bots">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>180</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>180</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="tabShape">
-         <enum>QTabWidget::Rounded</enum>
-        </property>
-        <property name="currentIndex">
-         <number>2</number>
-        </property>
-        <widget class="QWidget" name="tab">
-         <attribute name="title">
-          <string>SwSh</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_39"/>
-        </widget>
-        <widget class="QWidget" name="tab_2">
-         <attribute name="title">
-          <string>BDSP</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_40"/>
-        </widget>
-        <widget class="QWidget" name="tab_3">
-         <attribute name="title">
-          <string>Others</string>
-         </attribute>
-        </widget>
-       </widget>
-      </item>
-      <item>
        <widget class="QComboBox" name="CB_Bots">
         <item>
          <property name="text">
