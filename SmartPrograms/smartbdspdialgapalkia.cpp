@@ -150,13 +150,20 @@ void SmartBDSPDialgaPalkia::runNextState()
                     }
                     else
                     {
-                        // update timer in case delay has shifted
-                        m_noShinyTimer = elapsed;
+                        if (elapsed < 500)
+                        {
+                            emit printLog("Time taken: " + QString::number(elapsed) + "ms, unexpected low time, restarting...", LOG_ERROR);
+                        }
+                        else
+                        {
+                            // update timer in case delay has shifted
+                            m_noShinyTimer = elapsed;
+                            emit printLog("Time taken: " + QString::number(elapsed) + "ms, not shiny, restarting...");
+                        }
 
                         // reset
                         m_substage = SS_Restart;
                         runRestartCommand();
-                        emit printLog("Time taken: " + QString::number(elapsed) + "ms, not shiny, restarting...");
                     }
                 }
 
