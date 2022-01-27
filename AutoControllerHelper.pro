@@ -23,6 +23,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     SmartPrograms/smartbdspboxoperation.cpp \
     SmartPrograms/smartbdspdialgapalkia.cpp \
+    SmartPrograms/smartbdspshinylegendary.cpp \
     SmartPrograms/smartbdspstarter.cpp \
     SmartPrograms/smartberryfarmer.cpp \
     SmartPrograms/smartcolorcalibrator.cpp \
@@ -50,6 +51,7 @@ SOURCES += \
 HEADERS += \
     SmartPrograms/smartbdspboxoperation.h \
     SmartPrograms/smartbdspdialgapalkia.h \
+    SmartPrograms/smartbdspshinylegendary.h \
     SmartPrograms/smartbdspstarter.h \
     SmartPrograms/smartberryfarmer.h \
     SmartPrograms/smartcolorcalibrator.h \

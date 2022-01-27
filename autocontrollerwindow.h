@@ -183,6 +183,7 @@ private:
         P_BDSP_MenuGlitch113,
         P_BDSP_BoxDuplication,
         P_BDSP_BoxOperation,
+        P_BDSP_ResetLegendary,
 
         P_INVALID
     };

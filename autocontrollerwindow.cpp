@@ -46,6 +46,7 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_programEnumMap["BDSP_MenuGlitch113"]      = P_BDSP_MenuGlitch113;
     m_programEnumMap["BDSP_BoxDuplication"]     = P_BDSP_BoxDuplication;
     m_programEnumMap["BDSP_BoxOperation"]       = P_BDSP_BoxOperation;
+    m_programEnumMap["BDSP_ResetLegendary"]     = P_BDSP_ResetLegendary;
 
     m_tabID[P_DaySkipper]           = 1;
     m_tabID[P_DaySkipper_Unlimited] = 2;
@@ -79,6 +80,7 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_tabID[P_BDSP_MenuGlitch113]       = 0;
     m_tabID[P_BDSP_BoxDuplication]      = 21;
     m_tabID[P_BDSP_BoxOperation]        = 22;
+    m_tabID[P_BDSP_ResetLegendary]      = 0;
 
     if (!QDir(HEX_PATH).exists())
     {
@@ -1627,6 +1629,12 @@ void autocontrollerwindow::LoadConfig()
     }
 
     //--------------------------------------------------------
+    case P_BDSP_ResetLegendary:
+    {
+        break;
+    }
+
+    //--------------------------------------------------------
     case P_INVALID:
     {
         if (configExist)
@@ -2341,6 +2349,17 @@ void autocontrollerwindow::UpdateInfo()
     {
         int index = ui->BDSPBoxOperation_Type->currentIndex();
         info = "Program Duration: " + GetTimeString(name + QString::number(index), ui->BDSPBoxOperation_Count->value());
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_BDSP_ResetLegendary:
+    {
+        info = "Time per soft-reset: " + GetTimeString(name, 0);
+        info += "\nThis can be used for most legendaries that starts battle with A press.";
+        info += "\nOtherwise specified, you will need to use other programs, like Dialga/Palkia.";
+        info += "\nThis program DOES NOT stop by itself, you MUST keep an eye on encounters.";
+        info += "\nIf shiny is found unplug the board or take the Switch out from dock IMMEDIATELY!!";
         break;
     }
 
