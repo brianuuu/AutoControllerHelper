@@ -143,6 +143,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     ui->LE_CommandSender->InitCompleter(validCommands);
 
     // Logging
+    m_logCount = 0;
     m_successCount = 0;
     m_warningCount = 0;
     m_errorCount = 0;
@@ -181,6 +182,10 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     if (!QDir(LOG_PATH).exists())
     {
         QDir().mkdir(LOG_PATH);
+    }
+    if (!QDir(STREAM_COUNTER_PATH).exists())
+    {
+        QDir().mkdir(STREAM_COUNTER_PATH);
     }
 
     // Smart program
@@ -420,10 +425,17 @@ void RemoteControllerWindow::PrintLog(const QString &log, QColor color)
     str = "<font color=\"#FF" + r + g + b + "\">" + str + "</font>";
     ui->TB_Log->append(str);
 
+    m_logCount++;
     if (color == LOG_SUCCESS) m_successCount++;
     if (color == LOG_WARNING) m_warningCount++;
     if (color == LOG_ERROR) m_errorCount++;
     UpdateLogStat();
+
+    // Clear if there are too many logs
+    if (m_logCount >= 5000)
+    {
+        on_PB_ClearLog_clicked();
+    }
 }
 
 void RemoteControllerWindow::SaveLog(const QString name)
@@ -457,6 +469,61 @@ void RemoteControllerWindow::UpdateStatus(QString status, QColor color)
     styleSheet += QString::number(color.green()) + ",";
     styleSheet += QString::number(color.blue()) + ");";
     ui->L_Status->setStyleSheet(styleSheet);
+}
+
+void RemoteControllerWindow::UpdateStats(const SmartProgram sp, bool reset)
+{
+    // Delete all stream counter text files
+    QDirIterator it(QString(STREAM_COUNTER_PATH));
+    while (it.hasNext())
+    {
+        QString dir = it.next();
+        QFile::remove(dir);
+    }
+
+    // Grab stats for current program
+    QSettings stats(SMART_STATS_INI, QSettings::IniFormat, this);
+    stats.beginGroup(SmartProgramBase::getProgramInternalNameFromEnum(sp));
+    QStringList list = stats.allKeys();
+    QString statsStr;
+    if (list.isEmpty())
+    {
+        statsStr = "N/A";
+        ui->PB_ResetStats->setEnabled(false);
+    }
+    else
+    {
+        ui->PB_ResetStats->setEnabled(true);
+        for (int i = 0; i < list.size(); i++)
+        {
+            QString const& key = list[i];
+            if (i != 0)
+            {
+                statsStr += ", ";
+            }
+
+            if (reset)
+            {
+                stats.setValue(key, 0);
+            }
+
+            int count = stats.value(key, 0).toInt();
+            statsStr += key + ": " + QString::number(count);
+
+            // Write to individual files for each stat
+            if (m_smartSetting->isStreamCounterEnabled())
+            {
+                QFile file(STREAM_COUNTER_PATH + key + ".txt");
+                if(file.open(QIODevice::WriteOnly))
+                {
+                    QTextStream stream(&file);
+                    stream << key + ": " << count;
+                    file.close();
+                }
+            }
+        }
+    }
+    ui->L_CurrentStats->setText(statsStr);
 }
 
 //---------------------------------------------------------------------------
@@ -1168,6 +1235,7 @@ void RemoteControllerWindow::on_PB_ClearLog_clicked()
 {
     ui->TB_Log->clear();
 
+    m_logCount = 0;
     m_successCount = 0;
     m_warningCount = 0;
     m_errorCount = 0;
@@ -1831,12 +1899,34 @@ void RemoteControllerWindow::on_PB_SmartSettings_clicked()
 
 void RemoteControllerWindow::on_PB_ModifySmartCommands_clicked()
 {
-    QMessageBox::information(this, "Modify SmartCommands.xml", "When you finish editing and save, close Smart Program Manager and reopen to refresh commands.");
-    QString sourceFolder = QString(BOT_PATH) + "Others_SmartProgram";
-    QDesktopServices::openUrl(QUrl::fromLocalFile(sourceFolder));
+    QMessageBox::information(this, "Modify SmartCommands.xml", "Please use Notepad or Notepad++ to edit.\nWhen you finish editing and save, close Smart Program Manager and reopen to refresh commands.");
+    QDesktopServices::openUrl(QUrl::fromLocalFile(SMART_COMMAND_XML));
 
     //LoadSmartProgramCommands();
     //EnableSmartProgram();
+}
+
+void RemoteControllerWindow::on_PB_EditStats_clicked()
+{
+    QDesktopServices::openUrl(QUrl::fromLocalFile(SMART_STATS_INI));
+}
+
+void RemoteControllerWindow::on_PB_ResetStats_clicked()
+{
+    if (ui->L_CurrentStats->text() == "N/A") return;
+
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Reset Stats", "This will reset all stats for current program to 0, continue?\nIf you want to edit individual stats, press Edit.", QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes)
+    {
+        SmartProgram const sp = SmartProgramBase::getProgramEnumFromName(ui->LW_SmartProgram->currentItem()->text());
+        UpdateStats(sp, true);
+    }
+}
+
+void RemoteControllerWindow::EnableResetStats(bool enabled)
+{
+    ui->PB_ResetStats->setEnabled(enabled);
 }
 
 void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString &currentText)
@@ -1880,6 +1970,7 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
     }
 
     m_vlcWrapper->setDefaultAreaEnabled(useArea);
+    UpdateStats(sp);
 }
 
 void RemoteControllerWindow::on_CB_SmartProgram_currentIndexChanged(int index)
@@ -1903,7 +1994,9 @@ void RemoteControllerWindow::on_CB_SmartProgram_currentIndexChanged(int index)
         }
     }
 
-    // If we are here, no program
+    // If we are here, no program exist for this game
+    ui->L_CurrentStats->setText("N/A");
+    ui->PB_ResetStats->setEnabled(false);
     ui->SW_Settings->setEnabled(false);
 }
 
@@ -2042,7 +2135,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = Q_NULLPTR;
     }
 
-    SmartProgramParameter parameter(&m_smartProgramCommands, m_vlcWrapper, m_smartSetting, this);
+    SmartProgramParameter parameter(&m_smartProgramCommands, m_vlcWrapper, m_smartSetting, ui->L_CurrentStats, this);
     bool enableUI = SmartProgramBase::getProgramEnableUI(sp);
 
     switch (sp)
@@ -2155,6 +2248,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     connect(m_smartProgram, &SmartProgramBase::printLog, this, &RemoteControllerWindow::on_SmartProgram_printLog);
     connect(m_smartProgram, &SmartProgramBase::completed, this, &RemoteControllerWindow::on_SmartProgram_completed);
     connect(m_smartProgram, &SmartProgramBase::runSequence, this, &RemoteControllerWindow::on_SmartProgram_runSequence);
+    connect(m_smartProgram, &SmartProgramBase::enableResetStats, this, &RemoteControllerWindow::EnableResetStats);
     connect(this, &RemoteControllerWindow::commandFinished, m_smartProgram, &SmartProgramBase::commandFinished);
 
     // Clear log
@@ -2178,7 +2272,6 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     {
         StopSmartProgram();
     }
-
 }
 
 void RemoteControllerWindow::StopSmartProgram()

@@ -52,9 +52,12 @@ private:
     Substage m_substage;
 
     // Members
-    int m_encounter;
     double m_noShinyTimer;
     QElapsedTimer m_elapsedTimer;
+
+    // Stats
+    Stat m_encounter;
+    Stat m_error;
 };
 
 #endif // SMARTBDSPDIALGAPALKIA_H

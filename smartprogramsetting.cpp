@@ -34,9 +34,6 @@ SmartProgramSetting::SmartProgramSetting(QWidget *parent) :
 
     // Stream Counter
     ui->GB_Stream->setChecked(m_settings->value("StreamCounterEnable", false).toBool());
-    ui->LE_Prefix->setText(m_settings->value("TextFilePrefix", QString()).toString());
-    ui->LE_File->setText(m_settings->value("TextFileDirectory", QString()).toString());
-    ReadCounterFromText();
 
     // Others
     ui->CB_LogSave->setChecked(m_settings->value("LogAutosave", true).toBool());
@@ -67,8 +64,6 @@ void SmartProgramSetting::closeEvent(QCloseEvent *event)
 
     // Stream Counter
     m_settings->setValue("StreamCounterEnable", ui->GB_Stream->isChecked());
-    m_settings->setValue("TextFilePrefix", ui->LE_Prefix->text());
-    m_settings->setValue("TextFileDirectory", ui->LE_File->text());
 
     // Others
     m_settings->setValue("LogAutosave", ui->CB_LogSave->isChecked());
@@ -126,19 +121,6 @@ void SmartProgramSetting::playSound()
 bool SmartProgramSetting::isStreamCounterEnabled()
 {
     return ui->GB_Stream->isChecked();
-}
-
-int SmartProgramSetting::getStreamCounterCount()
-{
-    return ui->SB_Count->value();
-}
-
-void SmartProgramSetting::setStreamCounterCount(int count)
-{
-    if (isStreamCounterEnabled())
-    {
-        ui->SB_Count->setValue(count);
-    }
 }
 
 bool SmartProgramSetting::isLogAutosave()
@@ -215,51 +197,6 @@ void SmartProgramSetting::on_PB_PlaySound_clicked()
     playSound();
 }
 
-void SmartProgramSetting::on_PB_File_clicked()
-{
-    QString path = "";
-    if (!m_path.isEmpty())
-    {
-        path = m_path;
-    }
-
-    QString file = QFileDialog::getOpenFileName(this, tr("Select Counter File"), path, "Text Documents (*.txt)");
-    if (file == Q_NULLPTR) return;
-
-    // Save directory
-    QFileInfo info(file);
-    m_path = info.dir().absolutePath();
-    ui->LE_File->setText(file);
-
-    int index = file.lastIndexOf('\\');
-    if (index == -1) index = file.lastIndexOf('/');
-
-    ReadCounterFromText();
-}
-
-void SmartProgramSetting::on_SB_Count_valueChanged(int arg1)
-{
-    QString file = ui->LE_File->text();
-    if (file.isEmpty()) return;
-
-    QFile textFile(file);
-    if(!textFile.open(QIODevice::WriteOnly))
-    {
-        ui->LE_File->setText("");
-        return;
-    }
-
-    QString number = QString::number(arg1);
-    QTextStream textStream(&textFile);
-    textStream << ui->LE_Prefix->text() << number;
-    textFile.close();
-}
-
-void SmartProgramSetting::on_LE_Prefix_textEdited(const QString &arg1)
-{
-    on_SB_Count_valueChanged(ui->SB_Count->value());
-}
-
 void SmartProgramSetting::SetCustomSoundEnabled()
 {
     if (ui->RB_CustomSound->isChecked())
@@ -273,34 +210,5 @@ void SmartProgramSetting::SetCustomSoundEnabled()
     {
         ui->LE_Sound->setEnabled(false);
         ui->PB_Sound->setEnabled(false);
-    }
-}
-
-void SmartProgramSetting::ReadCounterFromText()
-{
-    QString file = ui->LE_File->text();
-    if (file.isEmpty()) return;
-
-    QFile textFile(file);
-    if(!textFile.open(QIODevice::ReadOnly))
-    {
-        ui->LE_File->setText("");
-        QMessageBox::critical(this, "Error", textFile.errorString());
-        return;
-    }
-
-    QTextStream textStream(&textFile);
-    QString line = textStream.readAll();
-    textFile.close();
-
-    QString noPrefix = line.mid(ui->LE_Prefix->text().size());
-    if (!noPrefix.isEmpty())
-    {
-        bool success = false;
-        int count = noPrefix.toInt(&success);
-        if (success)
-        {
-            ui->SB_Count->setValue(count);
-        }
     }
 }

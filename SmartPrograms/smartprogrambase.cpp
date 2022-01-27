@@ -497,3 +497,82 @@ void SmartProgramBase::runNextState()
     }
     }
 }
+
+void SmartProgramBase::initStat(Stat &stat, QString const &key)
+{
+    if (key.isEmpty()) return;
+
+    QSettings stats(SMART_STATS_INI, QSettings::IniFormat, this);
+    stats.beginGroup(getProgramInternalName());
+
+    // Set key and grab value from ini, resave it ini file doesn't exist
+    stat.second = key;
+    stat.first = stats.value(key, 0).toInt();
+    stats.setValue(stat.second, stat.first);
+
+    updateStats();
+}
+
+void SmartProgramBase::incrementStat(Stat &stat, int addCount)
+{
+    if (stat.second.isEmpty())
+    {
+        emit printLog("Uninitialzed stat key!", LOG_ERROR);
+        return;
+    }
+
+    QSettings stats(SMART_STATS_INI, QSettings::IniFormat, this);
+    stats.beginGroup(getProgramInternalName());
+
+    // Grab value from ini, increment and save
+    stat.first = stats.value(stat.second).toInt();
+    stat.first += addCount;
+    stats.setValue(stat.second, stat.first);
+
+    updateStats();
+}
+
+void SmartProgramBase::updateStats()
+{
+    if (!m_parameters.statsLabel) return;
+
+    QSettings stats(SMART_STATS_INI, QSettings::IniFormat, this);
+    stats.beginGroup(getProgramInternalName());
+
+    // Update label
+    QStringList list = stats.allKeys();
+    QString statsStr;
+    if (list.isEmpty())
+    {
+        statsStr = "N/A";
+        emit enableResetStats(false);
+    }
+    else
+    {
+        emit enableResetStats(true);
+        for (int i = 0; i < list.size(); i++)
+        {
+            QString const& key = list[i];
+            if (i != 0)
+            {
+                statsStr += ", ";
+            }
+
+            int count = stats.value(key, 0).toInt();
+            statsStr += key + ": " + QString::number(count);
+
+            // Write to individual files for each stat
+            if (m_parameters.settings->isStreamCounterEnabled())
+            {
+                QFile file(STREAM_COUNTER_PATH + key + ".txt");
+                if(file.open(QIODevice::WriteOnly))
+                {
+                    QTextStream stream(&file);
+                    stream << key + ": " << count;
+                    file.close();
+                }
+            }
+        }
+    }
+    m_parameters.statsLabel->setText(statsStr);
+}

@@ -58,9 +58,13 @@ private:
 
     // Members
     int m_starterIndex;
-    int m_encounter;
     bool m_dialogWasFound;
     QElapsedTimer m_elapsedTimer;
+
+    // Stats
+    Stat m_encounter;
+    Stat m_error;
+    Stat m_shinyStarlyCount;
 };
 
 #endif // SMARTBDSPSTARTER_H

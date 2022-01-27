@@ -13,6 +13,7 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QDir>
+#include <QDirIterator>
 #include <QDomDocument>
 #include <QGraphicsScene>
 #include <QKeyEvent>
@@ -142,6 +143,9 @@ private slots:
     void on_PB_StartSmartProgram_clicked();
     void on_PB_SmartSettings_clicked();
     void on_PB_ModifySmartCommands_clicked();
+    void on_PB_EditStats_clicked();
+    void on_PB_ResetStats_clicked();
+    void EnableResetStats(bool enabled);
     void on_LW_SmartProgram_currentTextChanged(const QString &currentText);
     void on_CB_SmartProgram_currentIndexChanged(int index);
 
@@ -151,6 +155,7 @@ private:
     void SaveLog(QString const name = "Log");
     void UpdateLogStat();
     void UpdateStatus(QString status, QColor color = QColor(0,0,0));
+    void UpdateStats(SmartProgram const sp, bool reset = false);
 
     // Serial
     void SerialConnect(QString const& port);
@@ -187,6 +192,7 @@ private:
     bool m_pauseKeyEventFilter;
 
     // Logging
+    int m_logCount;
     int m_successCount;
     int m_warningCount;
     int m_errorCount;

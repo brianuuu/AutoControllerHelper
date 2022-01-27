@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QDomDocument>
 #include <QGraphicsScene>
+#include <QSettings>
 #include <QTimer>
 #include <QWidget>
 
@@ -47,6 +48,7 @@ struct SmartProgramParameter
     QDomDocument* smartProgramCommands;
     VLCWrapper* vlcWrapper;
     SmartProgramSetting* settings;
+    QLabel* statsLabel;
     QWidget* parent;
     QGraphicsScene* preview;
     QGraphicsScene* previewMasked;
@@ -55,6 +57,7 @@ struct SmartProgramParameter
             QDomDocument* _smartProgramCommands,
             VLCWrapper* _vlcWrapper,
             SmartProgramSetting* _settings,
+            QLabel* _statsLabel,
             QWidget* _parent = nullptr,
             QGraphicsScene* _preview = nullptr,
             QGraphicsScene* _previewMasked = nullptr
@@ -62,6 +65,7 @@ struct SmartProgramParameter
         : smartProgramCommands(_smartProgramCommands)
         , vlcWrapper(_vlcWrapper)
         , settings(_settings)
+        , statsLabel(_statsLabel)
         , parent(_parent)
         , preview(_preview)
         , previewMasked(_previewMasked)
@@ -228,6 +232,8 @@ public:
         }
     }
 
+    typedef QPair<int, QString> Stat;
+
     bool run();
     virtual void stop();
     virtual SmartProgram getProgramEnum() = 0;
@@ -239,6 +245,7 @@ signals:
     void printLog(QString const log, QColor color = QColor(0,0,0));
     void completed();
     void runSequence(QString const sequence);
+    void enableResetStats(bool enabled);
 
 public slots:
     void commandFinished();
@@ -320,6 +327,10 @@ protected:
     SmartProgramParameter m_parameters;
 
     QString m_screenshotName;
+
+    void initStat(Stat& stat, QString const& key);
+    void incrementStat(Stat& stat, int addCount = 1);
+    void updateStats();
 
 private:
     QString m_logFileName;

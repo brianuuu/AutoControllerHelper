@@ -1510,6 +1510,79 @@
          </widget>
         </item>
         <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_29">
+          <item>
+           <spacer name="horizontalSpacer_12">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_60">
+            <property name="text">
+             <string>&lt;b&gt;Current Stats -&lt;b&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="L_CurrentStats">
+            <property name="text">
+             <string>N/A</string>
+            </property>
+            <property name="textFormat">
+             <enum>Qt::RichText</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="PB_EditStats">
+            <property name="maximumSize">
+             <size>
+              <width>40</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Edit</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="PB_ResetStats">
+            <property name="maximumSize">
+             <size>
+              <width>40</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Reset</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_13">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
          <layout class="QHBoxLayout" name="horizontalLayout_13">
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_20">
@@ -1676,7 +1749,7 @@
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>10</number>
+             <number>7</number>
             </property>
             <widget class="QWidget" name="page">
              <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -2028,8 +2101,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>252</width>
-                   <height>125</height>
+                   <width>428</width>
+                   <height>291</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -2203,8 +2276,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>279</width>
-                   <height>102</height>
+                   <width>428</width>
+                   <height>291</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -2336,8 +2409,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>199</width>
-                   <height>49</height>
+                   <width>428</width>
+                   <height>291</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -2451,8 +2524,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>405</width>
-                   <height>158</height>
+                   <width>428</width>
+                   <height>291</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -2705,16 +2778,15 @@ check the manual</string>
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>334</width>
-                   <height>70</height>
+                   <width>428</width>
+                   <height>291</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_22">
                   <item>
                    <widget class="QLabel" name="label_43">
                     <property name="text">
-                     <string>Note: This program also detects Shiny Starly, but will not stop.
-You can check for number of warnings in Log to see if you have got any.</string>
+                     <string>Note: This program also detects Shiny Starly, but will not stop.</string>
                     </property>
                    </widget>
                   </item>
@@ -2810,8 +2882,8 @@ You can check for number of warnings in Log to see if you have got any.</string>
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>392</width>
-                   <height>137</height>
+                   <width>428</width>
+                   <height>291</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_24">
@@ -3013,8 +3085,8 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>418</width>
-                   <height>69</height>
+                   <width>428</width>
+                   <height>291</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_27">
@@ -3116,7 +3188,7 @@ This is for duplicating Pokemon, for items, use Box Operation program instead.</
                    <x>0</x>
                    <y>0</y>
                    <width>428</width>
-                   <height>317</height>
+                   <height>291</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_29">

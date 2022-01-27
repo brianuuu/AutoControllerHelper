@@ -22,7 +22,6 @@ void SmartBDSPStarter::reset()
     SmartProgramBase::reset();
 
     m_substage = SS_Init;
-    m_encounter = 0;
     m_dialogWasFound = false;
 }
 
@@ -33,18 +32,12 @@ void SmartBDSPStarter::runNextState()
     {
     case SS_Init:
     {
+        initStat(m_encounter, "Encounters");
+        initStat(m_error, "Errors");
+        initStat(m_shinyStarlyCount, "Shiny Starly");
+
         m_substage = SS_Restart;
         runRestartCommand();
-
-        if (m_parameters.settings->isStreamCounterEnabled())
-        {
-            m_encounter = m_parameters.settings->getStreamCounterCount();
-            emit printLog("Stream Counter: ON, encounter starting at " + QString::number(m_encounter));
-        }
-        else
-        {
-            emit printLog("Stream Counter: OFF");
-        }
         break;
     }
     case SS_Restart:
@@ -73,6 +66,7 @@ void SmartBDSPStarter::runNextState()
         {
             if (m_elapsedTimer.elapsed() > 30000)
             {
+                incrementStat(m_error);
                 emit printLog("Unable to detect game start after title screen, the game might have froze or crashed. restarting...", LOG_ERROR);
                 m_substage = SS_Restart;
                 runRestartCommand();
@@ -150,6 +144,7 @@ void SmartBDSPStarter::runNextState()
             double elapsed = m_elapsedTimer.elapsed();
             if (elapsed > 15000)
             {
+                incrementStat(m_error);
                 emit printLog("Unable to detect dialog or battle UI for too long, restarting sequence...", LOG_ERROR);
                 m_substage = SS_Restart;
                 runRestartCommand();
@@ -186,6 +181,7 @@ void SmartBDSPStarter::runNextState()
                         emit printLog("\"Go! Starter!\" dialog detected, time taken: " + QString::number(elapsed) + "ms");
                         if (elapsed > 2000)
                         {
+                            incrementStat(m_shinyStarlyCount);
                             emit printLog("A SHINY Starly was found.....", LOG_WARNING);
                         }
                     }
@@ -198,9 +194,8 @@ void SmartBDSPStarter::runNextState()
                 if (checkBrightnessMeanTarget(A_Battle.m_rect, C_Color_Battle, 160))
                 {
                     // increment counter
-                    m_encounter++;
-                    m_parameters.settings->setStreamCounterCount(m_encounter);
-                    emit printLog("Current Encounter: " + QString::number(m_encounter));
+                    incrementStat(m_encounter);
+                    emit printLog("Current Encounter: " + QString::number(m_encounter.first));
 
                     if (elapsed > 2000)
                     {

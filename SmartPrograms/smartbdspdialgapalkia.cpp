@@ -20,7 +20,6 @@ void SmartBDSPDialgaPalkia::reset()
     SmartProgramBase::reset();
 
     m_substage = SS_Init;
-    m_encounter = 0;
     m_noShinyTimer = 0.0;
 }
 
@@ -31,18 +30,11 @@ void SmartBDSPDialgaPalkia::runNextState()
     {
     case SS_Init:
     {
+        initStat(m_encounter, "Encounters");
+        initStat(m_error, "Errors");
+
         m_substage = SS_Restart;
         runRestartCommand();
-
-        if (m_parameters.settings->isStreamCounterEnabled())
-        {
-            m_encounter = m_parameters.settings->getStreamCounterCount();
-            emit printLog("Stream Counter: ON, encounter starting at " + QString::number(m_encounter));
-        }
-        else
-        {
-            emit printLog("Stream Counter: OFF");
-        }
         break;
     }
     case SS_Restart:
@@ -71,6 +63,7 @@ void SmartBDSPDialgaPalkia::runNextState()
         {
             if (m_elapsedTimer.elapsed() > 30000)
             {
+                incrementStat(m_error);
                 emit printLog("Unable to detect game start after title screen, the game might have froze or crashed. restarting...", LOG_ERROR);
                 m_substage = SS_Restart;
                 runRestartCommand();
@@ -126,9 +119,8 @@ void SmartBDSPDialgaPalkia::runNextState()
             if (checkBrightnessMeanTarget(A_Battle.m_rect, C_Color_Battle, 160) && checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Pokemon, 160))
             {
                 // increment counter
-                m_encounter++;
-                m_parameters.settings->setStreamCounterCount(m_encounter);
-                emit printLog("Current Encounter: " + QString::number(m_encounter));
+                incrementStat(m_encounter);
+                emit printLog("Current Encounter: " + QString::number(m_encounter.first));
 
                 if (m_noShinyTimer == 0.0)
                 {
@@ -152,6 +144,7 @@ void SmartBDSPDialgaPalkia::runNextState()
                     {
                         if (elapsed < 500)
                         {
+                            incrementStat(m_error);
                             emit printLog("Time taken: " + QString::number(elapsed) + "ms, unexpected low time, restarting...", LOG_ERROR);
                         }
                         else
@@ -171,6 +164,7 @@ void SmartBDSPDialgaPalkia::runNextState()
             }
             else if (m_noShinyTimer > 0.0 && m_elapsedTimer.elapsed() > m_noShinyTimer + 10000)
             {
+                incrementStat(m_error);
                 emit printLog("Unable to detect battle UI for too long, restarting sequence...", LOG_ERROR);
                 m_substage = SS_Restart;
                 runRestartCommand();

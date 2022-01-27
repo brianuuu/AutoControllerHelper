@@ -43,8 +43,6 @@ public:
 
     // Stream Counter
     bool isStreamCounterEnabled();
-    int getStreamCounterCount();
-    void setStreamCounterCount(int count);
 
     // Others
     bool isLogAutosave();
@@ -62,17 +60,9 @@ private slots:
     void on_PB_Sound_clicked();
     void on_PB_PlaySound_clicked();
 
-    // Stream Counter
-    void on_PB_File_clicked();
-    void on_SB_Count_valueChanged(int arg1);
-    void on_LE_Prefix_textEdited(const QString &arg1);
-
 private:
     // Sound
     void SetCustomSoundEnabled();
-
-    // Stream Counter
-    void ReadCounterFromText();
 
 private:
     Ui::SmartProgramSetting *ui;
