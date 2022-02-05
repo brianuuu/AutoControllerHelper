@@ -2,11 +2,18 @@
 
 SmartBDSPShinyLegendary::SmartBDSPShinyLegendary
 (
+    LegendaryType type,
     SmartProgramParameter parameter
 )
     : SmartProgramBase(parameter)
+    , m_type(type)
 {
     init();
+
+    if (m_type >= LT_COUNT)
+    {
+        setState_error("Invalid legendary type!");
+    }
 }
 
 void SmartBDSPShinyLegendary::init()
@@ -73,6 +80,12 @@ void SmartBDSPShinyLegendary::runNextState()
                 if (m_substage == SS_GameStart)
                 {
                     m_substage = SS_Talk;
+                    switch (m_type)
+                    {
+                        case LT_DialgaPalkia: setState_runCommand(C_TalkDialgaPalkia); break;
+                        case LT_Regigigas: setState_runCommand(C_TalkRegigigas); break;
+                        default: setState_runCommand(C_Talk); break;
+                    }
                     setState_runCommand(C_Talk);
                     m_parameters.vlcWrapper->clearCaptures();
                 }

@@ -2244,7 +2244,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     }
     case SP_BDSP_ShinyLegendary:
     {
-        m_smartProgram = new SmartBDSPShinyLegendary(parameter);
+        m_smartProgram = new SmartBDSPShinyLegendary((SmartBDSPShinyLegendary::LegendaryType)ui->SP11_CB_LegendaryType->currentIndex(), parameter);
         break;
     }
     case SP_BDSP_DuplicateItem1to30:

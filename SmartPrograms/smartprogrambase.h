@@ -196,7 +196,7 @@ public:
             case SP_BDSP_MenuGlitch113:     return 0;
             case SP_BDSP_BoxDuplication:    return 9;
             case SP_BDSP_BoxOperation:      return 10;
-            case SP_BDSP_ShinyLegendary:    return 0;
+            case SP_BDSP_ShinyLegendary:    return 11;
             case SP_BDSP_DuplicateItem1to30:return 0;
 
             case SP_COUNT:                  return -1;

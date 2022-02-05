@@ -8,7 +8,17 @@
 class SmartBDSPShinyLegendary : public SmartProgramBase
 {
 public:
+    enum LegendaryType : uint8_t
+    {
+        LT_DialgaPalkia = 0,
+        LT_Regigigas,
+        LT_Others,
+        LT_COUNT,
+    };
+
+public:
     explicit SmartBDSPShinyLegendary(
+            LegendaryType type,
             SmartProgramParameter parameter
             );
 
@@ -21,11 +31,13 @@ private:
     void runRestartCommand();
 
     // Command indices
-    Command const C_Restart = 0;
-    Command const C_RestartNoUpdate = 1;
-    Command const C_Talk    = 2;
-    Command const C_Capture = 3;
-    Command const C_COUNT   = 4;
+    Command const C_Restart             = 0;
+    Command const C_RestartNoUpdate     = 1;
+    Command const C_Talk                = 2;
+    Command const C_TalkDialgaPalkia    = 3;
+    Command const C_TalkRegigigas       = 4;
+    Command const C_Capture             = 5;
+    Command const C_COUNT               = 6;
 
     // List of test color
     HSVRange const C_Color_Dialog = HSVRange(0,0,230,359,30,255);
@@ -50,6 +62,7 @@ private:
     Substage m_substage;
 
     // Members
+    LegendaryType m_type;
     double m_noShinyTimer;
     bool m_dialogWasFound;
     QElapsedTimer m_elapsedTimer;

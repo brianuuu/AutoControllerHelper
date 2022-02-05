@@ -121,6 +121,8 @@
 	<C_Restart>Home,1,Nothing,21,X,1,ASpam,120</C_Restart>
 	<C_RestartNoUpdate>Home,1,Nothing,21,X,10,A,20,LDown,1,LUp,1,A,20,LUp,1,ASpam,120</C_RestartNoUpdate>
 	<C_Talk>Nothing,21,A,1,BSpam,120,Nothing,80</C_Talk>
+	<C_TalkDialgaPalkia>LUp,40,BSpam,120,Nothing,90</C_TalkDialgaPalkia>
+	<C_TalkRegigigas>Nothing,21,A,1,BSpam,200,Nothing,80</C_TalkRegigigas>
 	<C_Capture>Nothing,63,Capture,22</C_Capture>
   </SmartBDSPShinyLegendary>
   <SmartBDSPDuplicateItem1to30>
