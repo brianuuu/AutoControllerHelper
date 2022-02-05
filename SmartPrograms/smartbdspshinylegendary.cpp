@@ -86,7 +86,6 @@ void SmartBDSPShinyLegendary::runNextState()
                         case LT_Regigigas: setState_runCommand(C_TalkRegigigas); break;
                         default: setState_runCommand(C_Talk); break;
                     }
-                    setState_runCommand(C_Talk);
                     m_parameters.vlcWrapper->clearCaptures();
                 }
                 else
@@ -118,7 +117,7 @@ void SmartBDSPShinyLegendary::runNextState()
         }
         break;
     }
-    case SS_Detect1: // wild starly appeared
+    case SS_Detect1: // Legendary appeared!
     case SS_Detect2: // Go! <POKEMON>!
     {
         if (state == S_CaptureReady)
