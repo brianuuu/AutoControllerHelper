@@ -34,7 +34,6 @@ enum SmartProgram : uint32_t
     SP_BerryFarmer,
     SP_WattFarmer,
 
-    SP_BDSP_DialgaPalkia,
     SP_BDSP_Starter,
     SP_BDSP_MenuGlitch113,
     SP_BDSP_BoxDuplication,
@@ -100,7 +99,6 @@ public:
             case SP_BerryFarmer:            return "Berry Farmer";
             case SP_WattFarmer:             return "Watt Farmer";
 
-            case SP_BDSP_DialgaPalkia:      return "Reset Dialga/Palkia";
             case SP_BDSP_Starter:           return "Reset Starter";
             case SP_BDSP_MenuGlitch113:     return "Menu Glitch v1.1.3";
             case SP_BDSP_BoxDuplication:    return "Box Duplication Glitch";
@@ -129,7 +127,6 @@ public:
         if (sp == "Berry Farmer")                   return SP_BerryFarmer;
         if (sp == "Watt Farmer")                    return SP_WattFarmer;
 
-        if (sp == "Reset Dialga/Palkia")            return SP_BDSP_DialgaPalkia;
         if (sp == "Reset Starter")                  return SP_BDSP_Starter;
         if (sp == "Menu Glitch v1.1.3")             return SP_BDSP_MenuGlitch113;
         if (sp == "Box Duplication Glitch")         return SP_BDSP_BoxDuplication;
@@ -159,7 +156,6 @@ public:
             case SP_BerryFarmer:            return "SmartBerryFarmer";
             case SP_WattFarmer:             return "SmartWattFarmer";
 
-            case SP_BDSP_DialgaPalkia:      return "SmartBDSPDialgaPalkia";
             case SP_BDSP_Starter:           return "SmartBDSPStarter";
             case SP_BDSP_MenuGlitch113:     return "SmartBDSPMenuGlitch113";
             case SP_BDSP_BoxDuplication:    return "SmartBDSPBoxDuplication";
@@ -191,7 +187,6 @@ public:
             case SP_BerryFarmer:            return 6;
             case SP_WattFarmer:             return 6;
 
-            case SP_BDSP_DialgaPalkia:      return 0;
             case SP_BDSP_Starter:           return 7;
             case SP_BDSP_MenuGlitch113:     return 0;
             case SP_BDSP_BoxDuplication:    return 9;
@@ -228,7 +223,7 @@ public:
 
     static QString getProgramGamePrefix(SmartProgram sp)
     {
-        if (sp >= SP_BDSP_DialgaPalkia)
+        if (sp >= SP_BDSP_Starter)
         {
             return "Pokemon BDSP";
         }

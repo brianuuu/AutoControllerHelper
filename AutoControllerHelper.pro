@@ -22,7 +22,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     SmartPrograms/smartbdspboxoperation.cpp \
-    SmartPrograms/smartbdspdialgapalkia.cpp \
     SmartPrograms/smartbdspduplicateitem1to30.cpp \
     SmartPrograms/smartbdspshinylegendary.cpp \
     SmartPrograms/smartbdspstarter.cpp \
@@ -51,7 +50,6 @@ SOURCES += \
 
 HEADERS += \
     SmartPrograms/smartbdspboxoperation.h \
-    SmartPrograms/smartbdspdialgapalkia.h \
     SmartPrograms/smartbdspduplicateitem1to30.h \
     SmartPrograms/smartbdspshinylegendary.h \
     SmartPrograms/smartbdspstarter.h \

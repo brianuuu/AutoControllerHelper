@@ -2217,11 +2217,6 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartWattFarmer(ui->SP6_CB_Skips->isChecked() ? ui->SP6_SB_Skips->value() : 0, parameter);
         break;
     }
-    case SP_BDSP_DialgaPalkia:
-    {
-        m_smartProgram = new SmartBDSPDialgaPalkia(parameter);
-        break;
-    }
     case SP_BDSP_Starter:
     {
         m_smartProgram = new SmartBDSPStarter(ui->SP7_CB_Starter->currentIndex(), parameter);
