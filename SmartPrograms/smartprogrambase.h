@@ -40,6 +40,7 @@ enum SmartProgram : uint32_t
     SP_BDSP_BoxDuplication,
     SP_BDSP_BoxOperation,
     SP_BDSP_ShinyLegendary,
+    SP_BDSP_DuplicateItem1to30,
 
     SP_COUNT
 };
@@ -105,6 +106,7 @@ public:
             case SP_BDSP_BoxDuplication:    return "Box Duplication Glitch";
             case SP_BDSP_BoxOperation:      return "Box Operation";
             case SP_BDSP_ShinyLegendary:    return "Reset Legendary";
+            case SP_BDSP_DuplicateItem1to30:return "Duplicate Item 1 to 30";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -133,6 +135,7 @@ public:
         if (sp == "Box Duplication Glitch")         return SP_BDSP_BoxDuplication;
         if (sp == "Box Operation")                  return SP_BDSP_BoxOperation;
         if (sp == "Reset Legendary")                return SP_BDSP_ShinyLegendary;
+        if (sp == "Duplicate Item 1 to 30")         return SP_BDSP_DuplicateItem1to30;
 
         return SP_COUNT;
     }
@@ -162,6 +165,7 @@ public:
             case SP_BDSP_BoxDuplication:    return "SmartBDSPBoxDuplication";
             case SP_BDSP_BoxOperation:      return "SmartBDSPBoxOperation";
             case SP_BDSP_ShinyLegendary:    return "SmartBDSPShinyLegendary";
+            case SP_BDSP_DuplicateItem1to30:return "SmartBDSPDuplicateItem1to30";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -193,6 +197,7 @@ public:
             case SP_BDSP_BoxDuplication:    return 9;
             case SP_BDSP_BoxOperation:      return 10;
             case SP_BDSP_ShinyLegendary:    return 0;
+            case SP_BDSP_DuplicateItem1to30:return 0;
 
             case SP_COUNT:                  return -1;
         }

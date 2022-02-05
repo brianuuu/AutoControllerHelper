@@ -2247,6 +2247,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartBDSPShinyLegendary(parameter);
         break;
     }
+    case SP_BDSP_DuplicateItem1to30:
+    {
+        m_smartProgram = new SmartBDSPDuplicateItem1to30(parameter);
+        break;
+    }
     default:
     {
         QMessageBox::critical(this, "Error", "No code exist for this Smart Program!");
