@@ -160,6 +160,7 @@ bool SmartProgramBase::checkColorMatchHSV(QColor testColor, HSVRange hsvRange)
 bool SmartProgramBase::checkPixelColorMatch(QPoint pixelPos, QColor targetColor, int threshold)
 {
     // m_frameAnalyze must be ready before calling this!
+    Q_ASSERT(m_state == S_CaptureReady);
 
     QColor testColor = m_capture.pixelColor(pixelPos);
     bool success = checkColorMatch(testColor, targetColor, threshold);
@@ -179,6 +180,7 @@ bool SmartProgramBase::checkPixelColorMatch(QPoint pixelPos, QColor targetColor,
 QColor SmartProgramBase::getAverageColor(QRect rectPos)
 {
     // m_frameAnalyze must be ready before calling this!
+    Q_ASSERT(m_state == S_CaptureReady);
 
     QImage cropped = m_capture.copy(rectPos);
     qreal r = 0;
@@ -208,6 +210,7 @@ QColor SmartProgramBase::getAverageColor(QRect rectPos)
 bool SmartProgramBase::checkAverageColorMatch(QRect rectPos, QColor targetColor, int threshold)
 {
     // m_frameAnalyze must be ready before calling this!
+    Q_ASSERT(m_state == S_CaptureReady);
 
     QColor avgColor = getAverageColor(rectPos);
     bool success = checkColorMatch(avgColor, targetColor, threshold);
@@ -227,6 +230,7 @@ bool SmartProgramBase::checkAverageColorMatch(QRect rectPos, QColor targetColor,
 double SmartProgramBase::getBrightnessMean(QRect rectPos, HSVRange hsvRange)
 {
     // m_frameAnalyze must be ready before calling this!
+    Q_ASSERT(m_state == S_CaptureReady);
 
     QImage cropped = m_capture.copy(rectPos);
     if (m_parameters.preview)
@@ -273,6 +277,7 @@ double SmartProgramBase::getBrightnessMean(QRect rectPos, HSVRange hsvRange)
 bool SmartProgramBase::checkBrightnessMeanTarget(QRect rectPos, SmartProgramBase::HSVRange hsvRange, double target)
 {
     // m_frameAnalyze must be ready before calling this!
+    Q_ASSERT(m_state == S_CaptureReady);
 
     double mean = getBrightnessMean(rectPos, hsvRange);
     bool success = mean > target;
