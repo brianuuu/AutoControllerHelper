@@ -25,6 +25,9 @@
     #define STREAM_COUNTER_PATH "../StreamCounters/"
 #endif
 
+#define SET_BIT(var,pos) (var |= (1U << pos))
+#define CLEAR_BIT(var,pos) (var &= ~(1U << pos))
+#define CHECK_BIT(var,pos) (var & (1U << pos))
 #define COMMAND_MAX 30
 #define SMART_HEX_VERSION 2
 

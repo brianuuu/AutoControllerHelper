@@ -3,12 +3,16 @@
 SmartBrightnessMeanFinder::SmartBrightnessMeanFinder
 (
     QVector<QSpinBox*> spinBoxes,
-    QLabel* label,
+    QLabel* labelMean,
+    QPushButton* imageMatchBtn,
+    QLabel* labelImageMatch,
     SmartProgramParameter parameter
 )
     : SmartProgramBase(parameter)
     , m_spinBoxes(spinBoxes)
-    , m_meanOutput(label)
+    , m_meanOutput(labelMean)
+    , m_imageMatchBtn(imageMatchBtn)
+    , m_imageMatchResult(labelImageMatch)
 {
     init();
 
@@ -32,6 +36,9 @@ SmartBrightnessMeanFinder::SmartBrightnessMeanFinder
 void SmartBrightnessMeanFinder::init()
 {
     SmartProgramBase::init();
+
+    connect(m_imageMatchBtn, &QPushButton::clicked, this, &SmartBrightnessMeanFinder::imageMatchAdd);
+    m_imageMatchStarted = false;
 }
 
 void SmartBrightnessMeanFinder::reset()
@@ -64,12 +71,51 @@ void SmartBrightnessMeanFinder::runNextState()
             double mean = getBrightnessMean(rect, HSVRange(minHSV,maxHSV));
             m_meanOutput->setText("Brightness Mean = " + QString::number(mean));
 
+            // Image matching
+            if (m_imageMatchStarted)
+            {
+                double ratio = getImageMatch(rect, HSVRange(minHSV,maxHSV), m_imageMatchImage);
+                m_imageMatchResult->setText("Similarity Ratio = " + QString::number(ratio));
+
+                if (m_imageMatchImage.width() != m_spinBoxes[2]->value() || m_imageMatchImage.height() != m_spinBoxes[3]->value())
+                {
+                    emit printLog("Image size changed", LOG_WARNING);
+                    m_imageMatchStarted = false;
+                }
+            }
+
             m_substage = SS_Init;
-            runNextStateDelay(20);
+            runNextStateDelay(100);
         }
         break;
     }
     }
 
     SmartProgramBase::runNextState();
+}
+
+void SmartBrightnessMeanFinder::imageMatchAdd()
+{
+    QString file = QFileDialog::getOpenFileName(this, tr("Import Image"), "", "Monochrone BMP (*.bmp)");
+    if (file.isEmpty()) return;
+
+    QImage tempImage(file);
+    if (tempImage.width() != m_spinBoxes[2]->value() || tempImage.height() != m_spinBoxes[3]->value())
+    {
+        emit printLog("Image size not match", LOG_ERROR);
+        return;
+    }
+
+    m_imageMatchImage = tempImage.convertToFormat(QImage::Format_MonoLSB, Qt::MonoOnly);
+    m_imageMatchStarted = true;
+
+    /*for (int y = 1; y < m_imageMatchImage.height(); y++)
+    {
+        uint8_t *rowData = (uint8_t*)m_imageMatchImage.scanLine(y);
+        for (int x = 0; x < m_imageMatchImage.width(); x++)
+        {
+            uint8_t byte = rowData[x / 8];
+            qDebug() << (CHECK_BIT(byte, x % 8) ? 0 : 1);
+        }
+    }*/
 }

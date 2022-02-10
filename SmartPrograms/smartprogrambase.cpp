@@ -188,9 +188,10 @@ QColor SmartProgramBase::getAverageColor(QRect rectPos)
     qreal b = 0;
     for (int y = 0; y < cropped.height(); y++)
     {
+        QRgb *rowData = (QRgb*)cropped.scanLine(y);
         for (int x = 0; x < cropped.width(); x++)
         {
-            QColor color = cropped.pixelColor(x,y);
+            QColor color = QColor::fromRgb(rowData[x]);
             r += color.redF();
             g += color.greenF();
             b += color.blueF();
@@ -240,16 +241,19 @@ double SmartProgramBase::getBrightnessMean(QRect rectPos, HSVRange hsvRange)
         m_parameters.preview->addPixmap(QPixmap::fromImage(cropped));
     }
 
-    QImage masked = QImage(cropped.size(), QImage::Format_Mono);
+    QImage masked = QImage(cropped.size(), QImage::Format_MonoLSB);
     masked.setColorTable({0xFF000000,0xFFFFFFFF});
 
     double mean = 0;
+
     for (int y = 0; y < cropped.height(); y++)
     {
+        QRgb *rowData = (QRgb*)cropped.scanLine(y);
+        uint8_t *rowMaskedData = (uint8_t*)masked.scanLine(y);
         for (int x = 0; x < cropped.width(); x++)
         {
             // Mask the target color
-            bool matched = checkColorMatchHSV(cropped.pixelColor(x,y), hsvRange);
+            bool matched = checkColorMatchHSV(QColor::fromRgb(rowData[x]), hsvRange);
             if (matched)
             {
                 mean += 255;
@@ -257,7 +261,7 @@ double SmartProgramBase::getBrightnessMean(QRect rectPos, HSVRange hsvRange)
 
             if (m_parameters.previewMasked)
             {
-                masked.setPixel(x, y, matched ? 1 : 0);
+                matched ? SET_BIT(rowMaskedData[x / 8], x % 8) : CLEAR_BIT(rowMaskedData[x / 8], x % 8);
             }
         }
     }
@@ -283,6 +287,112 @@ bool SmartProgramBase::checkBrightnessMeanTarget(QRect rectPos, SmartProgramBase
     bool success = mean > target;
 
     QString logStr = "Mean (" + QString::number(mean) + ") > target (" + QString::number(target) + ") = ";
+    logStr += success ? "TRUE" : "FALSE";
+    if (m_parameters.settings->isLogDebugColor())
+    {
+        emit printLog(logStr, success ? LOG_SUCCESS : LOG_ERROR);
+    }
+    else
+    {
+        qDebug() << logStr;
+    }
+
+    return success;
+}
+
+double SmartProgramBase::getImageSimilarRatio(const QImage &query, const QImage &database)
+{
+    double hitCount = 0;
+    double missCount = 0;
+    double count = 0;
+    for (int y = 0; y < query.height(); y++)
+    {
+        uint8_t *rowData = (uint8_t*)query.scanLine(y);
+        uint8_t *rowData2 = (uint8_t*)database.scanLine(y);
+        for (int x = 0; x < query.width(); x++)
+        {
+            // Only counts query's white pixels
+            // Remember, bit not set = white
+            bool pixelNotSet = !CHECK_BIT(rowData[x/8], x%8);
+            if (pixelNotSet)
+            {
+                count++;
+                if (!CHECK_BIT(rowData2[x/8], x%8))
+                {
+                    hitCount++;
+                }
+                else
+                {
+                    missCount++;
+                }
+            }
+        }
+    }
+
+    if (count <= 0)
+    {
+        return -1;
+    }
+
+    // Can be negative if we have >50% miss
+    return (hitCount - missCount) / count;
+}
+
+double SmartProgramBase::getImageMatch(QRect rectPos, SmartProgramBase::HSVRange hsvRange, const QImage &testImage)
+{
+    // m_frameAnalyze must be ready before calling this!
+    Q_ASSERT(m_state == S_CaptureReady);
+
+    QImage cropped = m_capture.copy(rectPos);
+    QImage masked = QImage(cropped.size(), QImage::Format_MonoLSB);
+    masked.setColorTable({0xFF000000,0xFFFFFFFF});
+
+    for (int y = 0; y < cropped.height(); y++)
+    {
+        QRgb *rowData = (QRgb*)cropped.scanLine(y);
+        uint8_t *rowMaskedData = (uint8_t*)masked.scanLine(y);
+        for (int x = 0; x < cropped.width(); x++)
+        {
+            // Note: This is fliped
+            bool matched = checkColorMatchHSV(QColor::fromRgb(rowData[x]), hsvRange);
+            matched ? CLEAR_BIT(rowMaskedData[x / 8], x % 8) : SET_BIT(rowMaskedData[x / 8], x % 8);
+        }
+    }
+
+    // Similar (query -> database)
+    double sqd = getImageSimilarRatio(masked, testImage);
+    qDebug() << "sqd =" << sqd;
+    if (sqd < 0) return 0;
+
+    // Similar (database -> query)
+    double sdq = getImageSimilarRatio(testImage, masked);
+    qDebug() << "sdq =" << sdq;
+    if (sdq < 0) return 0;
+
+    return (sqd + sdq) / 2;
+}
+
+bool SmartProgramBase::checkImageMatchTarget(QRect rectPos, SmartProgramBase::HSVRange hsvRange, const QImage &testImage, double target)
+{
+    // m_frameAnalyze must be ready before calling this!
+    Q_ASSERT(m_state == S_CaptureReady);
+
+    if (rectPos.width() != testImage.width() || rectPos.height() != testImage.height())
+    {
+        emit printLog("Test image size does not match for image matching", LOG_ERROR);
+        return false;
+    }
+
+    if (testImage.format() != QImage::Format_MonoLSB)
+    {
+        emit printLog("Test image format is not monochrome", LOG_ERROR);
+        return false;
+    }
+
+    double ratio = getImageMatch(rectPos, hsvRange, testImage);
+    bool success = ratio > target;
+
+    QString logStr = "Image Match Ratio (" + QString::number(ratio) + ") > target (" + QString::number(target) + ") = ";
     logStr += success ? "TRUE" : "FALSE";
     if (m_parameters.settings->isLogDebugColor())
     {

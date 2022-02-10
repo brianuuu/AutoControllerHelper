@@ -295,8 +295,13 @@ protected:
     bool checkPixelColorMatch(QPoint pixelPos, QColor targetColor, int threshold = 10);
     QColor getAverageColor(QRect rectPos);
     bool checkAverageColorMatch(QRect rectPos, QColor targetColor, int threshold = 10);
+
     double getBrightnessMean(QRect rectPos, HSVRange hsvRange);
     bool checkBrightnessMeanTarget(QRect rectPos, HSVRange hsvRange, double target);
+
+    double getImageSimilarRatio(QImage const& query, QImage const& database);
+    double getImageMatch(QRect rectPos, HSVRange hsvRange, QImage const& testImage);
+    bool checkImageMatchTarget(QRect rectPos, HSVRange hsvRange, QImage const& testImage, double target);
 
     typedef int Command;
     bool inializeCommands(int size);
