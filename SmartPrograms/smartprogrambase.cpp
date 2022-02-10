@@ -306,6 +306,12 @@ bool SmartProgramBase::inializeCommands(int size)
         return false;
     }
 
+    // No command
+    if (size <= 0)
+    {
+        return true;
+    }
+
     bool valid = false;
     bool found = false;
     QDomNodeList programList = m_parameters.smartProgramCommands->firstChildElement().childNodes();
