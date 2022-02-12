@@ -133,8 +133,8 @@
 	<C_Save>Nothing,40,DUp,1,Nothing,10,ZR,1,Nothing,16,A,60,B,10,ZL,10,B,30</C_Save>
 	<C_GetOnWyrdeer>LRight,2,LDown,1,Nothing,20,Plus,30,ZL,1,Nothing,20</C_GetOnWyrdeer>
 	<C_GetOnWyrdeerNoMove>Plus,30,Nothing,20</C_GetOnWyrdeerNoMove>
-	<C_FindCoin>LUp,100,LUpLeft,30,LUp,30,LUpLeft,30,LUp,40,LUpRight,80,LUp,60,LLeft,50,LUpLeft,30,DRight,1,Nothing,50,B,50,Nothing,100</C_FindCoin>
-	<C_FindCharm>LLeft,20,LUp,90,LLeft,92,LUp,150,LRight,40,LUp,30,LUpRight,35,LUp,50,DRight,1,Nothing,50,B,50,Nothing,100</C_FindCharm>
+	<C_FindCoin>LUp,100,LUpLeft,30,LUp,30,LUpLeft,30,LUp,40,LUpRight,80,LUp,60,LLeft,50,LUpLeft,30,DRight,1,Nothing,50,B,50,Nothing,80</C_FindCoin>
+	<C_FindCharm>LLeft,20,LUp,90,LLeft,92,LUp,150,LRight,40,LUp,30,LUpRight,35,LUp,50,DRight,1,Nothing,50,B,50,Nothing,80</C_FindCharm>
 	<C_AfterBattle>Nothing,200,ASpam,270,DRight,1,Plus,30,LUpRight,80,Nothing,80</C_AfterBattle>
 	<C_AfterBattleCharm>Nothing,200,ASpam,270,DRight,1,Plus,30,B,50,Nothing,80</C_AfterBattleCharm>
 	<C_TalkeToLaventon>Nothing,40,LUpRight,34,A,20</C_TalkeToLaventon>
