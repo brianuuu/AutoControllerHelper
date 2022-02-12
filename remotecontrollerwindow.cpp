@@ -1797,10 +1797,11 @@ void RemoteControllerWindow::on_SmartProgram_printLog(const QString log, QColor 
         {
             QTextStream stream(&file);
 
-            if (color == LOG_SUCCESS) stream << "[SUCCESS] ";
-            if (color == LOG_WARNING) stream << "[WARNING] ";
-            if (color == LOG_ERROR) stream << "[ERROR] ";
-            stream << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss - ") + log + "\n";
+            QString tag;
+            if (color == LOG_SUCCESS) tag = "[SUCCESS] ";
+            if (color == LOG_WARNING) tag = "[WARNING] ";
+            if (color == LOG_ERROR) tag = "[ERROR] ";
+            stream << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss - ") + tag + log + "\n";
 
             file.close();
         }
