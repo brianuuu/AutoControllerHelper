@@ -41,7 +41,7 @@ void SmartProgramBase::stop()
 
 void SmartProgramBase::commandFinished()
 {
-    if (m_state == S_CommandRunning)
+    //if (m_state == S_CommandRunning)
     {
         qDebug() << "command finish";
         m_state = S_CommandFinished;
@@ -300,6 +300,18 @@ bool SmartProgramBase::checkBrightnessMeanTarget(QRect rectPos, SmartProgramBase
     return success;
 }
 
+bool SmartProgramBase::setImageMatchFromResource(const QString &name, QImage &image)
+{
+    image = QImage(":/resources/ImageMatch/" + name + ".bmp").convertToFormat(QImage::Format_MonoLSB, Qt::MonoOnly);
+
+    if (image.isNull())
+    {
+        setState_error("Unable to find image match resource '" + name + "'");
+        return false;
+    }
+    return true;
+}
+
 double SmartProgramBase::getImageSimilarRatio(const QImage &query, const QImage &database)
 {
     double hitCount = 0;
@@ -466,13 +478,13 @@ bool SmartProgramBase::inializeCommands(int size)
     return valid;
 }
 
-void SmartProgramBase::setState_runCommand(Command commandIndex)
+void SmartProgramBase::setState_runCommand(Command commandIndex, bool requestFrameAnalyze)
 {
     m_customCommand.clear();
     if (m_commands.contains(commandIndex))
     {
         m_commandIndex = commandIndex;
-        m_state = S_CommandRunning;
+        m_state = requestFrameAnalyze ? S_CommandRunningCaptureRequested : S_CommandRunning;
     }
     else
     {
@@ -481,12 +493,12 @@ void SmartProgramBase::setState_runCommand(Command commandIndex)
     }
 }
 
-void SmartProgramBase::setState_runCommand(const QString &customCommand)
+void SmartProgramBase::setState_runCommand(const QString &customCommand, bool requestFrameAnalyze)
 {
     if (!customCommand.isEmpty())
     {
         m_customCommand = customCommand;
-        m_state = S_CommandRunning;
+        m_state = requestFrameAnalyze ? S_CommandRunningCaptureRequested : S_CommandRunning;
     }
     else
     {
@@ -536,6 +548,7 @@ void SmartProgramBase::runNextState()
         break;
     }
     case S_CommandRunning:
+    case S_CommandRunningCaptureRequested:
     {
         // If sequence failed to run, the client is responsible to stop this smart program
         // otherwise it will stuck in this state forever
@@ -560,6 +573,31 @@ void SmartProgramBase::runNextState()
         }
 
         emit runSequence(command);
+
+        if (m_state != S_CommandRunningCaptureRequested)
+        {
+            break;
+        }
+        [[clang::fallthrough]];
+    }
+    case S_CaptureRequested:
+    {
+        m_parameters.vlcWrapper->getFrame(m_capture);
+        m_state = S_CaptureReady;
+        m_runNextState = true;
+
+        /*
+        if (m_cameraCapture->isReadyForCapture())
+        {
+            m_cameraCapture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
+            m_cameraCapture->capture();
+        }
+        else
+        {
+            // Try again later
+            m_runNextState = true;
+        }
+        */
         break;
     }
     case S_TakeScreenshot:
@@ -583,26 +621,6 @@ void SmartProgramBase::runNextState()
             emit printLog("Saving screenshot: " + nameWithTime);
             m_cameraCapture->setCaptureDestination(QCameraImageCapture::CaptureToFile);
             m_cameraCapture->capture(SCREENSHOT_PATH + nameWithTime);
-        }
-        else
-        {
-            // Try again later
-            m_runNextState = true;
-        }
-        */
-        break;
-    }
-    case S_CaptureRequested:
-    {
-        m_parameters.vlcWrapper->getFrame(m_capture);
-        m_state = S_CaptureReady;
-        m_runNextState = true;
-
-        /*
-        if (m_cameraCapture->isReadyForCapture())
-        {
-            m_cameraCapture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
-            m_cameraCapture->capture();
         }
         else
         {

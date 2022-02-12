@@ -53,6 +53,8 @@
 #include "SmartPrograms/smartbdspshinylegendary.h"
 #include "SmartPrograms/smartbdspduplicateitem1to30.h"
 
+#include "SmartPrograms/smartplanuggetfarmer.h"
+
 namespace Ui {
 class RemoteControllerWindow;
 }

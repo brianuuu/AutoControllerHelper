@@ -2247,6 +2247,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartBDSPDuplicateItem1to30(parameter);
         break;
     }
+    case SP_PLA_NuggetFarmer:
+    {
+        m_smartProgram = new SmartPLANuggetFarmer(parameter);
+        break;
+    }
     default:
     {
         QMessageBox::critical(this, "Error", "No code exist for this Smart Program!");

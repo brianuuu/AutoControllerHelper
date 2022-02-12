@@ -3,5 +3,8 @@
         <file>Sounds/06-caught-a-pokemon.mp3</file>
         <file>UI/Mapping.png</file>
         <file>UI/NoVideo.png</file>
+        <file>ImageMatch/PLA_AConfirm.bmp</file>
+        <file>ImageMatch/PLA_RoyalWyrdeer.bmp</file>
+        <file>ImageMatch/PLA_RoyalBraviary.bmp</file>
     </qresource>
 </RCC>

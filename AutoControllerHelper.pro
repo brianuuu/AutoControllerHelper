@@ -29,6 +29,7 @@ SOURCES += \
     SmartPrograms/smartcolorcalibrator.cpp \
     SmartPrograms/smartdailyhighlight.cpp \
     SmartPrograms/smartloto.cpp \
+    SmartPrograms/smartplanuggetfarmer.cpp \
     SmartPrograms/smartsimpleprogram.cpp \
     SmartPrograms/smartwattfarmer.cpp \
     commandsender.cpp \
@@ -57,6 +58,7 @@ HEADERS += \
     SmartPrograms/smartcolorcalibrator.h \
     SmartPrograms/smartdailyhighlight.h \
     SmartPrograms/smartloto.h \
+    SmartPrograms/smartplanuggetfarmer.h \
     SmartPrograms/smartsimpleprogram.h \
     SmartPrograms/smartwattfarmer.h \
     autocontrollerdefines.h \

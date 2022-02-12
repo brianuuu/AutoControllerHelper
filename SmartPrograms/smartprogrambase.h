@@ -41,6 +41,8 @@ enum SmartProgram : uint32_t
     SP_BDSP_ShinyLegendary,
     SP_BDSP_DuplicateItem1to30,
 
+    SP_PLA_NuggetFarmer,
+
     SP_COUNT
 };
 
@@ -106,6 +108,8 @@ public:
             case SP_BDSP_ShinyLegendary:    return "Reset Legendary";
             case SP_BDSP_DuplicateItem1to30:return "Duplicate Item 1 to 30";
 
+            case SP_PLA_NuggetFarmer:       return "Nugget Farmer";
+
             case SP_COUNT:                  return "Invalid";
         }
     }
@@ -133,6 +137,8 @@ public:
         if (sp == "Box Operation")                  return SP_BDSP_BoxOperation;
         if (sp == "Reset Legendary")                return SP_BDSP_ShinyLegendary;
         if (sp == "Duplicate Item 1 to 30")         return SP_BDSP_DuplicateItem1to30;
+
+        if (sp == "Nugget Farmer")                  return SP_PLA_NuggetFarmer;
 
         return SP_COUNT;
     }
@@ -162,6 +168,8 @@ public:
             case SP_BDSP_BoxOperation:      return "SmartBDSPBoxOperation";
             case SP_BDSP_ShinyLegendary:    return "SmartBDSPShinyLegendary";
             case SP_BDSP_DuplicateItem1to30:return "SmartBDSPDuplicateItem1to30";
+
+            case SP_PLA_NuggetFarmer:       return "SmartPLANuggetFarmer";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -194,6 +202,8 @@ public:
             case SP_BDSP_ShinyLegendary:    return 11;
             case SP_BDSP_DuplicateItem1to30:return 0;
 
+            case SP_PLA_NuggetFarmer:       return 0;
+
             case SP_COUNT:                  return -1;
         }
     }
@@ -223,7 +233,11 @@ public:
 
     static QString getProgramGamePrefix(SmartProgram sp)
     {
-        if (sp >= SP_BDSP_Starter)
+        if (sp >= SP_PLA_NuggetFarmer)
+        {
+            return "Pokemon Legends: Arceus";
+        }
+        else if (sp >= SP_BDSP_Starter)
         {
             return "Pokemon BDSP";
         }
@@ -299,6 +313,7 @@ protected:
     double getBrightnessMean(QRect rectPos, HSVRange hsvRange);
     bool checkBrightnessMeanTarget(QRect rectPos, HSVRange hsvRange, double target);
 
+    bool setImageMatchFromResource(QString const& name, QImage& image);
     double getImageSimilarRatio(QImage const& query, QImage const& database);
     double getImageMatch(QRect rectPos, HSVRange hsvRange, QImage const& testImage);
     bool checkImageMatchTarget(QRect rectPos, HSVRange hsvRange, QImage const& testImage, double target);
@@ -312,6 +327,7 @@ protected:
         S_NotStarted,
         S_Completed,
         S_CommandRunning,
+        S_CommandRunningCaptureRequested,
         S_CommandFinished,
         S_TakeScreenshot,
         S_TakeScreenshotFinished,
@@ -322,8 +338,8 @@ protected:
     // State functions
     State getState() { return m_state; }
     void setState_completed() { m_state = S_Completed; }
-    void setState_runCommand(Command commandIndex);
-    void setState_runCommand(QString const& customCommand);
+    void setState_runCommand(Command commandIndex, bool requestFrameAnalyze = false);
+    void setState_runCommand(QString const& customCommand, bool requestFrameAnalyze = false);
     void setState_frameAnalyzeRequest();
     void setState_error(QString _errorMsg) { m_state = S_Error; m_errorMsg = _errorMsg; }
 

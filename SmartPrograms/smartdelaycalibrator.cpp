@@ -110,9 +110,7 @@ void SmartDelayCalibrator::runNextState()
                 }
                 else
                 {
-                    qDebug() << "A,1,Nothing,200";
-                    emit runSequence(m_commands[C_APress]);
-                    setState_frameAnalyzeRequest();
+                    setState_runCommand(C_APress, true);
                 }
             }
             else
