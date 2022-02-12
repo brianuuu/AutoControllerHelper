@@ -1,7 +1,7 @@
 #include "autocontrollerwindow.h"
 #include "ui_autocontrollerwindow.h"
 
-static const QString c_version = "5.1.3";
+static const QString c_version = "5.2.0";
 
 //---------------------------------------------------------------------------
 // Constructor
