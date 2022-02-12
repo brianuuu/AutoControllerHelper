@@ -32,8 +32,8 @@ void SmartPLANuggetFarmer::runNextState()
     {
     case SS_Init:
     {
-        /*setState_frameAnalyzeRequest();
-        m_substage = SS_SelectWyrdeer;*/
+        /*m_substage = SS_GetOnWyrdeer;
+        setState_runCommand(m_isCoin ? C_GetOnWyrdeer : C_GetOnWyrdeerNoMove);*/
 
         initStat(m_statSearches, "Searches");
         initStat(m_statCharmFound, "Charm");
@@ -292,13 +292,13 @@ void SmartPLANuggetFarmer::runNextState()
             {
                 // This will interrupt the currently running command
                 m_substage = SS_StartBattle;
-                setState_runCommand("Nothing,5");
+                setState_runCommand("Nothing,20");
             }
             else if (checkImageMatchTarget(A_Royal.m_rect, C_Color_RoyalWhite, m_imageMatch_RoyalWyrdeer, 0.5))
             {
                 // This will interrupt the currently running command
                 m_substage = SS_AlphaKnockOff;
-                setState_runCommand("Nothing,5");
+                setState_runCommand("Nothing,20");
             }
             else
             {
@@ -325,16 +325,24 @@ void SmartPLANuggetFarmer::runNextState()
     }
     case SS_DuringBattle:
     {
+        double elapsed = m_elapsedTimer.elapsed();
         if (state == S_CommandFinished)
         {
             setState_frameAnalyzeRequest();
 
-            m_parameters.vlcWrapper->clearCaptures();
-            m_parameters.vlcWrapper->setAreas({A_BattleEnd});
+            if (elapsed > 20000)
+            {
+                m_parameters.vlcWrapper->clearCaptures();
+                m_parameters.vlcWrapper->setAreas({A_BattleEnd});
+            }
+            else
+            {
+                emit printLog("Previous command has ended eariler than expected, delaying until 20s after battle started", LOG_ERROR);
+            }
         }
         else if (state == S_CaptureReady)
         {
-            if (m_elapsedTimer.elapsed() > 120000)
+            if (elapsed > 120000)
             {
                 incrementStat(m_statError);
                 emit printLog("Unable to detect battle end for too long, restarting game", LOG_ERROR);
@@ -344,7 +352,7 @@ void SmartPLANuggetFarmer::runNextState()
 
                 m_parameters.vlcWrapper->clearCaptures();
             }
-            else if (checkAverageColorMatch(A_BattleEnd.m_rect, QColor(0,0,0)))
+            else if (elapsed > 20000 && checkAverageColorMatch(A_BattleEnd.m_rect, QColor(0,0,0)))
             {
                 // TODO: it is possible we have switched to Braviary just before Coin
                 emit printLog("Battle complete!");
