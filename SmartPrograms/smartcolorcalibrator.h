@@ -15,7 +15,7 @@ public:
             SmartProgramParameter parameter
             );
 
-    virtual SmartProgram getProgramEnum() { return SP_BrightnessMeanFinder; }
+    virtual SmartProgram getProgramEnum() { return SP_ColorCalibrator; }
 
 private:
     virtual void init();
