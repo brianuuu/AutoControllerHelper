@@ -23,12 +23,15 @@ private:
     Command const C_WaitTillMorning     = 2;
     Command const C_Save                = 3;
     Command const C_GetOnWyrdeer        = 4;
-    Command const C_FindCoin            = 5;
-    Command const C_AfterBattle         = 6;
-    Command const C_TalkeToLaventon     = 7;
-    Command const C_VillageReturn       = 8;
-    Command const C_VillageReturnNoMove = 9;
-    Command const C_COUNT               = 10;
+    Command const C_GetOnWyrdeerNoMove  = 5;
+    Command const C_FindCoin            = 6;
+    Command const C_FindCharm           = 7;
+    Command const C_AfterBattle         = 8;
+    Command const C_AfterBattleCharm    = 9;
+    Command const C_TalkeToLaventon     = 10;
+    Command const C_VillageReturn       = 11;
+    Command const C_VillageReturnNoMove = 12;
+    Command const C_COUNT               = 13;
 
     // List of test color
     HSVRange const C_Color_Royal = HSVRange(30,0,220,90,255,255);
@@ -81,6 +84,8 @@ private:
     int m_searchRoyalCount;
     int m_searchSisterCount;
     bool m_isFirstTimeVillageReturn;
+    bool m_isFirstTimeSave;
+    bool m_isCoin;
 
     // Stats
     Stat m_statSearches;

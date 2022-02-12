@@ -21,6 +21,8 @@ void SmartPLANuggetFarmer::reset()
 
     m_substageAfterCamp = SS_TalkToLaventon;
     m_searchSisterCount = 0;
+    m_isFirstTimeSave = true;
+    m_isCoin = false;
 }
 
 void SmartPLANuggetFarmer::runNextState()
@@ -75,9 +77,28 @@ void SmartPLANuggetFarmer::runNextState()
                 }
                 else
                 {
-                    // m_substageAfterCamp is set at reset() or when Alpha pokemon knocked player off
-                    m_substage = SS_FlyToHeightCamp;
-                    setState_runCommand(C_FlyToHeightCamp);
+                    // If we restart from failing, no need to teleport to camp
+                    if (!m_isFirstTimeSave)
+                    {
+                        if (m_isCoin)
+                        {
+                            // For Coin, just search Charm immediately
+                            m_substage = SS_Save;
+                            setState_runCommand("Nothing,20");
+                        }
+                        else
+                        {
+                            // For Charm, talk to Laventon immediately
+                            m_substage = SS_TalkToLaventon;
+                            setState_runCommand(C_TalkeToLaventon);
+                        }
+                    }
+                    else
+                    {
+                        m_substageAfterCamp = SS_TalkToLaventon;
+                        m_substage = SS_FlyToHeightCamp;
+                        setState_runCommand(C_FlyToHeightCamp);
+                    }
 
                     m_parameters.vlcWrapper->clearCaptures();
                 }
@@ -108,7 +129,6 @@ void SmartPLANuggetFarmer::runNextState()
                 incrementStat(m_statError);
                 emit printLog("Unable to head to camp, might be targeted by Pokemon, restarting game", LOG_ERROR);
 
-                m_substageAfterCamp = SS_TalkToLaventon;
                 m_substage = SS_Restart;
                 setState_runCommand(C_Restart);
 
@@ -123,6 +143,13 @@ void SmartPLANuggetFarmer::runNextState()
                 {
                     m_substage = SS_Save;
                     setState_runCommand(C_Save);
+                    break;
+                }
+                case SS_SelectWyrdeer:
+                {
+                    // For when failing to find Coin only
+                    m_substage = SS_Save;
+                    setState_runCommand("Nothing,50");
                     break;
                 }
                 case SS_TalkToLaventon:
@@ -160,6 +187,11 @@ void SmartPLANuggetFarmer::runNextState()
     {
         if (state == S_CommandFinished)
         {
+            // Toggle sister every time we save
+            m_isCoin = !m_isCoin;
+
+            m_isFirstTimeSave = false;
+
             m_searchRoyalCount = 0;
             m_substage = SS_SelectWyrdeer;
             setState_frameAnalyzeRequest();
@@ -182,22 +214,21 @@ void SmartPLANuggetFarmer::runNextState()
                 m_searchRoyalCount = 0;
                 m_searchSisterCount++;
                 incrementStat(m_statSearches);
-                emit printLog("Wyrdeer selected, find Coin attempt " + QString::number(m_statSearches.first));
+                emit printLog(QString("Wyrdeer selected, now finding ") + (m_isCoin ? "Coin" : "Charm") + ": Attempt " + QString::number(m_statSearches.first));
 
                 m_substage = SS_GetOnWyrdeer;
-                setState_runCommand(C_GetOnWyrdeer);
+                setState_runCommand(m_isCoin ? C_GetOnWyrdeer : C_GetOnWyrdeerNoMove);
 
                 m_parameters.vlcWrapper->clearCaptures();
             }
             else
             {
                 m_searchRoyalCount++;
-                if (m_searchRoyalCount > 4)
+                if (m_searchRoyalCount > 12)
                 {
                     incrementStat(m_statError);
-                    emit printLog("Unable to find Wyrdeer after full cycle, restarting game", LOG_ERROR);
+                    emit printLog("Unable to find Wyrdeer after 3 cycles, restarting game", LOG_ERROR);
 
-                    m_substageAfterCamp = SS_TalkToLaventon;
                     m_substage = SS_Restart;
                     setState_runCommand(C_Restart);
                 }
@@ -214,7 +245,7 @@ void SmartPLANuggetFarmer::runNextState()
         if (state == S_CommandFinished)
         {
             m_substage = SS_FindSister;
-            setState_runCommand(C_FindCoin, true);
+            setState_runCommand(m_isCoin ? C_FindCoin : C_FindCharm, true);
 
             m_parameters.vlcWrapper->clearCaptures();
             m_parameters.vlcWrapper->setAreas({A_Dialog, A_Royal});
@@ -228,7 +259,6 @@ void SmartPLANuggetFarmer::runNextState()
             incrementStat(m_statError);
             emit printLog("Got knocked off by Alpha Pokemon, restarting game", LOG_ERROR);
 
-            m_substageAfterCamp = SS_TalkToLaventon;
             m_substage = SS_Restart;
             setState_runCommand(C_Restart);
 
@@ -240,8 +270,16 @@ void SmartPLANuggetFarmer::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            emit printLog("Coin not found, returning camp and talk to Laventon...", LOG_WARNING);
-            m_substageAfterCamp = SS_TalkToLaventon;
+            if (m_isCoin)
+            {
+                emit printLog("Coin not found, returning camp...", LOG_WARNING);
+                m_substageAfterCamp = SS_SelectWyrdeer;
+            }
+            else
+            {
+                emit printLog("Charm not found, returning camp and talk to Laventon...", LOG_WARNING);
+                m_substageAfterCamp = SS_TalkToLaventon;
+            }
 
             m_substage = SS_FlyToHeightCamp;
             setState_runCommand(C_FlyToHeightCamp);
@@ -254,13 +292,13 @@ void SmartPLANuggetFarmer::runNextState()
             {
                 // This will interrupt the currently running command
                 m_substage = SS_StartBattle;
-                setState_runCommand("Nothing,20");
+                setState_runCommand("Nothing,5");
             }
             else if (checkImageMatchTarget(A_Royal.m_rect, C_Color_RoyalWhite, m_imageMatch_RoyalWyrdeer, 0.5))
             {
                 // This will interrupt the currently running command
                 m_substage = SS_AlphaKnockOff;
-                setState_runCommand("Nothing,20");
+                setState_runCommand("Nothing,5");
             }
             else
             {
@@ -273,10 +311,11 @@ void SmartPLANuggetFarmer::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            incrementStat(m_statCoinFound);
-            emit printLog("Found Coin! Starting battle...", LOG_SUCCESS);
+            incrementStat(m_isCoin ? m_statCoinFound : m_statCharmFound);
+            emit printLog(QString("Found ") + (m_isCoin ? "Coin" : "Charm") + "! Starting battle...", LOG_SUCCESS);
 
             // Minus is added in case we found false positive
+            m_elapsedTimer.restart();
             m_substage = SS_DuringBattle;
             setState_runCommand("Minus,1,ASpam,500");
 
@@ -288,7 +327,6 @@ void SmartPLANuggetFarmer::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            m_elapsedTimer.restart();
             setState_frameAnalyzeRequest();
 
             m_parameters.vlcWrapper->clearCaptures();
@@ -296,12 +334,11 @@ void SmartPLANuggetFarmer::runNextState()
         }
         else if (state == S_CaptureReady)
         {
-            if (m_elapsedTimer.elapsed() > 60000)
+            if (m_elapsedTimer.elapsed() > 120000)
             {
                 incrementStat(m_statError);
                 emit printLog("Unable to detect battle end for too long, restarting game", LOG_ERROR);
 
-                m_substageAfterCamp = SS_TalkToLaventon;
                 m_substage = SS_Restart;
                 setState_runCommand(C_Restart);
 
@@ -311,8 +348,10 @@ void SmartPLANuggetFarmer::runNextState()
             {
                 // TODO: it is possible we have switched to Braviary just before Coin
                 emit printLog("Battle complete!");
+
+                // Battle arena may have around, try to fly to safety
                 m_substage = SS_AfterBattle;
-                setState_runCommand(C_AfterBattle);
+                setState_runCommand(m_isCoin ? C_AfterBattle : C_AfterBattleCharm);
 
                 m_parameters.vlcWrapper->clearCaptures();
             }
@@ -327,8 +366,16 @@ void SmartPLANuggetFarmer::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            emit printLog("Returning camp and talk to Laventon...");
-            m_substageAfterCamp = SS_TalkToLaventon;
+            if (m_isCoin)
+            {
+                emit printLog("Returning camp, finding Charm next");
+                m_substageAfterCamp = SS_Save;
+            }
+            else
+            {
+                emit printLog("Returning camp and talk to Laventon");
+                m_substageAfterCamp = SS_TalkToLaventon;
+            }
 
             m_substage = SS_FlyToHeightCamp;
             setState_runCommand(C_FlyToHeightCamp);
@@ -355,7 +402,7 @@ void SmartPLANuggetFarmer::runNextState()
                 // Head to village and return
                 emit printLog("Heading back to village and return...");
                 m_substage = SS_VillageReturn;
-                setState_runCommand(m_isFirstTimeVillageReturn ? C_VillageReturnNoMove : C_VillageReturn);
+                setState_runCommand(m_isFirstTimeVillageReturn ? C_VillageReturn : C_VillageReturnNoMove);
 
                 m_parameters.vlcWrapper->clearCaptures();
                 m_isFirstTimeVillageReturn = false;
@@ -372,14 +419,14 @@ void SmartPLANuggetFarmer::runNextState()
         if (state == S_CommandFinished)
         {
             // This is only for checking if we should sleep or not
-            if (m_searchSisterCount >= 5)
+            if (m_searchSisterCount >= 4)
             {
                 m_searchSisterCount = 0;
             }
 
             if (m_searchSisterCount == 0)
             {
-                emit printLog("Sleeping until morning (program start/every 5 searches)");
+                emit printLog("Sleeping until morning (program start/every 4 searches)");
 
                 m_substage = SS_WaitTillMorning;
                 setState_runCommand(C_WaitTillMorning);
