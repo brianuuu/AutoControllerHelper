@@ -32,8 +32,13 @@ void SmartPLANuggetFarmer::runNextState()
     {
     case SS_Init:
     {
-        /*m_substage = SS_GetOnWyrdeer;
+        /*m_isCoin = true;
+        m_substage = SS_GetOnWyrdeer;
         setState_runCommand(m_isCoin ? C_GetOnWyrdeer : C_GetOnWyrdeerNoMove);*/
+
+        /*m_elapsedTimer.restart();
+        m_substage = SS_TalkToLaventon;
+        setState_runCommand(C_TalkeToLaventon);*/
 
         initStat(m_statSearches, "Searches");
         initStat(m_statCharmFound, "Charm");
@@ -49,12 +54,25 @@ void SmartPLANuggetFarmer::runNextState()
         if (state == S_CommandFinished)
         {
             setState_frameAnalyzeRequest();
-            m_substage = SS_Title;
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (!checkAverageColorMatch(A_Title.m_rect, QColor(0,0,0)))
+            {
+                incrementStat(m_statError);
+                emit printLog("Unable to detect black screen on restart, HOME button might have missed, retrying...", LOG_ERROR);
+                setState_runCommand(C_Restart);
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
 
-            m_parameters.vlcWrapper->clearCaptures();
-            m_parameters.vlcWrapper->setAreas({A_Title});
+                m_parameters.vlcWrapper->clearCaptures();
+                m_parameters.vlcWrapper->setAreas({A_Title});
 
-            m_isFirstTimeVillageReturn = true;
+                m_substage = SS_Title;
+                m_isFirstTimeVillageReturn = true;
+            }
         }
         break;
     }
@@ -65,7 +83,7 @@ void SmartPLANuggetFarmer::runNextState()
         {
             setState_frameAnalyzeRequest();
         }
-        if (state == S_CaptureReady)
+        else if (state == S_CaptureReady)
         {
             if (!checkAverageColorMatch(A_Title.m_rect, QColor(0,0,0)))
             {
@@ -89,6 +107,7 @@ void SmartPLANuggetFarmer::runNextState()
                         else
                         {
                             // For Charm, talk to Laventon immediately
+                            m_elapsedTimer.restart();
                             m_substage = SS_TalkToLaventon;
                             setState_runCommand(C_TalkeToLaventon);
                         }
@@ -154,6 +173,7 @@ void SmartPLANuggetFarmer::runNextState()
                 }
                 case SS_TalkToLaventon:
                 {
+                    m_elapsedTimer.restart();
                     m_substage = SS_TalkToLaventon;
                     setState_runCommand(C_TalkeToLaventon);
                     break;
@@ -325,7 +345,7 @@ void SmartPLANuggetFarmer::runNextState()
     }
     case SS_DuringBattle:
     {
-        double elapsed = m_elapsedTimer.elapsed();
+        qint64 elapsed = m_elapsedTimer.elapsed();
         if (state == S_CommandFinished)
         {
             setState_frameAnalyzeRequest();
@@ -400,7 +420,17 @@ void SmartPLANuggetFarmer::runNextState()
         }
         else if (state == S_CaptureReady)
         {
-            if (checkBrightnessMeanTarget(A_PokedexProgress.m_rect, C_Color_Dialog, 200) || checkImageMatchTarget(A_AConfirmReport.m_rect, C_Color_AConfirmReturn, m_imageMatch_AConfirm, 0.5))
+            if (m_elapsedTimer.elapsed() > 60000)
+            {
+                incrementStat(m_statError);
+                emit printLog("Unable to finish talking to Laventon for too long, restarting game", LOG_ERROR);
+
+                m_substage = SS_Restart;
+                setState_runCommand(C_Restart);
+
+                m_parameters.vlcWrapper->clearCaptures();
+            }
+            else if (checkBrightnessMeanTarget(A_PokedexProgress.m_rect, C_Color_Dialog, 200) || checkImageMatchTarget(A_AConfirmReport.m_rect, C_Color_AConfirmReturn, m_imageMatch_AConfirm, 0.5))
             {
                 // Pokedex need to press A to exit
                 setState_runCommand("A,20,Nothing,1");
