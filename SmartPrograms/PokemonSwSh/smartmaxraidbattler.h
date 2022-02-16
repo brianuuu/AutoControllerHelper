@@ -2,7 +2,7 @@
 #define SMARTMAXRAIDBATTLER_H
 
 #include <QWidget>
-#include "smartprogrambase.h"
+#include "../smartprogrambase.h"
 
 class SmartMaxRaidBattler : public SmartProgramBase
 {

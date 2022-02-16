@@ -2,7 +2,7 @@
 #define SMARTBDSPDUPLICATEITEM1TO30_H
 
 #include <QWidget>
-#include "smartprogrambase.h"
+#include "../smartprogrambase.h"
 
 class SmartBDSPDuplicateItem1to30 : public SmartProgramBase
 {

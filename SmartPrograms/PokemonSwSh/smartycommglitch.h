@@ -2,7 +2,7 @@
 #define SMARTYCOMMGLITCH_H
 
 #include <QWidget>
-#include "smartprogrambase.h"
+#include "../smartprogrambase.h"
 
 class SmartYCommGlitch : public SmartProgramBase
 {

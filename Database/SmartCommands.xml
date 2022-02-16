@@ -138,7 +138,7 @@
 	<C_AfterBattle>Nothing,200,ASpam,270,DRight,1,Plus,30,LUpRight,80,Nothing,80</C_AfterBattle>
 	<C_AfterBattleCharm>Nothing,200,ASpam,270,DRight,1,Plus,30,B,50,Nothing,80</C_AfterBattleCharm>
 	<C_TalkeToLaventon>Nothing,40,LUpRight,34,A,20</C_TalkeToLaventon>
-	<C_VillageReturn>DDown,1,ASpam,240,LDown,60,A,1,Nothing,20,LDownRight,5,A,16,DDown,1,A,200</C_VillageReturn>
+	<C_VillageReturn>DDown,1,ASpam,240,LDown,60,A,1,Nothing,20,DRight,1,A,16,DDown,1,A,200</C_VillageReturn>
 	<C_VillageReturnNoMove>DDown,1,ASpam,240,LDown,60,A,1,Nothing,20,A,16,DDown,1,A,200</C_VillageReturnNoMove>
   </SmartPLANuggetFarmer>
 </SmartProgramCommands>

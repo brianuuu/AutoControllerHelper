@@ -2,7 +2,7 @@
 #define SMARTCOLORCALIBRATOR_H
 
 #include <QWidget>
-#include "smartprogrambase.h"
+#include "../smartprogrambase.h"
 
 class SmartColorCalibrator : public SmartProgramBase
 {

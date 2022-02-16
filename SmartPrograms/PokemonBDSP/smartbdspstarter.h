@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QElapsedTimer>
-#include "smartprogrambase.h"
+#include "../smartprogrambase.h"
 
 class SmartBDSPStarter : public SmartProgramBase
 {

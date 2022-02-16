@@ -34,26 +34,27 @@
 
 #include "SmartPrograms/smartprogrambase.h"
 #include "SmartPrograms/smartsimpleprogram.h"
-#include "SmartPrograms/smartdelaycalibrator.h"
-#include "SmartPrograms/smartcolorcalibrator.h"
 
-#include "SmartPrograms/smartbrightnessmeanfinder.h"
-#include "SmartPrograms/smartpurplebeamfilder.h"
-#include "SmartPrograms/smartycommglitch.h"
-#include "SmartPrograms/smartsurprisetrade.h"
-#include "SmartPrograms/smartmaxraidbattler.h"
-#include "SmartPrograms/smartdayskipper.h"
-#include "SmartPrograms/smartloto.h"
-#include "SmartPrograms/smartdailyhighlight.h"
-#include "SmartPrograms/smartberryfarmer.h"
-#include "SmartPrograms/smartwattfarmer.h"
+#include "SmartPrograms/Dev/smartdelaycalibrator.h"
+#include "SmartPrograms/Dev/smartcolorcalibrator.h"
+#include "SmartPrograms/Dev/smartbrightnessmeanfinder.h"
 
-#include "SmartPrograms/smartbdspstarter.h"
-#include "SmartPrograms/smartbdspboxoperation.h"
-#include "SmartPrograms/smartbdspshinylegendary.h"
-#include "SmartPrograms/smartbdspduplicateitem1to30.h"
+#include "SmartPrograms/PokemonSwSh/smartpurplebeamfilder.h"
+#include "SmartPrograms/PokemonSwSh/smartycommglitch.h"
+#include "SmartPrograms/PokemonSwSh/smartsurprisetrade.h"
+#include "SmartPrograms/PokemonSwSh/smartmaxraidbattler.h"
+#include "SmartPrograms/PokemonSwSh/smartdayskipper.h"
+#include "SmartPrograms/PokemonSwSh/smartloto.h"
+#include "SmartPrograms/PokemonSwSh/smartdailyhighlight.h"
+#include "SmartPrograms/PokemonSwSh/smartberryfarmer.h"
+#include "SmartPrograms/PokemonSwSh/smartwattfarmer.h"
 
-#include "SmartPrograms/smartplanuggetfarmer.h"
+#include "SmartPrograms/PokemonBDSP/smartbdspstarter.h"
+#include "SmartPrograms/PokemonBDSP/smartbdspboxoperation.h"
+#include "SmartPrograms/PokemonBDSP/smartbdspshinylegendary.h"
+#include "SmartPrograms/PokemonBDSP/smartbdspduplicateitem1to30.h"
+
+#include "SmartPrograms/PokemonPLA/smartplanuggetfarmer.h"
 
 namespace Ui {
 class RemoteControllerWindow;

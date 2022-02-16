@@ -2,7 +2,7 @@
 #define SMARTDAILYHIGHLIGHT_H
 
 #include <QWidget>
-#include "smartprogrambase.h"
+#include "../smartprogrambase.h"
 
 class SmartDailyHighlight : public SmartProgramBase
 {

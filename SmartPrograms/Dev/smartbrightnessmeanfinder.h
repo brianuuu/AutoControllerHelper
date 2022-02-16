@@ -3,7 +3,7 @@
 
 #include <QSpinBox>
 #include <QWidget>
-#include "smartprogrambase.h"
+#include "../smartprogrambase.h"
 
 class SmartBrightnessMeanFinder : public SmartProgramBase
 {

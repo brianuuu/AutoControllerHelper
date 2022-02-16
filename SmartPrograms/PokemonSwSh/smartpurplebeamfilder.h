@@ -2,7 +2,7 @@
 #define SMARTPURPLEBEAMFILDER_H
 
 #include <QWidget>
-#include "smartprogrambase.h"
+#include "../smartprogrambase.h"
 
 class SmartPurpleBeamFilder : public SmartProgramBase
 {

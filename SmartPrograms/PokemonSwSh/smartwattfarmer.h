@@ -2,7 +2,7 @@
 #define SMARTWATTFARMER_H
 
 #include <QWidget>
-#include "smartprogrambase.h"
+#include "../smartprogrambase.h"
 
 class SmartWattFarmer : public SmartProgramBase
 {

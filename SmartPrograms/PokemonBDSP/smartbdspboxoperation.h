@@ -2,7 +2,7 @@
 #define SMARTBDSPBOXOPERATION_H
 
 #include <QWidget>
-#include "smartprogrambase.h"
+#include "../smartprogrambase.h"
 
 class SmartBDSPBoxOperation : public SmartProgramBase
 {

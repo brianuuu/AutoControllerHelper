@@ -21,59 +21,59 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    SmartPrograms/smartbdspboxoperation.cpp \
-    SmartPrograms/smartbdspduplicateitem1to30.cpp \
-    SmartPrograms/smartbdspshinylegendary.cpp \
-    SmartPrograms/smartbdspstarter.cpp \
-    SmartPrograms/smartberryfarmer.cpp \
-    SmartPrograms/smartcolorcalibrator.cpp \
-    SmartPrograms/smartdailyhighlight.cpp \
-    SmartPrograms/smartloto.cpp \
-    SmartPrograms/smartplanuggetfarmer.cpp \
+    SmartPrograms/Dev/smartbrightnessmeanfinder.cpp \
+    SmartPrograms/Dev/smartcolorcalibrator.cpp \
+    SmartPrograms/Dev/smartdelaycalibrator.cpp \
+    SmartPrograms/PokemonBDSP/smartbdspboxoperation.cpp \
+    SmartPrograms/PokemonBDSP/smartbdspduplicateitem1to30.cpp \
+    SmartPrograms/PokemonBDSP/smartbdspshinylegendary.cpp \
+    SmartPrograms/PokemonBDSP/smartbdspstarter.cpp \
+    SmartPrograms/PokemonPLA/smartplanuggetfarmer.cpp \
+    SmartPrograms/PokemonSwSh/smartberryfarmer.cpp \
+    SmartPrograms/PokemonSwSh/smartdailyhighlight.cpp \
+    SmartPrograms/PokemonSwSh/smartdayskipper.cpp \
+    SmartPrograms/PokemonSwSh/smartloto.cpp \
+    SmartPrograms/PokemonSwSh/smartmaxraidbattler.cpp \
+    SmartPrograms/PokemonSwSh/smartpurplebeamfilder.cpp \
+    SmartPrograms/PokemonSwSh/smartsurprisetrade.cpp \
+    SmartPrograms/PokemonSwSh/smartwattfarmer.cpp \
+    SmartPrograms/PokemonSwSh/smartycommglitch.cpp \
+    SmartPrograms/smartprogrambase.cpp \
     SmartPrograms/smartsimpleprogram.cpp \
-    SmartPrograms/smartwattfarmer.cpp \
     commandsender.cpp \
     main.cpp \
     autocontrollerwindow.cpp \
     pushbuttonmapping.cpp \
     remotecontrollerwindow.cpp \
-    SmartPrograms/smartbrightnessmeanfinder.cpp \
-    SmartPrograms/smartdayskipper.cpp \
-    SmartPrograms/smartdelaycalibrator.cpp \
-    SmartPrograms/smartmaxraidbattler.cpp \
-    SmartPrograms/smartprogrambase.cpp \
-    SmartPrograms/smartpurplebeamfilder.cpp \
-    SmartPrograms/smartsurprisetrade.cpp \
-    SmartPrograms/smartycommglitch.cpp \
     smartprogramsetting.cpp \
     videoeffectsetting.cpp \
     vlcwrapper.cpp
 
 HEADERS += \
-    SmartPrograms/smartbdspboxoperation.h \
-    SmartPrograms/smartbdspduplicateitem1to30.h \
-    SmartPrograms/smartbdspshinylegendary.h \
-    SmartPrograms/smartbdspstarter.h \
-    SmartPrograms/smartberryfarmer.h \
-    SmartPrograms/smartcolorcalibrator.h \
-    SmartPrograms/smartdailyhighlight.h \
-    SmartPrograms/smartloto.h \
-    SmartPrograms/smartplanuggetfarmer.h \
+    SmartPrograms/Dev/smartbrightnessmeanfinder.h \
+    SmartPrograms/Dev/smartcolorcalibrator.h \
+    SmartPrograms/Dev/smartdelaycalibrator.h \
+    SmartPrograms/PokemonBDSP/smartbdspboxoperation.h \
+    SmartPrograms/PokemonBDSP/smartbdspduplicateitem1to30.h \
+    SmartPrograms/PokemonBDSP/smartbdspshinylegendary.h \
+    SmartPrograms/PokemonBDSP/smartbdspstarter.h \
+    SmartPrograms/PokemonPLA/smartplanuggetfarmer.h \
+    SmartPrograms/PokemonSwSh/smartberryfarmer.h \
+    SmartPrograms/PokemonSwSh/smartdailyhighlight.h \
+    SmartPrograms/PokemonSwSh/smartdayskipper.h \
+    SmartPrograms/PokemonSwSh/smartloto.h \
+    SmartPrograms/PokemonSwSh/smartmaxraidbattler.h \
+    SmartPrograms/PokemonSwSh/smartpurplebeamfilder.h \
+    SmartPrograms/PokemonSwSh/smartsurprisetrade.h \
+    SmartPrograms/PokemonSwSh/smartwattfarmer.h \
+    SmartPrograms/PokemonSwSh/smartycommglitch.h \
+    SmartPrograms/smartprogrambase.h \
     SmartPrograms/smartsimpleprogram.h \
-    SmartPrograms/smartwattfarmer.h \
     autocontrollerdefines.h \
     autocontrollerwindow.h \
     commandsender.h \
     pushbuttonmapping.h \
     remotecontrollerwindow.h \
-    SmartPrograms/smartbrightnessmeanfinder.h \
-    SmartPrograms/smartdayskipper.h \
-    SmartPrograms/smartdelaycalibrator.h \
-    SmartPrograms/smartmaxraidbattler.h \
-    SmartPrograms/smartprogrambase.h \
-    SmartPrograms/smartpurplebeamfilder.h \
-    SmartPrograms/smartsurprisetrade.h \
-    SmartPrograms/smartycommglitch.h \
     smartprogramsetting.h \
     videoeffectsetting.h \
     vlcwrapper.h

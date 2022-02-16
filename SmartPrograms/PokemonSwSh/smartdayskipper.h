@@ -2,7 +2,7 @@
 #define SMARTDAYSKIPPER_H
 
 #include <QWidget>
-#include "smartprogrambase.h"
+#include "../smartprogrambase.h"
 
 class SmartDaySkipper : public SmartProgramBase
 {

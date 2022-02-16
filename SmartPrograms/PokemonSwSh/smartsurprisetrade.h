@@ -2,7 +2,7 @@
 #define SMARTSURPRISETRADE_H
 
 #include <QWidget>
-#include "smartprogrambase.h"
+#include "../smartprogrambase.h"
 
 class SmartSurpriseTrade : public SmartProgramBase
 {

@@ -1,18 +1,18 @@
-#ifndef SMARTLOTO_H
-#define SMARTLOTO_H
+#ifndef SMARTBERRYFARMER_H
+#define SMARTBERRYFARMER_H
 
 #include <QWidget>
-#include "smartprogrambase.h"
+#include "../smartprogrambase.h"
 
-class SmartLoto : public SmartProgramBase
+class SmartBerryFarmer : public SmartProgramBase
 {
 public:
-    explicit SmartLoto(
+    explicit SmartBerryFarmer(
             int skips,
             SmartProgramParameter parameter
             );
 
-    virtual SmartProgram getProgramEnum() { return SP_Loto; }
+    virtual SmartProgram getProgramEnum() { return SP_BerryFarmer; }
 
 private:
     virtual void init();
@@ -25,16 +25,12 @@ private:
     Command const C_SkipYearEU  = 2;
     Command const C_SkipYearUS  = 3;
     Command const C_BackToGame  = 4;
-    Command const C_Start       = 5;
-    Command const C_BSpam       = 6;
-    Command const C_End         = 7;
-    Command const C_COUNT       = 8;
+    Command const C_Loop        = 5;
+    Command const C_COUNT       = 6;
 
     // List of test color
-    QColor const C_Color_Dialog = QColor(50,50,50);
 
     // List of test point/area
-    QRect const A_Dialog = QRect(805,646,80,32);
 
     // Substages
     enum Substage
@@ -43,9 +39,7 @@ private:
         SS_SyncTime,
         SS_SkipYear,
         SS_BackToGame,
-        SS_Start,
-        SS_BSpam,
-        SS_End
+        SS_Loop,
     };
     Substage m_substage;
 
@@ -54,4 +48,4 @@ private:
     int m_daySkipped;
 };
 
-#endif // SMARTLOTO_H
+#endif // SMARTBERRYFARMER_H

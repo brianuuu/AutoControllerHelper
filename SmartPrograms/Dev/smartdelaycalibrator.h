@@ -3,7 +3,7 @@
 
 #include <QElapsedTimer>
 #include <QWidget>
-#include "smartprogrambase.h"
+#include "../smartprogrambase.h"
 
 #define COUNT_MAX 4
 
