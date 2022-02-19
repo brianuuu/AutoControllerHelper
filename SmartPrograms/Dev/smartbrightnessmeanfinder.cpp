@@ -67,20 +67,37 @@ void SmartBrightnessMeanFinder::runNextState()
             QColor minHSV, maxHSV;
             minHSV.setHsv(m_spinBoxes[4]->value(), m_spinBoxes[5]->value(), m_spinBoxes[6]->value());
             maxHSV.setHsv(m_spinBoxes[7]->value(), m_spinBoxes[8]->value(), m_spinBoxes[9]->value());
+            HSVRange hsvRange(minHSV,maxHSV);
 
-            double mean = getBrightnessMean(rect, HSVRange(minHSV,maxHSV));
+            double mean = getBrightnessMean(rect, hsvRange);
             m_meanOutput->setText("Brightness Mean = " + QString::number(mean));
 
             // Image matching
             if (m_imageMatchStarted)
             {
-                double ratio = getImageMatch(rect, HSVRange(minHSV,maxHSV), m_imageMatchImage);
-                m_imageMatchResult->setText("Similarity Ratio = " + QString::number(ratio));
-
-                if (m_imageMatchImage.width() != m_spinBoxes[2]->value() || m_imageMatchImage.height() != m_spinBoxes[3]->value())
+                if (m_imageMatchImage.width() > m_spinBoxes[2]->value() || m_imageMatchImage.height() > m_spinBoxes[3]->value())
                 {
-                    emit printLog("Image size changed", LOG_WARNING);
+                    emit printLog("Capture dimension too small", LOG_WARNING);
                     m_imageMatchStarted = false;
+                }
+                else
+                {
+                    double maxRatio = 0;
+                    QPoint maxRatioOffset(0,0);
+                    for (int y = 0; y <= rect.height() - m_imageMatchImage.height(); y++)
+                    {
+                        for (int x = 0; x <= rect.width() - m_imageMatchImage.width(); x++)
+                        {
+                            QRect cropRect(rect.left() + x, rect.top() + y, m_imageMatchImage.width(), m_imageMatchImage.height());
+                            double ratio = getImageMatch(cropRect, hsvRange, m_imageMatchImage);
+                            if (ratio > maxRatio)
+                            {
+                                maxRatio = ratio;
+                                maxRatioOffset = QPoint(x,y);
+                            }
+                        }
+                    }
+                    m_imageMatchResult->setText("Similarity Ratio = " + QString::number(maxRatio) + ", Offset: {" + QString::number(maxRatioOffset.x()) + "," + QString::number(maxRatioOffset.y()) + "}");
                 }
             }
 
@@ -100,9 +117,9 @@ void SmartBrightnessMeanFinder::imageMatchAdd()
     if (file.isEmpty()) return;
 
     QImage tempImage(file);
-    if (tempImage.width() != m_spinBoxes[2]->value() || tempImage.height() != m_spinBoxes[3]->value())
+    if (tempImage.width() > m_spinBoxes[2]->value() || tempImage.height() > m_spinBoxes[3]->value())
     {
-        emit printLog("Image size not match", LOG_ERROR);
+        emit printLog("Image dimension too large", LOG_ERROR);
         return;
     }
 

@@ -344,7 +344,7 @@ protected:
     bool setImageMatchFromResource(QString const& name, QImage& image);
     double getImageSimilarRatio(QImage const& query, QImage const& database);
     double getImageMatch(QRect rectPos, HSVRange hsvRange, QImage const& testImage);
-    bool checkImageMatchTarget(QRect rectPos, HSVRange hsvRange, QImage const& testImage, double target);
+    bool checkImageMatchTarget(QRect rectPos, HSVRange hsvRange, QImage const& testImage, double target, QPoint* offset = nullptr);
 
     typedef int Command;
     bool inializeCommands(int size);

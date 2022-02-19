@@ -355,6 +355,12 @@ double SmartProgramBase::getImageMatch(QRect rectPos, SmartProgramBase::HSVRange
     // m_frameAnalyze must be ready before calling this!
     Q_ASSERT(m_state == S_CaptureReady);
 
+    if (rectPos.width() != testImage.width() || rectPos.height() != testImage.height())
+    {
+        emit printLog("Image size not matching capture area dimension", LOG_ERROR);
+        return 0;
+    }
+
     QImage cropped = m_capture.copy(rectPos);
     QImage masked = QImage(cropped.size(), QImage::Format_MonoLSB);
     masked.setColorTable({0xFF000000,0xFFFFFFFF});
@@ -373,25 +379,24 @@ double SmartProgramBase::getImageMatch(QRect rectPos, SmartProgramBase::HSVRange
 
     // Similar (query -> database)
     double sqd = getImageSimilarRatio(masked, testImage);
-    qDebug() << "sqd =" << sqd;
     if (sqd < 0) return 0;
 
     // Similar (database -> query)
     double sdq = getImageSimilarRatio(testImage, masked);
-    qDebug() << "sdq =" << sdq;
     if (sdq < 0) return 0;
 
+    qDebug() << "sqd =" << sqd << ", sdq =" << sdq;
     return (sqd + sdq) / 2;
 }
 
-bool SmartProgramBase::checkImageMatchTarget(QRect rectPos, SmartProgramBase::HSVRange hsvRange, const QImage &testImage, double target)
+bool SmartProgramBase::checkImageMatchTarget(QRect rectPos, SmartProgramBase::HSVRange hsvRange, const QImage &testImage, double target, QPoint* offset)
 {
     // m_frameAnalyze must be ready before calling this!
     Q_ASSERT(m_state == S_CaptureReady);
 
-    if (rectPos.width() != testImage.width() || rectPos.height() != testImage.height())
+    if (rectPos.width() < testImage.width() || rectPos.height() < testImage.height())
     {
-        emit printLog("Test image size does not match for image matching", LOG_ERROR);
+        emit printLog("Image size is larger than capture area dimension", LOG_ERROR);
         return false;
     }
 
@@ -401,10 +406,25 @@ bool SmartProgramBase::checkImageMatchTarget(QRect rectPos, SmartProgramBase::HS
         return false;
     }
 
-    double ratio = getImageMatch(rectPos, hsvRange, testImage);
-    bool success = ratio > target;
+    double maxRatio = 0;
+    QPoint maxRatioOffset(0,0);
+    for (int y = 0; y <= rectPos.height() - testImage.height(); y++)
+    {
+        for (int x = 0; x <= rectPos.width() - testImage.width(); x++)
+        {
+            QRect cropRect(rectPos.left() + x, rectPos.top() + y, testImage.width(), testImage.height());
+            double ratio = getImageMatch(cropRect, hsvRange, testImage);
+            if (ratio > maxRatio)
+            {
+                maxRatio = ratio;
+                maxRatioOffset = QPoint(x,y);
+            }
+        }
+    }
+    bool success = maxRatio > target;
 
-    QString logStr = "Image Match Ratio (" + QString::number(ratio) + ") > target (" + QString::number(target) + ") = ";
+    QString posStr = success ? " at offset {" + QString::number(maxRatioOffset.x()) + "," + QString::number(maxRatioOffset.y()) + "}" : "";
+    QString logStr = "Image Match Ratio (" + QString::number(maxRatio) + ") > target (" + QString::number(target) + ")" + posStr + " = ";
     logStr += success ? "TRUE" : "FALSE";
     if (m_parameters.settings->isLogDebugColor())
     {
@@ -415,6 +435,10 @@ bool SmartProgramBase::checkImageMatchTarget(QRect rectPos, SmartProgramBase::HS
         qDebug() << logStr;
     }
 
+    if (offset)
+    {
+        *offset = maxRatioOffset;
+    }
     return success;
 }
 
