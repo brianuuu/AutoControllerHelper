@@ -13,7 +13,7 @@ bool SmartProgramBase::run()
 {
     if (m_state == S_NotStarted)
     {
-        if (m_parameters.settings->isLogAutosave())
+        if (getProgramExportLog(getProgramEnum()) && m_parameters.settings->isLogAutosave())
         {
             m_logFileName = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") + "_" + getProgramInternalName() + ".log";
         }

@@ -55,6 +55,7 @@
 #include "SmartPrograms/PokemonBDSP/smartbdspduplicateitem1to30.h"
 
 #include "SmartPrograms/PokemonPLA/smartplanuggetfarmer.h"
+#include "SmartPrograms/PokemonPLA/smartplaresetalphapokemon.h"
 
 namespace Ui {
 class RemoteControllerWindow;

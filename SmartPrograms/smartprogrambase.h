@@ -42,6 +42,8 @@ enum SmartProgram : uint32_t
     SP_BDSP_DuplicateItem1to30,
 
     SP_PLA_NuggetFarmer,
+    SP_PLA_ResetAlphaPokemon,
+    SP_PLA_BraviaryGainHeight,
 
     SP_COUNT
 };
@@ -109,6 +111,8 @@ public:
             case SP_BDSP_DuplicateItem1to30:return "Duplicate Item 1 to 30";
 
             case SP_PLA_NuggetFarmer:       return "Nugget Farmer";
+            case SP_PLA_ResetAlphaPokemon:  return "Reset Alpha Pokemon";
+            case SP_PLA_BraviaryGainHeight: return "Braviary Gain Height";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -139,6 +143,8 @@ public:
         if (sp == "Duplicate Item 1 to 30")         return SP_BDSP_DuplicateItem1to30;
 
         if (sp == "Nugget Farmer")                  return SP_PLA_NuggetFarmer;
+        if (sp == "Reset Alpha Pokemon")            return SP_PLA_ResetAlphaPokemon;
+        if (sp == "Braviary Gain Height")           return SP_PLA_BraviaryGainHeight;
 
         return SP_COUNT;
     }
@@ -170,6 +176,8 @@ public:
             case SP_BDSP_DuplicateItem1to30:return "SmartBDSPDuplicateItem1to30";
 
             case SP_PLA_NuggetFarmer:       return "SmartPLANuggetFarmer";
+            case SP_PLA_ResetAlphaPokemon:  return "SmartPLAResetAlphaPokemon";
+            case SP_PLA_BraviaryGainHeight: return "SmartPLABraviaryGainHeight";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -203,6 +211,8 @@ public:
             case SP_BDSP_DuplicateItem1to30:return 0;
 
             case SP_PLA_NuggetFarmer:       return 0;
+            case SP_PLA_ResetAlphaPokemon:  return 0;
+            case SP_PLA_BraviaryGainHeight: return 0;
 
             case SP_COUNT:                  return -1;
         }
@@ -228,6 +238,24 @@ public:
             return true;
         default:
             return false;
+        }
+    }
+
+    static bool getProgramExportLog(SmartProgram sp)
+    {
+        switch (sp)
+        {
+        // all simple program return false
+        case SP_DelayCalibrator:
+        case SP_BrightnessMeanFinder:
+        case SP_ColorCalibrator:
+        case SP_BattleTower:
+        case SP_BDSP_MenuGlitch113:
+        case SP_BDSP_BoxDuplication:
+        case SP_PLA_BraviaryGainHeight:
+            return false;
+        default:
+            return true;
         }
     }
 

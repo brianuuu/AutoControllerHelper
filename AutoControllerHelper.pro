@@ -29,6 +29,7 @@ SOURCES += \
     SmartPrograms/PokemonBDSP/smartbdspshinylegendary.cpp \
     SmartPrograms/PokemonBDSP/smartbdspstarter.cpp \
     SmartPrograms/PokemonPLA/smartplanuggetfarmer.cpp \
+    SmartPrograms/PokemonPLA/smartplaresetalphapokemon.cpp \
     SmartPrograms/PokemonSwSh/smartberryfarmer.cpp \
     SmartPrograms/PokemonSwSh/smartdailyhighlight.cpp \
     SmartPrograms/PokemonSwSh/smartdayskipper.cpp \
@@ -58,6 +59,7 @@ HEADERS += \
     SmartPrograms/PokemonBDSP/smartbdspshinylegendary.h \
     SmartPrograms/PokemonBDSP/smartbdspstarter.h \
     SmartPrograms/PokemonPLA/smartplanuggetfarmer.h \
+    SmartPrograms/PokemonPLA/smartplaresetalphapokemon.h \
     SmartPrograms/PokemonSwSh/smartberryfarmer.h \
     SmartPrograms/PokemonSwSh/smartdailyhighlight.h \
     SmartPrograms/PokemonSwSh/smartdayskipper.h \

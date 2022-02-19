@@ -90,7 +90,7 @@ void SmartPLANuggetFarmer::runNextState()
                 if (m_substage == SS_Title)
                 {
                     emit printLog("Title detected!");
-                    setState_runCommand("Nothing,70,A,1,Nothing,50");
+                    setState_runCommand("ASpam,60,Nothing,30");
                     m_substage = SS_GameStart;
                 }
                 else

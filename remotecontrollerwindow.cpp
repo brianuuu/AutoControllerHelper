@@ -91,6 +91,8 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     m_flagToCharMap.insert(m_PBToFlagMap[ui->PB_LDown] | m_PBToFlagMap[ui->PB_A], ',');
     m_flagToCharMap.insert(m_PBToFlagMap[ui->PB_LRight] | m_PBToFlagMap[ui->PB_A], '.');
     m_flagToCharMap.insert(m_PBToFlagMap[ui->PB_DRight] | m_PBToFlagMap[ui->PB_R], '/');
+    // INVALID = '!'
+    m_flagToCharMap.insert(m_PBToFlagMap[ui->PB_LUp] | m_PBToFlagMap[ui->PB_LClick], '@');
 
     m_commandToFlagMap.insert("Nothing", 0);
     m_commandToFlagMap.insert("A", m_PBToFlagMap[ui->PB_A]);
@@ -128,6 +130,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     m_commandToFlagMap.insert("LDownA", m_PBToFlagMap[ui->PB_LDown] | m_PBToFlagMap[ui->PB_A]);
     m_commandToFlagMap.insert("LRightA", m_PBToFlagMap[ui->PB_LRight] | m_PBToFlagMap[ui->PB_A]);
     m_commandToFlagMap.insert("DRightR", m_PBToFlagMap[ui->PB_DRight] | m_PBToFlagMap[ui->PB_R]);
+    m_commandToFlagMap.insert("LUpClick", m_PBToFlagMap[ui->PB_LUp] | m_PBToFlagMap[ui->PB_LClick]);
 
     // Special case
     m_commandToFlagMap.insert("ASpam", m_PBToFlagMap[ui->PB_A] | m_turboFlag);
@@ -573,7 +576,7 @@ void RemoteControllerWindow::on_SerialPort_readyRead()
 
             if (m_executeCommands.empty())
             {
-                PrintLog("Unexpected extra " + QString::number(ba.size() - i) + "byte(s) returned from serial, ignoring...", LOG_ERROR);
+                PrintLog("Unexpected extra " + QString::number(ba.size() - i) + " byte(s) returned from serial, ignoring...", LOG_ERROR);
                 break;
             }
             else
@@ -2251,6 +2254,16 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     case SP_PLA_NuggetFarmer:
     {
         m_smartProgram = new SmartPLANuggetFarmer(parameter);
+        break;
+    }
+    case SP_PLA_ResetAlphaPokemon:
+    {
+        m_smartProgram = new SmartPLAResetAlphaPokemon(parameter);
+        break;
+    }
+    case SP_PLA_BraviaryGainHeight:
+    {
+        m_smartProgram = new SmartSimpleProgram(SP_PLA_BraviaryGainHeight, 10, parameter);
         break;
     }
     default:

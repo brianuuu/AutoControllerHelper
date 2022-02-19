@@ -141,4 +141,11 @@
 	<C_VillageReturn>DDown,1,ASpam,240,LDown,60,A,1,Nothing,20,DRight,1,A,16,DDown,1,A,200</C_VillageReturn>
 	<C_VillageReturnNoMove>DDown,1,ASpam,240,LDown,60,A,1,Nothing,20,A,16,DDown,1,A,200</C_VillageReturnNoMove>
   </SmartPLANuggetFarmer>
+  <SmartPLAResetAlphaPokemon>
+	<C_Restart>Home,1,Nothing,21,X,1,ASpam,240</C_Restart>
+	<C_WalkGallade>LUpClick,1,LUp,430,LUpClick,1,LRight,120,LDown,40,ZL,1,Nothing,10,RDown,6,LUpLeft,100,LUpClick,1,LUp,60</C_WalkGallade>
+  </SmartPLAResetAlphaPokemon>
+  <SmartPLABraviaryGainHeight>
+	<C_Loop>Y,6,Plus,5,A,6</C_Loop>
+  </SmartPLABraviaryGainHeight>
 </SmartProgramCommands>
