@@ -430,12 +430,12 @@ void SmartPLANuggetFarmer::runNextState()
 
                 m_parameters.vlcWrapper->clearCaptures();
             }
-            else if (checkBrightnessMeanTarget(A_PokedexProgress.m_rect, C_Color_Dialog, 200) || checkBrightnessMeanTarget(A_AConfirmReport.m_rect, C_Color_AConfirmReturn, 180))
+            else if (checkBrightnessMeanTarget(A_PokedexProgress.m_rect, C_Color_Dialog, 200) || checkBrightnessMeanTarget(A_AConfirmReport.m_rect, C_Color_AConfirmReturn, 160))
             {
                 // Pokedex need to press A to exit
                 setState_runCommand("A,20,Nothing,1");
             }
-            else if (checkBrightnessMeanTarget(A_AConfirmReturn.m_rect, C_Color_AConfirmReturn, 180))
+            else if (checkBrightnessMeanTarget(A_AConfirmReturn.m_rect, C_Color_AConfirmReturn, 160))
             {
                 // Head to village and return
                 emit printLog("Heading back to village and return...");

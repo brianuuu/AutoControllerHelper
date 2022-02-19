@@ -37,7 +37,7 @@ private:
     HSVRange const C_Color_Royal = HSVRange(30,0,220,90,255,255);
     HSVRange const C_Color_RoyalWhite = HSVRange(30,0,220,90,150,255);
     HSVRange const C_Color_Dialog = HSVRange(180,50,50,240,190,110);
-    HSVRange const C_Color_AConfirmReturn = HSVRange(0,0,150,259,80,255);
+    HSVRange const C_Color_AConfirmReturn = HSVRange(0,0,200,259,80,255);
 
     // List of test point/area
     CaptureArea const A_Title = CaptureArea(400,420,520,100);
