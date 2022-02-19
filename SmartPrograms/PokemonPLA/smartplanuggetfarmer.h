@@ -44,8 +44,8 @@ private:
     CaptureArea const A_Royal = CaptureArea(1175,479,65,68);
     CaptureArea const A_Dialog = CaptureArea(328,511,200,44);
     CaptureArea const A_BattleEnd = CaptureArea(1000,260,200,200);
-    CaptureArea const A_AConfirmReturn = CaptureArea(807,417,26,26);
-    CaptureArea const A_AConfirmReport = CaptureArea(865,447,26,26);
+    CaptureArea const A_AConfirmReturn = CaptureArea(983,416,64,28);
+    CaptureArea const A_AConfirmReport = CaptureArea(983,447,64,28);
     CaptureArea const A_PokedexProgress = CaptureArea(600,490,120,30);
 
     // Substages
@@ -79,7 +79,7 @@ private:
     // Members
     QElapsedTimer m_elapsedTimer;
     Substage m_substageAfterCamp;
-    QImage m_imageMatch_AConfirm;
+    //QImage m_imageMatch_AConfirm;
     QImage m_imageMatch_RoyalWyrdeer;
     int m_searchRoyalCount;
     int m_searchSisterCount;

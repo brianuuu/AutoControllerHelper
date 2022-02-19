@@ -16,7 +16,7 @@ void SmartPLANuggetFarmer::reset()
     SmartProgramBase::reset();
 
     m_substage = SS_Init;
-    setImageMatchFromResource("PLA_AConfirm", m_imageMatch_AConfirm);
+    //setImageMatchFromResource("PLA_AConfirm", m_imageMatch_AConfirm);
     setImageMatchFromResource("PLA_RoyalWyrdeer", m_imageMatch_RoyalWyrdeer);
 
     m_substageAfterCamp = SS_TalkToLaventon;
@@ -430,12 +430,12 @@ void SmartPLANuggetFarmer::runNextState()
 
                 m_parameters.vlcWrapper->clearCaptures();
             }
-            else if (checkBrightnessMeanTarget(A_PokedexProgress.m_rect, C_Color_Dialog, 200) || checkImageMatchTarget(A_AConfirmReport.m_rect, C_Color_AConfirmReturn, m_imageMatch_AConfirm, 0.5))
+            else if (checkBrightnessMeanTarget(A_PokedexProgress.m_rect, C_Color_Dialog, 200) || checkBrightnessMeanTarget(A_AConfirmReport.m_rect, C_Color_AConfirmReturn, 180))
             {
                 // Pokedex need to press A to exit
                 setState_runCommand("A,20,Nothing,1");
             }
-            else if (checkImageMatchTarget(A_AConfirmReturn.m_rect, C_Color_AConfirmReturn, m_imageMatch_AConfirm, 0.5))
+            else if (checkBrightnessMeanTarget(A_AConfirmReturn.m_rect, C_Color_AConfirmReturn, 180))
             {
                 // Head to village and return
                 emit printLog("Heading back to village and return...");
