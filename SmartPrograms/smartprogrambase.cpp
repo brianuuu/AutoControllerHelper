@@ -406,6 +406,7 @@ bool SmartProgramBase::checkImageMatchTarget(QRect rectPos, SmartProgramBase::HS
         return false;
     }
 
+    bool success = false;
     double maxRatio = 0;
     QPoint maxRatioOffset(0,0);
     for (int y = 0; y <= rectPos.height() - testImage.height(); y++)
@@ -419,9 +420,15 @@ bool SmartProgramBase::checkImageMatchTarget(QRect rectPos, SmartProgramBase::HS
                 maxRatio = ratio;
                 maxRatioOffset = QPoint(x,y);
             }
+
+            // Early out if we already found match
+            if (maxRatio > target)
+            {
+                success = true;
+                break;
+            }
         }
     }
-    bool success = maxRatio > target;
 
     QString posStr = success ? " at offset {" + QString::number(maxRatioOffset.x()) + "," + QString::number(maxRatioOffset.y()) + "}" : "";
     QString logStr = "Image Match Ratio (" + QString::number(maxRatio) + ") > target (" + QString::number(target) + ")" + posStr + " = ";
