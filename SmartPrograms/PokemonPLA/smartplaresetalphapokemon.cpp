@@ -1,8 +1,19 @@
 #include "smartplaresetalphapokemon.h"
 
-SmartPLAResetAlphaPokemon::SmartPLAResetAlphaPokemon(SmartProgramParameter parameter) : SmartProgramBase(parameter)
+SmartPLAResetAlphaPokemon::SmartPLAResetAlphaPokemon
+(
+    AlphaType type,
+    SmartProgramParameter parameter
+)
+    : SmartProgramBase(parameter)
+    , m_type(type)
 {
     init();
+
+    if (m_type >= AT_COUNT)
+    {
+        setState_error("Invalid legendary type!");
+    }
 }
 
 void SmartPLAResetAlphaPokemon::init()
@@ -31,6 +42,7 @@ void SmartPLAResetAlphaPokemon::runNextState()
     {
     case SS_Init:
     {
+        initStat(m_statError, "Errors");
         initStat(m_statAttempts, "Attempts");
         initStat(m_statAlphaFound, "Alpha Found");
 
@@ -85,7 +97,7 @@ void SmartPLAResetAlphaPokemon::runNextState()
                 {
                     incrementStat(m_statAttempts);
                     m_substage = SS_Walk;
-                    setState_runCommand(C_WalkGallade);
+                    setState_runCommand(m_type == AT_Gallade ? C_WalkGallade : C_WalkCrobat);
 
                     m_shinyFound = false;
                     m_alphaFound = false;

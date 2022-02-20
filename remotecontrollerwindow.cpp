@@ -2258,7 +2258,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     }
     case SP_PLA_ResetAlphaPokemon:
     {
-        m_smartProgram = new SmartPLAResetAlphaPokemon(parameter);
+        m_smartProgram = new SmartPLAResetAlphaPokemon((SmartPLAResetAlphaPokemon::AlphaType)ui->SP12_CB_AlphaType->currentIndex(), parameter);
         break;
     }
     case SP_PLA_BraviaryGainHeight:

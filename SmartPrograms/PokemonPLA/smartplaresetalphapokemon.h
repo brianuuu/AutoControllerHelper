@@ -7,7 +7,18 @@
 class SmartPLAResetAlphaPokemon : public SmartProgramBase
 {
 public:
-    explicit SmartPLAResetAlphaPokemon(SmartProgramParameter parameter);
+    enum AlphaType : uint8_t
+    {
+        AT_Gallade = 0,
+        AT_Crobat,
+        AT_COUNT,
+    };
+
+public:
+    explicit SmartPLAResetAlphaPokemon(
+            AlphaType type,
+            SmartProgramParameter parameter
+            );
 
     virtual SmartProgram getProgramEnum() { return SP_PLA_ResetAlphaPokemon; }
 
@@ -19,7 +30,8 @@ private:
     // Command indices
     Command const C_Restart     = 0;
     Command const C_WalkGallade = 1;
-    Command const C_COUNT       = 2;
+    Command const C_WalkCrobat  = 2;
+    Command const C_COUNT       = 3;
 
     // List of test color
     HSVRange const C_Color_Alpha = HSVRange(300,100,140,359,255,255); // >70
@@ -49,6 +61,7 @@ private:
     Substage m_substage;
 
     // Members
+    AlphaType m_type;
     QImage m_imageMatch_Shiny;
     int m_locateAlphaAttempt;
     bool m_alphaFound;
@@ -56,6 +69,7 @@ private:
     bool m_enteredFirstPerson;
 
     // Stats
+    Stat m_statError;
     Stat m_statAttempts;
     Stat m_statAlphaFound;
 };

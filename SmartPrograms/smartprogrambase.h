@@ -211,7 +211,7 @@ public:
             case SP_BDSP_DuplicateItem1to30:return 0;
 
             case SP_PLA_NuggetFarmer:       return 0;
-            case SP_PLA_ResetAlphaPokemon:  return 0;
+            case SP_PLA_ResetAlphaPokemon:  return 12;
             case SP_PLA_BraviaryGainHeight: return 0;
 
             case SP_COUNT:                  return -1;
@@ -331,16 +331,23 @@ protected:
         QColor m_maxHSV;
     };
 
+    // Single pixcel color
     bool checkColorMatch(QColor testColor, QColor targetColor, int threshold = 10);
     bool checkColorMatchHSV(QColor testColor, HSVRange hsvRange);
-
     bool checkPixelColorMatch(QPoint pixelPos, QColor targetColor, int threshold = 10);
+
+    // Average color in area
     QColor getAverageColor(QRect rectPos);
     bool checkAverageColorMatch(QRect rectPos, QColor targetColor, int threshold = 10);
 
+    // Brightness Mean (white pixel ratio)
     double getBrightnessMean(QRect rectPos, HSVRange hsvRange);
     bool checkBrightnessMeanTarget(QRect rectPos, HSVRange hsvRange, double target);
 
+    // Utils
+    QImage getMonochromeImage(QRect rectPos, HSVRange hsvRange, bool whiteIsOne = true);
+
+    // Image matching
     bool setImageMatchFromResource(QString const& name, QImage& image);
     double getImageSimilarRatio(QImage const& query, QImage const& database);
     double getImageMatch(QRect rectPos, HSVRange hsvRange, QImage const& testImage);

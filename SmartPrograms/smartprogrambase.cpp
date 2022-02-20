@@ -300,6 +300,33 @@ bool SmartProgramBase::checkBrightnessMeanTarget(QRect rectPos, SmartProgramBase
     return success;
 }
 
+QImage SmartProgramBase::getMonochromeImage(QRect rectPos, SmartProgramBase::HSVRange hsvRange, bool whiteIsOne)
+{
+    QImage cropped = m_capture.copy(rectPos);
+    QImage masked = QImage(cropped.size(), QImage::Format_MonoLSB);
+    masked.setColorTable({0xFF000000,0xFFFFFFFF});
+
+    for (int y = 0; y < cropped.height(); y++)
+    {
+        QRgb *rowData = (QRgb*)cropped.scanLine(y);
+        uint8_t *rowMaskedData = (uint8_t*)masked.scanLine(y);
+        for (int x = 0; x < cropped.width(); x++)
+        {
+            bool matched = checkColorMatchHSV(QColor::fromRgb(rowData[x]), hsvRange);
+            if (whiteIsOne ^ matched)
+            {
+                CLEAR_BIT(rowMaskedData[x / 8], x % 8);
+            }
+            else
+            {
+                SET_BIT(rowMaskedData[x / 8], x % 8);
+            }
+        }
+    }
+
+    return masked;
+}
+
 bool SmartProgramBase::setImageMatchFromResource(const QString &name, QImage &image)
 {
     image = QImage(":/resources/ImageMatch/" + name + ".bmp").convertToFormat(QImage::Format_MonoLSB, Qt::MonoOnly);
@@ -361,21 +388,8 @@ double SmartProgramBase::getImageMatch(QRect rectPos, SmartProgramBase::HSVRange
         return 0;
     }
 
-    QImage cropped = m_capture.copy(rectPos);
-    QImage masked = QImage(cropped.size(), QImage::Format_MonoLSB);
-    masked.setColorTable({0xFF000000,0xFFFFFFFF});
-
-    for (int y = 0; y < cropped.height(); y++)
-    {
-        QRgb *rowData = (QRgb*)cropped.scanLine(y);
-        uint8_t *rowMaskedData = (uint8_t*)masked.scanLine(y);
-        for (int x = 0; x < cropped.width(); x++)
-        {
-            // Note: This is fliped
-            bool matched = checkColorMatchHSV(QColor::fromRgb(rowData[x]), hsvRange);
-            matched ? CLEAR_BIT(rowMaskedData[x / 8], x % 8) : SET_BIT(rowMaskedData[x / 8], x % 8);
-        }
-    }
+    // Get filtered image (black is 1, white is 0)
+    QImage masked = getMonochromeImage(rectPos, hsvRange, false);
 
     // Similar (query -> database)
     double sqd = getImageSimilarRatio(masked, testImage);
