@@ -12,7 +12,7 @@ SmartPLAResetAlphaPokemon::SmartPLAResetAlphaPokemon
 
     if (m_type >= AT_COUNT)
     {
-        setState_error("Invalid legendary type!");
+        setState_error("Invalid alpha pokemon type!");
     }
 }
 
@@ -60,6 +60,7 @@ void SmartPLAResetAlphaPokemon::runNextState()
         {
             if (!checkAverageColorMatch(A_Title.m_rect, QColor(0,0,0)))
             {
+                incrementStat(m_statError);
                 emit printLog("Unable to detect black screen on restart, HOME button might have missed, retrying...", LOG_ERROR);
                 setState_runCommand(C_Restart);
             }
