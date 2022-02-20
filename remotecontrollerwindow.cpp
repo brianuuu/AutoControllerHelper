@@ -2263,7 +2263,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     }
     case SP_PLA_BraviaryGainHeight:
     {
-        m_smartProgram = new SmartSimpleProgram(SP_PLA_BraviaryGainHeight, 10, parameter);
+        m_smartProgram = new SmartSimpleProgram(SP_PLA_BraviaryGainHeight, 15, parameter);
         break;
     }
     default:
