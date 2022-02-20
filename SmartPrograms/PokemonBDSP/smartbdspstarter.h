@@ -30,7 +30,7 @@ private:
     Command const C_COUNT   = 5;
 
     // List of test color
-    HSVRange const C_Color_Battle = HSVRange(339,130,180,359,190,220);
+    HSVRange const C_Color_Battle = HSVRange(339,130,180,3,190,220);
     HSVRange const C_Color_Dialog = HSVRange(0,0,230,359,30,255);
 
     // List of test point/area
