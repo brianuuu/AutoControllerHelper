@@ -48,6 +48,9 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_programEnumMap["BDSP_BoxOperation"]       = P_BDSP_BoxOperation;
     m_programEnumMap["BDSP_ResetLegendary"]     = P_BDSP_ResetLegendary;
 
+    m_programEnumMap["PLA_ResetAlphaCrobat"]    = P_PLA_ResetAlphaCrobat;
+    m_programEnumMap["PLA_ResetAlphaGallade"]   = P_PLA_ResetAlphaGallade;
+
     m_tabID[P_DaySkipper]           = 1;
     m_tabID[P_DaySkipper_Unlimited] = 2;
     m_tabID[P_WattFarmer]           = 17; // 3 now use for error
@@ -81,6 +84,9 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_tabID[P_BDSP_BoxDuplication]      = 21;
     m_tabID[P_BDSP_BoxOperation]        = 22;
     m_tabID[P_BDSP_ResetLegendary]      = 0;
+
+    m_tabID[P_PLA_ResetAlphaCrobat]     = 0;
+    m_tabID[P_PLA_ResetAlphaGallade]    = 0;
 
     if (!QDir(HEX_PATH).exists())
     {
@@ -1123,12 +1129,6 @@ void autocontrollerwindow::LoadConfig()
     }
 
     //--------------------------------------------------------
-    case P_TurboA:
-    {
-        break;
-    }
-
-    //--------------------------------------------------------
     case P_FriendDeleteAdd:
     {
         QTextStream in(&configFile);
@@ -1380,18 +1380,6 @@ void autocontrollerwindow::LoadConfig()
     }
 
     //--------------------------------------------------------
-    case P_AutoBattleTower:
-    {
-        break;
-    }
-
-    //--------------------------------------------------------
-    case P_AutoTournament:
-    {
-        break;
-    }
-
-    //--------------------------------------------------------
     case P_GodEggDuplication:
     {
         QTextStream in(&configFile);
@@ -1403,12 +1391,6 @@ void autocontrollerwindow::LoadConfig()
                 ui->GodEgg_Count->setValue(GetVariableString(line).toInt());
             }
         }
-        break;
-    }
-
-    //--------------------------------------------------------
-    case P_PurpleBeamFinder:
-    {
         break;
     }
 
@@ -1558,18 +1540,6 @@ void autocontrollerwindow::LoadConfig()
     }
 
     //--------------------------------------------------------
-    case P_SmartProgram:
-    {
-        break;
-    }
-
-    //--------------------------------------------------------
-    case P_BDSP_ResetDialgaPalkia:
-    {
-        break;
-    }
-
-    //--------------------------------------------------------
     case P_BDSP_ResetStarter:
     {
         QTextStream in(&configFile);
@@ -1585,12 +1555,6 @@ void autocontrollerwindow::LoadConfig()
                 }
             }
         }
-        break;
-    }
-
-    //--------------------------------------------------------
-    case P_BDSP_MenuGlitch113:
-    {
         break;
     }
 
@@ -1629,12 +1593,6 @@ void autocontrollerwindow::LoadConfig()
     }
 
     //--------------------------------------------------------
-    case P_BDSP_ResetLegendary:
-    {
-        break;
-    }
-
-    //--------------------------------------------------------
     case P_INVALID:
     {
         if (configExist)
@@ -1647,6 +1605,8 @@ void autocontrollerwindow::LoadConfig()
         }
         break;
     }
+
+    default: break;
     }
 
     UpdateInfo();
@@ -2359,6 +2319,16 @@ void autocontrollerwindow::UpdateInfo()
         info += "\nThis can be used for most legendaries that starts battle with A press.";
         info += "\nOtherwise specified, you will need to use other programs, like Dialga/Palkia.";
         info += "\nThis program DOES NOT stop by itself, you MUST keep an eye on encounters.";
+        info += "\nIf shiny is found unplug the board or take the Switch out from dock IMMEDIATELY!!";
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_PLA_ResetAlphaCrobat:
+    case P_PLA_ResetAlphaGallade:
+    {
+        info = "Time per soft-reset: " + GetTimeString(name, 0);
+        info += "\nThis program DOES NOT stop by itself, you MUST listen for the shiny sound!";
         info += "\nIf shiny is found unplug the board or take the Switch out from dock IMMEDIATELY!!";
         break;
     }

@@ -185,6 +185,10 @@ private:
         P_BDSP_BoxOperation,
         P_BDSP_ResetLegendary,
 
+        // PLA Programs
+        P_PLA_ResetAlphaCrobat,
+        P_PLA_ResetAlphaGallade,
+
         P_INVALID
     };
     QMap<QString, Program> m_programEnumMap;
