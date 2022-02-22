@@ -143,7 +143,15 @@ void SmartPLAResetAlphaPokemon::runNextState()
             }
             else
             {
-                emit printLog("No shiny found, restarting...", LOG_WARNING);
+                if (m_locateAlphaAttempt >= 5)
+                {
+                    incrementStat(m_statError);
+                    emit printLog("Unable to locate Alpha Pokemon after 5 attempts, restarting...", LOG_ERROR);
+                }
+                else
+                {
+                    emit printLog("No shiny found, restarting...", LOG_WARNING);
+                }
                 m_substage = SS_Restart;
                 setState_runCommand(C_Restart);
 

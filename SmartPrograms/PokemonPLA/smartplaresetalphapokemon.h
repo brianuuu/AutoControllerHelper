@@ -34,7 +34,7 @@ private:
     Command const C_COUNT       = 3;
 
     // List of test color
-    HSVRange const C_Color_Alpha = HSVRange(300,100,140,359,255,255); // >70
+    HSVRange const C_Color_Alpha = HSVRange(300,100,140,60,255,255); // >70
     HSVRange const C_Color_UI = HSVRange(0,0,150,259,80,255); // >150
     HSVRange const C_Color_Shiny = HSVRange(0,0,130,359,60,255); // >0.3
 
