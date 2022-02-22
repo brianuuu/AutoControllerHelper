@@ -5,6 +5,7 @@
 SmartProgramBase::SmartProgramBase(SmartProgramParameter parameter)
     : QWidget(parameter.parent)
     , m_parameters(parameter)
+    , m_ocrHSVRange(0,0,0,0,0,0)
 {
     init();
 }
@@ -102,6 +103,11 @@ void SmartProgramBase::init()
     connect(&m_runStateTimer, &QTimer::timeout, this, &SmartProgramBase::runStateLoop);
     m_runStateDelayTimer.setSingleShot(true);
     connect(&m_runStateDelayTimer, &QTimer::timeout, this, [&](){m_runNextState = true;});
+
+    // OCR
+    m_ocrRect = QRect();
+    connect(&m_ocrProcess, &QProcess::errorOccurred, this, &SmartProgramBase::on_OCRErrorOccurred);
+    connect(&m_ocrProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_OCRFinished()));
 
     // ---------Child class should init their variables AFTER this (commands)---------
 }
@@ -557,6 +563,13 @@ void SmartProgramBase::setState_frameAnalyzeRequest()
     m_state = S_CaptureRequested;
 }
 
+void SmartProgramBase::setState_ocrRequest(QRect rect, HSVRange hsvRange)
+{
+    m_state = S_OCRRequested;
+    m_ocrRect = rect;
+    m_ocrHSVRange = hsvRange;
+}
+
 void SmartProgramBase::runStateLoop()
 {
     if (m_runNextState)
@@ -564,6 +577,42 @@ void SmartProgramBase::runStateLoop()
         m_runNextState = false;
         runNextState();
     }
+}
+
+void SmartProgramBase::startOCR(QRect rectPos, SmartProgramBase::HSVRange hsvRange)
+{
+    // Get filtered image (black is 1, white is 0)
+    QImage masked = getMonochromeImage(rectPos, hsvRange, false);
+    masked.save(QString(TESSERACT_PATH) + "capture.png", "PNG");
+
+    // TODO: Check if .traineddata exist
+
+    QString command = QString(TESSERACT_PATH) + "tesseract.exe ";
+    command += ".\\capture.png .\\output --tessdata-dir . ";
+    command += "-l eng";
+    command += " --psm 7 --oem 2 -c tessedit_create_txt=1";
+    m_ocrProcess.setWorkingDirectory(TESSERACT_PATH);
+    m_ocrProcess.start(command);
+}
+
+void SmartProgramBase::on_OCRErrorOccurred(QProcess::ProcessError error)
+{
+    setState_error("Unable to start text recognition, tesseract.exe might be missing.\nProcess exited with code: " + QString::number(error));
+    m_runNextState = true;
+}
+
+void SmartProgramBase::on_OCRFinished()
+{
+    if (QFile::exists(QString(TESSERACT_PATH) + "output.txt"))
+    {
+        m_state = S_OCRReady;
+    }
+    else
+    {
+        setState_error("Expected tesseract output.txt not found");
+    }
+
+    m_runNextState = true;
 }
 
 void SmartProgramBase::runNextStateDelay(int milliseconds)
@@ -643,6 +692,21 @@ void SmartProgramBase::runNextState()
             m_runNextState = true;
         }
         */
+        break;
+    }
+    case S_OCRRequested:
+    {
+        m_parameters.vlcWrapper->getFrame(m_capture);
+        if (!m_ocrRect.isNull())
+        {
+            startOCR(m_ocrRect, m_ocrHSVRange);
+        }
+        else
+        {
+            setState_error("Invalid OCR capture size");
+            m_runNextState = true;
+        }
+
         break;
     }
     case S_TakeScreenshot:

@@ -2160,7 +2160,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
                                     ui->SP1_SB_MaxH, ui->SP1_SB_MaxS, ui->SP1_SB_MaxV};
         parameter.preview = m_SP1_graphicScene;
         parameter.previewMasked = m_SP1_graphicSceneMasked;
-        m_smartProgram = new SmartBrightnessMeanFinder(spinBoxes, ui->SP1_L_Mean, ui->SP1_PB_MatchImage, ui->SP1_L_MatchResult, parameter);
+        m_smartProgram = new SmartBrightnessMeanFinder(spinBoxes, ui->SP1_L_Mean, ui->SP1_PB_MatchImage, ui->SP1_L_MatchResult, ui->SP1_PB_OCR, parameter);
         break;
     }
     case SP_PurpleBeamFinder:

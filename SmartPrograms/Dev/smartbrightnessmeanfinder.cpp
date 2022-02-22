@@ -6,6 +6,7 @@ SmartBrightnessMeanFinder::SmartBrightnessMeanFinder
     QLabel* labelMean,
     QPushButton* imageMatchBtn,
     QLabel* labelImageMatch,
+    QPushButton* ocrBtn,
     SmartProgramParameter parameter
 )
     : SmartProgramBase(parameter)
@@ -13,6 +14,7 @@ SmartBrightnessMeanFinder::SmartBrightnessMeanFinder
     , m_meanOutput(labelMean)
     , m_imageMatchBtn(imageMatchBtn)
     , m_imageMatchResult(labelImageMatch)
+    , m_ocrBtn(ocrBtn)
 {
     init();
 
@@ -39,6 +41,9 @@ void SmartBrightnessMeanFinder::init()
 
     connect(m_imageMatchBtn, &QPushButton::clicked, this, &SmartBrightnessMeanFinder::imageMatchAdd);
     m_imageMatchStarted = false;
+
+    connect(m_ocrBtn, &QPushButton::clicked, this, &SmartBrightnessMeanFinder::orcRequested);
+    m_ocrRequested = false;
 }
 
 void SmartBrightnessMeanFinder::reset()
@@ -61,7 +66,21 @@ void SmartBrightnessMeanFinder::runNextState()
     }
     case SS_Capture:
     {
-        if (state == S_CaptureReady)
+        if (state == S_OCRReady)
+        {
+            QFile output(QString(TESSERACT_PATH) + "output.txt");
+            if (output.open(QIODevice::Text | QIODevice::ReadOnly))
+            {
+                QTextStream in(&output);
+                in.setCodec("UTF-8");
+                emit printLog("OCR Completed with text: " + in.readLine());
+                output.close();
+            }
+
+            m_substage = SS_Init;
+            runNextStateDelay(100);
+        }
+        else if (state == S_CaptureReady)
         {
             QRect rect(m_spinBoxes[0]->value(), m_spinBoxes[1]->value(), m_spinBoxes[2]->value(), m_spinBoxes[3]->value());
             QColor minHSV, maxHSV;
@@ -99,6 +118,14 @@ void SmartBrightnessMeanFinder::runNextState()
                     }
                     m_imageMatchResult->setText("Similarity Ratio = " + QString::number(maxRatio) + ", Offset: {" + QString::number(maxRatioOffset.x()) + "," + QString::number(maxRatioOffset.y()) + "}");
                 }
+            }
+
+            if (m_ocrRequested)
+            {
+                // manually start OCR
+                startOCR(rect, hsvRange);
+                m_ocrRequested = false;
+                break;
             }
 
             m_substage = SS_Init;

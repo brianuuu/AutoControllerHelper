@@ -1749,7 +1749,7 @@
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>12</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="page">
              <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1782,7 +1782,7 @@
                    <x>0</x>
                    <y>0</y>
                    <width>240</width>
-                   <height>28</height>
+                   <height>25</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -2094,7 +2094,18 @@
                     <item>
                      <widget class="QLabel" name="SP1_L_MatchResult">
                       <property name="text">
-                       <string>Result: ---</string>
+                       <string>Similarity Ratio = : ---</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_34">
+                    <item>
+                     <widget class="QPushButton" name="SP1_PB_OCR">
+                      <property name="text">
+                       <string>Text Recognition Test</string>
                       </property>
                      </widget>
                     </item>
@@ -2142,8 +2153,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>252</width>
-                   <height>125</height>
+                   <width>428</width>
+                   <height>291</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -3378,8 +3389,8 @@ This is for duplicating Pokemon, for items, use Box Operation program instead.</
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>291</height>
+                   <width>197</width>
+                   <height>40</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_31">

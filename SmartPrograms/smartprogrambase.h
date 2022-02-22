@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QDomDocument>
 #include <QGraphicsScene>
+#include <QProcess>
 #include <QSettings>
 #include <QTimer>
 #include <QWidget>
@@ -300,6 +301,10 @@ public slots:
     void imageError(int id, QCameraImageCapture::Error error, const QString &errorString);
     void runStateLoop();
 
+    // Tesseract OCR (text recognition)
+    void on_OCRErrorOccurred(QProcess::ProcessError error);
+    void on_OCRFinished();
+
 protected:
     virtual void init();
     virtual void reset();
@@ -353,6 +358,9 @@ protected:
     double getImageMatch(QRect rectPos, HSVRange hsvRange, QImage const& testImage);
     bool checkImageMatchTarget(QRect rectPos, HSVRange hsvRange, QImage const& testImage, double target, QPoint* offset = nullptr);
 
+    // Tesseract OCR (text recognition)
+    void startOCR(QRect rectPos, HSVRange hsvRange);
+
     typedef int Command;
     bool inializeCommands(int size);
 
@@ -368,6 +376,8 @@ protected:
         S_TakeScreenshotFinished,
         S_CaptureRequested,
         S_CaptureReady,
+        S_OCRRequested,
+        S_OCRReady,
     };
 
     // State functions
@@ -376,6 +386,7 @@ protected:
     void setState_runCommand(Command commandIndex, bool requestFrameAnalyze = false);
     void setState_runCommand(QString const& customCommand, bool requestFrameAnalyze = false);
     void setState_frameAnalyzeRequest();
+    void setState_ocrRequest(QRect rect, HSVRange hsvRange);
     void setState_error(QString _errorMsg) { m_state = S_Error; m_errorMsg = _errorMsg; }
 
     Command m_commandIndex;
@@ -400,6 +411,11 @@ private:
     bool m_runNextState;
     QTimer m_runStateTimer;
     QTimer m_runStateDelayTimer;
+
+    // OCR
+    QProcess m_ocrProcess;
+    QRect m_ocrRect;
+    HSVRange m_ocrHSVRange;
 };
 
 #endif // SMARTPROGRAMBASE_H
