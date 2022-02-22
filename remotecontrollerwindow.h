@@ -223,7 +223,7 @@ private:
     QMutex* m_commandMutex;
     QVector<ButtonFlag> m_displayFlags;
     bool m_infiniteLoop;
-    bool m_executedCommandInterrupted;
+    bool m_executedCommandDirty;
 
     // Serials
     QSerialPort m_serialPort;

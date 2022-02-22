@@ -10,7 +10,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     connect(&m_serialPort, &QSerialPort::errorOccurred, this, &RemoteControllerWindow::on_SerialPort_errorOccurred);
     connect(&m_readTimer, &QTimer::timeout, this, &RemoteControllerWindow::on_ReadTimer_timeout);
     m_readTickCount = 0;
-    m_executedCommandInterrupted = false;
+    m_executedCommandDirty = false;
 
     m_serialState = SS_Disconnect;
 
@@ -568,22 +568,28 @@ void RemoteControllerWindow::on_SerialPort_readyRead()
     // this causes the first command for the new set to be removed earlier than it should!
 
     m_commandMutex->lock();
-
-    if (m_executedCommandInterrupted)
-    {
-        // Execute command has been changed to a new set
-        qDebug() << "Command has been inerrupted, discarding feedback for previous command!";
-        ba.clear();
-        m_executedCommandInterrupted = false;
-    }
-
     if (!ba.isEmpty() && !m_executeCommands.isEmpty())
     {
         for (int i = 0; i < ba.size(); i++)
         {
             uint8_t const byte = (uint8_t)ba.at(i);
-            if (m_hexVersion != byte)
+            if (m_executedCommandDirty)
             {
+                if (m_hexVersion != byte)
+                {
+                    // We expect the first byte returned to be the version number
+                    qDebug() << "Command has been inerrupted, discarding feedback for previous command!";
+                    continue;
+                }
+                else
+                {
+                    // Discard until we make sure the first feedback is correct
+                    m_executedCommandDirty = false;
+                }
+            }
+            else if (byte != 0xFF)
+            {
+                // All other feedback should be 0xFF
                 PrintLog("Unexpected byte (" + QString::number(byte) + ") returned from serial! ", LOG_ERROR);
             }
 
@@ -1364,7 +1370,7 @@ bool RemoteControllerWindow::SendCommand(const QString &commands)
     m_commandMutex->lock();
     m_infiniteLoop = false;
     m_displayFlags.clear();
-    m_executedCommandInterrupted = !m_executeCommands.empty();
+    m_executedCommandDirty = true;
     m_executeCommands.clear();
     QByteArray ba;
     ba.append((char)0xFE); // mode = FE
