@@ -24,6 +24,7 @@ SOURCES += \
     SmartPrograms/Dev/smartbrightnessmeanfinder.cpp \
     SmartPrograms/Dev/smartcolorcalibrator.cpp \
     SmartPrograms/Dev/smartdelaycalibrator.cpp \
+    SmartPrograms/Dev/smarttestprogram.cpp \
     SmartPrograms/PokemonBDSP/smartbdspboxoperation.cpp \
     SmartPrograms/PokemonBDSP/smartbdspduplicateitem1to30.cpp \
     SmartPrograms/PokemonBDSP/smartbdspshinylegendary.cpp \
@@ -54,6 +55,7 @@ HEADERS += \
     SmartPrograms/Dev/smartbrightnessmeanfinder.h \
     SmartPrograms/Dev/smartcolorcalibrator.h \
     SmartPrograms/Dev/smartdelaycalibrator.h \
+    SmartPrograms/Dev/smarttestprogram.h \
     SmartPrograms/PokemonBDSP/smartbdspboxoperation.h \
     SmartPrograms/PokemonBDSP/smartbdspduplicateitem1to30.h \
     SmartPrograms/PokemonBDSP/smartbdspshinylegendary.h \

@@ -38,6 +38,7 @@
 #include "SmartPrograms/Dev/smartdelaycalibrator.h"
 #include "SmartPrograms/Dev/smartcolorcalibrator.h"
 #include "SmartPrograms/Dev/smartbrightnessmeanfinder.h"
+#include "SmartPrograms/Dev/smarttestprogram.h"
 
 #include "SmartPrograms/PokemonSwSh/smartpurplebeamfilder.h"
 #include "SmartPrograms/PokemonSwSh/smartycommglitch.h"
