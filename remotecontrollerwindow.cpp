@@ -10,6 +10,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     connect(&m_serialPort, &QSerialPort::errorOccurred, this, &RemoteControllerWindow::on_SerialPort_errorOccurred);
     connect(&m_readTimer, &QTimer::timeout, this, &RemoteControllerWindow::on_ReadTimer_timeout);
     m_readTickCount = 0;
+    m_executedCommandInterrupted = false;
 
     m_serialState = SS_Disconnect;
 
@@ -563,7 +564,19 @@ void RemoteControllerWindow::on_SerialPort_readyRead()
         return;
     }
 
+    // Command can be interrupted right at this moment from SendCommand(), if we have feedback ready,
+    // this causes the first command for the new set to be removed earlier than it should!
+
     m_commandMutex->lock();
+
+    if (m_executedCommandInterrupted)
+    {
+        // Execute command has been changed to a new set
+        qDebug() << "Command has been inerrupted, discarding feedback for previous command!";
+        ba.clear();
+        m_executedCommandInterrupted = false;
+    }
+
     if (!ba.isEmpty() && !m_executeCommands.isEmpty())
     {
         for (int i = 0; i < ba.size(); i++)
@@ -1351,6 +1364,7 @@ bool RemoteControllerWindow::SendCommand(const QString &commands)
     m_commandMutex->lock();
     m_infiniteLoop = false;
     m_displayFlags.clear();
+    m_executedCommandInterrupted = !m_executeCommands.empty();
     m_executeCommands.clear();
     QByteArray ba;
     ba.append((char)0xFE); // mode = FE
