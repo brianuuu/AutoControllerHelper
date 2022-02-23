@@ -91,7 +91,7 @@ GameLanguage SmartProgramSetting::getGameLanguage()
 bool SmartProgramSetting::ensureTrainedDataExist()
 {
     QString languagePrefix = SmartProgramSetting::getGameLanguagePrefix(getGameLanguage());
-    return QFile::exists(QString(TESSERACT_PATH) + languagePrefix + ".traineddata");
+    return QFile::exists(QString(RESOURCES_PATH) + "Tesseract/" + languagePrefix + ".traineddata");
 }
 
 bool SmartProgramSetting::isSoundEnabled()

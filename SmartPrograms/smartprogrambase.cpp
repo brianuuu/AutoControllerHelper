@@ -583,7 +583,7 @@ bool SmartProgramBase::startOCR(QRect rectPos, SmartProgramBase::HSVRange hsvRan
 {
     // Get filtered image, flip black/white since black text detects better
     QImage masked = getMonochromeImage(rectPos, hsvRange, false);
-    masked.save(QString(TESSERACT_PATH) + "capture.png", "PNG");
+    masked.save(QString(RESOURCES_PATH) + "Tesseract/capture.png", "PNG");
 
     // Check if .traineddata exist
     GameLanguage gameLanguage = isNumber ? GL_English : m_parameters.settings->getGameLanguage();
@@ -596,11 +596,11 @@ bool SmartProgramBase::startOCR(QRect rectPos, SmartProgramBase::HSVRange hsvRan
         return false;
     }
 
-    QString command = QString(TESSERACT_PATH) + "tesseract.exe ";
-    command += ".\\capture.png .\\output --tessdata-dir . ";
+    QString command = QString(RESOURCES_PATH) + "Tesseract/tesseract.exe ";
+    command += "./capture.png ./output --tessdata-dir . ";
     command += "-l " + SmartProgramSetting::getGameLanguagePrefix(gameLanguage);
     command += " --psm 7 --oem 2 -c tessedit_create_txt=1";
-    m_ocrProcess.setWorkingDirectory(TESSERACT_PATH);
+    m_ocrProcess.setWorkingDirectory(QString(RESOURCES_PATH) + "Tesseract/");
     m_ocrProcess.start(command);
 
     return true;
@@ -741,7 +741,7 @@ int SmartProgramBase::matchSubStrings(const QString &query, const QStringList &s
 QString SmartProgramBase::getOCRStringRaw()
 {
     QString str;
-    QFile output(QString(TESSERACT_PATH) + "output.txt");
+    QFile output(QString(RESOURCES_PATH) + "Tesseract/output.txt");
     if (output.open(QIODevice::Text | QIODevice::ReadOnly))
     {
         QTextStream in(&output);
@@ -849,7 +849,7 @@ void SmartProgramBase::on_OCRErrorOccurred(QProcess::ProcessError error)
 
 void SmartProgramBase::on_OCRFinished()
 {
-    if (QFile::exists(QString(TESSERACT_PATH) + "output.txt"))
+    if (QFile::exists(QString(RESOURCES_PATH) + "Tesseract/output.txt"))
     {
         m_state = S_OCRReady;
     }
