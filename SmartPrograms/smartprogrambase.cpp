@@ -589,7 +589,7 @@ bool SmartProgramBase::startOCR(QRect rectPos, SmartProgramBase::HSVRange hsvRan
     GameLanguage gameLanguage = isNumber ? GL_English : m_parameters.settings->getGameLanguage();
     if (!m_parameters.settings->ensureTrainedDataExist())
     {
-        QString languageName = SmartProgramSetting::getGameLanguageName(gameLanguage);
+        QString languageName = PokemonDatabase::getGameLanguageName(gameLanguage);
         setState_error("Language trained data for '" + languageName + "' for Tesseract is missing, please goto 'Tesseract' folder and follow the instructions in README.md");
 
         m_runNextState = true;
@@ -598,36 +598,12 @@ bool SmartProgramBase::startOCR(QRect rectPos, SmartProgramBase::HSVRange hsvRan
 
     QString command = QString(RESOURCES_PATH) + "Tesseract/tesseract.exe ";
     command += "./capture.png ./output --tessdata-dir . ";
-    command += "-l " + SmartProgramSetting::getGameLanguagePrefix(gameLanguage);
+    command += "-l " + PokemonDatabase::getGameLanguagePrefix(gameLanguage);
     command += " --psm 7 --oem 2 -c tessedit_create_txt=1";
     m_ocrProcess.setWorkingDirectory(QString(RESOURCES_PATH) + "Tesseract/");
     m_ocrProcess.start(command);
 
     return true;
-}
-
-QString SmartProgramBase::stringRemoveNonAlphaNumeric(const QString &str)
-{
-    QString temp;
-    for (QChar c : str)
-    {
-        if (c.isLetterOrNumber()
-         || c == QChar(0x3099)  // Japanese dakuten
-         || c == QChar(0x309A)) // Japanese handakuten
-        {
-            temp += c;
-            continue;
-        }
-    }
-
-    return temp;
-}
-
-QString SmartProgramBase::normalizeString(const QString &str)
-{
-    QString temp = str.normalized(QString::NormalizationForm_KD);
-    temp = stringRemoveNonAlphaNumeric(temp);
-    return temp.toLower();
 }
 
 int SmartProgramBase::getLevenshteinDistance(const QString &a, const QString &b)
@@ -700,7 +676,7 @@ int SmartProgramBase::getLevenshteinDistanceSubString(const QString &longStr, co
 
 int SmartProgramBase::matchSubStrings(const QString &query, const QStringList &subStrings, int* o_dist)
 {
-    // Note: "query" should be already normalized
+    // Note: "query" and "subStrings" should be already normalized
     // This function finds the best match with in the entry,
     // though this doesn't matter much as any match in an entry always counts
 
@@ -708,8 +684,7 @@ int SmartProgramBase::matchSubStrings(const QString &query, const QStringList &s
     int minSubStringID = -1;
     for (int i = 0; i < subStrings.size(); i++)
     {
-        // TODO: pre-normalize all substrings in database
-        QString const subString = normalizeString(subStrings[i]);
+        QString const& subString = subStrings[i];
 
         // check for exact match
         if (query == subString)
@@ -789,11 +764,15 @@ bool SmartProgramBase::getOCRNumber(int &number)
     {
         emit printLog("OCR returned number: " + numStr);
     }
+    else
+    {
+        emit printLog("OCR failed to convert number", LOG_ERROR);
+    }
 
     return ok;
 }
 
-int SmartProgramBase::matchStringDatabase(const QVector<OCREntry> &database)
+int SmartProgramBase::matchStringDatabase(const PokemonDatabase::OCREntries &entries)
 {
     /* database structure:
      * {
@@ -809,20 +788,20 @@ int SmartProgramBase::matchStringDatabase(const QVector<OCREntry> &database)
     // Nothing
     if (queryRaw.isEmpty())
     {
-        emit printLog("OCR returned empty string");
+        emit printLog("OCR returned empty string", LOG_WARNING);
         return -1;
     }
 
     // Do comparison with each database string, find the best match entry
-    QString query = normalizeString(queryRaw);
+    QString query = PokemonDatabase::normalizeString(queryRaw);
 
     int minDist = INT_MAX;
     int minMatchedEntry = -1;
     int minSubStringMatched = -1;
-    for (int i = 0; i < database.size(); i++)
+    for (int i = 0; i < entries.size(); i++)
     {
         int dist = 0;
-        QStringList const& subStrings = database[i].second;
+        QStringList const& subStrings = entries[i].second;
         int subStringMatched = matchSubStrings(query, subStrings, &dist);
         if (subStringMatched >= 0 && subStringMatched < subStrings.size() && dist < minDist)
         {
@@ -834,8 +813,12 @@ int SmartProgramBase::matchStringDatabase(const QVector<OCREntry> &database)
 
     if (minMatchedEntry >= 0)
     {
-        OCREntry const& entry = database[minMatchedEntry];
+        PokemonDatabase::OCREntry const& entry = entries[minMatchedEntry];
         emit printLog("OCR text '" + queryRaw + "' has matched entry " + entry.first + ": '" + entry.second[minSubStringMatched] + "' from database (LD = " + QString::number(minDist) + ")");
+    }
+    else
+    {
+        emit printLog("OCR text '" + queryRaw + "' found no matches", LOG_WARNING);
     }
 
     return minMatchedEntry;

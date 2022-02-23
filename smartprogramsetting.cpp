@@ -90,7 +90,7 @@ GameLanguage SmartProgramSetting::getGameLanguage()
 
 bool SmartProgramSetting::ensureTrainedDataExist()
 {
-    QString languagePrefix = SmartProgramSetting::getGameLanguagePrefix(getGameLanguage());
+    QString languagePrefix = PokemonDatabase::getGameLanguagePrefix(getGameLanguage());
     return QFile::exists(QString(RESOURCES_PATH) + "Tesseract/" + languagePrefix + ".traineddata");
 }
 
@@ -179,7 +179,7 @@ void SmartProgramSetting::on_CB_GameLanguage_currentIndexChanged(int index)
 {
     if (!ensureTrainedDataExist())
     {
-        QString languageName = SmartProgramSetting::getGameLanguageName(getGameLanguage());
+        QString languageName = PokemonDatabase::getGameLanguageName(getGameLanguage());
         QMessageBox::warning(this, "Warning", "Language trained data for '" + languageName + "' for Tesseract is missing, please goto 'Tesseract' folder and follow the instructions in README.md", QMessageBox::Ok);
     }
 }

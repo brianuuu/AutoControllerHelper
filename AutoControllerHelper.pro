@@ -45,6 +45,7 @@ SOURCES += \
     commandsender.cpp \
     main.cpp \
     autocontrollerwindow.cpp \
+    pokemondatabase.cpp \
     pushbuttonmapping.cpp \
     remotecontrollerwindow.cpp \
     smartprogramsetting.cpp \
@@ -76,6 +77,7 @@ HEADERS += \
     autocontrollerdefines.h \
     autocontrollerwindow.h \
     commandsender.h \
+    pokemondatabase.h \
     pushbuttonmapping.h \
     remotecontrollerwindow.h \
     smartprogramsetting.h \

@@ -2,6 +2,7 @@
 #define SMARTPROGRAMBASE_H
 
 #include "autocontrollerdefines.h"
+#include "pokemondatabase.h"
 
 #include <QCameraImageCapture>
 #include <QCameraViewfinder>
@@ -290,7 +291,6 @@ public:
     }
 
     typedef QPair<int, QString> Stat;
-    typedef QPair<QString, QStringList> OCREntry;
 
     bool run();
     virtual void stop();
@@ -370,14 +370,12 @@ protected:
 
     // Tesseract OCR (text recognition)
     bool startOCR(QRect rectPos, HSVRange hsvRange, bool isNumber = false);
-    static QString stringRemoveNonAlphaNumeric(QString const& str);
-    static QString normalizeString(QString const& str);
     static int getLevenshteinDistance(QString const& a, QString const& b);
     static int getLevenshteinDistanceSubString(QString const& longStr, QString const& shortStr);
     static int matchSubStrings(QString const& query, QStringList const& subStrings, int* o_dist = nullptr);
     QString getOCRStringRaw();
     bool getOCRNumber(int& number);
-    int matchStringDatabase(QVector<OCREntry> const& database);
+    int matchStringDatabase(PokemonDatabase::OCREntries const& entries);
 
     typedef int Command;
     bool inializeCommands(int size);

@@ -88,7 +88,12 @@ void SmartBrightnessMeanFinder::runNextState()
                 }
                 else
                 {
-                    matchStringDatabase( { OCREntry("TestEntry", m_ocrLE->text().split(",")) } );
+                    QStringList list = m_ocrLE->text().split(",");
+                    for (QString& str : list)
+                    {
+                        str = PokemonDatabase::normalizeString(str);
+                    }
+                    matchStringDatabase( { PokemonDatabase::OCREntry("TestEntry", list) } );
                 }
             }
 
