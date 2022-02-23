@@ -579,14 +579,14 @@ void SmartProgramBase::runStateLoop()
     }
 }
 
-bool SmartProgramBase::startOCR(QRect rectPos, SmartProgramBase::HSVRange hsvRange)
+bool SmartProgramBase::startOCR(QRect rectPos, SmartProgramBase::HSVRange hsvRange, bool isNumber)
 {
     // Get filtered image, flip black/white since black text detects better
     QImage masked = getMonochromeImage(rectPos, hsvRange, false);
     masked.save(QString(TESSERACT_PATH) + "capture.png", "PNG");
 
     // Check if .traineddata exist
-    GameLanguage gameLanguage = m_parameters.settings->getGameLanguage();
+    GameLanguage gameLanguage = isNumber ? GL_English : m_parameters.settings->getGameLanguage();
     if (!m_parameters.settings->ensureTrainedDataExist())
     {
         QString languageName = SmartProgramSetting::getGameLanguageName(gameLanguage);
@@ -708,6 +708,7 @@ int SmartProgramBase::matchSubStrings(const QString &query, const QStringList &s
     int minSubStringID = -1;
     for (int i = 0; i < subStrings.size(); i++)
     {
+        // TODO: pre-normalize all substrings in database
         QString const subString = normalizeString(subStrings[i]);
 
         // check for exact match
@@ -737,6 +738,61 @@ int SmartProgramBase::matchSubStrings(const QString &query, const QStringList &s
     return minSubStringID;
 }
 
+QString SmartProgramBase::getOCRStringRaw()
+{
+    QString str;
+    QFile output(QString(TESSERACT_PATH) + "output.txt");
+    if (output.open(QIODevice::Text | QIODevice::ReadOnly))
+    {
+        QTextStream in(&output);
+        in.setCodec("UTF-8");
+        str = in.readLine();
+        output.close();
+    }
+
+    return str;
+}
+
+bool SmartProgramBase::getOCRNumber(int &number)
+{
+    QString queryRaw = getOCRStringRaw();
+
+    // Nothing
+    if (queryRaw.isEmpty())
+    {
+        emit printLog("OCR returned empty string, expected number", LOG_ERROR);
+        return false;
+    }
+
+    QString numStr;
+    bool hasDigit = false;
+    for (QChar ch : queryRaw)
+    {
+        if (ch.isDigit())
+        {
+            numStr += ch;
+            hasDigit = true;
+        }
+    }
+
+    if (!hasDigit)
+    {
+        emit printLog("OCR failed to read any number", LOG_ERROR);
+        return false;
+    }
+
+    // This should be number but we check convertion just in case
+    bool ok = false;
+    number = numStr.toInt(&ok);
+
+    if (ok)
+    {
+        emit printLog("OCR returned number: " + numStr);
+    }
+
+    return ok;
+}
+
 int SmartProgramBase::matchStringDatabase(const QVector<OCREntry> &database)
 {
     /* database structure:
@@ -748,20 +804,12 @@ int SmartProgramBase::matchStringDatabase(const QVector<OCREntry> &database)
      * }
      */
 
-    QString queryRaw;
-    QFile output(QString(TESSERACT_PATH) + "output.txt");
-    if (output.open(QIODevice::Text | QIODevice::ReadOnly))
-    {
-        QTextStream in(&output);
-        in.setCodec("UTF-8");
-        queryRaw = in.readLine();
-        output.close();
-    }
+    QString queryRaw = getOCRStringRaw();
 
     // Nothing
     if (queryRaw.isEmpty())
     {
-        emit printLog("OCR returned empty text");
+        emit printLog("OCR returned empty string");
         return -1;
     }
 

@@ -2123,12 +2123,25 @@
                        </size>
                       </property>
                       <property name="text">
-                       <string>Text Recognition Test</string>
+                       <string>Read/Match Text Test</string>
                       </property>
                      </widget>
                     </item>
                     <item>
                      <widget class="QLineEdit" name="SP1_LE_OCR"/>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="SP1_PB_OCRNumber">
+                      <property name="minimumSize">
+                       <size>
+                        <width>110</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>Read Number Test</string>
+                      </property>
+                     </widget>
                     </item>
                    </layout>
                   </item>

@@ -369,12 +369,14 @@ protected:
     bool checkImageMatchTarget(QRect rectPos, HSVRange hsvRange, QImage const& testImage, double target, QPoint* offset = nullptr);
 
     // Tesseract OCR (text recognition)
-    bool startOCR(QRect rectPos, HSVRange hsvRange);
+    bool startOCR(QRect rectPos, HSVRange hsvRange, bool isNumber = false);
     static QString stringRemoveNonAlphaNumeric(QString const& str);
     static QString normalizeString(QString const& str);
     static int getLevenshteinDistance(QString const& a, QString const& b);
     static int getLevenshteinDistanceSubString(QString const& longStr, QString const& shortStr);
     static int matchSubStrings(QString const& query, QStringList const& subStrings, int* o_dist = nullptr);
+    QString getOCRStringRaw();
+    bool getOCRNumber(int& number);
     int matchStringDatabase(QVector<OCREntry> const& database);
 
     typedef int Command;

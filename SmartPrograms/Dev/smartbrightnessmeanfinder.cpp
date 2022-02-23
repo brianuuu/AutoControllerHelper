@@ -8,6 +8,7 @@ SmartBrightnessMeanFinder::SmartBrightnessMeanFinder
     QLabel* labelImageMatch,
     QPushButton* ocrBtn,
     QLineEdit* ocrLE,
+    QPushButton* ocrNumBtn,
     SmartProgramParameter parameter
 )
     : SmartProgramBase(parameter)
@@ -17,6 +18,7 @@ SmartBrightnessMeanFinder::SmartBrightnessMeanFinder
     , m_imageMatchResult(labelImageMatch)
     , m_ocrBtn(ocrBtn)
     , m_ocrLE(ocrLE)
+    , m_ocrNumBtn(ocrNumBtn)
 {
     init();
 
@@ -46,6 +48,9 @@ void SmartBrightnessMeanFinder::init()
 
     connect(m_ocrBtn, &QPushButton::clicked, this, &SmartBrightnessMeanFinder::orcRequested);
     m_ocrRequested = false;
+
+    connect(m_ocrNumBtn, &QPushButton::clicked, this, &SmartBrightnessMeanFinder::orcNumRequested);
+    m_ocrNumRequested = false;
 }
 
 void SmartBrightnessMeanFinder::reset()
@@ -70,7 +75,25 @@ void SmartBrightnessMeanFinder::runNextState()
     {
         if (state == S_OCRReady)
         {
-            matchStringDatabase( { OCREntry("TestEntry", m_ocrLE->text().split(",")) } );
+            if (m_ocrNumRequested)
+            {
+                int number = 0;
+                getOCRNumber(number);
+            }
+            else
+            {
+                if (m_ocrLE->text().isEmpty())
+                {
+                    emit printLog("OCR returned string: " + getOCRStringRaw());
+                }
+                else
+                {
+                    matchStringDatabase( { OCREntry("TestEntry", m_ocrLE->text().split(",")) } );
+                }
+            }
+
+            m_ocrRequested = false;
+            m_ocrNumRequested = false;
 
             m_substage = SS_Init;
             runNextStateDelay(100);
@@ -115,11 +138,10 @@ void SmartBrightnessMeanFinder::runNextState()
                 }
             }
 
-            if (m_ocrRequested)
+            if (m_ocrRequested || m_ocrNumRequested)
             {
                 // manually start OCR
                 startOCR(rect, hsvRange);
-                m_ocrRequested = false;
                 break;
             }
 

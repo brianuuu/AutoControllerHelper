@@ -16,6 +16,7 @@ public:
             QLabel* labelImageMatch,
             QPushButton* ocrBtn,
             QLineEdit* ocrLE,
+            QPushButton* ocrNumBtn,
             SmartProgramParameter parameter
             );
 
@@ -24,6 +25,7 @@ public:
 public slots:
     void imageMatchAdd();
     void orcRequested() { m_ocrRequested = true; }
+    void orcNumRequested() { m_ocrNumRequested = true; }
 
 private:
     virtual void init();
@@ -56,6 +58,9 @@ private:
     bool m_ocrRequested;
     QPushButton* m_ocrBtn;
     QLineEdit* m_ocrLE;
+
+    bool m_ocrNumRequested;
+    QPushButton* m_ocrNumBtn;
 };
 
 #endif // SMARTBRIGHTNESSMEANFINDER_H
