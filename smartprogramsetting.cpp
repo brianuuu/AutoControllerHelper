@@ -16,6 +16,7 @@ SmartProgramSetting::SmartProgramSetting(QWidget *parent) :
     ui->CB_PreventUpdate->setChecked(m_settings->value("PreventUpdate", false).toBool());
     ui->CB_DateArrangement->setCurrentIndex(m_settings->value("DateArrangement", 0).toInt());
     ui->CurrentDate->setDate(QDate::currentDate());
+    ui->CB_GameLanguage->setCurrentIndex(m_settings->value("GameLanguage", 0).toInt());
 
     // Sound
     m_defaultPlayer.setMedia(QUrl("qrc:/resources/Sounds/06-caught-a-pokemon.mp3"));
@@ -52,6 +53,7 @@ void SmartProgramSetting::closeEvent(QCloseEvent *event)
     // System
     m_settings->setValue("PreventUpdate", ui->CB_PreventUpdate->isChecked());
     m_settings->setValue("DateArrangement", ui->CB_DateArrangement->currentIndex());
+    m_settings->setValue("GameLanguage", ui->CB_GameLanguage->currentIndex());
 
     // Sound
     m_settings->setValue("SoundEnable", ui->GB_Sound->isChecked());
@@ -79,6 +81,17 @@ bool SmartProgramSetting::isPreventUpdate()
 DateArrangement SmartProgramSetting::getDateArrangement()
 {
     return (DateArrangement)ui->CB_DateArrangement->currentIndex();
+}
+
+GameLanguage SmartProgramSetting::getGameLanguage()
+{
+    return (GameLanguage)ui->CB_GameLanguage->currentIndex();
+}
+
+bool SmartProgramSetting::ensureTrainedDataExist()
+{
+    QString languagePrefix = SmartProgramSetting::getGameLanguagePrefix(getGameLanguage());
+    return QFile::exists(QString(TESSERACT_PATH) + languagePrefix + ".traineddata");
 }
 
 bool SmartProgramSetting::isSoundEnabled()
@@ -159,6 +172,15 @@ void SmartProgramSetting::on_CB_DateArrangement_currentIndexChanged(int index)
     case DA_US:
         ui->CurrentDate->setDisplayFormat("MM/dd/yyyy");
         break;
+    }
+}
+
+void SmartProgramSetting::on_CB_GameLanguage_currentIndexChanged(int index)
+{
+    if (!ensureTrainedDataExist())
+    {
+        QString languageName = SmartProgramSetting::getGameLanguageName(getGameLanguage());
+        QMessageBox::warning(this, "Warning", "Language trained data for '" + languageName + "' for Tesseract is missing, please goto 'Tesseract' folder and follow the instructions in README.md", QMessageBox::Ok);
     }
 }
 

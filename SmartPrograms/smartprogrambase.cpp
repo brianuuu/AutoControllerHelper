@@ -579,20 +579,218 @@ void SmartProgramBase::runStateLoop()
     }
 }
 
-void SmartProgramBase::startOCR(QRect rectPos, SmartProgramBase::HSVRange hsvRange)
+bool SmartProgramBase::startOCR(QRect rectPos, SmartProgramBase::HSVRange hsvRange)
 {
-    // Get filtered image (black is 1, white is 0)
+    // Get filtered image, flip black/white since black text detects better
     QImage masked = getMonochromeImage(rectPos, hsvRange, false);
     masked.save(QString(TESSERACT_PATH) + "capture.png", "PNG");
 
-    // TODO: Check if .traineddata exist
+    // Check if .traineddata exist
+    GameLanguage gameLanguage = m_parameters.settings->getGameLanguage();
+    if (!m_parameters.settings->ensureTrainedDataExist())
+    {
+        QString languageName = SmartProgramSetting::getGameLanguageName(gameLanguage);
+        setState_error("Language trained data for '" + languageName + "' for Tesseract is missing, please goto 'Tesseract' folder and follow the instructions in README.md");
+
+        m_runNextState = true;
+        return false;
+    }
 
     QString command = QString(TESSERACT_PATH) + "tesseract.exe ";
     command += ".\\capture.png .\\output --tessdata-dir . ";
-    command += "-l eng";
+    command += "-l " + SmartProgramSetting::getGameLanguagePrefix(gameLanguage);
     command += " --psm 7 --oem 2 -c tessedit_create_txt=1";
     m_ocrProcess.setWorkingDirectory(TESSERACT_PATH);
     m_ocrProcess.start(command);
+
+    return true;
+}
+
+QString SmartProgramBase::stringRemoveNonAlphaNumeric(const QString &str)
+{
+    QString temp;
+    for (QChar c : str)
+    {
+        if (c.isLetterOrNumber()
+         || c == QChar(0x3099)  // Japanese dakuten
+         || c == QChar(0x309A)) // Japanese handakuten
+        {
+            temp += c;
+            continue;
+        }
+    }
+
+    return temp;
+}
+
+QString SmartProgramBase::normalizeString(const QString &str)
+{
+    QString temp = str.normalized(QString::NormalizationForm_KD);
+    temp = stringRemoveNonAlphaNumeric(temp);
+    return temp.toLower();
+}
+
+int SmartProgramBase::getLevenshteinDistance(const QString &a, const QString &b)
+{
+    QVector<int> v0(b.size() + 1);
+    QVector<int> v1(b.size() + 1);
+
+    for (int i = 0; i <= b.size(); i++)
+    {
+        v0[i] = i;
+    }
+
+    for (int i = 0; i < a.size(); i++)
+    {
+        v1[0] = i + 1;
+
+        for (int j = 0; j < b.size(); j++)
+        {
+            int deletion = v0[j + 1] + 1;
+            int insertion = v1[j] + 1;
+            int substitution = v0[j];
+            if (a[i] != b[j])
+            {
+                substitution += 1;
+            }
+
+            v1[j + 1] = qMin(deletion, qMin(insertion, substitution));
+        }
+
+        qSwap(v0, v1);
+    }
+
+    return v0[b.size()];
+}
+
+int SmartProgramBase::getLevenshteinDistanceSubString(const QString &longStr, const QString &shortStr)
+{
+    QVector<int> v0(shortStr.size() + 1);
+    QVector<int> v1(shortStr.size() + 1);
+
+    for (int i = 0; i <= shortStr.size(); i++)
+    {
+        v0[i] = i;
+    }
+
+    int min = shortStr.size();
+    for (int i = 0; i < longStr.size(); i++)
+    {
+        v1[0] = 0;
+
+        for (int j = 0; j < shortStr.size(); j++)
+        {
+            int deletion = v0[j + 1] + 1;
+            int insertion = v1[j] + 1;
+            int substitution = v0[j];
+            if (longStr[i] != shortStr[j])
+            {
+                substitution += 1;
+            }
+
+            v1[j + 1] = qMin(deletion, qMin(insertion, substitution));
+        }
+
+        qSwap(v0, v1);
+        min = qMin(min, v0[shortStr.size()]);
+    }
+
+    return min;
+}
+
+int SmartProgramBase::matchSubStrings(const QString &query, const QStringList &subStrings, int* o_dist)
+{
+    // Note: "query" should be already normalized
+    // This function finds the best match with in the entry,
+    // though this doesn't matter much as any match in an entry always counts
+
+    int minDist = INT_MAX;
+    int minSubStringID = -1;
+    for (int i = 0; i < subStrings.size(); i++)
+    {
+        QString const subString = normalizeString(subStrings[i]);
+
+        // check for exact match
+        if (query == subString)
+        {
+            minDist = 0;
+            minSubStringID = i;
+            break;
+        }
+
+        // Calculate Levenshtein Distance
+        int dist = getLevenshteinDistance(query, subString);
+
+        // Pretty naive way to filter, for modification less than database str/2
+        if (dist < minDist && dist <= subString.size() / 2 )
+        {
+            minDist = dist;
+            minSubStringID = i;
+        }
+    }
+
+    if (minSubStringID >= 0 && o_dist)
+    {
+        *o_dist = minDist;
+    }
+
+    return minSubStringID;
+}
+
+int SmartProgramBase::matchStringDatabase(const QVector<OCREntry> &database)
+{
+    /* database structure:
+     * {
+     *      { entry1, { test, t35T, tosi } },
+     *      { entry2, { Jeff } },
+     *      { entry3, { ur mom } },
+     *      ...
+     * }
+     */
+
+    QString queryRaw;
+    QFile output(QString(TESSERACT_PATH) + "output.txt");
+    if (output.open(QIODevice::Text | QIODevice::ReadOnly))
+    {
+        QTextStream in(&output);
+        in.setCodec("UTF-8");
+        queryRaw = in.readLine();
+        output.close();
+    }
+
+    // Nothing
+    if (queryRaw.isEmpty())
+    {
+        emit printLog("OCR returned empty text");
+        return -1;
+    }
+
+    // Do comparison with each database string, find the best match entry
+    QString query = normalizeString(queryRaw);
+
+    int minDist = INT_MAX;
+    int minMatchedEntry = -1;
+    int minSubStringMatched = -1;
+    for (int i = 0; i < database.size(); i++)
+    {
+        int dist = 0;
+        QStringList const& subStrings = database[i].second;
+        int subStringMatched = matchSubStrings(query, subStrings, &dist);
+        if (subStringMatched >= 0 && subStringMatched < subStrings.size() && dist < minDist)
+        {
+            minDist = dist;
+            minMatchedEntry = i;
+            minSubStringMatched = subStringMatched;
+        }
+    }
+
+    if (minMatchedEntry >= 0)
+    {
+        OCREntry const& entry = database[minMatchedEntry];
+        emit printLog("OCR text '" + queryRaw + "' has matched entry " + entry.first + ": '" + entry.second[minSubStringMatched] + "' from database (LD = " + QString::number(minDist) + ")");
+    }
+
+    return minMatchedEntry;
 }
 
 void SmartProgramBase::on_OCRErrorOccurred(QProcess::ProcessError error)

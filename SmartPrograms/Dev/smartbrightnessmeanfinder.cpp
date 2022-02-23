@@ -7,6 +7,7 @@ SmartBrightnessMeanFinder::SmartBrightnessMeanFinder
     QPushButton* imageMatchBtn,
     QLabel* labelImageMatch,
     QPushButton* ocrBtn,
+    QLineEdit* ocrLE,
     SmartProgramParameter parameter
 )
     : SmartProgramBase(parameter)
@@ -15,6 +16,7 @@ SmartBrightnessMeanFinder::SmartBrightnessMeanFinder
     , m_imageMatchBtn(imageMatchBtn)
     , m_imageMatchResult(labelImageMatch)
     , m_ocrBtn(ocrBtn)
+    , m_ocrLE(ocrLE)
 {
     init();
 
@@ -68,14 +70,7 @@ void SmartBrightnessMeanFinder::runNextState()
     {
         if (state == S_OCRReady)
         {
-            QFile output(QString(TESSERACT_PATH) + "output.txt");
-            if (output.open(QIODevice::Text | QIODevice::ReadOnly))
-            {
-                QTextStream in(&output);
-                in.setCodec("UTF-8");
-                emit printLog("OCR Completed with text: " + in.readLine());
-                output.close();
-            }
+            matchStringDatabase( { OCREntry("TestEntry", m_ocrLE->text().split(",")) } );
 
             m_substage = SS_Init;
             runNextStateDelay(100);

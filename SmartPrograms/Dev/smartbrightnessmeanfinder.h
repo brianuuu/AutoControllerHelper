@@ -1,6 +1,7 @@
 #ifndef SMARTBRIGHTNESSMEANFINDER_H
 #define SMARTBRIGHTNESSMEANFINDER_H
 
+#include <QLineEdit>
 #include <QSpinBox>
 #include <QWidget>
 #include "../smartprogrambase.h"
@@ -14,6 +15,7 @@ public:
             QPushButton* imageMatchBtn,
             QLabel* labelImageMatch,
             QPushButton* ocrBtn,
+            QLineEdit* ocrLE,
             SmartProgramParameter parameter
             );
 
@@ -53,6 +55,7 @@ private:
 
     bool m_ocrRequested;
     QPushButton* m_ocrBtn;
+    QLineEdit* m_ocrLE;
 };
 
 #endif // SMARTBRIGHTNESSMEANFINDER_H

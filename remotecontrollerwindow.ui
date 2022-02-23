@@ -2086,6 +2086,12 @@
                    <layout class="QHBoxLayout" name="horizontalLayout_31">
                     <item>
                      <widget class="QPushButton" name="SP1_PB_MatchImage">
+                      <property name="minimumSize">
+                       <size>
+                        <width>110</width>
+                        <height>0</height>
+                       </size>
+                      </property>
                       <property name="text">
                        <string>Match Image Test</string>
                       </property>
@@ -2093,6 +2099,12 @@
                     </item>
                     <item>
                      <widget class="QLabel" name="SP1_L_MatchResult">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="text">
                        <string>Similarity Ratio = : ---</string>
                       </property>
@@ -2104,10 +2116,19 @@
                    <layout class="QHBoxLayout" name="horizontalLayout_34">
                     <item>
                      <widget class="QPushButton" name="SP1_PB_OCR">
+                      <property name="minimumSize">
+                       <size>
+                        <width>110</width>
+                        <height>0</height>
+                       </size>
+                      </property>
                       <property name="text">
                        <string>Text Recognition Test</string>
                       </property>
                      </widget>
+                    </item>
+                    <item>
+                     <widget class="QLineEdit" name="SP1_LE_OCR"/>
                     </item>
                    </layout>
                   </item>
@@ -2153,8 +2174,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>291</height>
+                   <width>252</width>
+                   <height>125</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -3492,8 +3513,8 @@ This is for duplicating Pokemon, for items, use Box Operation program instead.</
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>291</height>
+                   <width>352</width>
+                   <height>57</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_33">

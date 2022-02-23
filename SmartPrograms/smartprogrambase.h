@@ -119,6 +119,7 @@ public:
 
             case SP_COUNT:                  return "Invalid";
         }
+        return "Invalid";
     }
 
     static SmartProgram getProgramEnumFromName(QString const& sp)
@@ -186,6 +187,7 @@ public:
 
             case SP_COUNT:                  return "Invalid";
         }
+        return "Invalid";
     }
 
     static int getProgramTabID(SmartProgram sp)
@@ -222,6 +224,7 @@ public:
 
             case SP_COUNT:                  return -1;
         }
+        return 0;
     }
 
     static bool getProgramEnableUI(SmartProgram sp)
@@ -287,6 +290,7 @@ public:
     }
 
     typedef QPair<int, QString> Stat;
+    typedef QPair<QString, QStringList> OCREntry;
 
     bool run();
     virtual void stop();
@@ -365,7 +369,13 @@ protected:
     bool checkImageMatchTarget(QRect rectPos, HSVRange hsvRange, QImage const& testImage, double target, QPoint* offset = nullptr);
 
     // Tesseract OCR (text recognition)
-    void startOCR(QRect rectPos, HSVRange hsvRange);
+    bool startOCR(QRect rectPos, HSVRange hsvRange);
+    static QString stringRemoveNonAlphaNumeric(QString const& str);
+    static QString normalizeString(QString const& str);
+    static int getLevenshteinDistance(QString const& a, QString const& b);
+    static int getLevenshteinDistanceSubString(QString const& longStr, QString const& shortStr);
+    static int matchSubStrings(QString const& query, QStringList const& subStrings, int* o_dist = nullptr);
+    int matchStringDatabase(QVector<OCREntry> const& database);
 
     typedef int Command;
     bool inializeCommands(int size);
