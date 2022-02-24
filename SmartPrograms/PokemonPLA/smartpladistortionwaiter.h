@@ -46,6 +46,7 @@ private:
     Substage m_substage;
 
     // Members
+    QDateTime m_startTime;
     QElapsedTimer m_timer;
 };
 

@@ -24,6 +24,8 @@ void SmartPLADistortionWaiter::runNextState()
     {
     case SS_Init:
     {
+        m_startTime = QDateTime::currentDateTime();
+
         m_parameters.vlcWrapper->clearAreas();
         m_parameters.vlcWrapper->setAreas({A_Text});
 
@@ -102,7 +104,8 @@ void SmartPLADistortionWaiter::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            emit printLog("Distortion found!", LOG_SUCCESS);
+            qint64 upTime = m_startTime.secsTo(QDateTime::currentDateTime());
+            emit printLog("Distortion found! Up time: " + QString::number(upTime / 60) + " minutes", LOG_SUCCESS);
             setState_completed();
         }
         break;

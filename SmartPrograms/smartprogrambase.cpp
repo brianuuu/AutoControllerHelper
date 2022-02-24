@@ -813,7 +813,7 @@ int SmartProgramBase::matchStringDatabase(const PokemonDatabase::OCREntries &ent
     if (minMatchedEntry >= 0)
     {
         PokemonDatabase::OCREntry const& entry = entries[minMatchedEntry];
-        emit printLog("OCR text \"" + queryRaw + "\" has matched entry \"" + entry.first + "\" from database (LD = " + QString::number(minDist) + ")");
+        emit printLog("OCR text \"" + queryRaw + "\" has matched entry \"" + entry.first + "\" (LD = " + QString::number(minDist) + ")");
     }
     else
     {
