@@ -2291,6 +2291,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartSimpleProgram(SP_PLA_BraviaryGainHeight, 15, parameter);
         break;
     }
+    case SP_PLA_DistortionWaiter:
+    {
+        m_smartProgram = new SmartPLADistortionWaiter(parameter);
+        break;
+    }
     default:
     {
         QMessageBox::critical(this, "Error", "No code exist for this Smart Program!");

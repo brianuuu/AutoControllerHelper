@@ -75,7 +75,6 @@ private:
 public:
     typedef QPair<QString, QStringList> OCREntry;
     typedef QVector<OCREntry> OCREntries;
-    typedef QMap<GameLanguage, OCREntries> Database;
 
     // String manipulation
     static QString stringRemoveNonAlphaNumeric(QString const& str);
@@ -85,13 +84,15 @@ public:
     OCREntries const& getEntries_PLADistortion(GameLanguage gameLanguage);
 
 private:
+    typedef QMap<GameLanguage, OCREntries> Database;
+
     // Json functions
     static bool readJson(QString const& path, QJsonObject &jsonObject);
 
     // Helper Functions
     static bool getDatabase(QString const& name, GameLanguage gameLanguage, Database& database);
 
-protected:
+private:
     // Pokemon Legends: Arceus
     Database m_database_PLADistortion;
 };

@@ -29,6 +29,7 @@ SOURCES += \
     SmartPrograms/PokemonBDSP/smartbdspduplicateitem1to30.cpp \
     SmartPrograms/PokemonBDSP/smartbdspshinylegendary.cpp \
     SmartPrograms/PokemonBDSP/smartbdspstarter.cpp \
+    SmartPrograms/PokemonPLA/smartpladistortionwaiter.cpp \
     SmartPrograms/PokemonPLA/smartplanuggetfarmer.cpp \
     SmartPrograms/PokemonPLA/smartplaresetalphapokemon.cpp \
     SmartPrograms/PokemonSwSh/smartberryfarmer.cpp \
@@ -61,6 +62,7 @@ HEADERS += \
     SmartPrograms/PokemonBDSP/smartbdspduplicateitem1to30.h \
     SmartPrograms/PokemonBDSP/smartbdspshinylegendary.h \
     SmartPrograms/PokemonBDSP/smartbdspstarter.h \
+    SmartPrograms/PokemonPLA/smartpladistortionwaiter.h \
     SmartPrograms/PokemonPLA/smartplanuggetfarmer.h \
     SmartPrograms/PokemonPLA/smartplaresetalphapokemon.h \
     SmartPrograms/PokemonSwSh/smartberryfarmer.h \

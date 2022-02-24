@@ -1749,7 +1749,7 @@
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page">
              <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1781,15 +1781,18 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>240</width>
-                   <height>25</height>
+                   <width>428</width>
+                   <height>291</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_20">
                   <item>
                    <widget class="QLabel" name="label_25">
                     <property name="text">
-                     <string>No settings available for the current Smart Program</string>
+                     <string>No settings available for the current Smart Program
+
+Some programs may require settings like &quot;Game Language&quot; or
+&quot;Switch's Current Date&quot; in General Settings, please make sure they are set correctly.</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>

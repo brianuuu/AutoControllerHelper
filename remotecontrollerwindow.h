@@ -57,6 +57,7 @@
 
 #include "SmartPrograms/PokemonPLA/smartplanuggetfarmer.h"
 #include "SmartPrograms/PokemonPLA/smartplaresetalphapokemon.h"
+#include "SmartPrograms/PokemonPLA/smartpladistortionwaiter.h"
 
 namespace Ui {
 class RemoteControllerWindow;
