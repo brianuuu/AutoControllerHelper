@@ -27,17 +27,32 @@ void SmartPLADistortionWaiter::runNextState()
         m_parameters.vlcWrapper->clearAreas();
         m_parameters.vlcWrapper->setAreas({A_Text});
 
+        // Keep crouching so we don't dim the screen
+        m_substage = SS_Request;
+        setState_runCommand("ASpam,2,Loop,0");
+
+        // Loop forever command never returns command finish
+        runNextStateContinue();
+        break;
+    }
+    case SS_Request:
+    {
+        m_substage = SS_Analyze;
         m_timer.restart();
-        m_substage = SS_Capture;
         setState_ocrRequest(A_Text.m_rect, C_Color_Text);
         break;
     }
-    case SS_Capture:
+    case SS_Analyze:
     {
         if (state == S_OCRReady)
         {
             GameLanguage const gameLanguage = m_parameters.settings->getGameLanguage();
             PokemonDatabase::OCREntries const& entries = PokemonDatabase::instance().getEntries_PLADistortion(gameLanguage);
+            if (entries.isEmpty())
+            {
+                setState_error("Unable to create OCR database from DistortionNotification");
+                break;
+            }
 
             int result = matchStringDatabase(entries);
             if (result >= 0)
@@ -70,7 +85,7 @@ void SmartPLADistortionWaiter::runNextState()
             }
 
             // run OCR every 2 seconds
-            m_substage = SS_Init;
+            m_substage = SS_Request;
             qint64 elpsed = m_timer.elapsed();
             if (2000 - elpsed < 0)
             {

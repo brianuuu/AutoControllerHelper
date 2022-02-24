@@ -39,7 +39,8 @@ private:
     enum Substage
     {
         SS_Init,
-        SS_Capture,
+        SS_Request,
+        SS_Analyze,
         SS_Found,
     };
     Substage m_substage;

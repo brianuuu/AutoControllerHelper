@@ -735,7 +735,7 @@ bool SmartProgramBase::getOCRNumber(int &number)
     // Nothing
     if (queryRaw.isEmpty())
     {
-        emit printLog("OCR did not find any number");
+        qDebug() << "OCR did not find any number";
         return false;
     }
 
@@ -789,7 +789,7 @@ int SmartProgramBase::matchStringDatabase(const PokemonDatabase::OCREntries &ent
     // Nothing
     if (query.isEmpty())
     {
-        emit printLog("OCR returned empty string");
+        qDebug() << "OCR returned empty string";
         return -1;
     }
 
@@ -813,11 +813,11 @@ int SmartProgramBase::matchStringDatabase(const PokemonDatabase::OCREntries &ent
     if (minMatchedEntry >= 0)
     {
         PokemonDatabase::OCREntry const& entry = entries[minMatchedEntry];
-        emit printLog("OCR text '" + queryRaw + "' has matched entry " + entry.first + ": '" + entry.second[minSubStringMatched] + "' from database (LD = " + QString::number(minDist) + ")");
+        emit printLog("OCR text \"" + queryRaw + "\" has matched entry \"" + entry.first + "\" from database (LD = " + QString::number(minDist) + ")");
     }
     else
     {
-        emit printLog("OCR text '" + queryRaw + "' found no matches");
+        emit printLog("OCR text \"" + queryRaw + "\" found no matches");
     }
 
     return minMatchedEntry;
