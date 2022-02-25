@@ -93,7 +93,9 @@ void SmartBrightnessMeanFinder::runNextState()
                     {
                         str = PokemonDatabase::normalizeString(str);
                     }
-                    matchStringDatabase( { PokemonDatabase::OCREntry("TestEntry", list) } );
+                    PokemonDatabase::OCREntries entries;
+                    entries["TestEntry"] = list;
+                    matchStringDatabase(entries);
                 }
             }
 

@@ -772,7 +772,7 @@ bool SmartProgramBase::getOCRNumber(int &number)
     return ok;
 }
 
-int SmartProgramBase::matchStringDatabase(const PokemonDatabase::OCREntries &entries)
+QString SmartProgramBase::matchStringDatabase(const PokemonDatabase::OCREntries &entries)
 {
     /* database structure:
      * {
@@ -790,30 +790,29 @@ int SmartProgramBase::matchStringDatabase(const PokemonDatabase::OCREntries &ent
     if (query.isEmpty())
     {
         qDebug() << "OCR returned empty string";
-        return -1;
+        return QString();
     }
 
     // Do comparison with each database string, find the best match entry
     int minDist = INT_MAX;
-    int minMatchedEntry = -1;
+    QString minMatchedEntry;
     int minSubStringMatched = -1;
-    for (int i = 0; i < entries.size(); i++)
+    for (auto iter = entries.begin(); iter != entries.end(); iter++)
     {
         int dist = 0;
-        QStringList const& subStrings = entries[i].second;
+        QStringList const& subStrings = iter.value();
         int subStringMatched = matchSubStrings(query, subStrings, &dist);
         if (subStringMatched >= 0 && subStringMatched < subStrings.size() && dist < minDist)
         {
             minDist = dist;
-            minMatchedEntry = i;
+            minMatchedEntry = iter.key();
             minSubStringMatched = subStringMatched;
         }
     }
 
-    if (minMatchedEntry >= 0)
+    if (!minMatchedEntry.isEmpty())
     {
-        PokemonDatabase::OCREntry const& entry = entries[minMatchedEntry];
-        emit printLog("OCR text \"" + queryRaw + "\" has matched entry \"" + entry.first + "\" (LD = " + QString::number(minDist) + ")");
+        emit printLog("OCR text \"" + queryRaw + "\" has matched entry \"" + minMatchedEntry + "\" (LD = " + QString::number(minDist) + ")");
     }
     else
     {

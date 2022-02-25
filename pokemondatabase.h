@@ -73,8 +73,7 @@ private:
     PokemonDatabase();
 
 public:
-    typedef QPair<QString, QStringList> OCREntry;
-    typedef QVector<OCREntry> OCREntries;
+    typedef QMap<QString, QStringList> OCREntries;
 
     // String manipulation
     static QString stringRemoveNonAlphaNumeric(QString const& str);

@@ -56,8 +56,8 @@ void SmartPLADistortionWaiter::runNextState()
                 break;
             }
 
-            int result = matchStringDatabase(entries);
-            if (result >= 0)
+            QString result = matchStringDatabase(entries);
+            if (!result.isEmpty())
             {
                 static QMap<QString, NotificationType> map =
                 {
@@ -66,7 +66,7 @@ void SmartPLADistortionWaiter::runNextState()
                     {"DistortionFaded",     NT_Faded},
                 };
 
-                auto iter = map.find(entries[result].first);
+                auto iter = map.find(result);
                 if (iter != map.end())
                 {
                     if (iter.value() == NT_Appeared || iter.value() == NT_Forming)

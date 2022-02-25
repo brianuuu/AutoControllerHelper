@@ -380,7 +380,7 @@ protected:
     static int matchSubStrings(QString const& query, QStringList const& subStrings, int* o_dist = nullptr);
     QString getOCRStringRaw();
     bool getOCRNumber(int& number);
-    int matchStringDatabase(PokemonDatabase::OCREntries const& entries);
+    QString matchStringDatabase(PokemonDatabase::OCREntries const& entries);
 
     typedef int Command;
     bool inializeCommands(int size);

@@ -97,7 +97,7 @@ bool PokemonDatabase::getDatabase(const QString &name, GameLanguage gameLanguage
             valueList.push_back(normalizeString(value.toString()));
         }
 
-        entries.push_back(OCREntry(it.key(), valueList));
+        entries.insert(it.key(), valueList);
     }
     database.insert(gameLanguage, entries);
     return true;
