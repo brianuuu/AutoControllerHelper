@@ -31,6 +31,7 @@ SOURCES += \
     SmartPrograms/PokemonBDSP/smartbdspstarter.cpp \
     SmartPrograms/PokemonPLA/smartpladistortionwaiter.cpp \
     SmartPrograms/PokemonPLA/smartplanuggetfarmer.cpp \
+    SmartPrograms/PokemonPLA/smartplaoutbreakfinder.cpp \
     SmartPrograms/PokemonPLA/smartplaresetalphapokemon.cpp \
     SmartPrograms/PokemonSwSh/smartberryfarmer.cpp \
     SmartPrograms/PokemonSwSh/smartdailyhighlight.cpp \
@@ -41,6 +42,7 @@ SOURCES += \
     SmartPrograms/PokemonSwSh/smartsurprisetrade.cpp \
     SmartPrograms/PokemonSwSh/smartwattfarmer.cpp \
     SmartPrograms/PokemonSwSh/smartycommglitch.cpp \
+    SmartPrograms/Widgets/pokemonautofilllineedit.cpp \
     SmartPrograms/smartprogrambase.cpp \
     SmartPrograms/smartsimpleprogram.cpp \
     commandsender.cpp \
@@ -64,6 +66,7 @@ HEADERS += \
     SmartPrograms/PokemonBDSP/smartbdspstarter.h \
     SmartPrograms/PokemonPLA/smartpladistortionwaiter.h \
     SmartPrograms/PokemonPLA/smartplanuggetfarmer.h \
+    SmartPrograms/PokemonPLA/smartplaoutbreakfinder.h \
     SmartPrograms/PokemonPLA/smartplaresetalphapokemon.h \
     SmartPrograms/PokemonSwSh/smartberryfarmer.h \
     SmartPrograms/PokemonSwSh/smartdailyhighlight.h \
@@ -74,6 +77,7 @@ HEADERS += \
     SmartPrograms/PokemonSwSh/smartsurprisetrade.h \
     SmartPrograms/PokemonSwSh/smartwattfarmer.h \
     SmartPrograms/PokemonSwSh/smartycommglitch.h \
+    SmartPrograms/Widgets/pokemonautofilllineedit.h \
     SmartPrograms/smartprogrambase.h \
     SmartPrograms/smartsimpleprogram.h \
     autocontrollerdefines.h \

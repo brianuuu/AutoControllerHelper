@@ -49,7 +49,7 @@ void SmartPLADistortionWaiter::runNextState()
         if (state == S_OCRReady)
         {
             GameLanguage const gameLanguage = m_parameters.settings->getGameLanguage();
-            PokemonDatabase::OCREntries const& entries = PokemonDatabase::instance().getEntries_PLADistortion(gameLanguage);
+            PokemonDatabase::OCREntries const& entries = PokemonDatabase::getEntries_PLADistortion(gameLanguage);
             if (entries.isEmpty())
             {
                 setState_error("Unable to create OCR database from DistortionNotification");

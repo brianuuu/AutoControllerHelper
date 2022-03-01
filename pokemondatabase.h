@@ -66,10 +66,8 @@ public:
         return "Unknown";
     }
 
-public:
-    static PokemonDatabase& instance();
-
 private:
+    static PokemonDatabase& instance();
     PokemonDatabase();
 
 public:
@@ -79,8 +77,14 @@ public:
     static QString stringRemoveNonAlphaNumeric(QString const& str);
     static QString normalizeString(QString const& str);
 
+    // Pokedex
+    static OCREntries const& getEntries_PokedexNational(GameLanguage gameLanguage);
+    static OCREntries const getEntries_PokedexSubList(GameLanguage gameLanguage, QStringList const& poekmonList);
+
     // Pokemon Legends: Arceus
-    OCREntries const& getEntries_PLADistortion(GameLanguage gameLanguage);
+    static QStringList const& getList_PLAMassOutbreak();
+    static OCREntries const& getEntries_PLADistortion(GameLanguage gameLanguage);
+    static OCREntries const getEntries_PLAMassOutbreak(GameLanguage gameLanguage);
 
 private:
     typedef QMap<GameLanguage, OCREntries> Database;
@@ -89,10 +93,15 @@ private:
     static bool readJson(QString const& path, QJsonObject &jsonObject);
 
     // Helper Functions
+    static bool getList(QString const& name, QStringList& list);
     static bool getDatabase(QString const& name, GameLanguage gameLanguage, Database& database);
 
 private:
+    // Pokedex
+    Database m_database_PokedexNational;
+
     // Pokemon Legends: Arceus
+    QStringList m_list_PLAOutbreak;
     Database m_database_PLADistortion;
 };
 

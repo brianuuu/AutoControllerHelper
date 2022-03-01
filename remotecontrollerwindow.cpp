@@ -145,6 +145,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     }
     validCommands.sort();
     ui->LE_CommandSender->InitCompleter(validCommands);
+    ui->SP13_LE_PokemonList->InitCompleter(PokemonDatabase::getList_PLAMassOutbreak());
 
     // Logging
     m_logCount = 0;
@@ -169,7 +170,6 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     connect(m_vlcWrapper, &VLCWrapper::stateChanged, this, &RemoteControllerWindow::on_VLCState_changed);
     QVBoxLayout* layout = reinterpret_cast<QVBoxLayout*>(ui->GB_CameraView->layout());
     layout->insertWidget(0, m_vlcWidget);
-
 
     /*
     m_cameraView = new QCameraViewfinder(this);
@@ -265,7 +265,14 @@ bool RemoteControllerWindow::eventFilter(QObject *object, QEvent *event)
     if (focusWidget)
     {
         QString className = QString(focusWidget->metaObject()->className());
-        if (className == "QLineEdit" || className == "CommandSender" || className == "QSpinBox")
+        static const QSet<QString> classNameToIgnore
+        {
+            "QLineEdit",
+            "CommandSender",
+            "QSpinBox",
+            "PokemonAutofillLineEdit"
+        };
+        if (classNameToIgnore.contains(className))
         {
             return false;
         }
@@ -2294,6 +2301,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     case SP_PLA_DistortionWaiter:
     {
         m_smartProgram = new SmartPLADistortionWaiter(parameter);
+        break;
+    }
+    case SP_PLA_OutbreakFinder:
+    {
+        m_smartProgram = new SmartPLAOutbreakFinder(ui->SP13_LE_PokemonList->text(), parameter);
         break;
     }
     default:

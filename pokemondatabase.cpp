@@ -39,12 +39,49 @@ QString PokemonDatabase::normalizeString(const QString &str)
 }
 
 // -----------------------------------------------
+// Pokedex
+// -----------------------------------------------
+const PokemonDatabase::OCREntries &PokemonDatabase::getEntries_PokedexNational(GameLanguage gameLanguage)
+{
+    instance().getDatabase("PokemonCommon/PokemonName", gameLanguage, instance().m_database_PokedexNational);
+    return instance().m_database_PokedexNational[gameLanguage];
+}
+
+const PokemonDatabase::OCREntries PokemonDatabase::getEntries_PokedexSubList(GameLanguage gameLanguage, const QStringList &poekmonList)
+{
+    OCREntries const& allPokemonEntries = getEntries_PokedexNational(gameLanguage);
+
+    // Get only the entries for requested pokemon
+    OCREntries pokemonSubList;
+    for (QString const& pokemon : poekmonList)
+    {
+        auto iter = allPokemonEntries.find(pokemon);
+        if (iter != allPokemonEntries.end())
+        {
+            pokemonSubList[pokemon] = iter.value();
+        }
+    }
+    return pokemonSubList;
+}
+
+// -----------------------------------------------
 // Pokemon Legends: Arceus
 // -----------------------------------------------
+const QStringList &PokemonDatabase::getList_PLAMassOutbreak()
+{
+    instance().getList("PokemonLA/Pokemon-MassOutbreak", instance().m_list_PLAOutbreak);
+    return instance().m_list_PLAOutbreak;
+}
+
 const PokemonDatabase::OCREntries &PokemonDatabase::getEntries_PLADistortion(GameLanguage gameLanguage)
 {
-    getDatabase("PokemonLA/DistortionNotification", gameLanguage, m_database_PLADistortion);
-    return m_database_PLADistortion[gameLanguage];
+    instance().getDatabase("PokemonLA/DistortionNotification", gameLanguage, instance().m_database_PLADistortion);
+    return instance().m_database_PLADistortion[gameLanguage];
+}
+
+const PokemonDatabase::OCREntries PokemonDatabase::getEntries_PLAMassOutbreak(GameLanguage gameLanguage)
+{
+    return getEntries_PokedexSubList(gameLanguage, getList_PLAMassOutbreak());
 }
 
 // -----------------------------------------------
@@ -72,6 +109,28 @@ bool PokemonDatabase::readJson(const QString &path, QJsonObject& jsonObject)
 // -----------------------------------------------
 // Helper functions
 // -----------------------------------------------
+bool PokemonDatabase::getList(const QString &name, QStringList &list)
+{
+    QFile file(RESOURCES_PATH + name + ".txt");
+    if (file.open(QIODevice::Text | QIODevice::ReadOnly))
+    {
+        QTextStream in(&file);
+        while (!in.atEnd())
+        {
+            QString const line = in.readLine();
+            if (!list.contains(line))
+            {
+                list.push_back(line);
+            }
+        }
+
+        file.close();
+        return true;
+    }
+
+    return false;
+}
+
 bool PokemonDatabase::getDatabase(const QString &name, GameLanguage gameLanguage, Database &database)
 {
     // Use this function to lazily initialize database if it's not created yet

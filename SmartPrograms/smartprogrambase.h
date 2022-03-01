@@ -48,6 +48,7 @@ enum SmartProgram : uint32_t
     SP_PLA_ResetAlphaPokemon,
     SP_PLA_BraviaryGainHeight,
     SP_PLA_DistortionWaiter,
+    SP_PLA_OutbreakFinder,
 
     SP_COUNT
 };
@@ -119,6 +120,7 @@ public:
             case SP_PLA_ResetAlphaPokemon:  return "Reset Alpha Pokemon";
             case SP_PLA_BraviaryGainHeight: return "Braviary Gain Height";
             case SP_PLA_DistortionWaiter:   return "Distortion Waiter";
+            case SP_PLA_OutbreakFinder:     return "Outbreak Finder";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -154,6 +156,7 @@ public:
         if (sp == "Reset Alpha Pokemon")            return SP_PLA_ResetAlphaPokemon;
         if (sp == "Braviary Gain Height")           return SP_PLA_BraviaryGainHeight;
         if (sp == "Distortion Waiter")              return SP_PLA_DistortionWaiter;
+        if (sp == "Outbreak Finder")                return SP_PLA_OutbreakFinder;
 
         return SP_COUNT;
     }
@@ -189,6 +192,7 @@ public:
             case SP_PLA_ResetAlphaPokemon:  return "SmartPLAResetAlphaPokemon";
             case SP_PLA_BraviaryGainHeight: return "SmartPLABraviaryGainHeight";
             case SP_PLA_DistortionWaiter:   return "SmartPLADistortionWaiter";
+            case SP_PLA_OutbreakFinder:     return "SmartPLAOutbreakFinder";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -227,6 +231,7 @@ public:
             case SP_PLA_ResetAlphaPokemon:  return 12;
             case SP_PLA_BraviaryGainHeight: return 0;
             case SP_PLA_DistortionWaiter:   return 0;
+            case SP_PLA_OutbreakFinder:     return 13;
 
             case SP_COUNT:                  return -1;
         }

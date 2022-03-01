@@ -149,4 +149,7 @@
   <SmartPLABraviaryGainHeight>
 	<C_Loop>Y,6,Plus,5,A,6</C_Loop>
   </SmartPLABraviaryGainHeight>
+  <SmartPLAOutbreakFinder>
+	<C_TalkeToLaventon>A,16,Nothing,1,Loop,3,DDown,1,ASpam,80</C_TalkeToLaventon>
+  </SmartPLAOutbreakFinder>
 </SmartProgramCommands>

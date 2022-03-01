@@ -1749,7 +1749,7 @@
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>13</number>
             </property>
             <widget class="QWidget" name="page">
              <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1781,8 +1781,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>291</height>
+                   <width>384</width>
+                   <height>64</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -1841,8 +1841,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>291</height>
+                   <width>323</width>
+                   <height>235</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -3604,6 +3604,71 @@ This is for duplicating Pokemon, for items, use Box Operation program instead.</
               </item>
              </layout>
             </widget>
+            <widget class="QWidget" name="page_13">
+             <layout class="QVBoxLayout" name="verticalLayout_34">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QScrollArea" name="scrollArea_14">
+                <property name="frameShape">
+                 <enum>QFrame::Panel</enum>
+                </property>
+                <property name="lineWidth">
+                 <number>2</number>
+                </property>
+                <property name="widgetResizable">
+                 <bool>true</bool>
+                </property>
+                <widget class="QWidget" name="scrollAreaWidgetContents_14">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>428</width>
+                   <height>291</height>
+                  </rect>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_35">
+                  <item>
+                   <widget class="QLabel" name="label_64">
+                    <property name="text">
+                     <string>Input the list of Mass Outbreak Pokemon you are looking for, separated by commas.
+Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbreak Pokemon.</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="PokemonAutofillLineEdit" name="SP13_LE_PokemonList"/>
+                  </item>
+                  <item>
+                   <spacer name="verticalSpacer_12">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>220</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </widget>
+              </item>
+             </layout>
+            </widget>
            </widget>
           </item>
          </layout>
@@ -3625,6 +3690,11 @@ This is for duplicating Pokemon, for items, use Box Operation program instead.</
    <class>CommandSender</class>
    <extends>QLineEdit</extends>
    <header>commandsender.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PokemonAutofillLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>SmartPrograms/Widgets/pokemonautofilllineedit.h</header>
   </customwidget>
  </customwidgets>
  <resources>
