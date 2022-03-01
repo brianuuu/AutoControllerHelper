@@ -93,7 +93,7 @@ void SmartBDSPShinyLegendary::runNextState()
                     {
                         case LT_DialgaPalkia: setState_runCommand(C_TalkDialgaPalkia); break;
                         case LT_Regigigas: setState_runCommand(C_TalkRegigigas); break;
-                        case LT_Shaymin: setState_runCommand(C_TalkShaymin); break;
+                        case LT_Shaymin: m_substage = SS_RestartShaymin; setState_runCommand("Nothing,21"); break;
                         case LT_Others: setState_runCommand(C_Talk); break;
                         default: setState_error("Invalid legendary type"); break;
                     }
@@ -141,6 +141,7 @@ void SmartBDSPShinyLegendary::runNextState()
                 m_substage = SS_Restart;
                 runRestartCommand();
 
+                m_parameters.vlcWrapper->clearCaptures();
                 break;
             }
             else
@@ -213,7 +214,7 @@ void SmartBDSPShinyLegendary::runNextState()
                 m_substage = SS_Restart;
                 runRestartCommand();
 
-                break;
+                m_parameters.vlcWrapper->clearCaptures();
             }
             else if (checkBrightnessMeanTarget(A_Battle.m_rect, C_Color_Battle, 160))
             {
@@ -223,7 +224,6 @@ void SmartBDSPShinyLegendary::runNextState()
                 setState_runCommand(C_RestartShaymin);
 
                 m_parameters.vlcWrapper->clearCaptures();
-                break;
             }
             else
             {
