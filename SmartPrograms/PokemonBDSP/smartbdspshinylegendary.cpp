@@ -40,8 +40,17 @@ void SmartBDSPShinyLegendary::runNextState()
         initStat(m_encounter, "Encounters");
         initStat(m_error, "Errors");
 
-        m_substage = SS_Restart;
-        runRestartCommand();
+        if (m_type == LT_Shaymin)
+        {
+            // No restart on Shaymin
+            m_substage = SS_Talk;
+            setState_runCommand(C_TalkShaymin);
+        }
+        else
+        {
+            m_substage = SS_Restart;
+            runRestartCommand();
+        }
         break;
     }
     case SS_Restart:
@@ -84,7 +93,9 @@ void SmartBDSPShinyLegendary::runNextState()
                     {
                         case LT_DialgaPalkia: setState_runCommand(C_TalkDialgaPalkia); break;
                         case LT_Regigigas: setState_runCommand(C_TalkRegigigas); break;
-                        default: setState_runCommand(C_Talk); break;
+                        case LT_Shaymin: setState_runCommand(C_TalkShaymin); break;
+                        case LT_Others: setState_runCommand(C_Talk); break;
+                        default: setState_error("Invalid legendary type"); break;
                     }
                     m_parameters.vlcWrapper->clearCaptures();
                 }
@@ -126,7 +137,7 @@ void SmartBDSPShinyLegendary::runNextState()
             if (elapsed > 15000)
             {
                 incrementStat(m_error);
-                emit printLog("Unable to detect dialog for too long, restarting sequence...", LOG_ERROR);
+                emit printLog("Unable to detect dialog for too long, restarting game...", LOG_ERROR);
                 m_substage = SS_Restart;
                 runRestartCommand();
 
@@ -161,6 +172,18 @@ void SmartBDSPShinyLegendary::runNextState()
                             setState_runCommand(C_Capture);
                             emit printLog(str + "SHINY FOUND!", LOG_SUCCESS);
                         }
+                        else if (m_type == LT_Shaymin)
+                        {
+                            // for Shaymin, just run from battle
+                            emit printLog(str + "not shiny, running from battle...");
+                            m_elapsedTimer.restart();
+                            m_substage = SS_DetectBattle;
+                            setState_frameAnalyzeRequest();
+
+                            m_parameters.vlcWrapper->clearCaptures();
+                            m_parameters.vlcWrapper->setAreas({A_Battle});
+                            break;
+                        }
                         else
                         {
                             // reset
@@ -176,6 +199,45 @@ void SmartBDSPShinyLegendary::runNextState()
                 m_dialogWasFound = foundDialog;
             }
             setState_frameAnalyzeRequest();
+        }
+        break;
+    }
+    case SS_DetectBattle:
+    {
+        if (state == S_CaptureReady)
+        {
+            if (m_elapsedTimer.elapsed() > 15000)
+            {
+                incrementStat(m_error);
+                emit printLog("Unable to detect battle UI for too long, restarting game...", LOG_ERROR);
+                m_substage = SS_Restart;
+                runRestartCommand();
+
+                break;
+            }
+            else if (checkBrightnessMeanTarget(A_Battle.m_rect, C_Color_Battle, 160))
+            {
+                // Walk down and up to respawn shaymin
+                emit printLog("Battle UI detected, respawning legendary...");
+                m_substage = SS_RestartShaymin;
+                setState_runCommand(C_RestartShaymin);
+
+                m_parameters.vlcWrapper->clearCaptures();
+                break;
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
+            }
+        }
+        break;
+    }
+    case SS_RestartShaymin:
+    {
+        if (state == S_CommandFinished)
+        {
+            m_substage = SS_Talk;
+            setState_runCommand(C_TalkShaymin);
         }
         break;
     }

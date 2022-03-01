@@ -1749,7 +1749,7 @@
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>13</number>
+             <number>11</number>
             </property>
             <widget class="QWidget" name="page">
              <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -3426,11 +3426,19 @@ This is for duplicating Pokemon, for items, use Box Operation program instead.</
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>197</width>
-                   <height>40</height>
+                   <width>428</width>
+                   <height>291</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_31">
+                  <item>
+                   <widget class="QLabel" name="label_65">
+                    <property name="text">
+                     <string>Select the Legendary Pokemon you're hunting.
+If the list doesn't have the specific Pokemon, select Others.</string>
+                    </property>
+                   </widget>
+                  </item>
                   <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_30">
                     <item>
@@ -3456,6 +3464,11 @@ This is for duplicating Pokemon, for items, use Box Operation program instead.</
                       <item>
                        <property name="text">
                         <string>Regigigas</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string>Shaymin</string>
                        </property>
                       </item>
                       <item>
@@ -3529,8 +3542,8 @@ This is for duplicating Pokemon, for items, use Box Operation program instead.</
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>352</width>
-                   <height>57</height>
+                   <width>428</width>
+                   <height>291</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_33">

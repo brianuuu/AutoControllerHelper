@@ -12,6 +12,7 @@ public:
     {
         LT_DialgaPalkia = 0,
         LT_Regigigas,
+        LT_Shaymin,
         LT_Others,
         LT_COUNT,
     };
@@ -33,18 +34,22 @@ private:
     // Command indices
     Command const C_Restart             = 0;
     Command const C_RestartNoUpdate     = 1;
-    Command const C_Talk                = 2;
-    Command const C_TalkDialgaPalkia    = 3;
-    Command const C_TalkRegigigas       = 4;
-    Command const C_Capture             = 5;
-    Command const C_COUNT               = 6;
+    Command const C_RestartShaymin      = 2;
+    Command const C_Talk                = 3;
+    Command const C_TalkDialgaPalkia    = 4;
+    Command const C_TalkRegigigas       = 5;
+    Command const C_TalkShaymin         = 6;
+    Command const C_Capture             = 7;
+    Command const C_COUNT               = 8;
 
     // List of test color
     HSVRange const C_Color_Dialog = HSVRange(0,0,230,359,30,255);
+    HSVRange const C_Color_Battle = HSVRange(339,130,180,3,190,220);
 
     // List of test point/area
     CaptureArea const A_Title = CaptureArea(400,380,520,100);
     CaptureArea const A_Dialog = CaptureArea(990,620,200,48);
+    CaptureArea const A_Battle = CaptureArea(1128,422,48,48);
 
     // Substages
     enum Substage
@@ -57,6 +62,8 @@ private:
         SS_Talk,
         SS_Detect1,
         SS_Detect2,
+        SS_DetectBattle,
+        SS_RestartShaymin,
         SS_Finish,
     };
     Substage m_substage;
