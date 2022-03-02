@@ -590,7 +590,7 @@ bool SmartProgramBase::startOCR(QRect rectPos, SmartProgramBase::HSVRange hsvRan
     if (!m_parameters.settings->ensureTrainedDataExist())
     {
         QString languageName = PokemonDatabase::getGameLanguageName(gameLanguage);
-        setState_error("Language trained data for '" + languageName + "' for Tesseract is missing, please goto 'Tesseract' folder and follow the instructions in README.md");
+        setState_error("Language trained data for '" + languageName + "' for Tesseract is missing, please goto \"Resources/Tesseract\" folder and follow the instructions in README.md");
 
         m_runNextState = true;
         return false;
