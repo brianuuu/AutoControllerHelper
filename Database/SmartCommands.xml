@@ -114,7 +114,7 @@
   <SmartBDSPShinyLegendary>
 	<C_Restart>Home,1,Nothing,21,X,1,ASpam,120</C_Restart>
 	<C_RestartNoUpdate>Home,1,Nothing,21,X,10,A,20,LDown,1,LUp,1,A,20,LUp,1,ASpam,120</C_RestartNoUpdate>
-	<C_RestartShaymin>DUp,1,A,1,BSpam,100,LDown,60,LUp,60</C_RestartShaymin>
+	<C_RestartShaymin>DUp,1,A,1,BSpam,100,Plus,6,LDown,45,LUp,45</C_RestartShaymin>
 	<C_Talk>Nothing,21,A,1,BSpam,120,Nothing,70</C_Talk>
 	<C_TalkDialgaPalkia>LUp,40,BSpam,120,Nothing,90</C_TalkDialgaPalkia>
 	<C_TalkRegigigas>Nothing,21,A,1,BSpam,200,Nothing,80</C_TalkRegigigas>
