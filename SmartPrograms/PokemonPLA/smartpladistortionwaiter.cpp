@@ -29,6 +29,8 @@ void SmartPLADistortionWaiter::runNextState()
         m_parameters.vlcWrapper->clearAreas();
         m_parameters.vlcWrapper->setAreas({A_Text});
 
+        emit printLog("Game Language = " + PokemonDatabase::getGameLanguageName(m_parameters.settings->getGameLanguage()));
+
         // Keep crouching so we don't dim the screen
         m_substage = SS_Request;
         setState_runCommand("ASpam,2,Loop,0");

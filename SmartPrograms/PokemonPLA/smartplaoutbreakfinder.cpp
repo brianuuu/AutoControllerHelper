@@ -70,6 +70,8 @@ void SmartPLAOutbreakFinder::runNextState()
         initStat(m_statChecks, "Checks");
         initStat(m_statError, "Errors");
 
+        emit printLog("Game Language = " + PokemonDatabase::getGameLanguageName(m_parameters.settings->getGameLanguage()));
+
         // Start by talking to Laventon
         m_substage = SS_TalkToLaventon;
         setState_runCommand(C_TalkToLaventon);
