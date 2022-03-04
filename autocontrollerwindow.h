@@ -184,6 +184,7 @@ private:
         P_BDSP_BoxDuplication,
         P_BDSP_BoxOperation,
         P_BDSP_ResetLegendary,
+        P_BDSP_ResetShaymin,
 
         // PLA Programs
         P_PLA_ResetAlphaCrobat,
