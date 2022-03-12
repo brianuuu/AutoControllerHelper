@@ -743,6 +743,13 @@ bool SmartProgramBase::getOCRNumber(int &number)
     bool hasDigit = false;
     for (QChar ch : queryRaw)
     {
+        // in case it false detect as these...?
+        if (ch == 'l' || ch == 'i' || ch == 't' || ch == 'F' || ch == 'f')
+        {
+            emit printLog(QString("Letter '") + ch + "' is converted to 1", LOG_WARNING);
+            ch = '1';
+        }
+
         if (ch.isDigit())
         {
             numStr += ch;
