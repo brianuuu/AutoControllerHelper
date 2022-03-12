@@ -49,7 +49,7 @@ private:
     Command const C_COUNT           = 1;
 
     // List of test color
-    HSVRange const C_Color_Loading = HSVRange(0,0,0,359,20,40);
+    HSVRange const C_Color_Loading = HSVRange(0,0,0,359,255,40);
     HSVRange const C_Color_Text = HSVRange(0,0,160,359,80,255);
 
     // List of test point/area
