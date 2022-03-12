@@ -78,7 +78,10 @@ void SmartBrightnessMeanFinder::runNextState()
             if (m_ocrNumRequested)
             {
                 int number = 0;
-                getOCRNumber(number);
+                if (getOCRNumber(number))
+                {
+                    emit printLog("OCR returned number: " + QString::number(number));
+                }
             }
             else
             {

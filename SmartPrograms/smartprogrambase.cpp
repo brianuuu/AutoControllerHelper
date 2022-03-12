@@ -769,7 +769,7 @@ bool SmartProgramBase::getOCRNumber(int &number)
 
     if (ok)
     {
-        emit printLog("OCR returned number: " + numStr);
+        qDebug() << "OCR returned number: " + numStr;
     }
     else
     {
