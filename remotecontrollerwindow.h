@@ -59,6 +59,7 @@
 #include "SmartPrograms/PokemonPLA/smartplaresetalphapokemon.h"
 #include "SmartPrograms/PokemonPLA/smartpladistortionwaiter.h"
 #include "SmartPrograms/PokemonPLA/smartplaoutbreakfinder.h"
+#include "SmartPrograms/PokemonPLA/smartplapasturesorter.h"
 
 #include "SmartPrograms/Widgets/pokemonautofilllineedit.h"
 

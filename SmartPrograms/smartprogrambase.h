@@ -49,6 +49,7 @@ enum SmartProgram : uint32_t
     SP_PLA_BraviaryGainHeight,
     SP_PLA_DistortionWaiter,
     SP_PLA_OutbreakFinder,
+    SP_PLA_PastureSorter,
 
     SP_COUNT
 };
@@ -121,42 +122,23 @@ public:
             case SP_PLA_BraviaryGainHeight: return "Braviary Gain Height";
             case SP_PLA_DistortionWaiter:   return "Distortion Waiter";
             case SP_PLA_OutbreakFinder:     return "Outbreak Finder";
+            case SP_PLA_PastureSorter:      return "Pasture Sorter";
 
             case SP_COUNT:                  return "Invalid";
         }
         return "Invalid";
     }
 
-    static SmartProgram getProgramEnumFromName(QString const& sp)
+    static SmartProgram getProgramEnumFromName(QString const& str)
     {
-        if (sp == "Dev: Camera Delay Checker")      return SP_DelayCalibrator;
-        if (sp == "Dev: Brightness Mean Finder")    return SP_BrightnessMeanFinder;
-        if (sp == "Dev: Color Calibrator")          return SP_ColorCalibrator;
-        if (sp == "Test Program")                   return SP_Test;
-
-        if (sp == "Purple Beam Finder")             return SP_PurpleBeamFinder;
-        if (sp == "Y-Comm Glitch")                  return SP_YCommGlitch;
-        if (sp == "Auto Surprise Trade")            return SP_SurpriseTrade;
-        if (sp == "Max Raid Battler")               return SP_MaxRaidBattler;
-        if (sp == "Auto Day Skipper")               return SP_DaySkipper;
-        if (sp == "Auto Battle Tower")              return SP_BattleTower;
-        if (sp == "Auto Loto")                      return SP_Loto;
-        if (sp == "Daily Highlight Farmer")         return SP_DailyHighlight;
-        if (sp == "Berry Farmer")                   return SP_BerryFarmer;
-        if (sp == "Watt Farmer")                    return SP_WattFarmer;
-
-        if (sp == "Reset Starter")                  return SP_BDSP_Starter;
-        if (sp == "Menu Glitch v1.1.3")             return SP_BDSP_MenuGlitch113;
-        if (sp == "Box Duplication Glitch")         return SP_BDSP_BoxDuplication;
-        if (sp == "Box Operation")                  return SP_BDSP_BoxOperation;
-        if (sp == "Reset Legendary")                return SP_BDSP_ShinyLegendary;
-        if (sp == "Duplicate Item 1 to 30")         return SP_BDSP_DuplicateItem1to30;
-
-        if (sp == "Nugget Farmer")                  return SP_PLA_NuggetFarmer;
-        if (sp == "Reset Alpha Pokemon")            return SP_PLA_ResetAlphaPokemon;
-        if (sp == "Braviary Gain Height")           return SP_PLA_BraviaryGainHeight;
-        if (sp == "Distortion Waiter")              return SP_PLA_DistortionWaiter;
-        if (sp == "Outbreak Finder")                return SP_PLA_OutbreakFinder;
+        for (int i = 0; i < (int)SP_COUNT; i++)
+        {
+            SmartProgram sp = (SmartProgram)i;
+            if (getProgramNameFromEnum(sp) == str)
+            {
+                return sp;
+            }
+        }
 
         return SP_COUNT;
     }
@@ -193,6 +175,7 @@ public:
             case SP_PLA_BraviaryGainHeight: return "SmartPLABraviaryGainHeight";
             case SP_PLA_DistortionWaiter:   return "SmartPLADistortionWaiter";
             case SP_PLA_OutbreakFinder:     return "SmartPLAOutbreakFinder";
+            case SP_PLA_PastureSorter:      return "SmartPLAPastureSorter";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -232,6 +215,7 @@ public:
             case SP_PLA_BraviaryGainHeight: return 0;
             case SP_PLA_DistortionWaiter:   return 0;
             case SP_PLA_OutbreakFinder:     return 13;
+            case SP_PLA_PastureSorter:      return 0;
 
             case SP_COUNT:                  return -1;
         }

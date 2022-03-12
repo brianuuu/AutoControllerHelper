@@ -2308,6 +2308,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartPLAOutbreakFinder(ui->SP13_LE_PokemonList->text(), parameter);
         break;
     }
+    case SP_PLA_PastureSorter:
+    {
+        m_smartProgram = new SmartPLAPastureSorter(parameter);
+        break;
+    }
     default:
     {
         QMessageBox::critical(this, "Error", "No code exist for this Smart Program!");

@@ -32,6 +32,7 @@ SOURCES += \
     SmartPrograms/PokemonPLA/smartpladistortionwaiter.cpp \
     SmartPrograms/PokemonPLA/smartplanuggetfarmer.cpp \
     SmartPrograms/PokemonPLA/smartplaoutbreakfinder.cpp \
+    SmartPrograms/PokemonPLA/smartplapasturesorter.cpp \
     SmartPrograms/PokemonPLA/smartplaresetalphapokemon.cpp \
     SmartPrograms/PokemonSwSh/smartberryfarmer.cpp \
     SmartPrograms/PokemonSwSh/smartdailyhighlight.cpp \
@@ -67,6 +68,7 @@ HEADERS += \
     SmartPrograms/PokemonPLA/smartpladistortionwaiter.h \
     SmartPrograms/PokemonPLA/smartplanuggetfarmer.h \
     SmartPrograms/PokemonPLA/smartplaoutbreakfinder.h \
+    SmartPrograms/PokemonPLA/smartplapasturesorter.h \
     SmartPrograms/PokemonPLA/smartplaresetalphapokemon.h \
     SmartPrograms/PokemonSwSh/smartberryfarmer.h \
     SmartPrograms/PokemonSwSh/smartdailyhighlight.h \
