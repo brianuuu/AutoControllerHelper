@@ -173,14 +173,29 @@ void SmartPLAPastureSorter::runNextState()
                         // Sort the remaining
                         std::sort(m_pokemonDataSorted.begin() + livingDexBoxes * 30, m_pokemonDataSorted.end(), PastureSort());
 
-                        // Update pasture count, expand original data, assuming they are empty
-                        int pastureCountPrev = m_settings.m_pastureCount;
-                        m_settings.m_pastureCount = m_pokemonDataSorted.size() / 30;
-                        qDebug() << "Extra pasture count =" << m_settings.m_pastureCount - pastureCountPrev;
-                        emit printLog("Creating Living Dex required " + QString::number(m_settings.m_pastureCount - pastureCountPrev) + " extra boxes!", LOG_WARNING);
-                        for (int i = 0; i < (m_settings.m_pastureCount - pastureCountPrev) * 30; i++)
+                        // Update pasture count, expand data if necessary, assuming they are empty
+                        int pastureCount = m_settings.m_pastureCount;
+                        int pastureCountSorted = m_pokemonDataSorted.size() / 30;
+                        if (pastureCount > pastureCountSorted)
                         {
-                            m_pokemonData.push_back(PokemonData());
+                            // Sorted has less box than non-sorted, pad them
+                            qDebug() << "Empty pasture count =" << pastureCount - pastureCountSorted;
+                            for (int i = 0; i < (pastureCount - pastureCountSorted) * 30; i++)
+                            {
+                                m_pokemonDataSorted.push_back(PokemonData());
+                            }
+                        }
+                        else if (pastureCount < pastureCountSorted)
+                        {
+                            // Require extra pastures
+                            m_settings.m_pastureCount = pastureCountSorted;
+
+                            qDebug() << "Extra pasture count =" << pastureCountSorted - pastureCount;
+                            emit printLog("Creating Living Dex required " + QString::number(pastureCountSorted - pastureCount) + " extra pastures!", LOG_WARNING);
+                            for (int i = 0; i < (pastureCountSorted - pastureCount) * 30; i++)
+                            {
+                                m_pokemonData.push_back(PokemonData());
+                            }
                         }
                     }
                     else
