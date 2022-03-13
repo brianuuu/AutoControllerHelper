@@ -83,10 +83,7 @@ private:
         SS_Init,
         SS_MoveMode,
         SS_Scan,
-
-        SS_SortStart,
-        SS_SortPokemon,
-
+        SS_Sort,
         SS_Finish,
     };
     Substage m_substage;
@@ -98,10 +95,24 @@ private:
 
     // Pasture data/functions
     Position m_position;
-    QVector<PokemonData> m_pokemonData;
-    QVector<PokemonData> m_pokemonDataSorted;
     Position m_positionTemp;
     PokemonData m_dataTemp;
+    QVector<PokemonData> m_pokemonData;
+    QVector<PokemonData> m_pokemonDataSorted;
+
+    struct SearchResult
+    {
+        int m_idCurrent;
+        int m_idResult;
+        bool m_isNearResult;
+
+        SearchResult() :
+            m_idCurrent(-1),
+            m_idResult(-1),
+            m_isNearResult(false)
+        {}
+    } m_searchResult;
+
     int findUnsortedResult(QVector<PokemonData> const& dataAll, PokemonData const& dataQuery);
     QString gotoNextPokemon(Position& pos, bool addDelay);
     QString gotoPosition(Position from, Position to, bool addDelay);

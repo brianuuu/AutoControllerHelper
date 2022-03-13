@@ -21,8 +21,6 @@ void SmartPLAPastureSorter::reset()
     SmartProgramBase::reset();
 
     m_substage = SS_Init;
-    m_readyNextCheck = false;
-    m_position = Position();
 }
 
 void SmartPLAPastureSorter::runNextState()
@@ -32,6 +30,14 @@ void SmartPLAPastureSorter::runNextState()
     {
     case SS_Init:
     {
+        m_readyNextCheck = false;
+        m_position = Position();
+        m_positionTemp = Position();
+        m_dataTemp = PokemonData();
+        m_pokemonData.clear();
+        m_pokemonDataSorted.clear();
+        m_searchResult = SearchResult();
+
         m_substage = SS_MoveMode;
         setState_runCommand("Plus,10,B,10,X,1,B,1,Y,20");
         break;
@@ -85,7 +91,7 @@ void SmartPLAPastureSorter::runNextState()
             if (m_readyNextCheck)
             {
                 // Push current pokemon data, reset
-                QString str = getPositionString(m_positionTemp);
+                QString str = getPositionString(m_positionTemp) + " - ";
                 if (m_dataTemp.m_dexNum == 0)
                 {
                     emit printLog(str + "No Pokemon");
@@ -189,11 +195,21 @@ void SmartPLAPastureSorter::runNextState()
                     qDebug() << "SORTING...";
                     PastureDebug(m_pokemonDataSorted);*/
 
-                    // Return to first pokemon
-                    m_substage = (m_pokemonData == m_pokemonDataSorted) ? SS_Finish : SS_SortPokemon;
-                    m_positionTemp = m_position;
-                    m_position = Position();
-                    setState_runCommand(gotoPosition(m_positionTemp, m_position, false));
+                    if (m_pokemonData == m_pokemonDataSorted)
+                    {
+                        // Already finished, return to first pokemon
+                        m_substage = SS_Finish;
+                        setState_runCommand(gotoPosition(m_position, Position(), false));
+                    }
+                    else
+                    {
+                        m_substage = SS_Sort;
+                        setState_runCommand("Nothing,2");
+
+                        // We are at the end of list, so it should be close to result
+                        m_searchResult.m_idCurrent = -1;
+                        m_searchResult.m_isNearResult = true;
+                    }
                 }
                 else
                 {
@@ -228,73 +244,62 @@ void SmartPLAPastureSorter::runNextState()
         }
         break;
     }
-    case SS_SortStart:
+    case SS_Sort:
     {
         if (state == S_CommandFinished)
         {
-            if (m_position.m_pasture == m_settings.m_pastureCount && m_position.m_point == QPoint(6,5))
+            m_searchResult.m_idCurrent++;
+            if (m_searchResult.m_idCurrent >= m_pokemonData.size())
             {
                 // Finished
                 m_substage = SS_Finish;
-                m_positionTemp = m_position;
-                m_position = Position();
-                setState_runCommand(gotoPosition(m_positionTemp, m_position, false));
+                setState_runCommand(gotoPosition(m_position, Position(), false));
             }
             else
             {
-                m_substage = SS_SortPokemon;
-                setState_runCommand(gotoNextPokemon(m_position, false));
-            }
-        }
-        break;
-    }
-    case SS_SortPokemon:
-    {
-        if (state == S_CommandFinished)
-        {
-            int id = getIDFromPosition(m_position);
-            int idResult = findUnsortedResult(m_pokemonData, m_pokemonDataSorted[id]);
-            if (idResult < 0)
-            {
-                setState_error("Unable to find Pokemon to sort");
-                break;
-            }
-            else
-            {
-                // Mark pokemon as sorted
-                m_pokemonData[idResult].m_isSorted = true;
-            }
+                // Get the result ID of the current slot
+                m_searchResult.m_idResult = findUnsortedResult(m_pokemonData, m_pokemonDataSorted[m_searchResult.m_idCurrent]);
+                if (m_searchResult.m_idResult < 0)
+                {
+                    setState_error("Unable to find Pokemon to sort");
+                    break;
+                }
+                else
+                {
+                    // Mark pokemon as sorted
+                    m_pokemonData[m_searchResult.m_idResult].m_isSorted = true;
+                }
 
-            emit printLog("Sorting " + getPositionString(m_position) + getPokemonDataString(m_pokemonDataSorted[id]));
+                Position currentPos = getPositionFromID(m_searchResult.m_idCurrent);
+                Position resultPos = getPositionFromID(m_searchResult.m_idResult);
 
-            m_substage = SS_SortStart;
-            if (id == idResult)
-            {
-                // No need to do anything
-                setState_runCommand("Nothing,2");
-                break;
-            }
+                if (m_searchResult.m_idCurrent == m_searchResult.m_idResult || (m_pokemonData[m_searchResult.m_idCurrent].m_dexNum == 0 && m_pokemonData[m_searchResult.m_idResult].m_dexNum == 0))
+                {
+                    // Both empty or already sorted
+                    emit printLog(getPositionString(currentPos) + " - (Already sorted) " + getPokemonDataString(m_pokemonDataSorted[m_searchResult.m_idCurrent]));
+                    runNextStateContinue();
+                    break;
+                }
 
-            // Do actual swap
-            m_positionTemp = getPositionFromID(idResult);
-            if (m_pokemonData[id].m_dexNum == 0 && m_pokemonData[idResult].m_dexNum == 0)
-            {
-                // Both empty
-                setState_runCommand("Nothing,2");
-            }
-            else if (m_pokemonData[idResult].m_dexNum == 0)
-            {
-                // Result is empty, pickup the current and put to empty spot
-                setState_runCommand("A,5,Loop,1," + gotoPosition(m_position, m_positionTemp, false) + ",A,5,Loop,1," + gotoPosition(m_positionTemp, m_position, false));
-            }
-            else
-            {
-                // Pickup the result and put it here
-                setState_runCommand(gotoPosition(m_position, m_positionTemp, false) + ",A,5,Loop,1," + gotoPosition(m_positionTemp, m_position, false) + ",A,5");
-            }
+                emit printLog(getPositionString(currentPos) + " swapping with " + getPositionString(resultPos) + " - " + getPokemonDataString(m_pokemonData[m_searchResult.m_idResult]));
+                if (m_pokemonData[m_searchResult.m_idCurrent].m_dexNum == 0 || (m_searchResult.m_isNearResult && m_pokemonData[m_searchResult.m_idResult].m_dexNum != 0))
+                {
+                    // Grab result slot and put it to current slot
+                    setState_runCommand(gotoPosition(m_position, resultPos, false) + ",A,5,Loop,1," + gotoPosition(resultPos, currentPos, false) + ",A,5");
+                    m_position = currentPos;
+                    m_searchResult.m_isNearResult = false;
+                }
+                else
+                {
+                    // Grab current slot and put it to result slot
+                    setState_runCommand(gotoPosition(m_position, currentPos, false) + ",A,5,Loop,1," + gotoPosition(currentPos, resultPos, false) + ",A,5");
+                    m_position = resultPos;
+                    m_searchResult.m_isNearResult = true;
+                }
 
-            // Swap data position
-            qSwap(m_pokemonData[id], m_pokemonData[idResult]);
+                // Swap data position
+                qSwap(m_pokemonData[m_searchResult.m_idCurrent], m_pokemonData[m_searchResult.m_idResult]);
+            }
         }
         break;
     }
@@ -381,8 +386,17 @@ QString SmartPLAPastureSorter::gotoPosition(SmartPLAPastureSorter::Position from
         if (!command.isEmpty()) command += ",";
 
         int diff = qAbs(from.m_point.x() - to.m_point.x());
-        command += (from.m_point.x() < to.m_point.x()) ? "DRight" : "DLeft";
-        command += ",1,Nothing,1,Loop," + QString::number(diff);
+        QString direction = (from.m_point.x() < to.m_point.x()) ? "Right" : "Left";
+        if (diff % 2 == 1)
+        {
+            command += "D" + direction + ",1,Loop,1";
+            if (diff >= 2) command += ",";
+        }
+
+        if (diff >= 2)
+        {
+            command += "L" + direction + ",1,D" + direction + ",1,Loop," + QString::number(diff / 2);
+        }
     }
 
     // Move to position Y
@@ -391,9 +405,21 @@ QString SmartPLAPastureSorter::gotoPosition(SmartPLAPastureSorter::Position from
         if (!command.isEmpty()) command += ",";
 
         int diff = qAbs(from.m_point.y() - to.m_point.y());
-        command += (from.m_point.y() < to.m_point.y()) ? "DDown" : "DUp";
-        command += ",1,Nothing,1,Loop," + QString::number(diff);
+        QString direction = (from.m_point.y() < to.m_point.y()) ? "Down" : "Up";
+        if (diff % 2 == 1)
+        {
+            command += "D" + direction + ",1,Loop,1";
+            if (diff >= 2) command += ",";
+        }
+
+        if (diff >= 2)
+        {
+            command += "L" + direction + ",1,D" + direction + ",1,Loop," + QString::number(diff / 2);
+        }
     }
+
+    // Dummy command if we're not moving at all
+    if (command.isEmpty()) command = "Nothing,1";
 
     // Add delay to account for camera delay
     if (addDelay)
@@ -419,7 +445,7 @@ SmartPLAPastureSorter::Position SmartPLAPastureSorter::getPositionFromID(int id)
 
 QString SmartPLAPastureSorter::getPositionString(SmartPLAPastureSorter::Position pos)
 {
-    return "Position {" + QString::number(pos.m_pasture) + "," + QString::number(pos.m_point.y()) + "," + QString::number(pos.m_point.x()) + "} - ";
+    return "Pos {" + QString::number(pos.m_pasture) + "," + QString::number(pos.m_point.y()) + "," + QString::number(pos.m_point.x()) + "}";
 }
 
 QString SmartPLAPastureSorter::getPokemonDataString(const SmartPLAPastureSorter::PokemonData &data)
