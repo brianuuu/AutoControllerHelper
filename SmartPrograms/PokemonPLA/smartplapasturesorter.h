@@ -23,11 +23,13 @@ public:
         int m_dexNum; // 0 = no pokemon
         bool m_isShiny;
         bool m_isAlpha;
+        bool m_isUsed; // used for sorting only
 
         PokemonData() :
             m_dexNum(0),
             m_isShiny(false),
-            m_isAlpha(false)
+            m_isAlpha(false),
+            m_isUsed(false)
         {}
     };
 
@@ -63,7 +65,12 @@ private:
     enum Substage
     {
         SS_Init,
-        SS_ScanPokemon,
+        SS_Scan,
+
+        SS_SortStart,
+        SS_SortPokemon,
+
+        SS_Finish,
     };
     Substage m_substage;
 
@@ -75,12 +82,40 @@ private:
     // Pasture data/functions
     Position m_position;
     QVector<PokemonData> m_pokemonData;
-    void gotoNextPokemon(Position& pos);
-    void gotoPosition(Position from, Position to);
+    QVector<PokemonData> m_pokemonDataSorted;
+    Position m_positionTemp;
+    PokemonData m_dataTemp;
+    int findUnusedResult(QVector<PokemonData>& dataAll, PokemonData const& dataQuery);
+    void gotoNextPokemon(Position& pos, bool addDelay);
+    QString gotoPosition(Position from, Position to, bool addDelay);
 
     static int getIDFromPosition(Position pos);
     static Position getPositionFromID(int id);
     static QString getPositionString(Position pos);
+    static QString getPokemonDataString(PokemonData const& data);
+
+    struct PastureSort
+    {
+        bool operator() (PokemonData const& a, PokemonData const& b)
+        {
+            // Shiny alpha
+            if (!a.m_isAlpha && !a.m_isShiny && b.m_isAlpha && b.m_isShiny) return true;
+            if (a.m_isAlpha && a.m_isShiny && !b.m_isAlpha && !b.m_isShiny) return false;
+
+            // Shiny
+            if (!a.m_isAlpha && !a.m_isShiny && !b.m_isAlpha && b.m_isShiny) return true;
+            if (!a.m_isAlpha && a.m_isShiny && !b.m_isAlpha && !b.m_isShiny) return false;
+
+            // Alpha
+            if (!a.m_isAlpha && !a.m_isShiny && b.m_isAlpha && !b.m_isShiny) return true;
+            if (a.m_isAlpha && !a.m_isShiny && !b.m_isAlpha && !b.m_isShiny) return false;
+
+            // Sort by dex no.
+            return (a.m_dexNum < b.m_dexNum);
+        }
+    };
+
+    static void PastureDebug(QVector<PokemonData> const& dataAll);
 };
 
 #endif // SMARTPLAPASTURESORTER_H
