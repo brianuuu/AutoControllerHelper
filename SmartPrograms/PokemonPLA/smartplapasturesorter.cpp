@@ -223,7 +223,7 @@ void SmartPLAPastureSorter::runNextState()
             }
             else
             {
-                gotoNextPokemon(m_position, true);
+                setState_runCommand(gotoNextPokemon(m_position, true));
             }
         }
         break;
@@ -243,7 +243,7 @@ void SmartPLAPastureSorter::runNextState()
             else
             {
                 m_substage = SS_SortPokemon;
-                gotoNextPokemon(m_position, false);
+                setState_runCommand(gotoNextPokemon(m_position, false));
             }
         }
         break;
@@ -326,7 +326,7 @@ int SmartPLAPastureSorter::findUnsortedResult(const QVector<PokemonData> &dataAl
     return -1;
 }
 
-void SmartPLAPastureSorter::gotoNextPokemon(Position &pos, bool addDelay)
+QString SmartPLAPastureSorter::gotoNextPokemon(Position &pos, bool addDelay)
 {
     // This does a zig-zag path to save a bit of time within the same box
     Position posPrev = pos;
@@ -361,7 +361,7 @@ void SmartPLAPastureSorter::gotoNextPokemon(Position &pos, bool addDelay)
         }
     }
 
-    setState_runCommand(gotoPosition(posPrev, pos, addDelay));
+    return gotoPosition(posPrev, pos, addDelay);
 }
 
 QString SmartPLAPastureSorter::gotoPosition(SmartPLAPastureSorter::Position from, SmartPLAPastureSorter::Position to, bool addDelay)

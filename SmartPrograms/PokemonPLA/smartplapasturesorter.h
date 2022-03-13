@@ -103,7 +103,7 @@ private:
     Position m_positionTemp;
     PokemonData m_dataTemp;
     int findUnsortedResult(QVector<PokemonData> const& dataAll, PokemonData const& dataQuery);
-    void gotoNextPokemon(Position& pos, bool addDelay);
+    QString gotoNextPokemon(Position& pos, bool addDelay);
     QString gotoPosition(Position from, Position to, bool addDelay);
 
     static int getIDFromPosition(Position pos);
