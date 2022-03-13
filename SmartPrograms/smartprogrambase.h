@@ -215,7 +215,7 @@ public:
             case SP_PLA_BraviaryGainHeight: return 0;
             case SP_PLA_DistortionWaiter:   return 0;
             case SP_PLA_OutbreakFinder:     return 13;
-            case SP_PLA_PastureSorter:      return 0;
+            case SP_PLA_PastureSorter:      return 14;
 
             case SP_COUNT:                  return -1;
         }

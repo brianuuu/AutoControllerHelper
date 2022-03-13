@@ -1,6 +1,12 @@
 #include "smartplapasturesorter.h"
 
-SmartPLAPastureSorter::SmartPLAPastureSorter(SmartProgramParameter parameter) : SmartProgramBase(parameter)
+SmartPLAPastureSorter::SmartPLAPastureSorter
+(
+    Settings setting,
+    SmartProgramParameter parameter
+)
+    : SmartProgramBase(parameter)
+    , m_settings(setting)
 {
     init();
 }
@@ -26,15 +32,23 @@ void SmartPLAPastureSorter::runNextState()
     {
     case SS_Init:
     {
-        m_substage = SS_Scan;
-        setState_runCommand("Nothing,20", true);
+        m_substage = SS_MoveMode;
+        setState_runCommand("Plus,10,B,10,X,1,B,1,Y,20");
+        break;
+    }
+    case SS_MoveMode:
+    {
+        if (state == S_CommandFinished)
+        {
+            m_substage = SS_Scan;
+            setState_runCommand("Nothing,20", true);
 
-        m_parameters.vlcWrapper->setAreas({A_Level, A_Stat, A_Shiny, A_Alpha});
+            m_parameters.vlcWrapper->setAreas({A_Level, A_Stat, A_Shiny, A_Alpha});
 
-        // Reserve pokemon data
-        m_settings.m_pastureCount = 10;
-        m_pokemonData.resize(m_settings.m_pastureCount * 30);
-        emit printLog("Scanning " + QString::number(m_settings.m_pastureCount) + " Pasture(s)...");
+            // Reserve pokemon data
+            m_pokemonData.resize(m_settings.m_pastureCount * 30);
+            emit printLog("Scanning " + QString::number(m_settings.m_pastureCount) + " Pasture(s)...");
+        }
         break;
     }
     case SS_Scan:
@@ -86,18 +100,97 @@ void SmartPLAPastureSorter::runNextState()
 
                 if (m_positionTemp.m_pasture == m_settings.m_pastureCount && m_positionTemp.m_point == QPoint(6,5))
                 {
-                    // Finished scanning, sort
-                    m_pokemonDataSorted = m_pokemonData;
-                    std::sort(m_pokemonDataSorted.begin(), m_pokemonDataSorted.end(), PastureSort());
+                    emit printLog("Scan completed, now sorting...");
 
+                    // Finished scanning, sort
+                    if (m_settings.m_livingDex)
+                    {
+                        QSet<int> idUsedForLivingDex;
+
+                        // Sort by living dex first
+                        int lastNonEmptySlot = 0;
+                        for (int i = 1; i <= 270; i++)
+                        {
+                            // Last entry is 242: Darkrai
+                            if (i > 242)
+                            {
+                                m_pokemonDataSorted.push_back(PokemonData());
+                                continue;
+                            }
+
+                            PokemonData dexEntry(i, m_settings.m_livingDexShiny, m_settings.m_livingDexAlpha);
+                            int idResult = findUnsortedResult(m_pokemonData, dexEntry);
+                            if (idResult < 0)
+                            {
+                                // Empty slot
+                                m_pokemonDataSorted.push_back(PokemonData());
+                            }
+                            else
+                            {
+                                m_pokemonDataSorted.push_back(dexEntry);
+                                idUsedForLivingDex.insert(idResult);
+
+                                // Remember the last non-empty slot
+                                lastNonEmptySlot = m_pokemonDataSorted.size();
+                            }
+                        }
+
+                        // Clear lagging boxes that is completely empty
+                        for (int i = 0; i < (9 - (lastNonEmptySlot+29) / 30) * 30; i++)
+                        {
+                            m_pokemonDataSorted.pop_back();
+                        }
+                        int livingDexBoxes = m_pokemonDataSorted.size() / 30;
+                        qDebug() << "Remove empty lagging box, pokemon count =" << m_pokemonDataSorted.size();
+
+                        // Push remaining pokemon
+                        for (int i = 0; i < m_pokemonData.size(); i++)
+                        {
+                            if (!idUsedForLivingDex.contains(i) && m_pokemonData[i].m_dexNum != 0)
+                            {
+                                m_pokemonDataSorted.push_back(m_pokemonData[i]);
+                            }
+                        }
+                        qDebug() << "Added remaining pokemon, pokemon count =" << m_pokemonDataSorted.size();
+
+                        // Push until it's multiple of 30
+                        int emptySlotRemainder = m_pokemonDataSorted.size() % 30;
+                        if (emptySlotRemainder != 0)
+                        {
+                            for (int i = 0; i < 30 - emptySlotRemainder; i++)
+                            {
+                                m_pokemonDataSorted.push_back(PokemonData());
+                            }
+                        }
+                        qDebug() << "Added empty slots, pokemon count =" << m_pokemonDataSorted.size();
+
+                        // Sort the remaining
+                        std::sort(m_pokemonDataSorted.begin() + livingDexBoxes * 30, m_pokemonDataSorted.end(), PastureSort());
+
+                        // Update pasture count, expand original data, assuming they are empty
+                        int pastureCountPrev = m_settings.m_pastureCount;
+                        m_settings.m_pastureCount = m_pokemonDataSorted.size() / 30;
+                        qDebug() << "Extra pasture count =" << m_settings.m_pastureCount - pastureCountPrev;
+                        emit printLog("Creating Living Dex required " + QString::number(m_settings.m_pastureCount - pastureCountPrev) + " extra boxes!", LOG_WARNING);
+                        for (int i = 0; i < (m_settings.m_pastureCount - pastureCountPrev) * 30; i++)
+                        {
+                            m_pokemonData.push_back(PokemonData());
+                        }
+                    }
+                    else
+                    {
+                        // Default sorting
+                        m_pokemonDataSorted = m_pokemonData;
+                        std::sort(m_pokemonDataSorted.begin(), m_pokemonDataSorted.end(), PastureSort());
+                    }
+
+                    Q_ASSERT(m_pokemonData.size() == m_pokemonDataSorted.size());
                     /*PastureDebug(m_pokemonData);
                     qDebug() << "SORTING...";
                     PastureDebug(m_pokemonDataSorted);*/
 
-                    emit printLog("Scan completed, now sorting...");
-
                     // Return to first pokemon
-                    m_substage = SS_SortPokemon;
+                    m_substage = (m_pokemonData == m_pokemonDataSorted) ? SS_Finish : SS_SortPokemon;
                     m_positionTemp = m_position;
                     m_position = Position();
                     setState_runCommand(gotoPosition(m_positionTemp, m_position, false));
@@ -126,7 +219,7 @@ void SmartPLAPastureSorter::runNextState()
             m_positionTemp = m_position; // cache position
             if (m_positionTemp.m_pasture == m_settings.m_pastureCount && m_positionTemp.m_point == QPoint(6,5))
             {
-                setState_runCommand("Nothing,5");
+                setState_runCommand("Nothing,2");
             }
             else
             {
@@ -160,11 +253,16 @@ void SmartPLAPastureSorter::runNextState()
         if (state == S_CommandFinished)
         {
             int id = getIDFromPosition(m_position);
-            int idResult = findUnusedResult(m_pokemonData, m_pokemonDataSorted[id]);
+            int idResult = findUnsortedResult(m_pokemonData, m_pokemonDataSorted[id]);
             if (idResult < 0)
             {
                 setState_error("Unable to find Pokemon to sort");
                 break;
+            }
+            else
+            {
+                // Mark pokemon as sorted
+                m_pokemonData[idResult].m_isSorted = true;
             }
 
             emit printLog("Sorting " + getPositionString(m_position) + getPokemonDataString(m_pokemonDataSorted[id]));
@@ -177,17 +275,14 @@ void SmartPLAPastureSorter::runNextState()
                 break;
             }
 
-            // Swap data position
-            qSwap(m_pokemonData[id], m_pokemonData[idResult]);
-
             // Do actual swap
             m_positionTemp = getPositionFromID(idResult);
-            if (m_pokemonData[id].m_dexNum == 0 && m_pokemonDataSorted[id].m_dexNum == 0)
+            if (m_pokemonData[id].m_dexNum == 0 && m_pokemonData[idResult].m_dexNum == 0)
             {
                 // Both empty
-                setState_runCommand("Nothing,5");
+                setState_runCommand("Nothing,2");
             }
-            else if (m_pokemonDataSorted[id].m_dexNum == 0)
+            else if (m_pokemonData[idResult].m_dexNum == 0)
             {
                 // Result is empty, pickup the current and put to empty spot
                 setState_runCommand("A,5,Loop,1," + gotoPosition(m_position, m_positionTemp, false) + ",A,5,Loop,1," + gotoPosition(m_positionTemp, m_position, false));
@@ -197,6 +292,9 @@ void SmartPLAPastureSorter::runNextState()
                 // Pickup the result and put it here
                 setState_runCommand(gotoPosition(m_position, m_positionTemp, false) + ",A,5,Loop,1," + gotoPosition(m_positionTemp, m_position, false) + ",A,5");
             }
+
+            // Swap data position
+            qSwap(m_pokemonData[id], m_pokemonData[idResult]);
         }
         break;
     }
@@ -204,6 +302,7 @@ void SmartPLAPastureSorter::runNextState()
     {
         if (state == S_CommandFinished)
         {
+            // If we are here, m_pokemonData and m_pokemonDataSorted should be the same
             emit printLog("Sort completed!", LOG_SUCCESS);
             setState_completed();
         }
@@ -214,14 +313,13 @@ void SmartPLAPastureSorter::runNextState()
     SmartProgramBase::runNextState();
 }
 
-int SmartPLAPastureSorter::findUnusedResult(QVector<SmartPLAPastureSorter::PokemonData> &dataAll, const SmartPLAPastureSorter::PokemonData &dataQuery)
+int SmartPLAPastureSorter::findUnsortedResult(const QVector<PokemonData> &dataAll, const SmartPLAPastureSorter::PokemonData &dataQuery)
 {
     for (int i = 0; i < dataAll.size(); i++)
     {
-        PokemonData& data = dataAll[i];
-        if (!data.m_isUsed && data.m_dexNum == dataQuery.m_dexNum && data.m_isAlpha == dataQuery.m_isAlpha && data.m_isShiny == dataQuery.m_isShiny)
+        PokemonData const& data = dataAll[i];
+        if (!data.m_isSorted && data.m_dexNum == dataQuery.m_dexNum && data.m_isAlpha == dataQuery.m_isAlpha && data.m_isShiny == dataQuery.m_isShiny)
         {
-            data.m_isUsed = true;
             return i;
         }
     }

@@ -2310,7 +2310,12 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     }
     case SP_PLA_PastureSorter:
     {
-        m_smartProgram = new SmartPLAPastureSorter(parameter);
+        SmartPLAPastureSorter::Settings settings;
+        settings.m_pastureCount = ui->SP14_SB_Count->value();
+        settings.m_livingDex = ui->SP14_CB_LivingDex->isChecked();
+        settings.m_livingDexShiny = ui->SP14_CB_Shiny->isChecked();
+        settings.m_livingDexAlpha = ui->SP14_CB_Alpha->isChecked();
+        m_smartProgram = new SmartPLAPastureSorter(settings, parameter);
         break;
     }
     default:

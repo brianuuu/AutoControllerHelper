@@ -8,14 +8,13 @@
 class SmartPLAPastureSorter : public SmartProgramBase
 {
 public:
-    explicit SmartPLAPastureSorter(SmartProgramParameter parameter);
-
-    virtual SmartProgram getProgramEnum() { return SP_PLA_PastureSorter; }
-
-public:
     struct Settings
     {
         int m_pastureCount;
+
+        bool m_livingDex;
+        bool m_livingDexShiny;
+        bool m_livingDexAlpha;
     };
 
     struct PokemonData
@@ -23,14 +22,26 @@ public:
         int m_dexNum; // 0 = no pokemon
         bool m_isShiny;
         bool m_isAlpha;
-        bool m_isUsed; // used for sorting only
+        bool m_isSorted; // used for sorting only
 
         PokemonData() :
             m_dexNum(0),
             m_isShiny(false),
             m_isAlpha(false),
-            m_isUsed(false)
+            m_isSorted(false)
         {}
+
+        PokemonData(int dexNum, bool isShiny, bool isAlpha) :
+            m_dexNum(dexNum),
+            m_isShiny(isShiny),
+            m_isAlpha(isAlpha),
+            m_isSorted(false)
+        {}
+
+        bool operator==(PokemonData const& other) const
+        {
+            return m_dexNum == other.m_dexNum && m_isShiny == other.m_isShiny && m_isAlpha == other.m_isAlpha;
+        }
     };
 
     struct Position
@@ -43,6 +54,11 @@ public:
             m_point(QPoint(x,y))
         {}
     };
+
+public:
+    explicit SmartPLAPastureSorter(Settings setting, SmartProgramParameter parameter);
+
+    virtual SmartProgram getProgramEnum() { return SP_PLA_PastureSorter; }
 
 private:
     virtual void init();
@@ -65,6 +81,7 @@ private:
     enum Substage
     {
         SS_Init,
+        SS_MoveMode,
         SS_Scan,
 
         SS_SortStart,
@@ -85,7 +102,7 @@ private:
     QVector<PokemonData> m_pokemonDataSorted;
     Position m_positionTemp;
     PokemonData m_dataTemp;
-    int findUnusedResult(QVector<PokemonData>& dataAll, PokemonData const& dataQuery);
+    int findUnsortedResult(QVector<PokemonData> const& dataAll, PokemonData const& dataQuery);
     void gotoNextPokemon(Position& pos, bool addDelay);
     QString gotoPosition(Position from, Position to, bool addDelay);
 
@@ -98,6 +115,10 @@ private:
     {
         bool operator() (PokemonData const& a, PokemonData const& b)
         {
+            // Empty slot
+            if (a.m_dexNum != 0 && b.m_dexNum == 0) return true;
+            if (a.m_dexNum == 0 && b.m_dexNum != 0) return false;
+
             // Shiny alpha
             if (!a.m_isAlpha && !a.m_isShiny && b.m_isAlpha && b.m_isShiny) return true;
             if (a.m_isAlpha && a.m_isShiny && !b.m_isAlpha && !b.m_isShiny) return false;
