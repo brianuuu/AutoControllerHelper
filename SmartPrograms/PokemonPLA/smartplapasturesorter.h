@@ -24,14 +24,7 @@ public:
         bool m_isAlpha;
         bool m_isSorted; // used for sorting only
 
-        PokemonData() :
-            m_dexNum(0),
-            m_isShiny(false),
-            m_isAlpha(false),
-            m_isSorted(false)
-        {}
-
-        PokemonData(int dexNum, bool isShiny, bool isAlpha) :
+        PokemonData(int dexNum = 0, bool isShiny = false, bool isAlpha = false) :
             m_dexNum(dexNum),
             m_isShiny(isShiny),
             m_isAlpha(isAlpha),

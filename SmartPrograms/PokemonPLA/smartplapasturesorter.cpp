@@ -114,7 +114,8 @@ void SmartPLAPastureSorter::runNextState()
                         QSet<int> idUsedForLivingDex;
 
                         // Sort by living dex first
-                        int lastNonEmptySlot = 0;
+                        int firstNonEmptySlot = -1;
+                        int lastNonEmptySlot = -1;
                         for (int i = 1; i <= 270; i++)
                         {
                             // Last entry is 242: Darkrai
@@ -136,18 +137,42 @@ void SmartPLAPastureSorter::runNextState()
                                 m_pokemonDataSorted.push_back(dexEntry);
                                 idUsedForLivingDex.insert(idResult);
 
+                                // Remember the first non-empty slot
+                                if (firstNonEmptySlot == -1)
+                                {
+                                    firstNonEmptySlot = m_pokemonDataSorted.size() - 1;
+                                }
+
                                 // Remember the last non-empty slot
-                                lastNonEmptySlot = m_pokemonDataSorted.size();
+                                lastNonEmptySlot = m_pokemonDataSorted.size() - 1;
                             }
                         }
 
-                        // Clear lagging boxes that is completely empty
-                        for (int i = 0; i < (9 - (lastNonEmptySlot+29) / 30) * 30; i++)
+                        // Clear leading boxes that are empty
+                        if (!m_pokemonData.isEmpty())
                         {
-                            m_pokemonDataSorted.pop_back();
+                            int removeBoxCount = (firstNonEmptySlot == -1) ? 0 : (firstNonEmptySlot / 30);
+                            for (int i = 0; i < removeBoxCount * 30; i++)
+                            {
+                                m_pokemonDataSorted.pop_front();
+                            }
+                            qDebug() << "firstNonEmptySlot:" << firstNonEmptySlot;
+                            qDebug() << "Remove" << removeBoxCount << "empty leading boxes, pokemon count =" << m_pokemonDataSorted.size();
                         }
+
+                        // Clear lagging boxes that are empty
+                        if (!m_pokemonData.isEmpty())
+                        {
+                            int removeBoxCount = (lastNonEmptySlot == -1) ? 9 : (8 - lastNonEmptySlot / 30);
+                            for (int i = 0; i < removeBoxCount * 30; i++)
+                            {
+                                m_pokemonDataSorted.pop_back();
+                            }
+                            qDebug() << "lastNonEmptySlot:" << lastNonEmptySlot;
+                            qDebug() << "Remove" << removeBoxCount << "empty lagging boxes, pokemon count =" << m_pokemonDataSorted.size();
+                        }
+
                         int livingDexBoxes = m_pokemonDataSorted.size() / 30;
-                        qDebug() << "Remove empty lagging box, pokemon count =" << m_pokemonDataSorted.size();
 
                         // Push remaining pokemon
                         for (int i = 0; i < m_pokemonData.size(); i++)
@@ -218,6 +243,15 @@ void SmartPLAPastureSorter::runNextState()
                     }
                     else
                     {
+                        // Mark those that already have correct position
+                        for (int i = 0; i < m_pokemonData.size(); i++)
+                        {
+                            if (m_pokemonData[i] == m_pokemonDataSorted[i])
+                            {
+                                m_pokemonData[i].m_isSorted = true;
+                            }
+                        }
+
                         m_substage = SS_Sort;
                         setState_runCommand("Nothing,2");
 
@@ -225,6 +259,8 @@ void SmartPLAPastureSorter::runNextState()
                         m_searchResult.m_idCurrent = -1;
                         m_searchResult.m_isNearResult = true;
                     }
+
+                    m_parameters.vlcWrapper->clearCaptures();
                 }
                 else
                 {
@@ -272,17 +308,25 @@ void SmartPLAPastureSorter::runNextState()
             }
             else
             {
-                // Get the result ID of the current slot
-                m_searchResult.m_idResult = findUnsortedResult(m_pokemonData, m_pokemonDataSorted[m_searchResult.m_idCurrent]);
-                if (m_searchResult.m_idResult < 0)
+                if (m_pokemonData[m_searchResult.m_idCurrent].m_isSorted)
                 {
-                    setState_error("Unable to find Pokemon to sort");
-                    break;
+                    // Already sorted
+                    m_searchResult.m_idResult = m_searchResult.m_idCurrent;
                 }
                 else
                 {
-                    // Mark pokemon as sorted
-                    m_pokemonData[m_searchResult.m_idResult].m_isSorted = true;
+                    // Get the result ID of the current slot
+                    m_searchResult.m_idResult = findUnsortedResult(m_pokemonData, m_pokemonDataSorted[m_searchResult.m_idCurrent]);
+                    if (m_searchResult.m_idResult < 0)
+                    {
+                        setState_error("Unable to find Pokemon to sort");
+                        break;
+                    }
+                    else
+                    {
+                        // Mark pokemon as sorted
+                        m_pokemonData[m_searchResult.m_idResult].m_isSorted = true;
+                    }
                 }
 
                 Position currentPos = getPositionFromID(m_searchResult.m_idCurrent);
