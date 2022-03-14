@@ -149,7 +149,7 @@ void SmartPLAPastureSorter::runNextState()
                         }
 
                         // Clear leading boxes that are empty
-                        if (!m_pokemonData.isEmpty())
+                        if (!m_pokemonDataSorted.isEmpty())
                         {
                             int removeBoxCount = (firstNonEmptySlot == -1) ? 0 : (firstNonEmptySlot / 30);
                             for (int i = 0; i < removeBoxCount * 30; i++)
@@ -161,7 +161,7 @@ void SmartPLAPastureSorter::runNextState()
                         }
 
                         // Clear lagging boxes that are empty
-                        if (!m_pokemonData.isEmpty())
+                        if (!m_pokemonDataSorted.isEmpty())
                         {
                             int removeBoxCount = (lastNonEmptySlot == -1) ? 9 : (8 - lastNonEmptySlot / 30);
                             for (int i = 0; i < removeBoxCount * 30; i++)
@@ -172,6 +172,7 @@ void SmartPLAPastureSorter::runNextState()
                             qDebug() << "Remove" << removeBoxCount << "empty lagging boxes, pokemon count =" << m_pokemonDataSorted.size();
                         }
 
+                        Q_ASSERT(m_pokemonDataSorted.size() % 30 == 0);
                         int livingDexBoxes = m_pokemonDataSorted.size() / 30;
 
                         // Push remaining pokemon

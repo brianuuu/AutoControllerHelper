@@ -3426,8 +3426,8 @@ This is for duplicating Pokemon, for items, use Box Operation program instead.</
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>428</width>
-                   <height>291</height>
+                   <width>274</width>
+                   <height>70</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_31">
@@ -3698,6 +3698,12 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
               </property>
               <item>
                <widget class="QScrollArea" name="scrollArea_15">
+                <property name="frameShape">
+                 <enum>QFrame::Panel</enum>
+                </property>
+                <property name="lineWidth">
+                 <number>2</number>
+                </property>
                 <property name="widgetResizable">
                  <bool>true</bool>
                 </property>
@@ -3706,8 +3712,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>430</width>
-                   <height>293</height>
+                   <width>428</width>
+                   <height>291</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_37">
