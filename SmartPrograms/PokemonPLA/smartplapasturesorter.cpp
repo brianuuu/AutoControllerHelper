@@ -323,9 +323,9 @@ void SmartPLAPastureSorter::runNextState()
                         setState_error("Unable to find Pokemon to sort");
                         break;
                     }
-                    else
+                    else if (m_pokemonData[m_searchResult.m_idResult].m_dexNum != 0)
                     {
-                        // Mark pokemon as sorted
+                        // Mark pokemon as sorted (we don't care about empty slots)
                         m_pokemonData[m_searchResult.m_idResult].m_isSorted = true;
                     }
                 }
@@ -333,10 +333,19 @@ void SmartPLAPastureSorter::runNextState()
                 Position currentPos = getPositionFromID(m_searchResult.m_idCurrent);
                 Position resultPos = getPositionFromID(m_searchResult.m_idResult);
 
-                if (m_searchResult.m_idCurrent == m_searchResult.m_idResult || (m_pokemonData[m_searchResult.m_idCurrent].m_dexNum == 0 && m_pokemonData[m_searchResult.m_idResult].m_dexNum == 0))
+                if (m_searchResult.m_idCurrent == m_searchResult.m_idResult)
                 {
                     // Both empty or already sorted
                     emit printLog(getPositionString(currentPos) + " - (Already sorted) " + getPokemonDataString(m_pokemonDataSorted[m_searchResult.m_idCurrent]));
+                    runNextStateContinue();
+                    break;
+                }
+
+                if (m_pokemonData[m_searchResult.m_idCurrent].m_dexNum != 0 && m_pokemonData[m_searchResult.m_idResult].m_dexNum == 0)
+                {
+                    // Current slot need to be replace with empty slot
+                    // but we can ignore this since later on the slot that need current slot will grab this
+                    emit printLog(getPositionString(currentPos) + " has pokemon but will be an empty slot, ignoring for now...");
                     runNextStateContinue();
                     break;
                 }
