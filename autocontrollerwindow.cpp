@@ -48,6 +48,7 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_programEnumMap["BDSP_BoxOperation"]       = P_BDSP_BoxOperation;
     m_programEnumMap["BDSP_ResetLegendary"]     = P_BDSP_ResetLegendary;
     m_programEnumMap["BDSP_ResetShaymin"]       = P_BDSP_ResetShaymin;
+    m_programEnumMap["BDSP_ResetArceus"]        = P_BDSP_ResetArceus;
 
     m_programEnumMap["PLA_ResetAlphaCrobat"]    = P_PLA_ResetAlphaCrobat;
     m_programEnumMap["PLA_ResetAlphaGallade"]   = P_PLA_ResetAlphaGallade;
@@ -86,6 +87,7 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_tabID[P_BDSP_BoxOperation]        = 22;
     m_tabID[P_BDSP_ResetLegendary]      = 0;
     m_tabID[P_BDSP_ResetShaymin]        = 0;
+    m_tabID[P_BDSP_ResetArceus]         = 0;
 
     m_tabID[P_PLA_ResetAlphaCrobat]     = 0;
     m_tabID[P_PLA_ResetAlphaGallade]    = 0;
@@ -2275,6 +2277,7 @@ void autocontrollerwindow::UpdateInfo()
 
     //--------------------------------------------------------
     case P_BDSP_ResetDialgaPalkia:
+    case P_BDSP_ResetArceus:
     {
         info = "Time per soft-reset: " + GetTimeString(name, 0);
         info += "\nThis program DOES NOT stop by itself, you MUST keep an eye on encounters.";

@@ -13,6 +13,7 @@ public:
         LT_DialgaPalkia = 0,
         LT_Regigigas,
         LT_Shaymin,
+        LT_Arceus,
         LT_Others,
         LT_COUNT,
     };
@@ -39,8 +40,9 @@ private:
     Command const C_TalkDialgaPalkia    = 4;
     Command const C_TalkRegigigas       = 5;
     Command const C_TalkShaymin         = 6;
-    Command const C_Capture             = 7;
-    Command const C_COUNT               = 8;
+    Command const C_TalkArceus          = 7;
+    Command const C_Capture             = 8;
+    Command const C_COUNT               = 9;
 
     // List of test color
     HSVRange const C_Color_Dialog = HSVRange(0,0,230,359,30,255);
@@ -48,7 +50,7 @@ private:
 
     // List of test point/area
     CaptureArea const A_Title = CaptureArea(400,380,520,100);
-    CaptureArea const A_Dialog = CaptureArea(990,620,200,48);
+    CaptureArea const A_Dialog = CaptureArea(890,620,300,48);
     CaptureArea const A_Battle = CaptureArea(1128,422,48,48);
 
     // Substages

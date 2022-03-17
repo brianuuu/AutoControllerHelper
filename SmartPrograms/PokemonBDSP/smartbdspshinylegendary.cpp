@@ -94,6 +94,7 @@ void SmartBDSPShinyLegendary::runNextState()
                         case LT_DialgaPalkia: setState_runCommand(C_TalkDialgaPalkia); break;
                         case LT_Regigigas: setState_runCommand(C_TalkRegigigas); break;
                         case LT_Shaymin: m_substage = SS_RestartShaymin; setState_runCommand("Nothing,21"); break;
+                        case LT_Arceus: setState_runCommand(C_TalkArceus); break;
                         case LT_Others: setState_runCommand(C_Talk); break;
                         default: setState_error("Invalid legendary type"); break;
                     }
@@ -101,7 +102,7 @@ void SmartBDSPShinyLegendary::runNextState()
                 }
                 else
                 {
-                    setState_runCommand("Nothing,21,A,1,Nothing,50");
+                    setState_runCommand("ASpam,30,Nothing,20");
                     m_elapsedTimer.restart();
                     m_substage = (m_substage == SS_Intro) ? SS_Title : SS_GameStart;
                 }
