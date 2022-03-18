@@ -123,15 +123,15 @@ void SmartPLAOutbreakFinder::runNextState()
             // Detect entering village/obsidian fieldlands
             if (!checkBrightnessMeanTarget(A_Loading.m_rect, C_Color_Loading, 240))
             {
+                m_parameters.vlcWrapper->clearAreas();
                 if (m_substage == SS_LoadingToVillage)
                 {
-                    // Goto Alabaster Icelands on map
-                    m_substage = SS_GotoMap;
-                    setState_runCommand(QString("LDown,60,A,1,Nothing,20") + (m_firstCheck ? ",LUpRight,30" : "") + ",DLeft,1,Nothing,1,DLeft,1,Nothing,1,DLeft,1,Nothing,21");
+                    // Detect map
+                    m_substage = SS_DetectMap;
+                    setState_runCommand("LDown,60");
 
-                    m_firstCheck = false;
-                    m_areaType = AT_AlabasterIcelands;
-                    m_readyNextCheck = true;
+                    m_timer.restart();
+                    m_parameters.vlcWrapper->setAreas({A_Map});
                 }
                 else
                 {
@@ -139,13 +139,44 @@ void SmartPLAOutbreakFinder::runNextState()
                     m_substage = SS_WalkToLaventon;
                     setState_runCommand("LUpRight,22");
                 }
-
-                m_parameters.vlcWrapper->clearAreas();
-
             }
             else
             {
                 setState_frameAnalyzeRequest();
+            }
+        }
+        break;
+    }
+    case SS_DetectMap:
+    {
+        if (state == S_CommandFinished)
+        {
+            setState_frameAnalyzeRequest();
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (m_timer.elapsed() > 10000)
+            {
+                incrementStat(m_statError);
+                setState_error("Unable to detect map for too long...");
+            }
+            else if (checkBrightnessMeanTarget(A_Map.m_rect, C_Color_Map, 240))
+            {
+                emit printLog("Map detected, checking each area for outbreaks...");
+
+                // Goto Alabaster Icelands on map
+                m_substage = SS_GotoMap;
+                setState_runCommand(QString(m_firstCheck ? "LUpRight,30," : "") + "DLeft,1,Nothing,1,DLeft,1,Nothing,1,DLeft,1,Nothing,21");
+
+                m_firstCheck = false;
+                m_areaType = AT_AlabasterIcelands;
+                m_readyNextCheck = true;
+
+                m_parameters.vlcWrapper->clearAreas();
+            }
+            else
+            {
+                setState_runCommand("A,1,Nothing,20");
             }
         }
         break;

@@ -438,12 +438,11 @@ void SmartPLANuggetFarmer::runNextState()
             else if (checkBrightnessMeanTarget(A_AConfirmReturn.m_rect, C_Color_AConfirmReturn, 160))
             {
                 // Head to village and return
-                emit printLog("Heading back to village and return...");
-                m_substage = SS_VillageReturn;
-                setState_runCommand(m_isFirstTimeVillageReturn ? C_VillageReturn : C_VillageReturnNoMove);
+                emit printLog("Heading back to village...");
+                m_substage = SS_LoadingToVillageStart;
+                setState_runCommand(C_TalkeToLaventonFinish);
 
                 m_parameters.vlcWrapper->clearCaptures();
-                m_isFirstTimeVillageReturn = false;
             }
             else
             {
@@ -452,28 +451,109 @@ void SmartPLANuggetFarmer::runNextState()
         }
         break;
     }
-    case SS_VillageReturn:
+    case SS_LoadingToVillageStart:
+    case SS_LoadingToObsidianStart:
     {
         if (state == S_CommandFinished)
         {
-            // This is only for checking if we should sleep or not
-            if (m_searchSisterCount >= 4)
+            m_elapsedTimer.restart();
+
+            m_parameters.vlcWrapper->clearAreas();
+            m_parameters.vlcWrapper->setAreas({A_Loading});
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (m_elapsedTimer.elapsed() > 5000)
             {
-                m_searchSisterCount = 0;
+                incrementStat(m_statError);
+                setState_error("Unable to detect loading screen for too long...");
+                break;
             }
-
-            if (m_searchSisterCount == 0)
+            else if (checkBrightnessMeanTarget(A_Loading.m_rect, C_Color_Loading, 240))
             {
-                emit printLog("Sleeping until morning (program start/every 4 searches)");
+                // Detect loading screen
+                m_substage = (m_substage == SS_LoadingToVillageStart) ? SS_LoadingToVillageEnd : SS_LoadingToObsidianEnd;
+            }
+        }
 
-                m_substage = SS_WaitTillMorning;
-                setState_runCommand(C_WaitTillMorning);
+        setState_frameAnalyzeRequest();
+        break;
+    }
+    case SS_LoadingToVillageEnd:
+    case SS_LoadingToObsidianEnd:
+    {
+        if (state == S_CaptureReady)
+        {
+            // Detect entering village/obsidian fieldlands
+            if (!checkBrightnessMeanTarget(A_Loading.m_rect, C_Color_Loading, 240))
+            {
+                m_parameters.vlcWrapper->clearAreas();
+                if (m_substage == SS_LoadingToVillageEnd)
+                {
+                    // Detect map
+                    m_substage = SS_DetectMap;
+                    setState_runCommand("LDown,60");
+
+                    m_elapsedTimer.restart();
+                    m_parameters.vlcWrapper->setAreas({A_Map});
+                }
+                else
+                {
+                    // Arrived Obsidian Fieldlands
+                    // This is only for checking if we should sleep or not
+                    if (m_searchSisterCount >= 4)
+                    {
+                        m_searchSisterCount = 0;
+                    }
+
+                    if (m_searchSisterCount == 0)
+                    {
+                        emit printLog("Sleeping until morning (program start/every 4 searches)");
+
+                        m_substage = SS_WaitTillMorning;
+                        setState_runCommand(C_WaitTillMorning);
+                    }
+                    else
+                    {
+                        // Not need to sleep till morning, save immediately
+                        m_substage = SS_Save;
+                        setState_runCommand(C_Save);
+                    }
+                }
             }
             else
             {
-                // Not need to sleep till morning, save immediately
-                m_substage = SS_Save;
-                setState_runCommand(C_Save);
+                setState_frameAnalyzeRequest();
+            }
+        }
+        break;
+    }
+    case SS_DetectMap:
+    {
+        if (state == S_CommandFinished)
+        {
+            setState_frameAnalyzeRequest();
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (m_elapsedTimer.elapsed() > 10000)
+            {
+                incrementStat(m_statError);
+                setState_error("Unable to detect map for too long...");
+            }
+            else if (checkBrightnessMeanTarget(A_Map.m_rect, C_Color_Map, 240))
+            {
+                emit printLog("Map detected, returning to Obsidian Fieldlands...");
+
+                m_substage = SS_LoadingToObsidianStart;
+                setState_runCommand(QString(m_isFirstTimeVillageReturn ? "DRight,1," : "") + "A,16,DDown,1,ASpam,80");
+
+                m_parameters.vlcWrapper->clearCaptures();
+                m_isFirstTimeVillageReturn = false;
+            }
+            else
+            {
+                setState_runCommand("A,1,Nothing,20");
             }
         }
         break;

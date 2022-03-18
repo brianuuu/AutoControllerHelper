@@ -51,10 +51,12 @@ private:
     // List of test color
     HSVRange const C_Color_Loading = HSVRange(0,0,0,359,255,40);
     HSVRange const C_Color_Text = HSVRange(0,0,160,359,80,255);
+    HSVRange const C_Color_Map = HSVRange(0,0,110,359,255,150);
 
     // List of test point/area
     CaptureArea const A_Loading = CaptureArea(560,654,200,42);
     CaptureArea const A_Text = CaptureArea(70,126,200,28);
+    CaptureArea const A_Map = CaptureArea(490,692,200,24);
 
     // Substages
     enum Substage
@@ -66,6 +68,7 @@ private:
 
         SS_LoadingToVillage,
         SS_LoadingToObsidian,
+        SS_DetectMap,
 
         SS_GotoMap,
         SS_EnterObsidian,
