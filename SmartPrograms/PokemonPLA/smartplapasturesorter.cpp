@@ -217,10 +217,23 @@ void SmartPLAPastureSorter::runNextState()
                             m_settings.m_pastureCount = pastureCountSorted;
 
                             qDebug() << "Extra pasture count =" << pastureCountSorted - pastureCount;
-                            emit printLog("Creating Living Dex required " + QString::number(pastureCountSorted - pastureCount) + " extra pastures!", LOG_WARNING);
-                            for (int i = 0; i < (pastureCountSorted - pastureCount) * 30; i++)
+                            QString warning = "Creating Living Dex required " + QString::number(pastureCountSorted - pastureCount) + " extra pastures!";
+                            emit printLog(warning, LOG_WARNING);
+
+                            QMessageBox::StandardButton resBtn = QMessageBox::Yes;
+                            resBtn = QMessageBox::warning(this, "Warning", warning + "\nAre you sure you want to continue?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+                            if (resBtn == QMessageBox::Yes)
                             {
-                                m_pokemonData.push_back(PokemonData());
+                                for (int i = 0; i < (pastureCountSorted - pastureCount) * 30; i++)
+                                {
+                                    m_pokemonData.push_back(PokemonData());
+                                }
+                            }
+                            else
+                            {
+                                emit printLog("Stopped by user");
+                                setState_completed();
+                                break;
                             }
                         }
                     }
