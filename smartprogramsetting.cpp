@@ -180,7 +180,7 @@ void SmartProgramSetting::on_CB_GameLanguage_currentIndexChanged(int index)
     if (!ensureTrainedDataExist())
     {
         QString languageName = PokemonDatabase::getGameLanguageName(getGameLanguage());
-        QMessageBox::warning(this, "Warning", "Language trained data for '" + languageName + "' for Tesseract is missing, please goto 'Tesseract' folder and follow the instructions in README.md", QMessageBox::Ok);
+        QMessageBox::warning(this, "Warning", "Language trained data for '" + languageName + "' for Tesseract is missing, please goto 'Resources/Tesseract' folder and follow the instructions in README.md", QMessageBox::Ok);
     }
 }
 

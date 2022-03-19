@@ -10,8 +10,8 @@
     #define BOT_PATH "C:/Users/User/Documents/GitHub/AutoController_swsh/SourceCode/Bots/"
     #define SCREENSHOT_PATH "C:/Users/User/Documents/GitHub/AutoController_swsh/Screenshots/"
     #define LOG_PATH "C:/Users/User/Documents/GitHub/AutoController_swsh/Logs/"
-    #define SMART_COMMAND_XML "../AutoControllerHelper/Database/SmartCommands.xml"
-    #define SMART_STATS_INI "C:/Users/User/Documents/GitHub/AutoController_swsh/SourceCode/Bots/Others_SmartProgram/SmartStats.ini"
+    #define SMART_COMMAND_PATH "../AutoControllerHelper/SmartCommands/"
+    #define SMART_STATS_INI "C:/Users/User/Documents/GitHub/AutoController_swsh/Resources/SmartStats.ini"
     #define STREAM_COUNTER_PATH "C:/Users/User/Documents/GitHub/AutoController_swsh/StreamCounters/"
     #define RESOURCES_PATH "C:/Users/User/Documents/GitHub/AutoController_swsh/Resources/"
 #else
@@ -21,8 +21,8 @@
     #define BOT_PATH "../SourceCode/Bots/"
     #define SCREENSHOT_PATH "../Screenshots/"
     #define LOG_PATH "../Logs/"
-    #define SMART_COMMAND_XML "../SourceCode/Bots/Others_SmartProgram/SmartCommands.xml"
-    #define SMART_STATS_INI "../SourceCode/Bots/Others_SmartProgram/SmartStats.ini"
+    #define SMART_COMMAND_PATH "../Resources/SmartCommands/"
+    #define SMART_STATS_INI "../Resources/SmartStats.ini"
     #define STREAM_COUNTER_PATH "../StreamCounters/"
     #define RESOURCES_PATH "../Resources/"
 #endif

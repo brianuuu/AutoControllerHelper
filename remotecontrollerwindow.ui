@@ -1717,27 +1717,9 @@
              </widget>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_21">
-              <item>
-               <widget class="QPushButton" name="PB_StartSmartProgram">
-                <property name="text">
-                 <string>Start</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="PB_SmartSettings">
-                <property name="text">
-                 <string>Settings</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
              <widget class="QPushButton" name="PB_ModifySmartCommands">
               <property name="text">
-               <string>Modify SmartCommands.xml</string>
+               <string>Modify Smart Commands</string>
               </property>
              </widget>
             </item>
@@ -3430,7 +3412,7 @@ This is for duplicating Pokemon, for items, use Box Operation program instead.</
                    <x>0</x>
                    <y>0</y>
                    <width>428</width>
-                   <height>291</height>
+                   <height>262</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_31">
@@ -3843,6 +3825,41 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
         </item>
        </layout>
       </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_21">
+       <item>
+        <widget class="QPushButton" name="PB_StartSmartProgram">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>14</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Start Smart Program</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="PB_SmartSettings">
+         <property name="font">
+          <font>
+           <pointsize>14</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>General Settings</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

@@ -469,15 +469,125 @@ bool SmartProgramBase::checkImageMatchTarget(QRect rectPos, SmartProgramBase::HS
     return success;
 }
 
+bool SmartProgramBase::validateCommand(const QString &commands, QString &errorMsg)
+{
+    static QSet<QString> const availableCommands =
+    {
+        "nothing",
+        "a",
+        "b",
+        "x",
+        "y",
+        "l",
+        "r",
+        "zl",
+        "zr",
+        "plus",
+        "minus",
+        "home",
+        "capture",
+        "lclick",
+        "lup",
+        "ldown",
+        "lleft",
+        "lright",
+        "rclick",
+        "rup",
+        "rdown",
+        "rleft",
+        "rright",
+        "dup",
+        "ddown",
+        "dleft",
+        "dright",
+        "triggers",
+        "lupleft",
+        "lupright",
+        "ldownleft",
+        "ldownright",
+        "lupa",
+        "ldowna",
+        "lrighta",
+        "drightr",
+        "lupclick",
+
+        "aspam",
+        "bspam",
+        "loop",
+    };
+
+    bool valid = true;
+    int count = 0;
+
+    QStringList list = commands.split(',');
+    if (list.isEmpty() || list.size() % 2 == 1)
+    {
+        errorMsg = "Invalid syntax, it should be \"COMMAND,DURATION,COMMAND,DURATION,...\"";
+        valid = false;
+    }
+    else
+    {
+        bool isLoop = false;
+        for (int i = 0; i < list.size(); i++)
+        {
+            QString const& str = list[i];
+            if (i % 2 == 0)
+            {
+                QString commandLower = str.toLower();
+                isLoop = commandLower == "loop";
+                if (!availableCommands.contains(commandLower))
+                {
+                    errorMsg = "\"" + str + "\" is not a recognized command";
+                    valid = false;
+                    break;
+                }
+            }
+            else
+            {
+                bool durationValid;
+                int duration = str.toInt(&durationValid);
+                if (!durationValid)
+                {
+                    errorMsg = "Duration is not an integer";
+                    valid = false;
+                    break;
+                }
+                else if (duration > 65534)
+                {
+                    errorMsg = "Duration cannot be larger than 65534";
+                    valid = false;
+                    break;
+                }
+                else if (duration < 0)
+                {
+                    errorMsg = "Duration cannot be negative";
+                    valid = false;
+                    break;
+                }
+                else if (!isLoop && duration == 0)
+                {
+                    errorMsg = "Only 'Loop' command can use duration 0, other commands have no effect";
+                    valid = false;
+                    break;
+                }
+
+                count++;
+            }
+        }
+    }
+
+    if (count > COMMAND_MAX)
+    {
+        valid = false;
+        errorMsg = "Number of commands exceed maximum of " + QString::number(COMMAND_MAX);
+    }
+
+    return valid;
+}
+
 bool SmartProgramBase::inializeCommands(int size)
 {
     m_commands.clear();
-    if (!m_parameters.smartProgramCommands)
-    {
-        m_errorMsg = "Commands .xml file missing!";
-        m_state = S_Error;
-        return false;
-    }
 
     // No command
     if (size <= 0)
@@ -485,48 +595,56 @@ bool SmartProgramBase::inializeCommands(int size)
         return true;
     }
 
-    bool valid = false;
-    bool found = false;
-    QDomNodeList programList = m_parameters.smartProgramCommands->firstChildElement().childNodes();
-    for (int i = 0; i < programList.count(); i++)
+    QString const fileName = this->getProgramInternalName() + ".xml";
+    if (!QFile::exists(SMART_COMMAND_PATH + fileName))
     {
-        QDomElement programElement = programList.at(i).toElement();
-        QString const programName = programElement.tagName();
+        m_errorMsg = fileName + " file missing!";
+        m_state = S_Error;
+        return false;
+    }
 
-        if (programName == this->getProgramInternalName())
+    QFile file(SMART_COMMAND_PATH + fileName);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        m_errorMsg = "Fail to load " + fileName;
+        m_state = S_Error;
+        return false;
+    }
+    else
+    {
+        QDomDocument programCommands;
+        programCommands.setContent(&file);
+        file.close();
+
+        QDomNodeList commandList = programCommands.firstChildElement().childNodes();
+        if (size > commandList.count())
         {
-            found = true;
+            m_errorMsg = "Program require " + QString::number(size) + " commands but only " + QString::number(commandList.count()) + " found";
+            m_state = S_Error;
+            return false;
+        }
 
-            QDomNodeList commandList = programElement.childNodes();
-            if (size > commandList.count())
+        for (int j = 0; j < commandList.count(); j++)
+        {
+            QDomElement commandElement = commandList.at(j).toElement();
+            QString const commandName = commandElement.tagName();
+            QString const commandString = commandElement.text();
+
+            QString error;
+            if (!validateCommand(commandString, error))
             {
-                m_errorMsg = "Program require " + QString::number(size) + " commands but only " + QString::number(commandList.count()) + " found";
-                break;
+                m_errorMsg = fileName + " &#60;" + commandName + "&#62; error: " + error;
+                m_state = S_Error;
+                return false;
             }
-
-            for (int j = 0; j < commandList.count(); j++)
+            else
             {
-                QDomElement commandElement = commandList.at(j).toElement();
-                QString const commandString = commandElement.text();
                 m_commands.insert(j, commandString);
             }
-
-            valid = true;
-            break;
         }
     }
 
-    if (!found)
-    {
-        m_errorMsg = "Commands for this program is not found in .xml";
-    }
-
-    if (!valid)
-    {
-        m_state = S_Error;
-    }
-
-    return valid;
+    return true;
 }
 
 void SmartProgramBase::setState_runCommand(Command commandIndex, bool requestFrameAnalyze)
@@ -539,8 +657,7 @@ void SmartProgramBase::setState_runCommand(Command commandIndex, bool requestFra
     }
     else
     {
-        qDebug() << "Invalid command index";
-        m_state = S_Error;
+        setState_error("Invalid command index");
     }
 }
 
@@ -553,8 +670,7 @@ void SmartProgramBase::setState_runCommand(const QString &customCommand, bool re
     }
     else
     {
-        qDebug() << "Invalid custom command";
-        m_state = S_Error;
+        setState_error("Invalid custom command");
     }
 }
 

@@ -56,7 +56,6 @@ enum SmartProgram : uint32_t
 
 struct SmartProgramParameter
 {
-    QDomDocument* smartProgramCommands;
     VLCWrapper* vlcWrapper;
     SmartProgramSetting* settings;
     QLabel* statsLabel;
@@ -65,7 +64,6 @@ struct SmartProgramParameter
     QGraphicsScene* previewMasked;
 
     SmartProgramParameter(
-            QDomDocument* _smartProgramCommands,
             VLCWrapper* _vlcWrapper,
             SmartProgramSetting* _settings,
             QLabel* _statsLabel,
@@ -73,8 +71,7 @@ struct SmartProgramParameter
             QGraphicsScene* _preview = nullptr,
             QGraphicsScene* _previewMasked = nullptr
             )
-        : smartProgramCommands(_smartProgramCommands)
-        , vlcWrapper(_vlcWrapper)
+        : vlcWrapper(_vlcWrapper)
         , settings(_settings)
         , statsLabel(_statsLabel)
         , parent(_parent)
@@ -292,6 +289,8 @@ public:
     QString getProgramName() { return getProgramNameFromEnum(getProgramEnum()); }
     QString getProgramInternalName() { return getProgramInternalNameFromEnum(getProgramEnum()); }
     QString getLogFileName() { return m_logFileName; }
+
+    static bool validateCommand(QString const& commands, QString& errorMsg);
 
 signals:
     void printLog(QString const log, QColor color = QColor(0,0,0));

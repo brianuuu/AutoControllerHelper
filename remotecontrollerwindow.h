@@ -184,7 +184,6 @@ private:
     void SendButtonFlag();
 
     // Command sender
-    bool ValidateCommand(QString const& commands, QString& errorMsg);
     bool SendCommand(QString const& commands);
 
     // Camera
@@ -253,14 +252,12 @@ private:
 
 private:
     // Smart Program
-    bool m_smartProgramCommandsValid;
-    QDomDocument m_smartProgramCommands;
     SmartProgramBase* m_smartProgram = Q_NULLPTR;
     SmartProgramSetting* m_smartSetting = Q_NULLPTR;
     VideoEffectSetting* m_videoEffectSetting = Q_NULLPTR;
 
     // Smart program
-    void LoadSmartProgramCommands();
+    void ValidateSmartProgramCommands();
     void EnableSmartProgram();
     QString GetSmartProgramName(SmartProgram sp);
     bool CanRunSmartProgram();

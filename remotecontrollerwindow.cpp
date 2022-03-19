@@ -137,6 +137,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     m_commandToFlagMap.insert("ASpam", m_PBToFlagMap[ui->PB_A] | m_turboFlag);
     m_commandToFlagMap.insert("BSpam", m_PBToFlagMap[ui->PB_B] | m_turboFlag);
     m_commandToFlagMap.insert("Loop", 0);
+    // NOTE: Must match QSet in SmartProgramBase::validateCommand!
 
     QStringList validCommands;
     for (QMap<QString, ButtonFlag>::iterator iter = m_commandToFlagMap.begin(); iter != m_commandToFlagMap.end(); iter++)
@@ -204,7 +205,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     }
 
     // Load all timings from .xml file
-    LoadSmartProgramCommands();
+    ValidateSmartProgramCommands();
 
     m_SP1_graphicScene = new QGraphicsScene(this);
     m_SP1_graphicSceneMasked = new QGraphicsScene(this);
@@ -1294,88 +1295,6 @@ void RemoteControllerWindow::on_PB_ClearLog_clicked()
     UpdateLogStat();
 }
 
-bool RemoteControllerWindow::ValidateCommand(const QString &commands, QString &errorMsg)
-{
-    bool valid = true;
-    int count = 0;
-
-    QStringList list = commands.split(',');
-    if (list.isEmpty() || list.size() % 2 == 1)
-    {
-        errorMsg = "Invalid syntax, it should be \"COMMAND,DURATION,COMMAND,DURATION,...\"";
-        valid = false;
-    }
-    else
-    {
-        bool isLoop = false;
-        for (int i = 0; i < list.size(); i++)
-        {
-            QString const& str = list[i];
-            if (i % 2 == 0)
-            {
-                bool found = false;
-
-                QString commandLower = str.toLower();
-                for (QMap<QString, ButtonFlag>::iterator iter = m_commandToFlagMap.begin(); iter != m_commandToFlagMap.end(); iter++)
-                {
-                    isLoop = commandLower == "loop";
-                    if (commandLower == iter.key().toLower())
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found)
-                {
-                    errorMsg = "\"" + str + "\" is not a recognized command";
-                    valid = false;
-                    break;
-                }
-            }
-            else
-            {
-                bool durationValid;
-                int duration = str.toInt(&durationValid);
-                if (!durationValid)
-                {
-                    errorMsg = "Duration is not an integer";
-                    valid = false;
-                    break;
-                }
-                else if (duration > 65534)
-                {
-                    errorMsg = "Duration cannot be larger than 65534";
-                    valid = false;
-                    break;
-                }
-                else if (duration < 0)
-                {
-                    errorMsg = "Duration cannot be negative";
-                    valid = false;
-                    break;
-                }
-                else if (!isLoop && duration == 0)
-                {
-                    errorMsg = "Only 'Loop' command can use duration 0, other commands have no effect";
-                    valid = false;
-                    break;
-                }
-
-                count++;
-            }
-        }
-    }
-
-    if (count > COMMAND_MAX)
-    {
-        valid = false;
-        errorMsg = "Number of commands exceed maximum of " + QString::number(COMMAND_MAX);
-    }
-
-    return valid;
-}
-
 bool RemoteControllerWindow::SendCommand(const QString &commands)
 {
     if (!m_serialPort.isOpen())
@@ -1386,7 +1305,7 @@ bool RemoteControllerWindow::SendCommand(const QString &commands)
 
     // Validate command
     QString errorMsg;
-    if (!ValidateCommand(commands, errorMsg))
+    if (!SmartProgramBase::validateCommand(commands, errorMsg))
     {
         PrintLog(errorMsg, LOG_ERROR);
         return false;
@@ -1958,11 +1877,13 @@ void RemoteControllerWindow::on_PB_SmartSettings_clicked()
 
 void RemoteControllerWindow::on_PB_ModifySmartCommands_clicked()
 {
-    QMessageBox::information(this, "Modify SmartCommands.xml", "Please use Notepad or Notepad++ to edit.\nWhen you finish editing and save, close Smart Program Manager and reopen to refresh commands.");
-    QDesktopServices::openUrl(QUrl::fromLocalFile(SMART_COMMAND_XML));
-
-    //LoadSmartProgramCommands();
-    //EnableSmartProgram();
+    QString name = ui->LW_SmartProgram->currentItem()->text();
+    SmartProgram const sp = SmartProgramBase::getProgramEnumFromName(name);
+    QString xmlName = SmartProgramBase::getProgramInternalNameFromEnum(sp) + ".xml";
+    if (QFile::exists(SMART_COMMAND_PATH + xmlName))
+    {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(SMART_COMMAND_PATH + xmlName));
+    }
 }
 
 void RemoteControllerWindow::on_PB_EditStats_clicked()
@@ -1997,6 +1918,9 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
         m_vlcWrapper->setDefaultAreaEnabled(false);
         return;
     }
+
+    QString xmlName = SmartProgramBase::getProgramInternalNameFromEnum(sp) + ".xml";
+    ui->PB_ModifySmartCommands->setEnabled(QFile::exists(SMART_COMMAND_PATH + xmlName));
 
     int tabIndex = SmartProgramBase::getProgramTabID(sp);
     if (tabIndex < 0 || tabIndex >= ui->SW_Settings->count())
@@ -2105,63 +2029,59 @@ void RemoteControllerWindow::SetCaptureAreaPos(QMouseEvent *event)
 //---------------------------------------------------------------------------
 // Smart program functions
 //---------------------------------------------------------------------------
-void RemoteControllerWindow::LoadSmartProgramCommands()
+void RemoteControllerWindow::ValidateSmartProgramCommands()
 {
     if (m_smartProgram)
     {
         return;
     }
 
-    m_smartProgramCommandsValid = true;
-    QFile file(SMART_COMMAND_XML);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    // Validate all available smart commands xml
+    int count = 0;
+    QDirIterator it(SMART_COMMAND_PATH);
+    while (it.hasNext())
     {
-        QMessageBox::critical(this, "Error", "Fail to load SmartCommands.xml!", QMessageBox::Ok);
-        m_smartProgramCommandsValid = false;
-    }
-    else
-    {
-        m_smartProgramCommands.clear();
-        m_smartProgramCommands.setContent(&file);
-        file.close();
-
-        QDomNodeList programList = m_smartProgramCommands.firstChildElement().childNodes();
-        for (int i = 0; i < programList.count(); i++)
+        QString dir = it.next();
+        QString fileName = dir.mid(dir.lastIndexOf('/') + 1);
+        if (fileName.endsWith(".xml"))
         {
-            QDomElement programElement = programList.at(i).toElement();
-            QString const programName = programElement.tagName();
-
-            QDomNodeList commandList = programElement.childNodes();
-            for (int j = 0; j < commandList.count(); j++)
+            count++;
+            QFile file(dir);
+            if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             {
-                QDomElement commandElement = commandList.at(j).toElement();
-                QString const commandName = commandElement.tagName();
-                QString const commandString = commandElement.text();
+                PrintLog("Fail to load " + fileName, LOG_ERROR);
+            }
+            else
+            {
+                QDomDocument programCommands;
+                programCommands.setContent(&file);
+                file.close();
 
-                QString error;
-                if (!ValidateCommand(commandString, error))
+                QDomNodeList commandList = programCommands.firstChildElement().childNodes();
+                for (int j = 0; j < commandList.count(); j++)
                 {
-                    PrintLog(programName + " " + commandName + " Error: " + error, LOG_ERROR);
-                    m_smartProgramCommandsValid = false;
+                    QDomElement commandElement = commandList.at(j).toElement();
+                    QString const commandName = commandElement.tagName();
+                    QString const commandString = commandElement.text();
+
+                    QString error;
+                    if (!SmartProgramBase::validateCommand(commandString, error))
+                    {
+                        PrintLog(fileName + " &#60;" + commandName + "&#62; error: " + error, LOG_ERROR);
+                    }
                 }
             }
         }
     }
 
-    if (!m_smartProgramCommandsValid)
-    {
-        PrintLog("Cannot enable Smart Programs due to invalid SmartCommands.xml!", LOG_ERROR);
-    }
-    else
-    {
-        PrintLog("SmartProgramCommands.xml validation completed!", LOG_SUCCESS);
-    }
+    PrintLog(QString::number(count) + " SmartCommand xml files validated", LOG_SUCCESS);
 }
 
 void RemoteControllerWindow::EnableSmartProgram()
 {
     bool canRun = CanRunSmartProgram();
     ui->GB_SmartProgram->setEnabled(canRun);
+    ui->PB_StartSmartProgram->setEnabled(canRun);
 
     // if program is running...
     if (!canRun && m_smartProgram)
@@ -2175,8 +2095,7 @@ bool RemoteControllerWindow::CanRunSmartProgram()
     return m_serialPort.isOpen()
         && m_serialState == SS_Connect
         && m_vlcWrapper->isPlaying()
-        && m_vlcWidget->isVisible()
-        && m_smartProgramCommandsValid;
+        && m_vlcWidget->isVisible();
 }
 
 void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
@@ -2194,7 +2113,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = Q_NULLPTR;
     }
 
-    SmartProgramParameter parameter(&m_smartProgramCommands, m_vlcWrapper, m_smartSetting, ui->L_CurrentStats, this);
+    SmartProgramParameter parameter(m_vlcWrapper, m_smartSetting, ui->L_CurrentStats, this);
     bool enableUI = SmartProgramBase::getProgramEnableUI(sp);
 
     switch (sp)
@@ -2360,7 +2279,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
 
     if (m_smartProgram->run())
     {
-        ui->PB_StartSmartProgram->setText("Stop");
+        ui->PB_StartSmartProgram->setText("Stop Smart Program");
         //ui->PB_SmartSettings->setEnabled(false);
         ui->CB_SmartProgram->setEnabled(false);
         ui->LW_SmartProgram->setEnabled(false);
@@ -2399,7 +2318,7 @@ void RemoteControllerWindow::StopSmartProgram()
         ClearButtonFlags();
     }
 
-    ui->PB_StartSmartProgram->setText("Start");
+    ui->PB_StartSmartProgram->setText("Start Smart Program");
     //ui->PB_SmartSettings->setEnabled(true);
     ui->CB_SmartProgram->setEnabled(true);
     ui->LW_SmartProgram->setEnabled(true);
