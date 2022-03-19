@@ -13,17 +13,28 @@
 #include <QWidget>
 #include <QMutex>
 
+#include "Audio/audiomanager.h"
+
 #define VIDEO_WIDTH   1280
 #define VIDEO_HEIGHT  720
 
 #define USE_CUSTOM_BUFFER true
+#define USE_CUSTOM_AUDIO true
 
 #if USE_CUSTOM_BUFFER
-struct context {
+struct context
+{
     QMutex m_mutex;
     uchar *m_pixels;
     QLabel *m_label;
     QImage m_frame;
+};
+#endif
+
+#if USE_CUSTOM_AUDIO
+struct contextAudio
+{
+    AudioManager* m_manager;
 };
 #endif
 
@@ -131,6 +142,11 @@ private:
     QSlider* m_volumeSlider;
     QLabel* m_videoWidget;
 
+#if USE_CUSTOM_AUDIO
+    struct contextAudio ctxAudio;
+#endif
+
+    // Capture areas/points
     bool m_defaultAreaEnable;
     CaptureArea m_defaultArea;
     QVector<CaptureArea> m_areas;

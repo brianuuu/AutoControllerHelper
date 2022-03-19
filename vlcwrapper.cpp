@@ -32,6 +32,17 @@ static void display(void *opaque, void *picture)
 }
 #endif
 
+#if USE_CUSTOM_AUDIO
+static void cbAudioPlay(void* p_audio_data, const void *samples, unsigned int count, int64_t pts)
+{
+    struct contextAudio *ctx = (contextAudio *)p_audio_data;
+    if (!ctx->m_manager) return;
+
+    // Pass new raw data to manager
+    ctx->m_manager->pushAudioData(samples, count, pts);
+}
+#endif
+
 VLCWrapper::VLCWrapper(QLabel* videoWidget, QSlider* volumeSlider, QWidget *parent)
     : QWidget(parent)
     , m_volumeSlider(volumeSlider)
@@ -59,6 +70,10 @@ VLCWrapper::VLCWrapper(QLabel* videoWidget, QSlider* volumeSlider, QWidget *pare
     ctx.m_label = m_videoWidget;
     ctx.m_pixels = new uchar[VIDEO_WIDTH * VIDEO_HEIGHT * 4];
     memset(ctx.m_pixels, 0, VIDEO_WIDTH * VIDEO_HEIGHT * 4);
+#endif
+
+#if USE_CUSTOM_AUDIO
+    ctxAudio.m_manager = new AudioManager(this);
 #endif
 
     m_defaultAreaEnable = false;
@@ -110,6 +125,12 @@ bool VLCWrapper::start(const QString &vdev, const QString &adev)
     libvlc_video_set_format(m_mediaPlayer, "BGRA", VIDEO_WIDTH, VIDEO_HEIGHT, VIDEO_WIDTH * 4);
 #else
     libvlc_media_player_set_hwnd(m_mediaPlayer, reinterpret_cast<HWND*>(m_videoWidget->winId()));
+#endif
+
+#if USE_CUSTOM_AUDIO
+    QAudioFormat const format = ctxAudio.m_manager->getAudioFormat();
+    libvlc_audio_set_callbacks(m_mediaPlayer, cbAudioPlay, nullptr, nullptr, nullptr, nullptr, &ctxAudio);
+    libvlc_audio_set_format(m_mediaPlayer, "s16l", format.sampleRate(), format.channelCount());
 #endif
 
     // Play media
