@@ -247,6 +247,22 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     connect(m_videoEffectSetting, &VideoEffectSetting::hueChanged, m_vlcWrapper, &VLCWrapper::setHue);
     connect(m_videoEffectSetting, &VideoEffectSetting::saturationChanged, m_vlcWrapper, &VLCWrapper::setSaturation);
     connect(m_videoEffectSetting, &VideoEffectSetting::gammaChanged, m_vlcWrapper, &VLCWrapper::setGamma);
+
+    // Goto last used smart program
+    ui->CB_SmartProgram->blockSignals(true);
+    ui->CB_SmartProgram->setCurrentIndex(m_settings->value("SmartProgramGame", 0).toInt());
+    ui->CB_SmartProgram->blockSignals(false);
+    on_CB_SmartProgram_currentIndexChanged(ui->CB_SmartProgram->currentIndex());
+
+    QString const savedProgram = m_settings->value("SmartProgramName", SmartProgramBase::getProgramNameFromEnum(SP_BattleTower)).toString();
+    for (int i = 0; i < ui->LW_SmartProgram->count(); i++)
+    {
+        if (ui->LW_SmartProgram->item(i)->text() == savedProgram)
+        {
+            ui->LW_SmartProgram->setCurrentRow(i);
+            break;
+        }
+    }
 }
 
 RemoteControllerWindow::~RemoteControllerWindow()
@@ -329,6 +345,13 @@ void RemoteControllerWindow::closeEvent(QCloseEvent *event)
     m_settings->setValue("CustomVideo", ui->LE_CustomVideo->text());
     m_settings->setValue("CustomAudio", ui->LE_CustomAudio->text());
     m_settings->setValue("UseDetectedDevice", ui->RB_DetectedDevice->isChecked());
+
+    // Remember last used Smart Program
+    m_settings->setValue("SmartProgramGame", ui->CB_SmartProgram->currentIndex());
+    if (ui->LW_SmartProgram->currentRow() != -1)
+    {
+        m_settings->setValue("SmartProgramName", ui->LW_SmartProgram->currentItem()->text());
+    }
 
     if (m_smartSetting->isVisible())
     {
