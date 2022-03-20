@@ -169,8 +169,17 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     m_vlcWidget->hide();
     m_vlcWrapper = new VLCWrapper(m_vlcWidget, ui->S_Volume, this);
     connect(m_vlcWrapper, &VLCWrapper::stateChanged, this, &RemoteControllerWindow::on_VLCState_changed);
-    QVBoxLayout* layout = reinterpret_cast<QVBoxLayout*>(ui->GB_CameraView->layout());
-    layout->insertWidget(0, m_vlcWidget);
+    ui->HL_CameraView->insertWidget(1, m_vlcWidget);
+
+    // Audio
+    QVBoxLayout* layout = reinterpret_cast<QVBoxLayout*>(ui->GB_AudioView->layout());
+    AudioManager* audioManager = m_vlcWrapper->getAudioManager();
+    if (audioManager)
+    {
+        AudioDisplayWidget* audioDisplayWidget = audioManager->getDisplayWidget();
+        layout->addWidget(audioDisplayWidget);
+        connect(ui->CB_AudioDisplayMode, SIGNAL(currentIndexChanged(int)), audioDisplayWidget, SLOT(displayModeChanged(int)));
+    }
 
     /*
     m_cameraView = new QCameraViewfinder(this);
@@ -243,7 +252,9 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
         on_RB_CustomDevice_clicked();
     }
 
+    // Set last used audio settings
     ui->S_Volume->setValue(m_settings->value("Volume", 100).toInt());
+    ui->CB_AudioDisplayMode->setCurrentIndex(m_settings->value("AudioDisplayMode", 0).toInt());
 
     m_smartSetting = new SmartProgramSetting();
     m_videoEffectSetting = new VideoEffectSetting();
@@ -349,7 +360,9 @@ void RemoteControllerWindow::closeEvent(QCloseEvent *event)
     m_settings->setValue("CustomAudio", ui->LE_CustomAudio->text());
     m_settings->setValue("UseDetectedDevice", ui->RB_DetectedDevice->isChecked());
 
+    // Save audio settings
     m_settings->setValue("Volume", ui->S_Volume->value());
+    m_settings->setValue("AudioDisplayMode", ui->CB_AudioDisplayMode->currentIndex());
 
     // Remember last used Smart Program
     m_settings->setValue("SmartProgramGame", ui->CB_SmartProgram->currentIndex());

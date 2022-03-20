@@ -91,6 +91,15 @@ VLCWrapper::~VLCWrapper()
     libvlc_release(m_instance);
 }
 
+AudioManager* VLCWrapper::getAudioManager() const
+{
+#if USE_CUSTOM_AUDIO
+    return ctxAudio.m_manager;
+#else
+    return nullptr;
+#endif
+}
+
 bool VLCWrapper::start(const QString &vdev, const QString &adev)
 {
     if (vdev.isEmpty() && adev.isEmpty()) return false;

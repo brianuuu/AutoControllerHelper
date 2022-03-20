@@ -21,6 +21,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    Audio/audioconversionutils.cpp \
+    Audio/audiodisplaywidget.cpp \
     Audio/audiomanager.cpp \
     SmartPrograms/Dev/smartbrightnessmeanfinder.cpp \
     SmartPrograms/Dev/smartcolorcalibrator.cpp \
@@ -58,6 +60,8 @@ SOURCES += \
     vlcwrapper.cpp
 
 HEADERS += \
+    Audio/audioconversionutils.h \
+    Audio/audiodisplaywidget.h \
     Audio/audiomanager.h \
     SmartPrograms/Dev/smartbrightnessmeanfinder.h \
     SmartPrograms/Dev/smartcolorcalibrator.h \

@@ -80,6 +80,7 @@ public:
 
     // General
     bool isStarted() { return m_isStarted; }
+    AudioManager* getAudioManager() const;
 
     // Camera
     bool start(QString const& vdev, QString const& adev);

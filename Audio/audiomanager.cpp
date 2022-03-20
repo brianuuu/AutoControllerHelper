@@ -2,6 +2,9 @@
 
 AudioManager::AudioManager(QWidget *parent) : QWidget(parent)
 {
+    // Set up display widget
+    m_displayWidget = new AudioDisplayWidget(this);
+
     // Set up global audio format
     m_audioFormat.setSampleRate(48000);
     m_audioFormat.setChannelCount(2);
