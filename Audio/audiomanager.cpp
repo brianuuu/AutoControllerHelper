@@ -75,7 +75,7 @@ void AudioManager::setVolume(int volume)
         return;
     }
 
-    if (volume == 0.0f)
+    if (volume == 0)
     {
         m_volumeScaleDB = 0.0;
         return;
