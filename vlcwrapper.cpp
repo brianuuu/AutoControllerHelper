@@ -38,6 +38,19 @@ static void cbAudioPlay(void* p_audio_data, const void *samples, unsigned int co
     struct contextAudio *ctx = (contextAudio *)p_audio_data;
     if (!ctx->m_manager) return;
 
+    // Extremely convoluted way to make sure volume is correct...
+    ctx->m_mutex.lock();
+    if (ctx->m_volumeSet == 0)
+    {
+        ctx->m_volumeSet = 1;
+    }
+    if (ctx->m_volumeSet != 2)
+    {
+        ctx->m_mutex.unlock();
+        return;
+    }
+    ctx->m_mutex.unlock();
+
     // Pass new raw data to manager
     ctx->m_manager->pushAudioData(samples, count, pts);
 }
@@ -130,7 +143,7 @@ bool VLCWrapper::start(const QString &vdev, const QString &adev)
 #if USE_CUSTOM_AUDIO
     QAudioFormat const format = ctxAudio.m_manager->getAudioFormat();
     libvlc_audio_set_callbacks(m_mediaPlayer, cbAudioPlay, nullptr, nullptr, nullptr, nullptr, &ctxAudio);
-    libvlc_audio_set_format(m_mediaPlayer, "s16l", format.sampleRate(), format.channelCount());
+    libvlc_audio_set_format(m_mediaPlayer, "s16l", static_cast<unsigned>(format.sampleRate()), static_cast<unsigned>(format.channelCount()));
 #endif
 
     // Play media
@@ -145,6 +158,11 @@ bool VLCWrapper::start(const QString &vdev, const QString &adev)
         m_timer.start(16);
         m_isStarted = true;
 
+#if USE_CUSTOM_AUDIO
+        ctxAudio.m_manager->start();
+        ctxAudio.reset();
+#endif
+
         libvlc_video_set_adjust_int(m_mediaPlayer, libvlc_video_adjust_option_t::libvlc_adjust_Enable, true);
         return true;
     }
@@ -156,6 +174,11 @@ void VLCWrapper::stop()
     {
         m_isStarted = false;
         libvlc_media_player_stop(m_mediaPlayer);
+
+#if USE_CUSTOM_AUDIO
+        ctxAudio.m_manager->stop();
+        ctxAudio.reset();
+#endif
     }
 }
 
@@ -230,7 +253,26 @@ void VLCWrapper::timeout()
         emit stateChanged(m_state);
     }
 
-    if (newState == VLCState::ENDED)
+    // Force update volume
+    if (newState == VLCState::PLAYING && m_volumeSlider)
+    {
+#if USE_CUSTOM_AUDIO
+        ctxAudio.m_mutex.lock();
+        if (ctxAudio.m_volumeSet == 1)
+        {
+            setVolume(m_volumeSlider->value());
+            ctxAudio.m_volumeSet = 2;
+        }
+        ctxAudio.m_mutex.unlock();
+#else
+        if (m_volumeSlider->value() != libvlc_audio_get_volume(m_mediaPlayer))
+        {
+            setVolume(m_volumeSlider->value());
+        }
+#endif
+    }
+
+    if (newState == VLCState::STOPPED)
     {
         m_timer.stop();
     }

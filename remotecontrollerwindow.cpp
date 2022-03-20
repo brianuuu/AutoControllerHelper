@@ -243,6 +243,8 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
         on_RB_CustomDevice_clicked();
     }
 
+    ui->S_Volume->setValue(m_settings->value("Volume", 100).toInt());
+
     m_smartSetting = new SmartProgramSetting();
     m_videoEffectSetting = new VideoEffectSetting();
     connect(m_videoEffectSetting, &VideoEffectSetting::hueChanged, m_vlcWrapper, &VLCWrapper::setHue);
@@ -346,6 +348,8 @@ void RemoteControllerWindow::closeEvent(QCloseEvent *event)
     m_settings->setValue("CustomVideo", ui->LE_CustomVideo->text());
     m_settings->setValue("CustomAudio", ui->LE_CustomAudio->text());
     m_settings->setValue("UseDetectedDevice", ui->RB_DetectedDevice->isChecked());
+
+    m_settings->setValue("Volume", ui->S_Volume->value());
 
     // Remember last used Smart Program
     m_settings->setValue("SmartProgramGame", ui->CB_SmartProgram->currentIndex());
@@ -1549,7 +1553,6 @@ void RemoteControllerWindow::CameraToggle(bool on)
             ui->RB_CustomDevice->setEnabled(false);
             ui->GB_DetectedDevice->setEnabled(false);
             ui->GB_CustomDevice->setEnabled(false);
-            ui->S_Volume->setEnabled(true);
             ui->PB_Screenshot->setEnabled(true);
             ui->PB_AdjustVideo->setEnabled(true);
             ui->L_NoVideo->setHidden(true);
@@ -1650,13 +1653,9 @@ void RemoteControllerWindow::CameraToggle(bool on)
         ui->RB_CustomDevice->setEnabled(true);
         ui->GB_DetectedDevice->setEnabled(true);
         ui->GB_CustomDevice->setEnabled(true);
-        ui->S_Volume->setEnabled(false);
         ui->PB_Screenshot->setEnabled(false);
         ui->PB_AdjustVideo->setEnabled(false);
         ui->L_NoVideo->setHidden(false);
-
-        // Reset audio to 100%
-        ui->S_Volume->setValue(100);
 
         if (m_smartSetting->isVisible())
         {
@@ -2074,7 +2073,7 @@ void RemoteControllerWindow::ValidateSmartProgramCommands()
         }
     }
 
-    PrintLog(QString::number(count) + " SmartCommand xml files validated", LOG_SUCCESS);
+    PrintLog(QString::number(count) + " Smart Commands xml files validated", LOG_SUCCESS);
 }
 
 void RemoteControllerWindow::EnableSmartProgram()

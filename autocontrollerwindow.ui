@@ -293,14 +293,14 @@
            <x>0</x>
            <y>0</y>
            <width>538</width>
-           <height>521</height>
+           <height>515</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_27">
           <item>
            <widget class="QStackedWidget" name="SW_Settings">
             <property name="currentIndex">
-             <number>22</number>
+             <number>19</number>
             </property>
             <widget class="QWidget" name="page">
              <layout class="QHBoxLayout" name="horizontalLayout_10">
@@ -2840,6 +2840,13 @@
                   <height>60</height>
                  </size>
                 </property>
+                <property name="font">
+                 <font>
+                  <pointsize>14</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
                 <property name="text">
                  <string>Launch Smart Program Manager</string>
                 </property>
@@ -3198,8 +3205,15 @@
           <property name="minimumSize">
            <size>
             <width>168</width>
-            <height>0</height>
+            <height>26</height>
            </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
           </property>
           <property name="text">
            <string>Save &amp;&amp; Generate HEX file</string>
@@ -3208,6 +3222,19 @@
         </item>
         <item>
          <widget class="QPushButton" name="PB_Log">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>26</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
           <property name="text">
            <string>Show Compile Log</string>
           </property>

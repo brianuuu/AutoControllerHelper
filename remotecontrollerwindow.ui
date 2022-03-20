@@ -1402,7 +1402,7 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>26</height>
+              <height>0</height>
              </size>
             </property>
             <property name="sizeAdjustPolicy">
@@ -1447,7 +1447,7 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>28</height>
+              <height>0</height>
              </size>
             </property>
            </widget>
@@ -1464,7 +1464,7 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>28</height>
+              <height>0</height>
              </size>
             </property>
            </widget>
@@ -1601,9 +1601,6 @@
             </item>
             <item>
              <widget class="QSlider" name="S_Volume">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -3412,7 +3409,7 @@ This is for duplicating Pokemon, for items, use Box Operation program instead.</
                    <x>0</x>
                    <y>0</y>
                    <width>428</width>
-                   <height>262</height>
+                   <height>265</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_31">
@@ -3833,6 +3830,12 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
          <property name="enabled">
           <bool>false</bool>
          </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>26</height>
+          </size>
+         </property>
          <property name="font">
           <font>
            <pointsize>14</pointsize>
@@ -3847,6 +3850,12 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
        </item>
        <item>
         <widget class="QPushButton" name="PB_SmartSettings">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>26</height>
+          </size>
+         </property>
          <property name="font">
           <font>
            <pointsize>14</pointsize>

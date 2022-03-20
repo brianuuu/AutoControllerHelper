@@ -8,6 +8,8 @@
 #include <QObject>
 #include <QWidget>
 
+#include "audioconversionutils.h"
+
 class AudioManager : public QWidget
 {
     Q_OBJECT
@@ -15,8 +17,12 @@ public:
     explicit AudioManager(QWidget *parent = nullptr);
 
     // Const functions
-    bool isInitialized() const { return m_audioOutput; }
+    bool isStarted() const { return m_audioOutput && m_audioDevice; }
     QAudioFormat const getAudioFormat() const { return m_audioFormat; }
+
+    // Controls
+    void start();
+    void stop();
 
     // Input
     void pushAudioData(const void *samples, unsigned int count, int64_t pts);
