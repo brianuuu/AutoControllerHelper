@@ -179,6 +179,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
         AudioDisplayWidget* audioDisplayWidget = audioManager->getDisplayWidget();
         layout->addWidget(audioDisplayWidget);
         connect(ui->CB_AudioDisplayMode, SIGNAL(currentIndexChanged(int)), audioDisplayWidget, SLOT(displayModeChanged(int)));
+        connect(ui->SB_AudioSamples, SIGNAL(valueChanged(int)), audioDisplayWidget, SLOT(displaySampleChanged(int)));
     }
 
     /*

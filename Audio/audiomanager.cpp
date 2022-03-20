@@ -30,12 +30,14 @@ AudioManager::AudioManager(QWidget *parent) : QWidget(parent)
 void AudioManager::start()
 {
     m_audioDevice = m_audioOutput->start();
+    m_displayWidget->start();
 }
 
 void AudioManager::stop()
 {
     m_audioOutput->stop();
     m_audioDevice = Q_NULLPTR;
+    m_displayWidget->stop();
 }
 
 void AudioManager::pushAudioData(const void *samples, unsigned int count, int64_t pts)
@@ -66,6 +68,10 @@ void AudioManager::pushAudioData(const void *samples, unsigned int count, int64_
     m_playbackMutex.unlock();
 
     // TODO: Processing
+    if (m_displayWidget->getDisplayMode() == ADM_RawWave)
+    {
+        m_displayWidget->sendData_rawWave(m_audioFormat, (const char*)samples, sampleSize);
+    }
 }
 
 void AudioManager::setVolume(int volume)
