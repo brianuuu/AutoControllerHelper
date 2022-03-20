@@ -43,8 +43,44 @@ void AudioManager::pushAudioData(const void *samples, unsigned int count, int64_
 
     // Playback
     m_playbackMutex.lock();
-    m_audioDevice->write((const char*)samples, sampleSize);
+    if (m_volumeScaleDB == 1.0)
+    {
+        // Don't convert anything
+        m_audioDevice->write((const char*)samples, sampleSize);
+    }
+    else if (m_volumeScaleDB > 0.0)
+    {
+        // Scale the audio, unfortunately we have to assume the data type here...
+        int16_t* sampleScaled = new int16_t[sampleSize / sizeof(int16_t)];
+        memcpy(sampleScaled, samples, sampleSize);
+        for (size_t i = 0; i < sampleSize / sizeof(int16_t); i++)
+        {
+            sampleScaled[i] = static_cast<int16_t>((double)sampleScaled[i] * m_volumeScaleDB);
+        }
+        m_audioDevice->write((const char*)sampleScaled, sampleSize);
+        delete[] sampleScaled;
+    }
     m_playbackMutex.unlock();
 
     // TODO: Processing
+}
+
+void AudioManager::setVolume(int volume)
+{
+    volume = qBound(0, volume, 100);
+
+    if (volume == 100)
+    {
+        m_volumeScaleDB = 1.0;
+        return;
+    }
+
+    if (volume == 0.0f)
+    {
+        m_volumeScaleDB = 0.0;
+        return;
+    }
+
+    constexpr double exp = 20.0;
+    m_volumeScaleDB = (qPow(exp, (double)volume * 0.01) - 1.0) / (exp - 1.0);
 }

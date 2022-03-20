@@ -34,16 +34,7 @@ struct context
 #if USE_CUSTOM_AUDIO
 struct contextAudio
 {
-    QMutex m_mutex;
     AudioManager* m_manager;
-    uint8_t m_volumeSet; // 0: stopped, 1: notify, 2: started
-
-    void reset()
-    {
-        m_mutex.lock();
-        m_volumeSet = 0;
-        m_mutex.unlock();
-    }
 };
 #endif
 

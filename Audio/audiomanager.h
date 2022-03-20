@@ -7,6 +7,7 @@
 #include <QMutex>
 #include <QObject>
 #include <QWidget>
+#include <QtMath>
 
 #include "audioconversionutils.h"
 
@@ -26,6 +27,7 @@ public:
 
     // Input
     void pushAudioData(const void *samples, unsigned int count, int64_t pts);
+    void setVolume(int volume);
 
 signals:
 
@@ -37,6 +39,7 @@ private:
     QAudioFormat    m_audioFormat;
     QAudioOutput*   m_audioOutput;
     QIODevice*      m_audioDevice;
+    double          m_volumeScaleDB;
 };
 
 #endif // AUDIOMANAGER_H
