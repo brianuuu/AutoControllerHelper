@@ -50,41 +50,6 @@ void SmartProgramBase::commandFinished()
     }
 }
 
-void SmartProgramBase::imageReady(int id, const QImage &preview)
-{
-    Q_UNUSED(id)
-    if (m_state == S_CaptureRequested)
-    {
-        QSize size(1280,720);
-        m_capture = (preview.size() == size) ? preview : preview.scaled(size);
-
-        m_state = S_CaptureReady;
-        m_runNextState = true;
-    }
-    else if (m_state == S_TakeScreenshot)
-    {
-        m_state = S_TakeScreenshotFinished;
-        m_runNextState = true;
-    }
-}
-
-void SmartProgramBase::imageError(int id, QCameraImageCapture::Error error, const QString &errorString)
-{
-    Q_UNUSED(id)
-    if (m_state == S_CaptureRequested || m_state == S_TakeScreenshot)
-    {
-        if (error == QCameraImageCapture::NoError || error == QCameraImageCapture::NotReadyError)
-        {
-            // nothing
-        }
-        else
-        {
-            emit printLog("Error ouccured cpaturing frame (" + errorString + ")", LOG_ERROR);
-            stop();
-        }
-    }
-}
-
 void SmartProgramBase::init()
 {
     reset();
@@ -92,12 +57,6 @@ void SmartProgramBase::init()
     m_logFileName.clear();
     m_errorMsg = "An error has occured";
     m_commands.clear();
-
-    /*
-    Q_ASSERT(m_cameraCapture && m_cameraView);
-    connect(m_cameraCapture, &QCameraImageCapture::imageCaptured, this, &SmartProgramBase::imageReady);
-    connect(m_cameraCapture, SIGNAL(error(int,QCameraImageCapture::Error,const QString&)), this, SLOT(imageError(int,QCameraImageCapture::Error,const QString&)));
-    */
 
     m_runNextState = false;
     connect(&m_runStateTimer, &QTimer::timeout, this, &SmartProgramBase::runStateLoop);
@@ -1030,18 +989,6 @@ void SmartProgramBase::runNextState()
         m_state = S_CaptureReady;
         m_runNextState = true;
 
-        /*
-        if (m_cameraCapture->isReadyForCapture())
-        {
-            m_cameraCapture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
-            m_cameraCapture->capture();
-        }
-        else
-        {
-            // Try again later
-            m_runNextState = true;
-        }
-        */
         break;
     }
     case S_OCRRequested:
@@ -1057,36 +1004,6 @@ void SmartProgramBase::runNextState()
             m_runNextState = true;
         }
 
-        break;
-    }
-    case S_TakeScreenshot:
-    {
-        QString nameWithTime = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") + "_" + m_screenshotName + ".jpg";
-        emit printLog("Saving screenshot: " + nameWithTime);
-        m_parameters.vlcWrapper->takeSnapshot(SCREENSHOT_PATH + nameWithTime);
-
-        m_state = S_TakeScreenshotFinished;
-        m_runNextState = true;
-
-        /*
-        if (m_cameraCapture->isReadyForCapture())
-        {
-            if (!QDir(SCREENSHOT_PATH).exists())
-            {
-                QDir().mkdir(SCREENSHOT_PATH);
-            }
-
-            QString nameWithTime = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") + "_" + m_screenshotName + ".jpg";
-            emit printLog("Saving screenshot: " + nameWithTime);
-            m_cameraCapture->setCaptureDestination(QCameraImageCapture::CaptureToFile);
-            m_cameraCapture->capture(SCREENSHOT_PATH + nameWithTime);
-        }
-        else
-        {
-            // Try again later
-            m_runNextState = true;
-        }
-        */
         break;
     }
     default:

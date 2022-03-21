@@ -300,8 +300,6 @@ signals:
 
 public slots:
     void commandFinished();
-    void imageReady(int id, const QImage &image);
-    void imageError(int id, QCameraImageCapture::Error error, const QString &errorString);
     void runStateLoop();
 
     // Tesseract OCR (text recognition)
@@ -312,7 +310,7 @@ protected:
     virtual void init();
     virtual void reset();
     virtual void runNextState();
-    void runNextStateContinue() {m_runNextState = true;}
+    void runNextStateContinue() { m_runNextState = true; }
     void runNextStateDelay(int milliseconds = 1000);
 
     // Capture analysis
@@ -370,6 +368,7 @@ protected:
     bool getOCRNumber(int& number);
     QString matchStringDatabase(PokemonDatabase::OCREntries const& entries);
 
+    // Commands
     typedef int Command;
     bool inializeCommands(int size);
 
@@ -381,8 +380,6 @@ protected:
         S_CommandRunning,
         S_CommandRunningCaptureRequested,
         S_CommandFinished,
-        S_TakeScreenshot,
-        S_TakeScreenshotFinished,
         S_CaptureRequested,
         S_CaptureReady,
         S_OCRRequested,
@@ -398,20 +395,18 @@ protected:
     void setState_ocrRequest(QRect rect, HSVRange hsvRange);
     void setState_error(QString _errorMsg) { m_state = S_Error; m_errorMsg = _errorMsg; }
 
-    Command m_commandIndex;
-    QString m_customCommand;
-    QMap<Command, QString> m_commands;
-
-    //QCameraImageCapture* m_cameraCapture;
-    //QCameraViewfinder* m_cameraView;
     QImage m_capture;
     SmartProgramParameter m_parameters;
-
-    QString m_screenshotName;
 
     void initStat(Stat& stat, QString const& key);
     void incrementStat(Stat& stat, int addCount = 1);
     void updateStats();
+
+protected:
+    // Commands
+    Command m_commandIndex;
+    QString m_customCommand;
+    QMap<Command, QString> m_commands;
 
 private:
     QString m_logFileName;
