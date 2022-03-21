@@ -36,7 +36,7 @@ public:
     void sendData_rawWave(QAudioFormat const& format, const char* samples, size_t sampleSize);
 
 protected:
-    virtual void paintEvent(QPaintEvent* event);
+    virtual void paintEvent(QPaintEvent* event) override;
 
 signals:
 

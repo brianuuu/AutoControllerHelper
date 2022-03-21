@@ -5,7 +5,7 @@ AudioDisplayWidget::AudioDisplayWidget(QWidget *parent) : QWidget(parent)
     m_started = false;
     m_mode = ADM_None;
 
-    m_displaySamples = 512;
+    m_displaySamples = 1024;
 }
 
 void AudioDisplayWidget::start()
@@ -37,19 +37,18 @@ void AudioDisplayWidget::sendData_rawWave(const QAudioFormat &format, const char
     // Only support this atm...
     if (format.sampleSize() != 16 || format.sampleType() != QAudioFormat::SignedInt) return;
 
+    // Convert raw samples to float
+    QVector<float> newRawData;
+    AudioConversionUtils::convertSamplesToFloat(format, samples, sampleSize, newRawData);
+
     bool update = false;
     m_displayMutex.lock();
     {
-        // Convert raw samples to float
-        QVector<float> newRawData;
-        AudioConversionUtils::convertSamplesToFloat(format, samples, sampleSize, newRawData);
-
-        int frameCount = newRawData.size() / 2;
         if (m_displaySamples <= this->width())
         {
             // Always wipe data if we can't display all samples
             m_dataRawWave.clear();
-            m_dataRawWave.reserve(frameCount);
+            m_dataRawWave.reserve(m_displaySamples);
         }
         else
         {
@@ -57,12 +56,13 @@ void AudioDisplayWidget::sendData_rawWave(const QAudioFormat &format, const char
             if (m_dataRawWave.size() >= m_displaySamples)
             {
                 m_dataRawWave.clear();
-                m_dataRawWave.reserve(frameCount);
+                m_dataRawWave.reserve(m_displaySamples);
             }
         }
 
         // Average LR channels
-        for (int i = 0; i < frameCount; i++)
+        int frameCount = newRawData.size() / 2;
+        for (int i = 0; i < frameCount && m_dataRawWave.size() < m_displaySamples; i++)
         {
             m_dataRawWave.push_back((newRawData[2*i] + newRawData[2*i+1]) * 0.5f);
         }
@@ -165,8 +165,8 @@ void AudioDisplayWidget::paintEvent(QPaintEvent* event)
 
 void AudioDisplayWidget::paintImage()
 {
-    float const width = static_cast<float>(this->width());
-    float const height = static_cast<float>(this->height());
+    int const width = this->width();
+    int const height = this->height();
     float const heightHalf = height * 0.5f;
 
     // Paint image
@@ -184,7 +184,7 @@ void AudioDisplayWidget::paintImage()
         if (m_displaySamples < width)
         {
             // fewer samples than width, we need to scale it up
-            float const pointWidth = width / (float)m_displaySamples;
+            float const pointWidth = (float)width / (float)m_displaySamples;
             for (int i = 0; i < m_dataRawWave.size(); i++)
             {
                 float const p = m_dataRawWave[i] * heightHalf + heightHalf;
@@ -204,7 +204,7 @@ void AudioDisplayWidget::paintImage()
         else
         {
             // More samples then width, will need to ignore some
-            float const sampleRatio = (float)m_dataRawWave.size() / (float)width;
+            float const sampleRatio = (float)m_displaySamples / (float)width;
             for (int i = 0; i < width; i++)
             {
                 int sampleIndex = static_cast<int>(sampleRatio * (float)i);
