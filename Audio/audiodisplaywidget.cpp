@@ -120,20 +120,13 @@ void AudioDisplayWidget::displayModeChanged(int index)
 
 void AudioDisplayWidget::displaySampleChanged(int count)
 {
-    qDebug() << "Display Sample size changed to" << count;
-
-    bool update = false;
     m_displayMutex.lock();
     {
         m_displaySamples = count;
-        update = (m_mode == ADM_RawWave);
     }
     m_displayMutex.unlock();
 
-    if (update)
-    {
-        QWidget::update();
-    }
+    // No need to update, let input data do it
 }
 
 //---------------------------------------------
@@ -142,11 +135,7 @@ void AudioDisplayWidget::displaySampleChanged(int count)
 void AudioDisplayWidget::paintEvent(QPaintEvent* event)
 {
     QWidget::paintEvent(event);
-
-    if (this->height() == 0)
-    {
-        return;
-    }
+    if (this->height() == 0) return;
 
     m_displayMutex.lock();
     {
