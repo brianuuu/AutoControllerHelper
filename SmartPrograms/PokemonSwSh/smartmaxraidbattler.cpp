@@ -40,7 +40,7 @@ void SmartMaxRaidBattler::runNextState()
         m_substage = SS_ASpam;
         setState_runCommand(C_ASpam);
 
-        m_parameters.vlcWrapper->setAreas(A_RaidMenu);
+        m_videoManager->setAreas(A_RaidMenu);
         break;
     }
     case SS_ASpam:
@@ -69,8 +69,8 @@ void SmartMaxRaidBattler::runNextState()
                 setState_frameAnalyzeRequest();
                 emit printLog("Inviting others...");
 
-                m_parameters.vlcWrapper->clearCaptures();
-                m_parameters.vlcWrapper->setAreas({A_RaidMenu[1],A_RaidMenu[2],A_RaidMenu[3]});
+                m_videoManager->clearCaptures();
+                m_videoManager->setAreas({A_RaidMenu[1],A_RaidMenu[2],A_RaidMenu[3]});
             }
             else
             {
@@ -101,7 +101,7 @@ void SmartMaxRaidBattler::runNextState()
                     emit printLog("Starting raid (" + QString::number(m_curBattle) + ")");
                 }
 
-                m_parameters.vlcWrapper->clearCaptures();
+                m_videoManager->clearCaptures();
             }
             else
             {
@@ -121,7 +121,7 @@ void SmartMaxRaidBattler::runNextState()
             m_substage = SS_ASpam;
             setState_runCommand(C_ASpam);
 
-            m_parameters.vlcWrapper->setAreas(A_RaidMenu);
+            m_videoManager->setAreas(A_RaidMenu);
         }
         break;
     }

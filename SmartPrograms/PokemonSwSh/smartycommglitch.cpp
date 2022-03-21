@@ -31,8 +31,8 @@ void SmartYCommGlitch::runNextState()
     {
     case SS_Init:
     {
-        m_parameters.vlcWrapper->clearCaptures();
-        m_parameters.vlcWrapper->setAreas({A_Internet});
+        m_videoManager->clearCaptures();
+        m_videoManager->setAreas({A_Internet});
 
         m_substage = SS_CheckInternet;
         setState_frameAnalyzeRequest();
@@ -47,8 +47,8 @@ void SmartYCommGlitch::runNextState()
             m_substage = SS_GotoYComm;
             setState_runCommand(C_GotoYComm);
 
-            m_parameters.vlcWrapper->clearCaptures();
-            m_parameters.vlcWrapper->setAreas(A_YCommMenu);
+            m_videoManager->clearCaptures();
+            m_videoManager->setAreas(A_YCommMenu);
         }
         break;
     }
@@ -75,8 +75,8 @@ void SmartYCommGlitch::runNextState()
                     setState_runCommand(C_LinkBattle);
                     emit printLog("Internect already connected, starting battle...");
 
-                    m_parameters.vlcWrapper->clearCaptures();
-                    m_parameters.vlcWrapper->setAreas({A_Dialog});
+                    m_videoManager->clearCaptures();
+                    m_videoManager->setAreas({A_Dialog});
                 }
                 else
                 {
@@ -113,8 +113,8 @@ void SmartYCommGlitch::runNextState()
                 setState_runCommand(C_LinkBattle);
                 emit printLog("Starting link battle...");
 
-                m_parameters.vlcWrapper->clearCaptures();
-                m_parameters.vlcWrapper->setAreas({A_Dialog});
+                m_videoManager->clearCaptures();
+                m_videoManager->setAreas({A_Dialog});
             }
             else
             {
@@ -139,7 +139,7 @@ void SmartYCommGlitch::runNextState()
                 setState_runCommand(C_Disconnect);
                 emit printLog("Opponent found! Disconnecting...");
 
-                m_parameters.vlcWrapper->clearCaptures();
+                m_videoManager->clearCaptures();
             }
             else
             {

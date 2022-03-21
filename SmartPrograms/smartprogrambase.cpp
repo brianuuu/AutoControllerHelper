@@ -4,9 +4,15 @@
 
 SmartProgramBase::SmartProgramBase(SmartProgramParameter parameter)
     : QWidget(parameter.parent)
-    , m_parameters(parameter)
     , m_ocrHSVRange(0,0,0,0,0,0)
 {
+    m_audioManager  = parameter.vlcWrapper->getAudioManager();
+    m_videoManager  = parameter.vlcWrapper->getVideoManager();
+    m_settings      = parameter.settings;
+    m_statsLabel    = parameter.statsLabel;
+    m_preview       = parameter.preview;
+    m_previewMasked = parameter.previewMasked;
+
     init();
 }
 
@@ -14,7 +20,7 @@ bool SmartProgramBase::run()
 {
     if (m_state == S_NotStarted)
     {
-        if (getProgramExportLog(getProgramEnum()) && m_parameters.settings->isLogAutosave())
+        if (getProgramExportLog(getProgramEnum()) && m_settings->isLogAutosave())
         {
             m_logFileName = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") + "_" + getProgramInternalName() + ".log";
         }
@@ -22,7 +28,8 @@ bool SmartProgramBase::run()
         emit printLog("-----------Started-----------");
         m_runNextState = true;
         m_runStateTimer.start();
-        m_parameters.vlcWrapper->clearCaptures();
+
+        m_videoManager->clearCaptures();
         return true;
     }
 
@@ -37,7 +44,8 @@ void SmartProgramBase::stop()
     m_runNextState = false;
     m_runStateTimer.stop();
     m_runStateDelayTimer.stop();
-    m_parameters.vlcWrapper->clearCaptures();
+
+    m_videoManager->clearCaptures();
 }
 
 void SmartProgramBase::commandFinished()
@@ -130,7 +138,7 @@ bool SmartProgramBase::checkPixelColorMatch(QPoint pixelPos, QColor targetColor,
     QColor testColor = m_capture.pixelColor(pixelPos);
     bool success = checkColorMatch(testColor, targetColor, threshold);
 
-    if (m_parameters.settings->isLogDebugColor())
+    if (m_settings->isLogDebugColor())
     {
         QString logStr = "Pixel(" + QString::number(testColor.red()) + "," + QString::number(testColor.green()) + "," + QString::number(testColor.blue()) + ")";
         logStr += "~= Target(" + QString::number(targetColor.red()) + "," + QString::number(targetColor.green()) + "," + QString::number(targetColor.blue()) + ") = ";
@@ -181,7 +189,7 @@ bool SmartProgramBase::checkAverageColorMatch(QRect rectPos, QColor targetColor,
     QColor avgColor = getAverageColor(rectPos);
     bool success = checkColorMatch(avgColor, targetColor, threshold);
 
-    if (m_parameters.settings->isLogDebugColor())
+    if (m_settings->isLogDebugColor())
     {
         QString logStr = "Average(" + QString::number(avgColor.red()) + "," + QString::number(avgColor.green()) + "," + QString::number(avgColor.blue()) + ")";
         logStr += ", Target(" + QString::number(targetColor.red()) + "," + QString::number(targetColor.green()) + "," + QString::number(targetColor.blue()) + ") = ";
@@ -199,11 +207,11 @@ double SmartProgramBase::getBrightnessMean(QRect rectPos, HSVRange hsvRange)
     Q_ASSERT(m_state == S_CaptureReady);
 
     QImage cropped = m_capture.copy(rectPos);
-    if (m_parameters.preview)
+    if (m_preview)
     {
-        m_parameters.preview->clear();
-        m_parameters.preview->setSceneRect(cropped.rect());
-        m_parameters.preview->addPixmap(QPixmap::fromImage(cropped));
+        m_preview->clear();
+        m_preview->setSceneRect(cropped.rect());
+        m_preview->addPixmap(QPixmap::fromImage(cropped));
     }
 
     QImage masked = QImage(cropped.size(), QImage::Format_MonoLSB);
@@ -224,18 +232,18 @@ double SmartProgramBase::getBrightnessMean(QRect rectPos, HSVRange hsvRange)
                 mean += 255;
             }
 
-            if (m_parameters.previewMasked)
+            if (m_previewMasked)
             {
                 matched ? SET_BIT(rowMaskedData[x / 8], x % 8) : CLEAR_BIT(rowMaskedData[x / 8], x % 8);
             }
         }
     }
 
-    if (m_parameters.previewMasked)
+    if (m_previewMasked)
     {
-        m_parameters.previewMasked->clear();
-        m_parameters.previewMasked->setSceneRect(masked.rect());
-        m_parameters.previewMasked->addPixmap(QPixmap::fromImage(masked));
+        m_previewMasked->clear();
+        m_previewMasked->setSceneRect(masked.rect());
+        m_previewMasked->addPixmap(QPixmap::fromImage(masked));
     }
 
     // Get average value of brightness
@@ -253,7 +261,7 @@ bool SmartProgramBase::checkBrightnessMeanTarget(QRect rectPos, SmartProgramBase
 
     QString logStr = "Mean (" + QString::number(mean) + ") > target (" + QString::number(target) + ") = ";
     logStr += success ? "TRUE" : "FALSE";
-    if (m_parameters.settings->isLogDebugColor())
+    if (m_settings->isLogDebugColor())
     {
         emit printLog(logStr, success ? LOG_SUCCESS : LOG_ERROR);
     }
@@ -412,7 +420,7 @@ bool SmartProgramBase::checkImageMatchTarget(QRect rectPos, SmartProgramBase::HS
     QString posStr = success ? " at offset {" + QString::number(maxRatioOffset.x()) + "," + QString::number(maxRatioOffset.y()) + "}" : "";
     QString logStr = "Image Match Ratio (" + QString::number(maxRatio) + ") > target (" + QString::number(target) + ")" + posStr + " = ";
     logStr += success ? "TRUE" : "FALSE";
-    if (m_parameters.settings->isLogDebugColor())
+    if (m_settings->isLogDebugColor())
     {
         emit printLog(logStr, success ? LOG_SUCCESS : LOG_ERROR);
     }
@@ -661,8 +669,8 @@ bool SmartProgramBase::startOCR(QRect rectPos, SmartProgramBase::HSVRange hsvRan
     masked.save(QString(RESOURCES_PATH) + "Tesseract/capture.png", "PNG");
 
     // Check if .traineddata exist
-    GameLanguage gameLanguage = isNumber ? GL_English : m_parameters.settings->getGameLanguage();
-    if (!m_parameters.settings->ensureTrainedDataExist())
+    GameLanguage gameLanguage = isNumber ? GL_English : m_settings->getGameLanguage();
+    if (!m_settings->ensureTrainedDataExist())
     {
         QString languageName = PokemonDatabase::getGameLanguageName(gameLanguage);
         setState_error("Language trained data for '" + languageName + "' for Tesseract is missing, please goto \"Resources/Tesseract\" folder and follow the instructions in README.md");
@@ -966,7 +974,7 @@ void SmartProgramBase::runNextState()
         }
 
         QString const logStr = "Running command: [" + command + "]";
-        if (m_parameters.settings->isLogDebugCommand())
+        if (m_settings->isLogDebugCommand())
         {
             emit printLog(logStr);
         }
@@ -985,7 +993,7 @@ void SmartProgramBase::runNextState()
     }
     case S_CaptureRequested:
     {
-        m_parameters.vlcWrapper->getFrame(m_capture);
+        m_videoManager->getFrame(m_capture);
         m_state = S_CaptureReady;
         m_runNextState = true;
 
@@ -993,7 +1001,7 @@ void SmartProgramBase::runNextState()
     }
     case S_OCRRequested:
     {
-        m_parameters.vlcWrapper->getFrame(m_capture);
+        m_videoManager->getFrame(m_capture);
         if (!m_ocrRect.isNull())
         {
             startOCR(m_ocrRect, m_ocrHSVRange);
@@ -1049,7 +1057,7 @@ void SmartProgramBase::incrementStat(Stat &stat, int addCount)
 
 void SmartProgramBase::updateStats()
 {
-    if (!m_parameters.statsLabel) return;
+    if (!m_statsLabel) return;
 
     QSettings stats(SMART_STATS_INI, QSettings::IniFormat, this);
     stats.beginGroup(getProgramInternalName());
@@ -1077,13 +1085,13 @@ void SmartProgramBase::updateStats()
             statsStr += key + ": " + QString::number(count);
 
             // Write to individual files for each stat
-            if (m_parameters.settings->isStreamCounterEnabled())
+            if (m_settings->isStreamCounterEnabled())
             {
                 QFile file(STREAM_COUNTER_PATH + key + ".txt");
                 if(file.open(QIODevice::WriteOnly))
                 {
                     QTextStream stream(&file);
-                    if (!m_parameters.settings->isStreamCounterExcludePrefix())
+                    if (!m_settings->isStreamCounterExcludePrefix())
                     {
                         stream << key + ": ";
                     }
@@ -1093,5 +1101,5 @@ void SmartProgramBase::updateStats()
             }
         }
     }
-    m_parameters.statsLabel->setText(statsStr);
+    m_statsLabel->setText(statsStr);
 }

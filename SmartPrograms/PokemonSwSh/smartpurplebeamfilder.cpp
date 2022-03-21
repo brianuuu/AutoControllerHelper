@@ -56,8 +56,8 @@ void SmartPurpleBeamFilder::runNextState()
             setState_runCommand(C_GotoMenu);
             emit printLog("Setting text speed to slow");
 
-            m_parameters.vlcWrapper->clearCaptures();
-            m_parameters.vlcWrapper->setAreas(A_MenuIcons);
+            m_videoManager->clearCaptures();
+            m_videoManager->setAreas(A_MenuIcons);
         }
         break;
     }
@@ -81,7 +81,7 @@ void SmartPurpleBeamFilder::runNextState()
             m_substage = SS_SetTextSpeed;
             setState_runCommand(m_textSpeedSlow ? C_SetTextSpeedFast : C_SetTextSpeedSlow);
 
-            m_parameters.vlcWrapper->clearCaptures();
+            m_videoManager->clearCaptures();
         }
         break;
     }
@@ -110,8 +110,8 @@ void SmartPurpleBeamFilder::runNextState()
             m_substage = SS_BeamCheck;
             setState_frameAnalyzeRequest();
 
-            m_parameters.vlcWrapper->clearCaptures();
-            m_parameters.vlcWrapper->setPoints({P_Home});
+            m_videoManager->clearCaptures();
+            m_videoManager->setPoints({P_Home});
 
             // emit command without calling set state, we need to do frame analyze immediately
             emit runSequence(m_commands[C_BeamCheck]);
@@ -139,8 +139,8 @@ void SmartPurpleBeamFilder::runNextState()
                     setState_runCommand(C_RestartGame);
                     emit printLog("Not purple beam, restarting game...");
 
-                    m_parameters.vlcWrapper->clearCaptures();
-                    m_parameters.vlcWrapper->setPoints({P_Center});
+                    m_videoManager->clearCaptures();
+                    m_videoManager->setPoints({P_Center});
                 }
             }
             else
@@ -165,8 +165,8 @@ void SmartPurpleBeamFilder::runNextState()
             setState_runCommand(C_GotoMenu);
             emit printLog("Setting text speed to fast");
 
-            m_parameters.vlcWrapper->clearCaptures();
-            m_parameters.vlcWrapper->setAreas(A_MenuIcons);
+            m_videoManager->clearCaptures();
+            m_videoManager->setAreas(A_MenuIcons);
         }
         break;
     }
@@ -174,7 +174,7 @@ void SmartPurpleBeamFilder::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            m_parameters.vlcWrapper->getFrame(m_capture);
+            m_videoManager->getFrame(m_capture);
 
             // Wait until screen is not black anymore (intro plays)
             bool introStarted = !checkPixelColorMatch(P_Center.m_point, QColor(0,0,0));
@@ -195,7 +195,7 @@ void SmartPurpleBeamFilder::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            m_parameters.vlcWrapper->getFrame(m_capture);
+            m_videoManager->getFrame(m_capture);
 
             // Wait until screen to be black
             bool enteredBlackScreen = checkPixelColorMatch(P_Center.m_point, QColor(0,0,0));
@@ -203,8 +203,8 @@ void SmartPurpleBeamFilder::runNextState()
             {
                 m_substage = SS_EnterGame;
 
-                m_parameters.vlcWrapper->clearCaptures();
-                m_parameters.vlcWrapper->setAreas({A_EnterGame});
+                m_videoManager->clearCaptures();
+                m_videoManager->setAreas({A_EnterGame});
             }
 
             runNextStateContinue();
@@ -216,7 +216,7 @@ void SmartPurpleBeamFilder::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            m_parameters.vlcWrapper->getFrame(m_capture);
+            m_videoManager->getFrame(m_capture);
 
             // Wait until screen to be not black anymore
             bool enteredGame = !checkAverageColorMatch(A_EnterGame.m_rect, QColor(0,0,0));
@@ -225,7 +225,7 @@ void SmartPurpleBeamFilder::runNextState()
                 m_substage = SS_TalkToDen;
                 setState_runCommand(C_TalkToDen);
 
-                m_parameters.vlcWrapper->clearCaptures();
+                m_videoManager->clearCaptures();
             }
             else
             {

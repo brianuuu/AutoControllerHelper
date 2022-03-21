@@ -41,7 +41,7 @@ SmartPLAOutbreakFinder::SmartPLAOutbreakFinder
     }
 
     // Get outbreak entries for OCR
-    m_allOutbreakEntries = PokemonDatabase::getEntries_PLAMassOutbreak(m_parameters.settings->getGameLanguage());
+    m_allOutbreakEntries = PokemonDatabase::getEntries_PLAMassOutbreak(m_settings->getGameLanguage());
 }
 
 void SmartPLAOutbreakFinder::init()
@@ -70,7 +70,7 @@ void SmartPLAOutbreakFinder::runNextState()
         initStat(m_statChecks, "Checks");
         initStat(m_statError, "Errors");
 
-        emit printLog("Game Language = " + PokemonDatabase::getGameLanguageName(m_parameters.settings->getGameLanguage()));
+        emit printLog("Game Language = " + PokemonDatabase::getGameLanguageName(m_settings->getGameLanguage()));
 
         // Start by talking to Laventon
         m_substage = SS_TalkToLaventon;
@@ -93,8 +93,8 @@ void SmartPLAOutbreakFinder::runNextState()
         {
             m_timer.restart();
 
-            m_parameters.vlcWrapper->clearAreas();
-            m_parameters.vlcWrapper->setAreas({A_Loading});
+            m_videoManager->clearAreas();
+            m_videoManager->setAreas({A_Loading});
         }
         else if (state == S_CaptureReady)
         {
@@ -123,7 +123,7 @@ void SmartPLAOutbreakFinder::runNextState()
             // Detect entering village/obsidian fieldlands
             if (!checkBrightnessMeanTarget(A_Loading.m_rect, C_Color_Loading, 240))
             {
-                m_parameters.vlcWrapper->clearAreas();
+                m_videoManager->clearAreas();
                 if (m_substage == SS_LoadingToVillage)
                 {
                     // Detect map
@@ -131,7 +131,7 @@ void SmartPLAOutbreakFinder::runNextState()
                     setState_runCommand("LDown,60");
 
                     m_timer.restart();
-                    m_parameters.vlcWrapper->setAreas({A_Map});
+                    m_videoManager->setAreas({A_Map});
                 }
                 else
                 {
@@ -172,7 +172,7 @@ void SmartPLAOutbreakFinder::runNextState()
                 m_areaType = AT_AlabasterIcelands;
                 m_readyNextCheck = true;
 
-                m_parameters.vlcWrapper->clearAreas();
+                m_videoManager->clearAreas();
             }
             else
             {
@@ -205,7 +205,7 @@ void SmartPLAOutbreakFinder::runNextState()
                     m_substage = SS_EnterObsidian;
                     setState_runCommand("ASpam,80");
 
-                    m_parameters.vlcWrapper->clearAreas();
+                    m_videoManager->clearAreas();
                     break;
                 }
                 else
@@ -221,7 +221,7 @@ void SmartPLAOutbreakFinder::runNextState()
                 setState_ocrRequest(A_Text.m_rect, C_Color_Text);
                 runNextStateContinue();
 
-                m_parameters.vlcWrapper->setAreas({A_Text});
+                m_videoManager->setAreas({A_Text});
             }
             else
             {

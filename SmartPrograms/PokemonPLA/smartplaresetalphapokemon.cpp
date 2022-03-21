@@ -68,8 +68,8 @@ void SmartPLAResetAlphaPokemon::runNextState()
             {
                 setState_frameAnalyzeRequest();
 
-                m_parameters.vlcWrapper->clearCaptures();
-                m_parameters.vlcWrapper->setAreas({A_Title});
+                m_videoManager->clearCaptures();
+                m_videoManager->setAreas({A_Title});
 
                 m_substage = SS_Title;
             }
@@ -105,7 +105,7 @@ void SmartPLAResetAlphaPokemon::runNextState()
                     m_enteredFirstPerson = false;
                     m_locateAlphaAttempt = 0;
 
-                    m_parameters.vlcWrapper->clearCaptures();
+                    m_videoManager->clearCaptures();
                 }
             }
             else
@@ -131,7 +131,7 @@ void SmartPLAResetAlphaPokemon::runNextState()
                 if (m_substage == SS_Walk)
                 {
                     m_substage = SS_FindAlpha;
-                    m_parameters.vlcWrapper->setAreas({A_Alpha, A_UI, A_Shiny});
+                    m_videoManager->setAreas({A_Alpha, A_UI, A_Shiny});
                 }
 
                 m_locateAlphaAttempt++;
@@ -155,7 +155,7 @@ void SmartPLAResetAlphaPokemon::runNextState()
                 m_substage = SS_Restart;
                 setState_runCommand(C_Restart);
 
-                m_parameters.vlcWrapper->clearCaptures();
+                m_videoManager->clearCaptures();
             }
         }
         else if (state == S_CaptureReady)

@@ -37,8 +37,8 @@ void SmartColorCalibrator::runNextState()
     case SS_Init:
     {
         m_substage = SS_Capture;
-        m_parameters.vlcWrapper->clearPoints();
-        m_parameters.vlcWrapper->setPoints({P_Battle,P_Pokemon,P_Bag,P_Run});
+        m_videoManager->clearPoints();
+        m_videoManager->setPoints({P_Battle,P_Pokemon,P_Bag,P_Run});
         setState_frameAnalyzeRequest();
         break;
     }

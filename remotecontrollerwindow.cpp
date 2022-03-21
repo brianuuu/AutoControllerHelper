@@ -162,33 +162,19 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     qApp->installEventFilter(this);
     m_pauseKeyEventFilter = false;
 
-    // Camera
-    m_vlcWidget = new QLabel(this);
-    m_vlcWidget->setMinimumSize(640,360);
-    m_vlcWidget->setMaximumSize(640,360);
-    m_vlcWidget->hide();
-    m_vlcWrapper = new VLCWrapper(m_vlcWidget, ui->S_Volume, this);
+    // Video
+    m_vlcWrapper = new VLCWrapper(this);
     connect(m_vlcWrapper, &VLCWrapper::stateChanged, this, &RemoteControllerWindow::on_VLCState_changed);
-    ui->HL_CameraView->insertWidget(1, m_vlcWidget);
+    VideoManager* videoManager = m_vlcWrapper->getVideoManager();
+    ui->HL_CameraView->insertWidget(1, videoManager);
 
     // Audio
     QVBoxLayout* layout = reinterpret_cast<QVBoxLayout*>(ui->GB_AudioView->layout());
     AudioManager* audioManager = m_vlcWrapper->getAudioManager();
-    if (audioManager)
-    {
-        AudioDisplayWidget* audioDisplayWidget = audioManager->getDisplayWidget();
-        layout->addWidget(audioDisplayWidget);
-        connect(ui->CB_AudioDisplayMode, SIGNAL(currentIndexChanged(int)), audioDisplayWidget, SLOT(displayModeChanged(int)));
-        connect(ui->SB_AudioSamples, SIGNAL(valueChanged(int)), audioDisplayWidget, SLOT(displaySampleChanged(int)));
-    }
-
-    /*
-    m_cameraView = new QCameraViewfinder(this);
-    m_cameraView->setMinimumSize(640,360);
-    m_cameraView->setMaximumSize(640,360);
-    m_cameraView->hide();
-    layout->insertWidget(0, m_cameraView);
-    */
+    layout->addWidget(audioManager);
+    connect(ui->CB_AudioDisplayMode, SIGNAL(currentIndexChanged(int)), audioManager, SLOT(displayModeChanged(int)));
+    connect(ui->SB_AudioSamples, SIGNAL(valueChanged(int)), audioManager, SLOT(displaySampleChanged(int)));
+    connect(ui->S_Volume, &QSlider::valueChanged, audioManager, &AudioManager::setVolume);
 
     if (!QDir(SCREENSHOT_PATH).exists())
     {
@@ -255,6 +241,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
 
     // Set last used audio settings
     ui->S_Volume->setValue(m_settings->value("Volume", 100).toInt());
+    audioManager->setVolume(ui->S_Volume->value());
     ui->CB_AudioDisplayMode->setCurrentIndex(m_settings->value("AudioDisplayMode", 0).toInt());
 
     m_smartSetting = new SmartProgramSetting();
@@ -1570,7 +1557,6 @@ void RemoteControllerWindow::CameraToggle(bool on)
             ui->PB_Screenshot->setEnabled(true);
             ui->PB_AdjustVideo->setEnabled(true);
             ui->L_NoVideo->setHidden(true);
-            m_vlcWidget->show();
 
             // set initial HSC
             m_vlcWrapper->setHue(m_videoEffectSetting->getHue());
@@ -1581,63 +1567,6 @@ void RemoteControllerWindow::CameraToggle(bool on)
         {
             QMessageBox::critical(this, "Error", "An error occured when starting camera!", QMessageBox::Ok);
         }
-
-        /*
-        // Remove previous camera instance (if not already)
-        if (m_camera)
-        {
-            delete m_camera;
-            m_camera = Q_NULLPTR;
-        }
-
-        bool found = false;
-        for (QCameraInfo const& info : QCameraInfo::availableCameras())
-        {
-            if (ui->CB_Cameras->currentText() == info.description())
-            {
-                m_camera = new QCamera(info, this);
-                m_cameraCapture = new QCameraImageCapture(m_camera, this);
-                m_camera->setCaptureMode(QCamera::CaptureStillImage);
-                m_camera->setViewfinder(m_cameraView);
-                m_camera->start();
-                found = true;
-                break;
-            }
-        }
-
-        if (found)
-        {
-            // Handle error
-            if (m_camera->error() != QCamera::NoError)
-            {
-                delete m_camera;
-                m_camera = Q_NULLPTR;
-                delete m_cameraCapture;
-                m_cameraCapture = Q_NULLPTR;
-
-                PrintLog("Failed to start camera", LOG_ERROR);
-                QMessageBox::critical(this, "Error", "Failed to start camera!", QMessageBox::Ok);
-            }
-            else
-            {
-                PrintLog("Camera on", LOG_SUCCESS);
-                ui->PB_StartCamera->setText("Stop Camera");
-
-                ui->CB_Cameras->setEnabled(false);
-                ui->PB_RefreshCamera->setEnabled(false);
-                ui->PB_Screenshot->setEnabled(true);
-                ui->L_NoVideo->setVisible(false);
-                m_cameraView->show();
-            }
-        }
-        else
-        {
-            on_PB_RefreshCamera_clicked();
-
-            PrintLog("Camera not found, refreshing list...", LOG_ERROR);
-            QMessageBox::critical(this, "Error", "Selected camera no longer exist, list is now refreshed.", QMessageBox::Ok);
-        }
-        */
     }
     else
     {
@@ -1647,22 +1576,9 @@ void RemoteControllerWindow::CameraToggle(bool on)
             PrintLog("Camera off");
         }
 
-        /*
-        if (m_camera)
-        {
-            m_camera->stop();
-            delete m_camera;
-            m_camera = Q_NULLPTR;
-            delete m_cameraCapture;
-            m_cameraCapture = Q_NULLPTR;
-            PrintLog("Camera off");
-        }
-        */
-
         ui->PB_StartCamera->setText("Start Camera");
         ui->PB_StartCamera->setEnabled(true);
 
-        m_vlcWidget->hide();
         ui->RB_DetectedDevice->setEnabled(true);
         ui->RB_CustomDevice->setEnabled(true);
         ui->GB_DetectedDevice->setEnabled(true);
@@ -1691,36 +1607,9 @@ void RemoteControllerWindow::CameraCaptureToFile(QString name)
 
     // Grab frame and save from QT draw
     QImage frame;
-    m_vlcWrapper->getFrame(frame);
+    m_vlcWrapper->getVideoManager()->getFrame(frame);
     frame.save(SCREENSHOT_PATH + nameWithTime);
     PrintLog("Screenshot saved: " + nameWithTime);
-
-    /*
-    // Use VLC internal to take screenshot
-    if (m_vlcWrapper->takeSnapshot(SCREENSHOT_PATH + nameWithTime))
-    {
-        PrintLog("Screenshot saved: " + nameWithTime);
-    }
-    else
-    {
-        PrintLog("Screenshot failed, please try again later", LOG_ERROR);
-    }
-    */
-
-    /*
-    // Old QCamera implementation
-    if (m_cameraCapture->isReadyForCapture())
-    {
-        QString nameWithTime = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") + "_" + name + ".jpg";
-        m_cameraCapture->setCaptureDestination(QCameraImageCapture::CaptureToFile);
-        m_cameraCapture->capture(SCREENSHOT_PATH + nameWithTime);
-        PrintLog("Screenshot saved: " + nameWithTime);
-    }
-    else
-    {
-        PrintLog("Screenshot failed, please try again later", LOG_ERROR);
-    }
-    */
 }
 
 //---------------------------------------------------------------------------
@@ -1730,38 +1619,38 @@ void RemoteControllerWindow::on_SP1_SB_X_valueChanged(int arg1)
 {
     ui->SP1_SB_Width->setMaximum(1280 - arg1);
     QRect rect(ui->SP1_SB_X->value(),ui->SP1_SB_Y->value(),ui->SP1_SB_Width->value(),ui->SP1_SB_Height->value());
-    m_vlcWrapper->setDefaultArea(rect);
+    m_vlcWrapper->getVideoManager()->setDefaultArea(rect);
 }
 
 void RemoteControllerWindow::on_SP1_SB_Y_valueChanged(int arg1)
 {
     ui->SP1_SB_Height->setMaximum(720 - arg1);
     QRect rect(ui->SP1_SB_X->value(),ui->SP1_SB_Y->value(),ui->SP1_SB_Width->value(),ui->SP1_SB_Height->value());
-    m_vlcWrapper->setDefaultArea(rect);
+    m_vlcWrapper->getVideoManager()->setDefaultArea(rect);
 }
 
 void RemoteControllerWindow::on_SP1_SB_Width_valueChanged(int arg1)
 {
     QRect rect(ui->SP1_SB_X->value(),ui->SP1_SB_Y->value(),ui->SP1_SB_Width->value(),ui->SP1_SB_Height->value());
-    m_vlcWrapper->setDefaultArea(rect);
+    m_vlcWrapper->getVideoManager()->setDefaultArea(rect);
 }
 
 void RemoteControllerWindow::on_SP1_SB_Height_valueChanged(int arg1)
 {
     QRect rect(ui->SP1_SB_X->value(),ui->SP1_SB_Y->value(),ui->SP1_SB_Width->value(),ui->SP1_SB_Height->value());
-    m_vlcWrapper->setDefaultArea(rect);
+    m_vlcWrapper->getVideoManager()->setDefaultArea(rect);
 }
 
 void RemoteControllerWindow::on_SP2_SB_X_valueChanged(int arg1)
 {
     QRect rect(ui->SP2_SB_X->value(),ui->SP2_SB_Y->value(),140,80);
-    m_vlcWrapper->setDefaultArea(rect);
+    m_vlcWrapper->getVideoManager()->setDefaultArea(rect);
 }
 
 void RemoteControllerWindow::on_SP2_SB_Y_valueChanged(int arg1)
 {
     QRect rect(ui->SP2_SB_X->value(),ui->SP2_SB_Y->value(),140,80);
-    m_vlcWrapper->setDefaultArea(rect);
+    m_vlcWrapper->getVideoManager()->setDefaultArea(rect);
 }
 
 void RemoteControllerWindow::on_SP6_CB_Skips_clicked()
@@ -1852,7 +1741,7 @@ void RemoteControllerWindow::on_PB_StartSmartProgram_clicked()
 
     // Check for black border
     QImage frame;
-    m_vlcWrapper->getFrame(frame);
+    m_vlcWrapper->getVideoManager()->getFrame(frame);
     bool border = true;
     for (int y = 0; y < frame.height(); y++)
     {
@@ -1928,7 +1817,7 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
     if (sp == SP_COUNT)
     {
         QMessageBox::critical(this, "Error", "Missing mapping for this Smart Program!");
-        m_vlcWrapper->setDefaultAreaEnabled(false);
+        m_vlcWrapper->getVideoManager()->setDefaultAreaEnabled(false);
         return;
     }
 
@@ -1939,7 +1828,7 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
     if (tabIndex < 0 || tabIndex >= ui->SW_Settings->count())
     {
         QMessageBox::critical(this, "Error", "Invalid tab ID for this Smart Program!");
-        m_vlcWrapper->setDefaultAreaEnabled(false);
+        m_vlcWrapper->getVideoManager()->setDefaultAreaEnabled(false);
         return;
     }
     ui->SW_Settings->setCurrentIndex(tabIndex);
@@ -1952,20 +1841,20 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
     {
         useArea = true;
         QRect rect(ui->SP1_SB_X->value(),ui->SP1_SB_Y->value(),ui->SP1_SB_Width->value(),ui->SP1_SB_Height->value());
-        m_vlcWrapper->setDefaultArea(rect);
+        m_vlcWrapper->getVideoManager()->setDefaultArea(rect);
         break;
     }
     case SP_PurpleBeamFinder:
     {
         useArea = true;
         QRect rect(ui->SP2_SB_X->value(),ui->SP2_SB_Y->value(),140,80);
-        m_vlcWrapper->setDefaultArea(rect);
+        m_vlcWrapper->getVideoManager()->setDefaultArea(rect);
         break;
     }
     default: break;
     }
 
-    m_vlcWrapper->setDefaultAreaEnabled(useArea);
+    m_vlcWrapper->getVideoManager()->setDefaultAreaEnabled(useArea);
     UpdateStats(sp);
 }
 
@@ -2008,9 +1897,10 @@ void RemoteControllerWindow::SetCaptureAreaPos(QMouseEvent *event)
     }
 
     QWidget* widget = this->childAt(event->pos());
-    if (widget == m_vlcWidget)
+    VideoManager* videoManager = m_vlcWrapper->getVideoManager();
+    if (widget == videoManager)
     {
-        QPoint areaPoint = (event->pos() - m_vlcWidget->mapTo(this, QPoint(0,0))) * 2;
+        QPoint areaPoint = (event->pos() - videoManager->mapTo(this, QPoint(0,0))) * 2;
         if (areaPoint.x() > 1278 || areaPoint.y() > 718) return;
 
         QString name = ui->LW_SmartProgram->currentItem()->text();
@@ -2107,8 +1997,7 @@ bool RemoteControllerWindow::CanRunSmartProgram()
 {
     return m_serialPort.isOpen()
         && m_serialState == SS_Connect
-        && m_vlcWrapper->isPlaying()
-        && m_vlcWidget->isVisible();
+        && m_vlcWrapper->isPlaying();
 }
 
 void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)

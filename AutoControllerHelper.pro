@@ -22,7 +22,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     Audio/audioconversionutils.cpp \
-    Audio/audiodisplaywidget.cpp \
     Audio/audiomanager.cpp \
     SmartPrograms/Dev/smartbrightnessmeanfinder.cpp \
     SmartPrograms/Dev/smartcolorcalibrator.cpp \
@@ -49,6 +48,7 @@ SOURCES += \
     SmartPrograms/Widgets/pokemonautofilllineedit.cpp \
     SmartPrograms/smartprogrambase.cpp \
     SmartPrograms/smartsimpleprogram.cpp \
+    Video/videomanager.cpp \
     commandsender.cpp \
     main.cpp \
     autocontrollerwindow.cpp \
@@ -61,7 +61,6 @@ SOURCES += \
 
 HEADERS += \
     Audio/audioconversionutils.h \
-    Audio/audiodisplaywidget.h \
     Audio/audiomanager.h \
     SmartPrograms/Dev/smartbrightnessmeanfinder.h \
     SmartPrograms/Dev/smartcolorcalibrator.h \
@@ -88,6 +87,7 @@ HEADERS += \
     SmartPrograms/Widgets/pokemonautofilllineedit.h \
     SmartPrograms/smartprogrambase.h \
     SmartPrograms/smartsimpleprogram.h \
+    Video/videomanager.h \
     autocontrollerdefines.h \
     autocontrollerwindow.h \
     commandsender.h \

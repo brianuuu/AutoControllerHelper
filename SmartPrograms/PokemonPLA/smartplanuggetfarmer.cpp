@@ -67,8 +67,8 @@ void SmartPLANuggetFarmer::runNextState()
             {
                 setState_frameAnalyzeRequest();
 
-                m_parameters.vlcWrapper->clearCaptures();
-                m_parameters.vlcWrapper->setAreas({A_Title});
+                m_videoManager->clearCaptures();
+                m_videoManager->setAreas({A_Title});
 
                 m_substage = SS_Title;
                 m_isFirstTimeVillageReturn = true;
@@ -119,7 +119,7 @@ void SmartPLANuggetFarmer::runNextState()
                         setState_runCommand(C_FlyToHeightCamp);
                     }
 
-                    m_parameters.vlcWrapper->clearCaptures();
+                    m_videoManager->clearCaptures();
                 }
             }
             else
@@ -137,8 +137,8 @@ void SmartPLANuggetFarmer::runNextState()
             m_elapsedTimer.restart();
             setState_frameAnalyzeRequest();
 
-            m_parameters.vlcWrapper->clearCaptures();
-            m_parameters.vlcWrapper->setAreas({A_BattleEnd});
+            m_videoManager->clearCaptures();
+            m_videoManager->setAreas({A_BattleEnd});
         }
         else if (state == S_CaptureReady)
         {
@@ -151,11 +151,11 @@ void SmartPLANuggetFarmer::runNextState()
                 m_substage = SS_Restart;
                 setState_runCommand(C_Restart);
 
-                m_parameters.vlcWrapper->clearCaptures();
+                m_videoManager->clearCaptures();
             }
             else if(checkAverageColorMatch(A_BattleEnd.m_rect, QColor(0,0,0)))
             {
-                m_parameters.vlcWrapper->clearCaptures();
+                m_videoManager->clearCaptures();
                 switch (m_substageAfterCamp)
                 {
                 case SS_Save:
@@ -216,8 +216,8 @@ void SmartPLANuggetFarmer::runNextState()
             m_substage = SS_SelectWyrdeer;
             setState_frameAnalyzeRequest();
 
-            m_parameters.vlcWrapper->clearCaptures();
-            m_parameters.vlcWrapper->setAreas({A_Royal});
+            m_videoManager->clearCaptures();
+            m_videoManager->setAreas({A_Royal});
         }
         break;
     }
@@ -239,7 +239,7 @@ void SmartPLANuggetFarmer::runNextState()
                 m_substage = SS_GetOnWyrdeer;
                 setState_runCommand(m_isCoin ? C_GetOnWyrdeer : C_GetOnWyrdeerNoMove);
 
-                m_parameters.vlcWrapper->clearCaptures();
+                m_videoManager->clearCaptures();
             }
             else
             {
@@ -267,8 +267,8 @@ void SmartPLANuggetFarmer::runNextState()
             m_substage = SS_FindSister;
             setState_runCommand(m_isCoin ? C_FindCoin : C_FindCharm, true);
 
-            m_parameters.vlcWrapper->clearCaptures();
-            m_parameters.vlcWrapper->setAreas({A_Dialog, A_Royal});
+            m_videoManager->clearCaptures();
+            m_videoManager->setAreas({A_Dialog, A_Royal});
         }
         break;
     }
@@ -282,7 +282,7 @@ void SmartPLANuggetFarmer::runNextState()
             m_substage = SS_Restart;
             setState_runCommand(C_Restart);
 
-            m_parameters.vlcWrapper->clearCaptures();
+            m_videoManager->clearCaptures();
         }
         break;
     }
@@ -304,7 +304,7 @@ void SmartPLANuggetFarmer::runNextState()
             m_substage = SS_FlyToHeightCamp;
             setState_runCommand(C_FlyToHeightCamp);
 
-            m_parameters.vlcWrapper->clearCaptures();
+            m_videoManager->clearCaptures();
         }
         if (state == S_CaptureReady)
         {
@@ -339,7 +339,7 @@ void SmartPLANuggetFarmer::runNextState()
             m_substage = SS_DuringBattle;
             setState_runCommand("Minus,1,ASpam,500");
 
-            m_parameters.vlcWrapper->clearCaptures();
+            m_videoManager->clearCaptures();
         }
         break;
     }
@@ -352,8 +352,8 @@ void SmartPLANuggetFarmer::runNextState()
 
             if (elapsed > 20000)
             {
-                m_parameters.vlcWrapper->clearCaptures();
-                m_parameters.vlcWrapper->setAreas({A_BattleEnd});
+                m_videoManager->clearCaptures();
+                m_videoManager->setAreas({A_BattleEnd});
             }
             else
             {
@@ -370,7 +370,7 @@ void SmartPLANuggetFarmer::runNextState()
                 m_substage = SS_Restart;
                 setState_runCommand(C_Restart);
 
-                m_parameters.vlcWrapper->clearCaptures();
+                m_videoManager->clearCaptures();
             }
             else if (elapsed > 20000 && checkAverageColorMatch(A_BattleEnd.m_rect, QColor(0,0,0)))
             {
@@ -381,7 +381,7 @@ void SmartPLANuggetFarmer::runNextState()
                 m_substage = SS_AfterBattle;
                 setState_runCommand(m_isCoin ? C_AfterBattle : C_AfterBattleCharm);
 
-                m_parameters.vlcWrapper->clearCaptures();
+                m_videoManager->clearCaptures();
             }
             else
             {
@@ -416,7 +416,7 @@ void SmartPLANuggetFarmer::runNextState()
         {
             setState_frameAnalyzeRequest();
 
-            m_parameters.vlcWrapper->setAreas({A_AConfirmReturn, A_AConfirmReport, A_PokedexProgress});
+            m_videoManager->setAreas({A_AConfirmReturn, A_AConfirmReport, A_PokedexProgress});
         }
         else if (state == S_CaptureReady)
         {
@@ -428,7 +428,7 @@ void SmartPLANuggetFarmer::runNextState()
                 m_substage = SS_Restart;
                 setState_runCommand(C_Restart);
 
-                m_parameters.vlcWrapper->clearCaptures();
+                m_videoManager->clearCaptures();
             }
             else if (checkBrightnessMeanTarget(A_PokedexProgress.m_rect, C_Color_Dialog, 200) || checkBrightnessMeanTarget(A_AConfirmReport.m_rect, C_Color_AConfirmReturn, 160))
             {
@@ -442,7 +442,7 @@ void SmartPLANuggetFarmer::runNextState()
                 m_substage = SS_LoadingToVillageStart;
                 setState_runCommand(C_TalkeToLaventonFinish);
 
-                m_parameters.vlcWrapper->clearCaptures();
+                m_videoManager->clearCaptures();
             }
             else
             {
@@ -458,8 +458,8 @@ void SmartPLANuggetFarmer::runNextState()
         {
             m_elapsedTimer.restart();
 
-            m_parameters.vlcWrapper->clearAreas();
-            m_parameters.vlcWrapper->setAreas({A_Loading});
+            m_videoManager->clearAreas();
+            m_videoManager->setAreas({A_Loading});
         }
         else if (state == S_CaptureReady)
         {
@@ -487,7 +487,7 @@ void SmartPLANuggetFarmer::runNextState()
             // Detect entering village/obsidian fieldlands
             if (!checkBrightnessMeanTarget(A_Loading.m_rect, C_Color_Loading, 240))
             {
-                m_parameters.vlcWrapper->clearAreas();
+                m_videoManager->clearAreas();
                 if (m_substage == SS_LoadingToVillageEnd)
                 {
                     // Detect map
@@ -495,7 +495,7 @@ void SmartPLANuggetFarmer::runNextState()
                     setState_runCommand("LDown,60");
 
                     m_elapsedTimer.restart();
-                    m_parameters.vlcWrapper->setAreas({A_Map});
+                    m_videoManager->setAreas({A_Map});
                 }
                 else
                 {
@@ -548,7 +548,7 @@ void SmartPLANuggetFarmer::runNextState()
                 m_substage = SS_LoadingToObsidianStart;
                 setState_runCommand(QString(m_isFirstTimeVillageReturn ? "DRight,1," : "") + "A,16,DDown,1,ASpam,80");
 
-                m_parameters.vlcWrapper->clearCaptures();
+                m_videoManager->clearCaptures();
                 m_isFirstTimeVillageReturn = false;
             }
             else

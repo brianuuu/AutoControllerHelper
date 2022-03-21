@@ -395,31 +395,36 @@ protected:
     void setState_ocrRequest(QRect rect, HSVRange hsvRange);
     void setState_error(QString _errorMsg) { m_state = S_Error; m_errorMsg = _errorMsg; }
 
-    QImage m_capture;
-    SmartProgramParameter m_parameters;
-
     void initStat(Stat& stat, QString const& key);
     void incrementStat(Stat& stat, int addCount = 1);
     void updateStats();
 
 protected:
+    AudioManager*           m_audioManager;
+    VideoManager*           m_videoManager;
+    QImage                  m_capture;
+    SmartProgramSetting*    m_settings;
+    QLabel*                 m_statsLabel;
+    QGraphicsScene*         m_preview;
+    QGraphicsScene*         m_previewMasked;
+
     // Commands
     Command m_commandIndex;
     QString m_customCommand;
     QMap<Command, QString> m_commands;
 
 private:
-    QString m_logFileName;
-    QString m_errorMsg;
-    State m_state;
-    bool m_runNextState;
-    QTimer m_runStateTimer;
-    QTimer m_runStateDelayTimer;
+    QString     m_logFileName;
+    QString     m_errorMsg;
+    State       m_state;
+    bool        m_runNextState;
+    QTimer      m_runStateTimer;
+    QTimer      m_runStateDelayTimer;
 
     // OCR
-    QProcess m_ocrProcess;
-    QRect m_ocrRect;
-    HSVRange m_ocrHSVRange;
+    QProcess    m_ocrProcess;
+    QRect       m_ocrRect;
+    HSVRange    m_ocrHSVRange;
 };
 
 #endif // SMARTPROGRAMBASE_H

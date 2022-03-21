@@ -49,7 +49,7 @@ void SmartPLAPastureSorter::runNextState()
             m_substage = SS_Scan;
             setState_runCommand("Nothing,20", true);
 
-            m_parameters.vlcWrapper->setAreas({A_Level, A_Stat, A_Shiny, A_Alpha});
+            m_videoManager->setAreas({A_Level, A_Stat, A_Shiny, A_Alpha});
 
             // Reserve pokemon data
             m_pokemonData.resize(m_settings.m_pastureCount * 30);
@@ -274,7 +274,7 @@ void SmartPLAPastureSorter::runNextState()
                         m_searchResult.m_isNearResult = true;
                     }
 
-                    m_parameters.vlcWrapper->clearCaptures();
+                    m_videoManager->clearCaptures();
                 }
                 else
                 {

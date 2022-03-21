@@ -34,7 +34,7 @@ void SmartDelayCalibrator::runNextState()
     {
     case SS_Init:
     {
-        m_parameters.vlcWrapper->setPoints({P_Home});
+        m_videoManager->setPoints({P_Home});
         m_substage = SS_GotoHome;
         setState_runCommand(C_HomePress);
         emit printLog("Going to HOME menu...");
@@ -49,8 +49,8 @@ void SmartDelayCalibrator::runNextState()
             bool atHome2 = checkPixelColorMatch(P_Home.m_point, C_Color_Home2);
             if (atHome || atHome2)
             {
-                m_parameters.vlcWrapper->clearCaptures();
-                m_parameters.vlcWrapper->setAreas(A_TestButtons);
+                m_videoManager->clearCaptures();
+                m_videoManager->setAreas(A_TestButtons);
 
                 // Goto "Test Controller Buttons"
                 m_substage = SS_GoToTestButton;

@@ -45,7 +45,7 @@ void SmartWattFarmer::runNextState()
         if (state == S_CommandFinished)
         {
             m_substage = SS_SkipYear;
-            switch (m_parameters.settings->getDateArrangement())
+            switch (m_settings->getDateArrangement())
             {
                 case DA_JP: setState_runCommand(C_SkipYearJP); break;
                 case DA_EU: setState_runCommand(C_SkipYearEU); break;

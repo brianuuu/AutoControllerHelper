@@ -26,10 +26,10 @@ void SmartPLADistortionWaiter::runNextState()
     {
         m_startTime = QDateTime::currentDateTime();
 
-        m_parameters.vlcWrapper->clearAreas();
-        m_parameters.vlcWrapper->setAreas({A_Text});
+        m_videoManager->clearAreas();
+        m_videoManager->setAreas({A_Text});
 
-        emit printLog("Game Language = " + PokemonDatabase::getGameLanguageName(m_parameters.settings->getGameLanguage()));
+        emit printLog("Game Language = " + PokemonDatabase::getGameLanguageName(m_settings->getGameLanguage()));
 
         // Keep crouching so we don't dim the screen
         m_substage = SS_Request;
@@ -50,7 +50,7 @@ void SmartPLADistortionWaiter::runNextState()
     {
         if (state == S_OCRReady)
         {
-            GameLanguage const gameLanguage = m_parameters.settings->getGameLanguage();
+            GameLanguage const gameLanguage = m_settings->getGameLanguage();
             PokemonDatabase::OCREntries const& entries = PokemonDatabase::getEntries_PLADistortion(gameLanguage);
             if (entries.isEmpty())
             {

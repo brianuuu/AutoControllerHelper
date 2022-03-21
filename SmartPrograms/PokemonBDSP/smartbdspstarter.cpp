@@ -47,8 +47,8 @@ void SmartBDSPStarter::runNextState()
             setState_frameAnalyzeRequest();
             m_substage = SS_Intro;
 
-            m_parameters.vlcWrapper->clearCaptures();
-            m_parameters.vlcWrapper->setAreas({A_Title});
+            m_videoManager->clearCaptures();
+            m_videoManager->setAreas({A_Title});
 
             m_elapsedTimer.restart();
         }
@@ -77,7 +77,7 @@ void SmartBDSPStarter::runNextState()
                 {
                     m_substage = SS_Talk;
                     setState_runCommand(C_Talk);
-                    m_parameters.vlcWrapper->clearCaptures();
+                    m_videoManager->clearCaptures();
                 }
                 else
                 {
@@ -126,8 +126,8 @@ void SmartBDSPStarter::runNextState()
             setState_frameAnalyzeRequest();
             m_substage = SS_Detect1;
 
-            m_parameters.vlcWrapper->clearCaptures();
-            m_parameters.vlcWrapper->setAreas({A_Dialog});
+            m_videoManager->clearCaptures();
+            m_videoManager->setAreas({A_Dialog});
 
             m_dialogWasFound = false;
             m_elapsedTimer.restart();
@@ -165,8 +165,8 @@ void SmartBDSPStarter::runNextState()
                     }
                     else
                     {
-                        m_parameters.vlcWrapper->clearCaptures();
-                        m_parameters.vlcWrapper->setAreas({A_Battle});
+                        m_videoManager->clearCaptures();
+                        m_videoManager->setAreas({A_Battle});
                         m_substage = SS_Detect3;
                     }
                 }
@@ -212,7 +212,7 @@ void SmartBDSPStarter::runNextState()
                         emit printLog("Battle UI detected, time taken: " + QString::number(elapsed) + "ms, not shiny, restarting...");
                     }
 
-                    m_parameters.vlcWrapper->clearCaptures();
+                    m_videoManager->clearCaptures();
                     break;
                 }
             }
@@ -236,5 +236,5 @@ void SmartBDSPStarter::runNextState()
 
 void SmartBDSPStarter::runRestartCommand()
 {
-    setState_runCommand(m_parameters.settings->isPreventUpdate() ? C_RestartNoUpdate : C_Restart);
+    setState_runCommand(m_settings->isPreventUpdate() ? C_RestartNoUpdate : C_Restart);
 }

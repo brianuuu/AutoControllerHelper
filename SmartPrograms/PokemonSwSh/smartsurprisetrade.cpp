@@ -69,8 +69,8 @@ void SmartSurpriseTrade::runNextState()
         m_substage = SS_CheckInternet;
         setState_frameAnalyzeRequest();
 
-        m_parameters.vlcWrapper->clearCaptures();
-        m_parameters.vlcWrapper->setAreas({A_YComm});
+        m_videoManager->clearCaptures();
+        m_videoManager->setAreas({A_YComm});
         break;
     }
     case SS_CheckInternet:
@@ -82,8 +82,8 @@ void SmartSurpriseTrade::runNextState()
             m_substage = SS_GotoYComm;
             setState_runCommand(C_GotoYComm);
 
-            m_parameters.vlcWrapper->clearCaptures();
-            m_parameters.vlcWrapper->setAreas(A_YCommMenu);
+            m_videoManager->clearCaptures();
+            m_videoManager->setAreas(A_YCommMenu);
         }
         break;
     }
@@ -109,8 +109,8 @@ void SmartSurpriseTrade::runNextState()
                     m_substage = SS_GotoPokemon;
                     setState_runCommand(getGotoPokemon());
 
-                    m_parameters.vlcWrapper->clearCaptures();
-                    m_parameters.vlcWrapper->setAreas({A_PokemonName, A_DynamaxLevel});
+                    m_videoManager->clearCaptures();
+                    m_videoManager->setAreas({A_PokemonName, A_DynamaxLevel});
                 }
                 else
                 {
@@ -127,8 +127,8 @@ void SmartSurpriseTrade::runNextState()
                 setState_runCommand("BSpam,80");
                 emit printLog("Not at Y-comm (trade evolution?), attemping recover...");
 
-                m_parameters.vlcWrapper->clearCaptures();
-                m_parameters.vlcWrapper->setAreas({A_YComm});
+                m_videoManager->clearCaptures();
+                m_videoManager->setAreas({A_YComm});
             }
         }
         break;
@@ -152,8 +152,8 @@ void SmartSurpriseTrade::runNextState()
                 m_substage = SS_GotoPokemon;
                 setState_runCommand(getGotoPokemon());
 
-                m_parameters.vlcWrapper->clearCaptures();
-                m_parameters.vlcWrapper->setAreas({A_PokemonName, A_DynamaxLevel});
+                m_videoManager->clearCaptures();
+                m_videoManager->setAreas({A_PokemonName, A_DynamaxLevel});
             }
             else
             {
@@ -204,8 +204,8 @@ void SmartSurpriseTrade::runNextState()
                     setState_runCommand(C_ConfirmTrade);
                     emit printLog(location + ": Trading...");
 
-                    m_parameters.vlcWrapper->clearCaptures();
-                    m_parameters.vlcWrapper->setAreas({A_TradeDialogBIG});
+                    m_videoManager->clearCaptures();
+                    m_videoManager->setAreas({A_TradeDialogBIG});
                 }
                 else
                 {
@@ -249,8 +249,8 @@ void SmartSurpriseTrade::runNextState()
                     setState_frameAnalyzeRequest();
                     emit printLog("Pokemon could not be traded, Battle Box?");
 
-                    m_parameters.vlcWrapper->clearCaptures();
-                    m_parameters.vlcWrapper->setAreas({A_YComm});
+                    m_videoManager->clearCaptures();
+                    m_videoManager->setAreas({A_YComm});
                 }
             }
             else*/
@@ -278,8 +278,8 @@ void SmartSurpriseTrade::runNextState()
                 setState_runCommand(C_FinishTrade);
                 emit printLog("Trade complete!");
 
-                m_parameters.vlcWrapper->clearCaptures();
-                m_parameters.vlcWrapper->setAreas({A_YComm});
+                m_videoManager->clearCaptures();
+                m_videoManager->setAreas({A_YComm});
                 m_calibrateBtn->setEnabled(false);
             }
             else

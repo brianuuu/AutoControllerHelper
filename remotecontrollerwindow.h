@@ -243,12 +243,8 @@ private:
         SS_Connect
     } m_serialState;
 
-    // Camera
+    // VLC player
     VLCWrapper* m_vlcWrapper;
-    QLabel* m_vlcWidget;
-    //QCamera* m_camera = Q_NULLPTR;
-    //QCameraImageCapture* m_cameraCapture = Q_NULLPTR;
-    //QCameraViewfinder* m_cameraView = Q_NULLPTR;
 
 private:
     // Smart Program

@@ -60,8 +60,8 @@ void SmartBDSPShinyLegendary::runNextState()
             setState_frameAnalyzeRequest();
             m_substage = SS_Intro;
 
-            m_parameters.vlcWrapper->clearCaptures();
-            m_parameters.vlcWrapper->setAreas({A_Title});
+            m_videoManager->clearCaptures();
+            m_videoManager->setAreas({A_Title});
 
             m_elapsedTimer.restart();
         }
@@ -98,7 +98,7 @@ void SmartBDSPShinyLegendary::runNextState()
                         case LT_Others: setState_runCommand(C_Talk); break;
                         default: setState_error("Invalid legendary type"); break;
                     }
-                    m_parameters.vlcWrapper->clearCaptures();
+                    m_videoManager->clearCaptures();
                 }
                 else
                 {
@@ -121,8 +121,8 @@ void SmartBDSPShinyLegendary::runNextState()
             setState_frameAnalyzeRequest();
             m_substage = SS_Detect1;
 
-            m_parameters.vlcWrapper->clearCaptures();
-            m_parameters.vlcWrapper->setAreas({A_Dialog});
+            m_videoManager->clearCaptures();
+            m_videoManager->setAreas({A_Dialog});
 
             m_dialogWasFound = false;
             m_elapsedTimer.restart();
@@ -142,7 +142,7 @@ void SmartBDSPShinyLegendary::runNextState()
                 m_substage = SS_Restart;
                 runRestartCommand();
 
-                m_parameters.vlcWrapper->clearCaptures();
+                m_videoManager->clearCaptures();
                 break;
             }
             else
@@ -182,8 +182,8 @@ void SmartBDSPShinyLegendary::runNextState()
                             m_substage = SS_DetectBattle;
                             setState_frameAnalyzeRequest();
 
-                            m_parameters.vlcWrapper->clearCaptures();
-                            m_parameters.vlcWrapper->setAreas({A_Battle});
+                            m_videoManager->clearCaptures();
+                            m_videoManager->setAreas({A_Battle});
                             break;
                         }
                         else
@@ -194,7 +194,7 @@ void SmartBDSPShinyLegendary::runNextState()
                             emit printLog(str + "not shiny, restarting...");
                         }
 
-                        m_parameters.vlcWrapper->clearCaptures();
+                        m_videoManager->clearCaptures();
                         break;
                     }
                 }
@@ -215,7 +215,7 @@ void SmartBDSPShinyLegendary::runNextState()
                 m_substage = SS_Restart;
                 runRestartCommand();
 
-                m_parameters.vlcWrapper->clearCaptures();
+                m_videoManager->clearCaptures();
             }
             else if (checkBrightnessMeanTarget(A_Battle.m_rect, C_Color_Battle, 160))
             {
@@ -224,7 +224,7 @@ void SmartBDSPShinyLegendary::runNextState()
                 m_substage = SS_RestartShaymin;
                 setState_runCommand(C_RestartShaymin);
 
-                m_parameters.vlcWrapper->clearCaptures();
+                m_videoManager->clearCaptures();
             }
             else
             {
@@ -257,5 +257,5 @@ void SmartBDSPShinyLegendary::runNextState()
 
 void SmartBDSPShinyLegendary::runRestartCommand()
 {
-    setState_runCommand(m_parameters.settings->isPreventUpdate() ? C_RestartNoUpdate : C_Restart);
+    setState_runCommand(m_settings->isPreventUpdate() ? C_RestartNoUpdate : C_Restart);
 }

@@ -45,7 +45,7 @@ void SmartLoto::runNextState()
         if (state == S_CommandFinished)
         {
             m_substage = SS_SkipYear;
-            switch (m_parameters.settings->getDateArrangement())
+            switch (m_settings->getDateArrangement())
             {
                 case DA_JP: setState_runCommand(C_SkipYearJP); break;
                 case DA_EU: setState_runCommand(C_SkipYearEU); break;
@@ -79,8 +79,8 @@ void SmartLoto::runNextState()
             m_substage = SS_BSpam;
             setState_frameAnalyzeRequest();
 
-            m_parameters.vlcWrapper->clearCaptures();
-            m_parameters.vlcWrapper->setAreas({A_Dialog});
+            m_videoManager->clearCaptures();
+            m_videoManager->setAreas({A_Dialog});
         }
         break;
     }
@@ -99,7 +99,7 @@ void SmartLoto::runNextState()
                 setState_runCommand(C_End);
                 emit printLog("Item " + QString::number(m_daySkipped + 1) + " get!");
 
-                m_parameters.vlcWrapper->clearCaptures();
+                m_videoManager->clearCaptures();
             }
             else
             {

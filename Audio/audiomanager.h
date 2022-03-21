@@ -6,11 +6,21 @@
 #include <QMessageBox>
 #include <QMutex>
 #include <QObject>
+#include <QPainter>
 #include <QWidget>
 #include <QtMath>
 
 #include "audioconversionutils.h"
-#include "audiodisplaywidget.h"
+
+enum AudioDisplayMode : uint8_t
+{
+    ADM_None,
+    ADM_RawWave,
+    ADM_FreqBars,
+    ADM_Spectrogram,
+
+    ADM_COUNT
+};
 
 class AudioManager : public QWidget
 {
@@ -21,7 +31,7 @@ public:
     // Const functions
     bool isStarted() const { return m_audioOutput && m_audioDevice; }
     QAudioFormat const getAudioFormat() const { return m_audioFormat; }
-    AudioDisplayWidget* getDisplayWidget() const { return m_displayWidget; }
+    AudioDisplayMode getDisplayMode() { return m_displayMode; }
 
     // Controls
     void start();
@@ -29,11 +39,23 @@ public:
 
     // Input
     void pushAudioData(const void *samples, unsigned int count, int64_t pts);
-    void setVolume(int volume);
+
+protected:
+    virtual void paintEvent(QPaintEvent* event) override;
 
 signals:
 
 public slots:
+    void setVolume(int volume);
+    void displayModeChanged(int index);
+    void displaySampleChanged(int count);
+
+private:
+    // Recieve data
+    void sendData_rawWave(QAudioFormat const& format, const char* samples, size_t sampleSize);
+
+    // Display
+    void paintImage();
 
 private:
     // Playback
@@ -44,7 +66,15 @@ private:
     double          m_volumeScaleDB;
 
     // Display
-    AudioDisplayWidget* m_displayWidget;
+    QMutex              m_displayMutex;
+    AudioDisplayMode    m_displayMode;
+
+    // Raw Wave data
+    int                 m_displaySamples;
+    QVector<float>      m_dataRawWave;
+
+    // Spectrogram data
+    QImage              m_displayImage;
 };
 
 #endif // AUDIOMANAGER_H

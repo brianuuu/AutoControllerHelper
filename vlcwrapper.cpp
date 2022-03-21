@@ -14,9 +14,9 @@ static void* cbVideoLock(void *opaque, void **planes)
 static void cbVideoUnlock(void *opaque, void *picture, void *const *planes)
 {
     struct contextVideo *ctx = (contextVideo *)opaque;
-    unsigned char *data = (unsigned char *)*planes;
+    unsigned char const* data = (unsigned char const*)*planes;
 
-    ctx->m_frame = QImage(data, VIDEO_WIDTH, VIDEO_HEIGHT, QImage::Format_ARGB32);
+    ctx->m_manager->pushVideoData(data);
     ctx->m_mutex.unlock();
 }
 
@@ -29,10 +29,7 @@ static void cbAudioPlay(void* p_audio_data, const void *samples, unsigned int co
     ctx->m_manager->pushAudioData(samples, count, pts);
 }
 
-VLCWrapper::VLCWrapper(QLabel* videoWidget, QSlider* volumeSlider, QWidget *parent)
-    : QWidget(parent)
-    , m_volumeSlider(volumeSlider)
-    , m_videoWidget(videoWidget)
+VLCWrapper::VLCWrapper(QWidget *parent) : QWidget(parent)
 {
     const char* const vlc_args[] = {
                 "--intf", "dummy",
@@ -43,25 +40,17 @@ VLCWrapper::VLCWrapper(QLabel* videoWidget, QSlider* volumeSlider, QWidget *pare
     //m_instance = libvlc_new(0, nullptr);
     m_mediaPlayer = libvlc_media_player_new(m_instance);
 
-    if (volumeSlider)
-    {
-        connect(volumeSlider, &QSlider::valueChanged, this, &VLCWrapper::setVolume);
-    }
-
     m_isStarted = false;
     m_state = VLCState::NONE;
-    connect(&m_timer, &QTimer::timeout, this, &VLCWrapper::timeout);
 
     // Video
-    ctxVideo.m_label = m_videoWidget;
+    ctxVideo.m_manager = new VideoManager(this);
     ctxVideo.m_pixels = new uchar[VIDEO_WIDTH * VIDEO_HEIGHT * 4];
     memset(ctxVideo.m_pixels, 0, VIDEO_WIDTH * VIDEO_HEIGHT * 4);
+    connect(ctxVideo.m_manager, &VideoManager::timeout, this, &VLCWrapper::timeout);
 
     // Audio
     ctxAudio.m_manager = new AudioManager(this);
-
-    m_defaultAreaEnable = false;
-    m_defaultArea = CaptureArea(QRect(0,0,VIDEO_WIDTH,VIDEO_HEIGHT), QColor(255,0,0));
 }
 
 VLCWrapper::~VLCWrapper()
@@ -71,11 +60,6 @@ VLCWrapper::~VLCWrapper()
     stop();
     libvlc_media_player_release(m_mediaPlayer);
     libvlc_release(m_instance);
-}
-
-AudioManager* VLCWrapper::getAudioManager() const
-{
-    return ctxAudio.m_manager;
 }
 
 bool VLCWrapper::start(const QString &vdev, const QString &adev)
@@ -105,8 +89,6 @@ bool VLCWrapper::start(const QString &vdev, const QString &adev)
     libvlc_media_release(m_media);
 
     // Set the callback to extract the frame or display it on the screen
-    ctxVideo.m_frame = QImage(VIDEO_WIDTH, VIDEO_HEIGHT, QImage::Format_ARGB32);
-    ctxVideo.m_frame.fill(Qt::black);
     libvlc_video_set_callbacks(m_mediaPlayer, cbVideoLock, cbVideoUnlock, nullptr, &ctxVideo);
     libvlc_video_set_format(m_mediaPlayer, "BGRA", VIDEO_WIDTH, VIDEO_HEIGHT, VIDEO_WIDTH * 4);
 
@@ -123,13 +105,11 @@ bool VLCWrapper::start(const QString &vdev, const QString &adev)
     }
     else
     {
-        // ~60fps (actual: 62.5fps)
-        m_timer.start(16);
         m_isStarted = true;
 
-        // Start audio playback
+        // Start video & audio playback
+        ctxVideo.m_manager->start();
         ctxAudio.m_manager->start();
-        setVolume(m_volumeSlider ? m_volumeSlider->value() : 100);
 
         libvlc_video_set_adjust_int(m_mediaPlayer, libvlc_video_adjust_option_t::libvlc_adjust_Enable, true);
         return true;
@@ -143,6 +123,8 @@ void VLCWrapper::stop()
         m_isStarted = false;
         libvlc_media_player_stop(m_mediaPlayer);
 
+        // Stop display
+        ctxVideo.m_manager->stop();
         ctxAudio.m_manager->stop();
     }
 }
@@ -156,67 +138,14 @@ bool VLCWrapper::takeSnapshot(const QString &path)
     return result == 0;
 }
 
-void VLCWrapper::getFrame(QImage &frame)
-{
-    ctxVideo.m_mutex.lock();
-    frame = ctxVideo.m_frame;
-    ctxVideo.m_mutex.unlock();
-}
-
-void VLCWrapper::setPoints(const QVector<CapturePoint> &points)
-{
-    m_points.clear();
-    m_points = points;
-}
-
-void VLCWrapper::setAreas(QVector<CaptureArea> const& areas)
-{
-    m_areas.clear();
-    m_areas = areas;
-}
-
 void VLCWrapper::timeout()
 {
-    // Update drawn frame, lock and only do copy inside
-    QImage frame;
-    getFrame(frame);
-
-    // Draw overlay boxes
-    QPainter painter(&frame);
-    QPen pen;
-    pen.setWidth(4);
-    if (m_defaultAreaEnable)
-    {
-        pen.setColor(m_defaultArea.m_color);
-        painter.setPen(pen);
-        painter.drawRect(m_defaultArea.m_rect);
-    }
-    for (CaptureArea const& area : m_areas)
-    {
-        pen.setColor(area.m_color);
-        painter.setPen(pen);
-        painter.drawRect(area.m_rect);
-    }
-    for (CapturePoint const& points : m_points)
-    {
-        pen.setColor(points.m_color);
-        painter.setPen(pen);
-        painter.drawLine(points.m_point + QPoint(15,15), points.m_point + QPoint(-15,-15));
-        painter.drawLine(points.m_point + QPoint(-15,15), points.m_point + QPoint(15,-15));
-    }
-    m_videoWidget->setPixmap(QPixmap::fromImage(frame.scaled(640, 360)));
-
     // Check state
     VLCState newState = static_cast<VLCState>(libvlc_media_player_get_state(m_mediaPlayer));
     if (m_state != newState)
     {
         m_state = newState;
         emit stateChanged(m_state);
-    }
-
-    if (newState == VLCState::STOPPED)
-    {
-        m_timer.stop();
     }
 }
 
