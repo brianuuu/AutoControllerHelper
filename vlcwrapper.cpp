@@ -1,38 +1,25 @@
 #include "vlcwrapper.h"
 
-#if USE_CUSTOM_BUFFER
-static void *lock(void *opaque, void **planes)
+static void* cbVideoLock(void *opaque, void **planes)
 {
-    struct context *ctx = (context *)opaque;
+    struct contextVideo *ctx = (contextVideo *)opaque;
     ctx->m_mutex.lock();
 
     // tell VLC to put the decoded data in the buffer
     *planes = ctx->m_pixels;
-
     return nullptr;
 }
 
  // get the argb image and save it to a file
-static void unlock(void *opaque, void *picture, void *const *planes)
+static void cbVideoUnlock(void *opaque, void *picture, void *const *planes)
 {
-    Q_UNUSED(picture)
-
-    struct context *ctx = (context *)opaque;
+    struct contextVideo *ctx = (contextVideo *)opaque;
     unsigned char *data = (unsigned char *)*planes;
 
     ctx->m_frame = QImage(data, VIDEO_WIDTH, VIDEO_HEIGHT, QImage::Format_ARGB32);
     ctx->m_mutex.unlock();
 }
 
-static void display(void *opaque, void *picture)
-{
-    Q_UNUSED(picture)
-
-    (void)opaque;
-}
-#endif
-
-#if USE_CUSTOM_AUDIO
 static void cbAudioPlay(void* p_audio_data, const void *samples, unsigned int count, int64_t pts)
 {
     struct contextAudio *ctx = (contextAudio *)p_audio_data;
@@ -41,7 +28,6 @@ static void cbAudioPlay(void* p_audio_data, const void *samples, unsigned int co
     // Pass new raw data to manager
     ctx->m_manager->pushAudioData(samples, count, pts);
 }
-#endif
 
 VLCWrapper::VLCWrapper(QLabel* videoWidget, QSlider* volumeSlider, QWidget *parent)
     : QWidget(parent)
@@ -66,15 +52,13 @@ VLCWrapper::VLCWrapper(QLabel* videoWidget, QSlider* volumeSlider, QWidget *pare
     m_state = VLCState::NONE;
     connect(&m_timer, &QTimer::timeout, this, &VLCWrapper::timeout);
 
-#if USE_CUSTOM_BUFFER
-    ctx.m_label = m_videoWidget;
-    ctx.m_pixels = new uchar[VIDEO_WIDTH * VIDEO_HEIGHT * 4];
-    memset(ctx.m_pixels, 0, VIDEO_WIDTH * VIDEO_HEIGHT * 4);
-#endif
+    // Video
+    ctxVideo.m_label = m_videoWidget;
+    ctxVideo.m_pixels = new uchar[VIDEO_WIDTH * VIDEO_HEIGHT * 4];
+    memset(ctxVideo.m_pixels, 0, VIDEO_WIDTH * VIDEO_HEIGHT * 4);
 
-#if USE_CUSTOM_AUDIO
+    // Audio
     ctxAudio.m_manager = new AudioManager(this);
-#endif
 
     m_defaultAreaEnable = false;
     m_defaultArea = CaptureArea(QRect(0,0,VIDEO_WIDTH,VIDEO_HEIGHT), QColor(255,0,0));
@@ -82,9 +66,7 @@ VLCWrapper::VLCWrapper(QLabel* videoWidget, QSlider* volumeSlider, QWidget *pare
 
 VLCWrapper::~VLCWrapper()
 {
-#if USE_CUSTOM_BUFFER
-    delete[] ctx.m_pixels;
-#endif
+    delete[] ctxVideo.m_pixels;
 
     stop();
     libvlc_media_player_release(m_mediaPlayer);
@@ -93,11 +75,7 @@ VLCWrapper::~VLCWrapper()
 
 AudioManager* VLCWrapper::getAudioManager() const
 {
-#if USE_CUSTOM_AUDIO
     return ctxAudio.m_manager;
-#else
-    return nullptr;
-#endif
 }
 
 bool VLCWrapper::start(const QString &vdev, const QString &adev)
@@ -126,21 +104,16 @@ bool VLCWrapper::start(const QString &vdev, const QString &adev)
     libvlc_media_player_set_media(m_mediaPlayer, m_media);
     libvlc_media_release(m_media);
 
-#if USE_CUSTOM_BUFFER
     // Set the callback to extract the frame or display it on the screen
-    ctx.m_frame = QImage(VIDEO_WIDTH, VIDEO_HEIGHT, QImage::Format_ARGB32);
-    ctx.m_frame.fill(QColor(0,0,0));
-    libvlc_video_set_callbacks(m_mediaPlayer, lock, unlock, display, &ctx);
+    ctxVideo.m_frame = QImage(VIDEO_WIDTH, VIDEO_HEIGHT, QImage::Format_ARGB32);
+    ctxVideo.m_frame.fill(Qt::black);
+    libvlc_video_set_callbacks(m_mediaPlayer, cbVideoLock, cbVideoUnlock, nullptr, &ctxVideo);
     libvlc_video_set_format(m_mediaPlayer, "BGRA", VIDEO_WIDTH, VIDEO_HEIGHT, VIDEO_WIDTH * 4);
-#else
-    libvlc_media_player_set_hwnd(m_mediaPlayer, reinterpret_cast<HWND*>(m_videoWidget->winId()));
-#endif
 
-#if USE_CUSTOM_AUDIO
+    // Set callback to extract raw PCM data
     QAudioFormat const format = ctxAudio.m_manager->getAudioFormat();
     libvlc_audio_set_callbacks(m_mediaPlayer, cbAudioPlay, nullptr, nullptr, nullptr, nullptr, &ctxAudio);
-    libvlc_audio_set_format(m_mediaPlayer, "s16l", static_cast<unsigned>(format.sampleRate()), static_cast<unsigned>(format.channelCount()));
-#endif
+    libvlc_audio_set_format(m_mediaPlayer, "s16l", format.sampleRate(), format.channelCount());
 
     // Play media
     int result = libvlc_media_player_play(m_mediaPlayer);
@@ -154,10 +127,9 @@ bool VLCWrapper::start(const QString &vdev, const QString &adev)
         m_timer.start(16);
         m_isStarted = true;
 
-#if USE_CUSTOM_AUDIO
+        // Start audio playback
         ctxAudio.m_manager->start();
         setVolume(m_volumeSlider ? m_volumeSlider->value() : 100);
-#endif
 
         libvlc_video_set_adjust_int(m_mediaPlayer, libvlc_video_adjust_option_t::libvlc_adjust_Enable, true);
         return true;
@@ -171,9 +143,7 @@ void VLCWrapper::stop()
         m_isStarted = false;
         libvlc_media_player_stop(m_mediaPlayer);
 
-#if USE_CUSTOM_AUDIO
         ctxAudio.m_manager->stop();
-#endif
     }
 }
 
@@ -188,13 +158,9 @@ bool VLCWrapper::takeSnapshot(const QString &path)
 
 void VLCWrapper::getFrame(QImage &frame)
 {
-#if USE_CUSTOM_BUFFER
-    ctx.m_mutex.lock();
-    frame = ctx.m_frame;
-    ctx.m_mutex.unlock();
-#else
-    qDebug() << "NOT SUPPORTED!";
-#endif
+    ctxVideo.m_mutex.lock();
+    frame = ctxVideo.m_frame;
+    ctxVideo.m_mutex.unlock();
 }
 
 void VLCWrapper::setPoints(const QVector<CapturePoint> &points)
@@ -248,17 +214,6 @@ void VLCWrapper::timeout()
         emit stateChanged(m_state);
     }
 
-    // Force update volume
-#if !USE_CUSTOM_AUDIO
-    if (newState == VLCState::PLAYING && m_volumeSlider)
-    {
-        if (m_volumeSlider->value() != libvlc_audio_get_volume(m_mediaPlayer))
-        {
-            setVolume(m_volumeSlider->value());
-        }
-    }
-#endif
-
     if (newState == VLCState::STOPPED)
     {
         m_timer.stop();
@@ -269,11 +224,7 @@ void VLCWrapper::setVolume(int volume)
 {
     if (m_isStarted)
     {
-#if USE_CUSTOM_AUDIO
         ctxAudio.m_manager->setVolume(volume);
-#else
-        libvlc_audio_set_volume(m_mediaPlayer, volume);
-#endif
     }
 }
 

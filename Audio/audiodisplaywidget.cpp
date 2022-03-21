@@ -120,6 +120,7 @@ void AudioDisplayWidget::displayModeChanged(int index)
 
 void AudioDisplayWidget::displaySampleChanged(int count)
 {
+    qDebug() << "Display Sample size changed to" << count;
     m_displayMutex.lock();
     {
         m_displaySamples = count;
