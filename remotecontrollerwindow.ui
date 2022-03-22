@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1409</width>
+    <width>1398</width>
     <height>831</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1409</width>
+    <width>1398</width>
     <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>1409</width>
+    <width>1398</width>
     <height>16777215</height>
    </size>
   </property>
@@ -1348,7 +1348,7 @@
        <item>
         <widget class="QRadioButton" name="RB_CustomDevice">
          <property name="text">
-          <string>Custom Device Name</string>
+          <string>Custom Capture Device Name</string>
          </property>
         </widget>
        </item>
@@ -1386,8 +1386,14 @@
           </property>
           <item>
            <widget class="QLabel" name="label_23">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="text">
-             <string>Devices List:</string>
+             <string>Camera Devices List:</string>
             </property>
            </widget>
           </item>
@@ -1485,6 +1491,126 @@
       </layout>
      </item>
      <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_38">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_40">
+         <item>
+          <widget class="QLabel" name="label_68">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Audio Display Mode:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="CB_AudioDisplayMode">
+           <item>
+            <property name="text">
+             <string>None</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Raw Wave</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Frequency Bars</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Spectrogram</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_41">
+         <item>
+          <widget class="QLabel" name="label_69">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Audio Display Samples:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="SB_AudioSamples">
+           <property name="minimum">
+            <number>512</number>
+           </property>
+           <property name="maximum">
+            <number>20480</number>
+           </property>
+           <property name="singleStep">
+            <number>128</number>
+           </property>
+           <property name="value">
+            <number>1024</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_20">
+         <item>
+          <widget class="QLabel" name="label_28">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Volume:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSlider" name="S_Volume">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximum">
+            <number>100</number>
+           </property>
+           <property name="value">
+            <number>100</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
       <widget class="QScrollArea" name="scrollArea_16">
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
@@ -1500,8 +1626,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>670</width>
-          <height>748</height>
+          <width>669</width>
+          <height>701</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_39">
@@ -1518,7 +1644,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QGroupBox" name="GB_CameraView">
+          <widget class="QGroupBox" name="GB_MediaView">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
              <horstretch>0</horstretch>
@@ -1526,7 +1652,7 @@
             </sizepolicy>
            </property>
            <property name="title">
-            <string>Camera View</string>
+            <string>Media View</string>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
             <item>
@@ -1673,132 +1799,6 @@
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="GB_AudioView">
-           <property name="title">
-            <string>Audio View</string>
-           </property>
-           <property name="checked">
-            <bool>false</bool>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_40">
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_38">
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_40">
-                <item>
-                 <widget class="QLabel" name="label_68">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="text">
-                   <string>Display Mode:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="CB_AudioDisplayMode">
-                  <item>
-                   <property name="text">
-                    <string>None</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Raw Wave</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Frequency Bars</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Spectrogram</string>
-                   </property>
-                  </item>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_41">
-                <item>
-                 <widget class="QLabel" name="label_69">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="text">
-                   <string>Display Samples:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QSpinBox" name="SB_AudioSamples">
-                  <property name="minimum">
-                   <number>512</number>
-                  </property>
-                  <property name="maximum">
-                   <number>20480</number>
-                  </property>
-                  <property name="singleStep">
-                   <number>128</number>
-                  </property>
-                  <property name="value">
-                   <number>1024</number>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_20">
-                <item>
-                 <widget class="QLabel" name="label_28">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="text">
-                   <string>Volume:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QSlider" name="S_Volume">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="maximum">
-                   <number>100</number>
-                  </property>
-                  <property name="value">
-                   <number>100</number>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
           <widget class="QGroupBox" name="GB_SmartProgram">
            <property name="enabled">
             <bool>false</bool>
@@ -1810,7 +1810,7 @@
             </sizepolicy>
            </property>
            <property name="title">
-            <string>Smart Programs</string>
+            <string>Smart Program Settings</string>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_4">
             <item>
@@ -1976,7 +1976,7 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>430</width>
+                       <width>429</width>
                        <height>284</height>
                       </rect>
                      </property>
