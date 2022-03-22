@@ -243,6 +243,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     ui->S_Volume->setValue(m_settings->value("Volume", 100).toInt());
     audioManager->setVolume(ui->S_Volume->value());
     ui->CB_AudioDisplayMode->setCurrentIndex(m_settings->value("AudioDisplayMode", 0).toInt());
+    ui->SB_AudioSamples->setValue(m_settings->value("AudioDisplaySamples", 1024).toInt());
 
     m_smartSetting = new SmartProgramSetting();
     m_videoEffectSetting = new VideoEffectSetting();
@@ -351,6 +352,7 @@ void RemoteControllerWindow::closeEvent(QCloseEvent *event)
     // Save audio settings
     m_settings->setValue("Volume", ui->S_Volume->value());
     m_settings->setValue("AudioDisplayMode", ui->CB_AudioDisplayMode->currentIndex());
+    m_settings->setValue("AudioDisplaySamples", ui->SB_AudioSamples->value());
 
     // Remember last used Smart Program
     m_settings->setValue("SmartProgramGame", ui->CB_SmartProgram->currentIndex());

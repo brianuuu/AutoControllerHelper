@@ -40,11 +40,7 @@ void AudioManager::stop()
     m_audioOutput->stop();
     m_audioDevice = Q_NULLPTR;
 
-    m_displayMutex.lock();
-    {
-        m_rawWaveData.clear();
-    }
-    m_displayMutex.unlock();
+    resetRawWaveData();
     QWidget::update();
 }
 
@@ -82,26 +78,39 @@ void AudioManager::displayModeChanged(int index)
     {
         m_displayMode = (AudioDisplayMode)index;
 
-        // Wipe cached spectrogram image
-        if (m_displayMode == ADM_Spectrogram)
+        // Set display height
+        if (index > ADM_None && index < ADM_COUNT)
         {
+            this->setFixedHeight(100);
+        }
+        else
+        {
+            this->setFixedHeight(0);
+        }
+
+        // Handle resize
+        if (m_displayImage.size() != this->size())
+        {
+            m_displayImage = QImage(this->size(), QImage::Format_RGB32);
             m_displayImage.fill(Qt::black);
         }
 
+        // Handle resetting data
         switch (m_displayMode)
         {
-            case ADM_RawWave:
-            case ADM_FreqBars:
-            case ADM_Spectrogram:
-            {
-                this->setFixedHeight(100);
-                break;
-            }
-            default:
-            {
-                this->setFixedHeight(0);
-                break;
-            }
+        case ADM_RawWave:
+        {
+            resetRawWaveData_NonTS();
+            break;
+        }
+        case ADM_FreqBars:
+        case ADM_Spectrogram:
+        {
+            // TODO:
+            m_displayImage.fill(Qt::black);
+            break;
+        }
+        default: break;
         }
     }
     m_displayMutex.unlock();
@@ -116,11 +125,10 @@ void AudioManager::displaySampleChanged(int count)
     m_displayMutex.lock();
     {
         m_displaySamples = count;
-
-        m_rawWaveData.clear();
-        m_rawWaveDataSize = 0;
     }
     m_displayMutex.unlock();
+
+    resetRawWaveData();
     QWidget::update();
 }
 
@@ -164,14 +172,35 @@ void AudioManager::pushAudioData(const void *samples, unsigned int count, int64_
     {
         case ADM_RawWave:
         {
-            sendData_rawWave(m_audioFormat, (const char*)samples, sampleSize);
+            writeRawWaveData(m_audioFormat, (const char*)samples, sampleSize);
             break;
         }
         default: break;
     }
 }
 
-void AudioManager::sendData_rawWave(const QAudioFormat &format, const char* samples, size_t sampleSize)
+//---------------------------------------------
+// Raw Wave
+//---------------------------------------------
+void AudioManager::resetRawWaveData()
+{
+    m_displayMutex.lock();
+    {
+        resetRawWaveData_NonTS();
+    }
+    m_displayMutex.unlock();
+}
+
+void AudioManager::resetRawWaveData_NonTS()
+{
+    m_rawWaveDataSize = 0;
+    for (float& f : m_rawWaveData)
+    {
+        f = 0.0f;
+    }
+}
+
+void AudioManager::writeRawWaveData(const QAudioFormat &format, const char* samples, size_t sampleSize)
 {
     // Only support this atm...
     if (format.sampleSize() != 16 || format.sampleType() != QAudioFormat::SignedInt) return;
@@ -209,20 +238,13 @@ void AudioManager::paintEvent(QPaintEvent* event)
 
     m_displayMutex.lock();
     {
-        // Handle resize
-        if (m_displayImage.size() != this->size())
-        {
-            m_displayImage = QImage(this->size(), QImage::Format_RGB32);
-            m_displayImage.fill(Qt::black);
-        }
-
         // Draw on image
-        paintImage();
+        paintEvent_NonTS();
     }
     m_displayMutex.unlock();
 }
 
-void AudioManager::paintImage()
+void AudioManager::paintEvent_NonTS()
 {
     int const width = this->width();
     int const height = this->height();
@@ -237,7 +259,17 @@ void AudioManager::paintImage()
         painter.fillRect(this->rect(), Qt::black);
         painter.setPen(QColor(Qt::cyan));
 
-        if (m_rawWaveData.isEmpty()) return;
+        // If no samples, draw a null sound line
+        if (m_rawWaveDataSize == 0)
+        {
+            // Draw null sound line
+            QPainter imagePainter(&m_displayImage);
+            imagePainter.fillRect(this->rect(), Qt::black);
+            imagePainter.setPen(QColor(Qt::cyan));
+            imagePainter.drawLine(0, (int)heightHalf, this->width(), (int)heightHalf);
+            painter.drawImage(this->rect(), m_displayImage);
+            return;
+        }
 
         QPoint lastPointPos(0, (int)heightHalf);
         if (m_displaySamples <= width)

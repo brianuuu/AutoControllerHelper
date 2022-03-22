@@ -53,11 +53,13 @@ public slots:
     void drawSlot();
 
 private:
-    // Recieve data
-    void sendData_rawWave(QAudioFormat const& format, const char* samples, size_t sampleSize);
+    // Raw wave
+    void resetRawWaveData();
+    void resetRawWaveData_NonTS();
+    void writeRawWaveData(QAudioFormat const& format, const char* samples, size_t sampleSize);
 
     // Display
-    void paintImage();
+    void paintEvent_NonTS();
 
 private:
     // Playback
