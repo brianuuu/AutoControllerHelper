@@ -1,6 +1,7 @@
 #ifndef VIDEOMANAGER_H
 #define VIDEOMANAGER_H
 
+#include <QDebug>
 #include <QTimer>
 #include <QMutex>
 #include <QPainter>

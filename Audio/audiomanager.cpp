@@ -22,6 +22,7 @@ AudioManager::AudioManager(QWidget *parent) : QWidget(parent)
     }
 
     m_audioDevice = Q_NULLPTR;
+    connect(this, &AudioManager::drawSignal, this, &AudioManager::drawSlot);
 
     // Display
     m_displayMode = ADM_None;
@@ -121,6 +122,11 @@ void AudioManager::displaySampleChanged(int count)
     // No need to update, let input data do it
 }
 
+void AudioManager::drawSlot()
+{
+    QWidget::update();
+}
+
 //---------------------------------------------
 // Recieve data
 //---------------------------------------------
@@ -205,7 +211,7 @@ void AudioManager::sendData_rawWave(const QAudioFormat &format, const char* samp
 
     if (update)
     {
-        QWidget::update();
+        emit drawSignal();
     }
 }
 
@@ -214,7 +220,6 @@ void AudioManager::sendData_rawWave(const QAudioFormat &format, const char* samp
 //---------------------------------------------
 void AudioManager::paintEvent(QPaintEvent* event)
 {
-    QWidget::paintEvent(event);
     if (this->height() == 0) return;
 
     m_displayMutex.lock();

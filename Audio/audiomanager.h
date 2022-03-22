@@ -44,11 +44,13 @@ protected:
     virtual void paintEvent(QPaintEvent* event) override;
 
 signals:
+    void drawSignal();
 
 public slots:
     void setVolume(int volume);
     void displayModeChanged(int index);
     void displaySampleChanged(int count);
+    void drawSlot();
 
 private:
     // Recieve data
