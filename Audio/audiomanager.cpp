@@ -116,10 +116,10 @@ void AudioManager::displaySampleChanged(int count)
     m_displayMutex.lock();
     {
         m_displaySamples = count;
+        m_dataRawWave.clear();
     }
     m_displayMutex.unlock();
-
-    // No need to update, let input data do it
+    QWidget::update();
 }
 
 void AudioManager::drawSlot()
@@ -178,41 +178,20 @@ void AudioManager::sendData_rawWave(const QAudioFormat &format, const char* samp
     QVector<float> newRawData;
     AudioConversionUtils::convertSamplesToFloat(format, samples, sampleSize, newRawData);
 
-    bool update = false;
     m_displayMutex.lock();
     {
-        if (m_displaySamples <= this->width())
-        {
-            // Always wipe data if we can't display all samples
-            m_dataRawWave.clear();
-            m_dataRawWave.reserve(m_displaySamples);
-        }
-        else
-        {
-            // Data is full, wipe them and start from beginning
-            if (m_dataRawWave.size() >= m_displaySamples)
-            {
-                m_dataRawWave.clear();
-                m_dataRawWave.reserve(m_displaySamples);
-            }
-        }
+        int frameCount = newRawData.size() / 2;
+        m_dataRawWave.clear();
+        m_dataRawWave.reserve(frameCount);
 
         // Average LR channels
-        int frameCount = newRawData.size() / 2;
-        for (int i = 0; i < frameCount && m_dataRawWave.size() < m_displaySamples; i++)
+        for (int i = 0; i < frameCount; i++)
         {
             m_dataRawWave.push_back((newRawData[2*i] + newRawData[2*i+1]) * 0.5f);
         }
-
-        // Draw when we have enough samples
-        update = (m_dataRawWave.size() >= m_displaySamples);
     }
     m_displayMutex.unlock();
-
-    if (update)
-    {
-        emit drawSignal();
-    }
+    emit drawSignal();
 }
 
 //---------------------------------------------
@@ -255,7 +234,7 @@ void AudioManager::paintImage()
         if (m_dataRawWave.isEmpty()) return;
 
         QPoint lastPointPos(0, (int)heightHalf);
-        if (m_displaySamples < width)
+        if (m_displaySamples <= width)
         {
             // fewer samples than width, we need to scale it up
             float const pointWidth = (float)width / (float)m_displaySamples;
@@ -268,8 +247,8 @@ void AudioManager::paintImage()
                 }
                 else
                 {
-                    float const xPos = pointWidth * (float)i;
-                    QPoint newPointPos = QPoint((int)xPos, (int)p);
+                    int const xPos = (int)pointWidth * i;
+                    QPoint newPointPos = QPoint(xPos, (int)p);
                     painter.drawLine(lastPointPos, newPointPos);
                     lastPointPos = newPointPos;
                 }
@@ -277,23 +256,36 @@ void AudioManager::paintImage()
         }
         else
         {
+
             // More samples then width, will need to ignore some
             float const sampleRatio = (float)m_displaySamples / (float)width;
-            for (int i = 0; i < width; i++)
+            int const drawWidth = (int)((float)m_dataRawWave.size() / sampleRatio);
+
+            m_displayImage = m_displayImage.copy(drawWidth, 0, width, height);
+            QPainter imagePainter(&m_displayImage);
+            imagePainter.setPen(QColor(Qt::cyan));
+
+            int const xPosStart = width - drawWidth;
+            for (int i = 0; i < drawWidth; i++)
             {
                 int sampleIndex = static_cast<int>(sampleRatio * (float)i);
+                if (sampleIndex >= m_dataRawWave.size()) break;
+
                 float const p = m_dataRawWave[sampleIndex] * heightHalf + heightHalf;
                 if (i == 0)
                 {
-                    lastPointPos = QPoint(0, (int)p);
+                    lastPointPos = QPoint(xPosStart, (int)p);
                 }
                 else
                 {
-                    QPoint newPointPos = QPoint(i, (int)p);
-                    painter.drawLine(lastPointPos, newPointPos);
+                    QPoint newPointPos = QPoint(xPosStart + i, (int)p);
+                    imagePainter.drawLine(lastPointPos, newPointPos);
                     lastPointPos = newPointPos;
                 }
             }
+            painter.drawImage(this->rect(), m_displayImage);
+
+            //m_displayImage = this->grab().toImage();
         }
         break;
     }

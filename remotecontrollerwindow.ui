@@ -1745,7 +1745,7 @@
                    <number>512</number>
                   </property>
                   <property name="maximum">
-                   <number>8192</number>
+                   <number>20480</number>
                   </property>
                   <property name="singleStep">
                    <number>128</number>
@@ -1884,7 +1884,7 @@
                  </sizepolicy>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <widget class="QWidget" name="page">
                  <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1976,8 +1976,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>323</width>
-                       <height>235</height>
+                       <width>430</width>
+                       <height>284</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -2193,6 +2193,12 @@ Some programs may require settings like &quot;Game Language&quot; or
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                            </sizepolicy>
+                          </property>
+                          <property name="minimumSize">
+                           <size>
+                            <width>0</width>
+                            <height>100</height>
+                           </size>
                           </property>
                           <property name="maximumSize">
                            <size>
@@ -3567,8 +3573,8 @@ This is for duplicating Pokemon, for items, use Box Operation program instead.</
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>443</width>
-                       <height>214</height>
+                       <width>274</width>
+                       <height>186</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_31">
