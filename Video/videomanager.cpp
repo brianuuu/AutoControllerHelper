@@ -37,6 +37,15 @@ void VideoManager::stop()
     this->hide();
 }
 
+void VideoManager::displayTimeout()
+{
+    emit timeout();
+    QWidget::update();
+}
+
+//---------------------------------------------
+// Input
+//---------------------------------------------
 void VideoManager::pushVideoData(const unsigned char *data)
 {
     m_displayMutex.lock();
@@ -48,6 +57,9 @@ void VideoManager::pushVideoData(const unsigned char *data)
     // We don't immediately update, let timeout do it
 }
 
+//---------------------------------------------
+// Output
+//---------------------------------------------
 void VideoManager::getFrame(QImage &frame)
 {
     m_displayMutex.lock();
@@ -57,12 +69,9 @@ void VideoManager::getFrame(QImage &frame)
     m_displayMutex.unlock();
 }
 
-void VideoManager::displayTimeout()
-{
-    emit timeout();
-    QWidget::update();
-}
-
+//---------------------------------------------
+// Drawing
+//---------------------------------------------
 void VideoManager::paintEvent(QPaintEvent *event)
 {
     QImage imageScaled;

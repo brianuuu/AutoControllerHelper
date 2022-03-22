@@ -70,13 +70,14 @@ private:
     // Display
     QMutex              m_displayMutex;
     AudioDisplayMode    m_displayMode;
+    QImage              m_displayImage;
 
     // Raw Wave data
     int                 m_displaySamples;
-    QVector<float>      m_dataRawWave;
+    QVector<float>      m_rawWaveData;
+    int                 m_rawWaveDataSize;
 
     // Spectrogram data
-    QImage              m_displayImage;
 };
 
 #endif // AUDIOMANAGER_H

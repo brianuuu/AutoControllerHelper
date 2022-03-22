@@ -1560,7 +1560,7 @@
             <number>512</number>
            </property>
            <property name="maximum">
-            <number>20480</number>
+            <number>48000</number>
            </property>
            <property name="singleStep">
             <number>128</number>
@@ -1618,6 +1618,9 @@
        <property name="lineWidth">
         <number>0</number>
        </property>
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOn</enum>
+       </property>
        <property name="widgetResizable">
         <bool>true</bool>
        </property>
@@ -1626,8 +1629,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>669</width>
-          <height>701</height>
+          <width>668</width>
+          <height>691</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_39">
@@ -1976,7 +1979,7 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>429</width>
+                       <width>428</width>
                        <height>284</height>
                       </rect>
                      </property>

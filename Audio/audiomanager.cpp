@@ -42,7 +42,7 @@ void AudioManager::stop()
 
     m_displayMutex.lock();
     {
-        m_dataRawWave.clear();
+        m_rawWaveData.clear();
     }
     m_displayMutex.unlock();
     QWidget::update();
@@ -116,7 +116,9 @@ void AudioManager::displaySampleChanged(int count)
     m_displayMutex.lock();
     {
         m_displaySamples = count;
-        m_dataRawWave.clear();
+
+        m_rawWaveData.clear();
+        m_rawWaveDataSize = 0;
     }
     m_displayMutex.unlock();
     QWidget::update();
@@ -180,14 +182,18 @@ void AudioManager::sendData_rawWave(const QAudioFormat &format, const char* samp
 
     m_displayMutex.lock();
     {
-        int frameCount = newRawData.size() / 2;
-        m_dataRawWave.clear();
-        m_dataRawWave.reserve(frameCount);
+        // only re-allocate if we don't have enough size
+        // this way we can re-use the same memory
+        m_rawWaveDataSize = newRawData.size() / 2;
+        if (m_rawWaveData.size() < m_rawWaveDataSize)
+        {
+            m_rawWaveData.resize(m_rawWaveDataSize);
+        }
 
         // Average LR channels
-        for (int i = 0; i < frameCount; i++)
+        for (int i = 0; i < m_rawWaveDataSize; i++)
         {
-            m_dataRawWave.push_back((newRawData[2*i] + newRawData[2*i+1]) * 0.5f);
+            m_rawWaveData[i] = (newRawData[2*i] + newRawData[2*i+1]) * 0.5f;
         }
     }
     m_displayMutex.unlock();
@@ -231,16 +237,16 @@ void AudioManager::paintImage()
         painter.fillRect(this->rect(), Qt::black);
         painter.setPen(QColor(Qt::cyan));
 
-        if (m_dataRawWave.isEmpty()) return;
+        if (m_rawWaveData.isEmpty()) return;
 
         QPoint lastPointPos(0, (int)heightHalf);
         if (m_displaySamples <= width)
         {
             // fewer samples than width, we need to scale it up
             float const pointWidth = (float)width / (float)m_displaySamples;
-            for (int i = 0; i < m_dataRawWave.size(); i++)
+            for (int i = 0; i < m_rawWaveDataSize; i++)
             {
-                float const p = m_dataRawWave[i] * heightHalf + heightHalf;
+                float const p = m_rawWaveData[i] * heightHalf + heightHalf;
                 if (i == 0)
                 {
                     lastPointPos = QPoint(0, (int)p);
@@ -256,22 +262,23 @@ void AudioManager::paintImage()
         }
         else
         {
-
             // More samples then width, will need to ignore some
             float const sampleRatio = (float)m_displaySamples / (float)width;
-            int const drawWidth = (int)((float)m_dataRawWave.size() / sampleRatio);
+            int const drawWidth = (int)((float)m_rawWaveDataSize / sampleRatio);
 
+            // Shift previously drawn wave data
             m_displayImage = m_displayImage.copy(drawWidth, 0, width, height);
             QPainter imagePainter(&m_displayImage);
             imagePainter.setPen(QColor(Qt::cyan));
 
+            // Draw the new data at the right side end of the image
             int const xPosStart = width - drawWidth;
             for (int i = 0; i < drawWidth; i++)
             {
                 int sampleIndex = static_cast<int>(sampleRatio * (float)i);
-                if (sampleIndex >= m_dataRawWave.size()) break;
+                if (sampleIndex >= m_rawWaveDataSize) break;
 
-                float const p = m_dataRawWave[sampleIndex] * heightHalf + heightHalf;
+                float const p = m_rawWaveData[sampleIndex] * heightHalf + heightHalf;
                 if (i == 0)
                 {
                     lastPointPos = QPoint(xPosStart, (int)p);
@@ -283,9 +290,9 @@ void AudioManager::paintImage()
                     lastPointPos = newPointPos;
                 }
             }
-            painter.drawImage(this->rect(), m_displayImage);
 
-            //m_displayImage = this->grab().toImage();
+            // Finally draw the image on widget
+            painter.drawImage(this->rect(), m_displayImage);
         }
         break;
     }
