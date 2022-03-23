@@ -2,6 +2,11 @@
 
 AudioManager::AudioManager(QWidget *parent) : QWidget(parent)
 {
+    this->setFixedSize(640,100);
+    this->hide();
+    m_displayImage = QImage(this->size(), QImage::Format_RGB32);
+    m_displayImage.fill(Qt::black);
+
     // Set up global audio format
     m_audioFormat.setSampleRate(48000);
     m_audioFormat.setChannelCount(2);
@@ -81,18 +86,11 @@ void AudioManager::displayModeChanged(int index)
         // Set display height
         if (index > ADM_None && index < ADM_COUNT)
         {
-            this->setFixedHeight(100);
+            this->show();
         }
         else
         {
-            this->setFixedHeight(0);
-        }
-
-        // Handle resize
-        if (m_displayImage.size() != this->size())
-        {
-            m_displayImage = QImage(this->size(), QImage::Format_RGB32);
-            m_displayImage.fill(Qt::black);
+            this->hide();
         }
 
         // Handle resetting data

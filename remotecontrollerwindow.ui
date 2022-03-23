@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1398</width>
+    <width>1407</width>
     <height>831</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1398</width>
+    <width>1407</width>
     <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>1398</width>
+    <width>1407</width>
     <height>16777215</height>
    </size>
   </property>
@@ -1618,9 +1618,6 @@
        <property name="lineWidth">
         <number>0</number>
        </property>
-       <property name="verticalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOn</enum>
-       </property>
        <property name="widgetResizable">
         <bool>true</bool>
        </property>
@@ -1629,8 +1626,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>668</width>
-          <height>691</height>
+          <width>678</width>
+          <height>701</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_39">
@@ -1659,7 +1656,7 @@
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
             <item>
-             <layout class="QHBoxLayout" name="HL_CameraView">
+             <layout class="QHBoxLayout" name="horizontalLayout_37">
               <item>
                <spacer name="horizontalSpacer_19">
                 <property name="orientation">
@@ -1674,17 +1671,21 @@
                </spacer>
               </item>
               <item>
-               <widget class="QLabel" name="L_NoVideo">
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="pixmap">
-                 <pixmap resource="resource.qrc">:/resources/UI/NoVideo.png</pixmap>
-                </property>
-                <property name="scaledContents">
-                 <bool>false</bool>
-                </property>
-               </widget>
+               <layout class="QVBoxLayout" name="VL_MediaView">
+                <item>
+                 <widget class="QLabel" name="L_NoVideo">
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="pixmap">
+                   <pixmap resource="resource.qrc">:/resources/UI/NoVideo.png</pixmap>
+                  </property>
+                  <property name="scaledContents">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
               <item>
                <spacer name="horizontalSpacer_20">
@@ -1919,8 +1920,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>440</width>
-                       <height>196</height>
+                       <width>384</width>
+                       <height>64</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -1979,7 +1980,7 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>428</width>
+                       <width>438</width>
                        <height>284</height>
                       </rect>
                      </property>

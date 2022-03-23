@@ -166,12 +166,11 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     m_vlcWrapper = new VLCWrapper(this);
     connect(m_vlcWrapper, &VLCWrapper::stateChanged, this, &RemoteControllerWindow::on_VLCState_changed);
     VideoManager* videoManager = m_vlcWrapper->getVideoManager();
-    ui->HL_CameraView->insertWidget(1, videoManager);
+    ui->VL_MediaView->insertWidget(0, videoManager);
 
     // Audio
-    QVBoxLayout* layout = reinterpret_cast<QVBoxLayout*>(ui->GB_MediaView->layout());
     AudioManager* audioManager = m_vlcWrapper->getAudioManager();
-    layout->insertWidget(0, audioManager);
+    ui->VL_MediaView->insertWidget(0, audioManager);
     connect(ui->CB_AudioDisplayMode, SIGNAL(currentIndexChanged(int)), audioManager, SLOT(displayModeChanged(int)));
     connect(ui->SB_AudioSamples, SIGNAL(valueChanged(int)), audioManager, SLOT(displaySampleChanged(int)));
     connect(ui->S_Volume, &QSlider::valueChanged, audioManager, &AudioManager::setVolume);
