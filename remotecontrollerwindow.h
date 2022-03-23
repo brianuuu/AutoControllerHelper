@@ -136,6 +136,9 @@ private slots:
     void on_PB_Screenshot_clicked();
     void on_PB_AdjustVideo_clicked();
     void on_VLCState_changed(VLCWrapper::VLCState state);
+    void on_CB_AudioDisplayMode_currentIndexChanged(int index);
+    void on_SB_AudioFreqLow_valueChanged(int arg1);
+    void on_SB_AudioFreqHigh_valueChanged(int arg1);
 
     // Smart program
     void on_SP1_SB_X_valueChanged(int arg1);

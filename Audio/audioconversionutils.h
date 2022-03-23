@@ -4,6 +4,7 @@
 #include <QAudioFormat>
 #include <QDebug>
 #include <QWidget>
+#include <QtMath>
 
 #include <fftw3.h>
 #define REAL 0
@@ -19,6 +20,7 @@ public:
     static void fft(int sampleSize, fftwf_complex *in, fftwf_complex *out);
     static void ifft(int sampleSize, fftwf_complex *in, fftwf_complex *out);
     static void debugComplex(fftwf_complex *c, int size);
+    static void fftOutToSpectrogram(int sampleSize, fftwf_complex const* in, QVector<float>& out);
 
 private:
     // Byte swap template functions

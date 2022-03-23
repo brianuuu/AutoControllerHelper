@@ -1542,7 +1542,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_41">
          <item>
-          <widget class="QLabel" name="label_69">
+          <widget class="QLabel" name="L_AudioSamples">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -1567,6 +1567,45 @@
            </property>
            <property name="value">
             <number>1024</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="L_AudioFreq">
+           <property name="text">
+            <string>Frequency Range:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="SB_AudioFreqLow">
+           <property name="minimum">
+            <number>100</number>
+           </property>
+           <property name="maximum">
+            <number>20000</number>
+           </property>
+           <property name="singleStep">
+            <number>100</number>
+           </property>
+           <property name="value">
+            <number>100</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="SB_AudioFreqHigh">
+           <property name="minimum">
+            <number>100</number>
+           </property>
+           <property name="maximum">
+            <number>20000</number>
+           </property>
+           <property name="singleStep">
+            <number>100</number>
+           </property>
+           <property name="value">
+            <number>10500</number>
            </property>
           </widget>
          </item>

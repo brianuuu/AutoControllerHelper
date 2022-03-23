@@ -37,7 +37,7 @@ AudioManager::AudioManager(QWidget *parent) : QWidget(parent)
     m_rawWaveDataSize = 0;
 
     // Spectrogram data
-    m_fftBufferData.resize(FFT_WINDOW_STEP * 8);
+    m_fftBufferData.resize(FFT_SAMPLE_COUNT * 8);
     m_fftAnalysisStart = 0;
     m_fftNewDataStart = 0;
     m_fftDataIn = fftwf_alloc_complex(FFT_SAMPLE_COUNT);
@@ -49,9 +49,12 @@ AudioManager::AudioManager(QWidget *parent) : QWidget(parent)
     m_hanningFunction.resize(FFT_SAMPLE_COUNT);
     for (int i = 0; i < FFT_SAMPLE_COUNT / 2; i++)
     {
-        m_hanningFunction[i] = 0.5f - 0.5f * std::cos((2.0f * (float)M_PI * i) / (FFT_SAMPLE_COUNT - 1));
+        m_hanningFunction[i] = 0.5f - 0.5f * std::cos((2.0f * float(M_PI) * i) / (FFT_SAMPLE_COUNT - 1));
         m_hanningFunction[FFT_SAMPLE_COUNT - 1 - i] = m_hanningFunction[i];
     }
+
+    m_freqLow = 100;
+    m_freqHigh = 10500;
 }
 
 AudioManager::~AudioManager()
@@ -101,7 +104,7 @@ void AudioManager::setVolume(int volume)
         else
         {
             constexpr double exp = 20.0;
-            m_volumeScaleDB = (qPow(exp, (double)volume * 0.01) - 1.0) / (exp - 1.0);
+            m_volumeScaleDB = (qPow(exp, double(volume) * 0.01) - 1.0) / (exp - 1.0);
         }
     }
     m_playbackMutex.unlock();
@@ -112,7 +115,7 @@ void AudioManager::displayModeChanged(int index)
     qDebug() << "Display Mode Updated to" << index;
     m_displayMutex.lock();
     {
-        m_displayMode = (AudioDisplayMode)index;
+        m_displayMode = AudioDisplayMode(index);
 
         // Set display height
         if (index > ADM_None && index < ADM_COUNT)
@@ -166,6 +169,26 @@ void AudioManager::drawSlot()
     QWidget::update();
 }
 
+void AudioManager::freqLowChanged(int value)
+{
+    m_displayMutex.lock();
+    {
+        m_freqLow = value;
+        m_displayImage.fill(Qt::black);
+    }
+    m_displayMutex.unlock();
+}
+
+void AudioManager::freqHighChanged(int value)
+{
+    m_displayMutex.lock();
+    {
+        m_freqHigh = value;
+        m_displayImage.fill(Qt::black);
+    }
+    m_displayMutex.unlock();
+}
+
 void AudioManager::newFFTBufferDataSlot()
 {
     bool doFFT = false;
@@ -210,25 +233,7 @@ void AudioManager::newFFTBufferDataSlot()
     if (doFFT)
     {
         AudioConversionUtils::fft(FFT_SAMPLE_COUNT, m_fftDataIn, m_fftDataOut);
-        for (int i = 0; i < FFT_SAMPLE_COUNT / 2; i++)
-        {
-            float const& real = m_fftDataOut[i][REAL];
-            float const& imag = m_fftDataOut[i][IMAG];
-            float const mag = std::sqrt(real * real + imag * imag) / (FFT_SAMPLE_COUNT / 2);
-
-            // Get magnitude in log scale, this will be [0,-inf]
-            m_spectrogramData[i] = 0.0f;
-            if (mag > 0.0f)
-            {
-                constexpr float minMag = -7.0f;
-                constexpr float maxMag = -2.0f;
-                float const logMag = std::log(mag);
-                if (logMag > minMag)
-                {
-                    m_spectrogramData[i] = 1.0f - ((maxMag - logMag) / (maxMag - minMag));
-                }
-            }
-        }
+        AudioConversionUtils::fftOutToSpectrogram(FFT_SAMPLE_COUNT, m_fftDataOut, m_spectrogramData);
 
         QWidget::update();
     }
@@ -260,7 +265,7 @@ void AudioManager::pushAudioData(const void *samples, unsigned int count, int64_
         memcpy(sampleScaled, samples, sampleSize);
         for (size_t i = 0; i < sampleSize / sizeof(int16_t); i++)
         {
-            sampleScaled[i] = static_cast<int16_t>((double)sampleScaled[i] * m_volumeScaleDB);
+            sampleScaled[i] = static_cast<int16_t>(double(sampleScaled[i]) * m_volumeScaleDB);
         }
         m_audioDevice->write((const char*)sampleScaled, sampleSize);
         delete[] sampleScaled;
@@ -353,6 +358,8 @@ void AudioManager::resetFFTBufferData_NonTS()
     {
         f = 0.0f;
     }
+
+    m_displayImage.fill(Qt::black);
 }
 
 void AudioManager::writeFFTBufferData(QVector<float> const& newData)
@@ -422,27 +429,27 @@ void AudioManager::paintEvent_NonTS()
             QPainter imagePainter(&m_displayImage);
             imagePainter.fillRect(this->rect(), Qt::black);
             imagePainter.setPen(QColor(Qt::cyan));
-            imagePainter.drawLine(0, (int)heightHalf, this->width(), (int)heightHalf);
+            imagePainter.drawLine(0, int(heightHalf), this->width(), int(heightHalf));
             painter.drawImage(this->rect(), m_displayImage);
             return;
         }
 
-        QPoint lastPointPos(0, (int)heightHalf);
+        QPoint lastPointPos(0, int(heightHalf));
         if (m_displaySamples <= width)
         {
             // fewer samples than width, we need to scale it up
-            float const pointWidth = (float)width / (float)m_displaySamples;
+            float const pointWidth = float(width) / float(m_displaySamples);
             for (int i = 0; i < m_rawWaveDataSize; i++)
             {
                 float const p = m_rawWaveData[i] * heightHalf + heightHalf;
                 if (i == 0)
                 {
-                    lastPointPos = QPoint(0, (int)p);
+                    lastPointPos = QPoint(0, int(p));
                 }
                 else
                 {
-                    int const xPos = (int)pointWidth * i;
-                    QPoint newPointPos = QPoint(xPos, (int)p);
+                    int const xPos = int(pointWidth) * i;
+                    QPoint newPointPos = QPoint(xPos, int(p));
                     painter.drawLine(lastPointPos, newPointPos);
                     lastPointPos = newPointPos;
                 }
@@ -451,8 +458,8 @@ void AudioManager::paintEvent_NonTS()
         else
         {
             // More samples then width, will need to ignore some
-            float const sampleRatio = (float)m_displaySamples / (float)width;
-            int const drawWidth = (int)((float)m_rawWaveDataSize / sampleRatio);
+            float const sampleRatio = float(m_displaySamples) / float(width);
+            int const drawWidth = int(float(m_rawWaveDataSize) / sampleRatio);
 
             // Shift previously drawn wave data
             m_displayImage = m_displayImage.copy(drawWidth, 0, width, height);
@@ -463,17 +470,17 @@ void AudioManager::paintEvent_NonTS()
             int const xPosStart = width - drawWidth;
             for (int i = 0; i < drawWidth; i++)
             {
-                int sampleIndex = static_cast<int>(sampleRatio * (float)i);
+                int sampleIndex = int(sampleRatio * float(i));
                 if (sampleIndex >= m_rawWaveDataSize) break;
 
                 float const p = m_rawWaveData[sampleIndex] * heightHalf + heightHalf;
                 if (i == 0)
                 {
-                    lastPointPos = QPoint(xPosStart, (int)p);
+                    lastPointPos = QPoint(xPosStart, int(p));
                 }
                 else
                 {
-                    QPoint newPointPos = QPoint(xPosStart + i, (int)p);
+                    QPoint newPointPos = QPoint(xPosStart + i, int(p));
                     imagePainter.drawLine(lastPointPos, newPointPos);
                     lastPointPos = newPointPos;
                 }
@@ -491,25 +498,105 @@ void AudioManager::paintEvent_NonTS()
         painter.setPen(QColor(Qt::cyan));
         painter.drawLine(0, height, width, height);
 
-        float const sampleRatio = (float)m_spectrogramData.size() / (float)width;
-        for (int i = 1; i < width; i++)
+        float const freqRes = float(m_audioFormat.sampleRate()) / FFT_SAMPLE_COUNT;
+        int const indexStart = int(float(m_freqLow) / freqRes);
+        int const indexEnd = int(float(m_freqHigh) / freqRes);
+        int const drawWidth = indexEnd - indexStart + 1;
+
+        if (drawWidth >= width)
         {
-            int sampleIndex = static_cast<int>(sampleRatio * (float)i);
-            float const logMag = m_spectrogramData[sampleIndex];
-            if (logMag > 0.0f)
+            // More samples then width, will need to ignore some
+            float const sampleRatio = float(drawWidth) / float(width);
+            for (int i = 0; i < width; i++)
             {
-                painter.drawLine(i, height, i, (int)((1.0f - logMag) * height));
+                int sampleIndex = indexStart + int(sampleRatio * i);
+                float const logMag = m_spectrogramData[sampleIndex];
+                if (logMag > 0.0f)
+                {
+                    painter.drawLine(i, height, i, int((1.0f - logMag) * height));
+                }
+            }
+        }
+        else
+        {
+            // fewer samples than width, we need to scale it up
+            float nextXPos = 0.0f;
+            float const barWidth = float(width) / float(drawWidth);
+            for (int i = 0; i < drawWidth; i++)
+            {
+                int sampleIndex = indexStart + i;
+                if (sampleIndex >= m_spectrogramData.size()) break;
+
+                float const logMag = m_spectrogramData[sampleIndex];
+                if (logMag > 0.0f)
+                {
+                    painter.drawRect(int(nextXPos), int((1.0f - logMag) * height), int(barWidth), height);
+                }
+                nextXPos += barWidth;
             }
         }
         break;
     }
     case ADM_Spectrogram:
     {
-        // TODO: Shift?
         QPainter painter(this);
         painter.fillRect(this->rect(), Qt::black);
+
+        // Shift previously drawn spectrogram data
+        m_displayImage = m_displayImage.copy(1, 0, width, height);
+        QPainter imagePainter(&m_displayImage);
+
+        float const freqRes = float(m_audioFormat.sampleRate()) / FFT_SAMPLE_COUNT;
+        int const indexStart = int(float(m_freqLow) / freqRes);
+        int const indexEnd = int(float(m_freqHigh) / freqRes);
+
+        float const sampleRatio = float(indexEnd - indexStart + 1) / float(height);
+        for (int i = 0; i < height; i++)
+        {
+            int sampleIndex = indexStart + int(sampleRatio * i);
+            if (sampleIndex >= m_spectrogramData.size()) break;
+
+            imagePainter.setPen(getMagnitudeColor(m_spectrogramData[sampleIndex]));
+            imagePainter.drawPoint(width - 1, i);
+        }
+
+        // Finally draw the image on widget
+        painter.drawImage(this->rect(), m_displayImage);
         break;
     }
     default: break;
+    }
+}
+
+QColor AudioManager::getMagnitudeColor(float v)
+{
+    if (v <= 0.0f)
+    {
+        return QColor(0,0,0);
+    }
+    else if (v < 0.125f)
+    {
+        return QColor(0, 0, int((0.5f + 4.0f * v) * 255.f));
+    }
+    else if (v < 0.375f)
+    {
+        return QColor(0, int((v - 0.125f) * 1020.0f), 255);
+    }
+    else if (v < 0.625f)
+    {
+        int c = int((v - 0.375f) * 1020.0f);
+        return QColor(c, 255, 255 - c);
+    }
+    else if (v < 0.875f)
+    {
+        return QColor(255, 255 - int((v - 0.625f) * 1020.f), 0);
+    }
+    else if (v <= 1.0f)
+    {
+        return QColor(255 - int((v - 0.875f) * 1020.f), 0, 0);
+    }
+    else
+    {
+        return QColor(255, 255, 255);
     }
 }

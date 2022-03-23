@@ -57,6 +57,8 @@ public slots:
     void displaySampleChanged(int count);
     void drawSlot();
 
+    void freqLowChanged(int value);
+    void freqHighChanged(int value);
     void newFFTBufferDataSlot();
 
 private:
@@ -72,6 +74,7 @@ private:
 
     // Display
     void paintEvent_NonTS();
+    static QColor getMagnitudeColor(float v);
 
 private:
     // Playback
@@ -101,6 +104,8 @@ private:
     fftwf_complex*      m_fftDataIn;
     fftwf_complex*      m_fftDataOut;
     QVector<float>      m_spectrogramData;
+    int                 m_freqLow;
+    int                 m_freqHigh;
 };
 
 #endif // AUDIOMANAGER_H

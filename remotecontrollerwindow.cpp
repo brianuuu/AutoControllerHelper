@@ -174,6 +174,8 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     connect(ui->CB_AudioDisplayMode, SIGNAL(currentIndexChanged(int)), audioManager, SLOT(displayModeChanged(int)));
     connect(ui->SB_AudioSamples, SIGNAL(valueChanged(int)), audioManager, SLOT(displaySampleChanged(int)));
     connect(ui->S_Volume, &QSlider::valueChanged, audioManager, &AudioManager::setVolume);
+    connect(ui->SB_AudioFreqLow, SIGNAL(valueChanged(int)), audioManager, SLOT(freqLowChanged(int)));
+    connect(ui->SB_AudioFreqHigh, SIGNAL(valueChanged(int)), audioManager, SLOT(freqHighChanged(int)));
 
     if (!QDir(SCREENSHOT_PATH).exists())
     {
@@ -243,6 +245,10 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     audioManager->setVolume(ui->S_Volume->value());
     ui->CB_AudioDisplayMode->setCurrentIndex(m_settings->value("AudioDisplayMode", 0).toInt());
     ui->SB_AudioSamples->setValue(m_settings->value("AudioDisplaySamples", 1024).toInt());
+    ui->SB_AudioFreqLow->setValue(m_settings->value("AudioFreqLow", 100).toInt());
+    ui->SB_AudioFreqHigh->setValue(m_settings->value("AudioFreqHigh", 10500).toInt());
+    ui->SB_AudioFreqHigh->setMinimum(ui->SB_AudioFreqLow->value() + 100);
+    ui->SB_AudioFreqLow->setMaximum(ui->SB_AudioFreqHigh->value() - 100);
 
     m_smartSetting = new SmartProgramSetting();
     m_videoEffectSetting = new VideoEffectSetting();
@@ -352,6 +358,8 @@ void RemoteControllerWindow::closeEvent(QCloseEvent *event)
     m_settings->setValue("Volume", ui->S_Volume->value());
     m_settings->setValue("AudioDisplayMode", ui->CB_AudioDisplayMode->currentIndex());
     m_settings->setValue("AudioDisplaySamples", ui->SB_AudioSamples->value());
+    m_settings->setValue("AudioFreqLow", ui->SB_AudioFreqLow->value());
+    m_settings->setValue("AudioFreqHigh", ui->SB_AudioFreqHigh->value());
 
     // Remember last used Smart Program
     m_settings->setValue("SmartProgramGame", ui->CB_SmartProgram->currentIndex());
@@ -1526,6 +1534,44 @@ void RemoteControllerWindow::on_VLCState_changed(VLCWrapper::VLCState state)
     }
     default: break;
     }
+}
+
+void RemoteControllerWindow::on_CB_AudioDisplayMode_currentIndexChanged(int index)
+{
+    switch (index)
+    {
+    case ADM_RawWave:
+    {
+        ui->L_AudioSamples->setHidden(false);
+        ui->SB_AudioSamples->setHidden(false);
+
+        ui->L_AudioFreq->setHidden(true);
+        ui->SB_AudioFreqLow->setHidden(true);
+        ui->SB_AudioFreqHigh->setHidden(true);
+        break;
+    }
+    case ADM_FreqBars:
+    case ADM_Spectrogram:
+    {
+        ui->L_AudioSamples->setHidden(true);
+        ui->SB_AudioSamples->setHidden(true);
+
+        ui->L_AudioFreq->setHidden(false);
+        ui->SB_AudioFreqLow->setHidden(false);
+        ui->SB_AudioFreqHigh->setHidden(false);
+        break;
+    }
+    }
+}
+
+void RemoteControllerWindow::on_SB_AudioFreqLow_valueChanged(int arg1)
+{
+    ui->SB_AudioFreqHigh->setMinimum(arg1 + 100);
+}
+
+void RemoteControllerWindow::on_SB_AudioFreqHigh_valueChanged(int arg1)
+{
+    ui->SB_AudioFreqLow->setMaximum(arg1 - 100);
 }
 
 //---------------------------------------------------------------------------

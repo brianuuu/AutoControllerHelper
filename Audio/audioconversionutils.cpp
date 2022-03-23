@@ -110,3 +110,26 @@ void AudioConversionUtils::debugComplex(fftwf_complex *c, int size)
         }
     }
 }
+
+void AudioConversionUtils::fftOutToSpectrogram(int sampleSize, const fftwf_complex *in, QVector<float> &out)
+{
+    for (int i = 0; i < sampleSize / 2; i++)
+    {
+        float const& real = in[i][REAL];
+        float const& imag = in[i][IMAG];
+        float const mag = std::sqrt(real * real + imag * imag) / (sampleSize / 2);
+
+        // Get magnitude in log scale, this will be [0,-inf]
+        out[i] = 0.0f;
+        if (mag > 0.0f)
+        {
+            constexpr float minMag = -10.0f;
+            constexpr float maxMag = -3.0f;
+            float const logMag = std::log(mag);
+            if (logMag > minMag)
+            {
+                out[i] = 1.0f - ((maxMag - logMag) / (maxMag - minMag));
+            }
+        }
+    }
+}
