@@ -122,6 +122,7 @@ void VLCWrapper::stop()
     {
         m_isStarted = false;
         libvlc_media_player_stop(m_mediaPlayer);
+        m_state = static_cast<VLCState>(libvlc_media_player_get_state(m_mediaPlayer));
 
         // Stop display
         ctxVideo.m_manager->stop();
