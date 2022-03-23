@@ -59,3 +59,54 @@ void AudioConversionUtils::normalizeAudio(const Type *in, float *out, size_t out
         out[c] = ((float)(isLittleEndian ? in[c] : byteSwap(in[c])) * rcp - sub);
     }
 }
+
+//-----------------------------------------
+// Fast Fourier Transform
+//-----------------------------------------
+void AudioConversionUtils::fft(int sampleSize, fftwf_complex *in, fftwf_complex *out)
+{
+    // create a DFT plan
+    fftwf_plan plan = fftwf_plan_dft_1d(sampleSize, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+
+    // execute the plan
+    fftwf_execute(plan);
+
+    // do some cleaning
+    fftwf_destroy_plan(plan);
+    fftwf_cleanup();
+}
+
+void AudioConversionUtils::ifft(int sampleSize, fftwf_complex *in, fftwf_complex *out)
+{
+    // create an IDFT plan
+    fftwf_plan plan = fftwf_plan_dft_1d(sampleSize, in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
+
+    // execute the plan
+    fftwf_execute(plan);
+
+    // do some cleaning
+    fftwf_destroy_plan(plan);
+    fftwf_cleanup();
+
+    // scale the output to obtain the exact inverse
+    for (int i = 0; i < sampleSize; ++i)
+    {
+        out[i][REAL] /= sampleSize;
+        out[i][IMAG] /= sampleSize;
+    }
+}
+
+void AudioConversionUtils::debugComplex(fftwf_complex *c, int size)
+{
+    for (int i = 0; i < size; ++i)
+    {
+        if (c[i][IMAG] < 0)
+        {
+            qDebug() << QString::number(c[i][REAL]) + " - " + QString::number(qAbs(c[i][IMAG])) + "i";
+        }
+        else
+        {
+            qDebug() << QString::number(c[i][REAL]) + " + " + QString::number(c[i][IMAG]) + "i";
+        }
+    }
+}

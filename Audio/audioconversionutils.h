@@ -2,13 +2,23 @@
 #define AUDIOCONVERSIONUTILS_H
 
 #include <QAudioFormat>
+#include <QDebug>
 #include <QWidget>
+
+#include <fftw3.h>
+#define REAL 0
+#define IMAG 1
 
 class AudioConversionUtils
 {
 public:
     // Main conversion function
     static bool convertSamplesToFloat(const QAudioFormat& format, const char* data, size_t dataSize, QVector<float>& out);
+
+    // Fast Fourier Transform
+    static void fft(int sampleSize, fftwf_complex *in, fftwf_complex *out);
+    static void ifft(int sampleSize, fftwf_complex *in, fftwf_complex *out);
+    static void debugComplex(fftwf_complex *c, int size);
 
 private:
     // Byte swap template functions

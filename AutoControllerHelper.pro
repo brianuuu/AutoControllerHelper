@@ -116,3 +116,6 @@ RESOURCES += \
 
 INCLUDEPATH += "D:/Brian_Data/LibVLC/include"
 LIBS += -L"D:/Brian_Data/LibVLC" -lvlc -lvlccore
+
+INCLUDEPATH += "D:/Brian_Data/fftw/include"
+LIBS += -L"D:/Brian_Data/fftw/bin" -lfftw3f-3
