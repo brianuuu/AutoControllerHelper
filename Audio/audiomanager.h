@@ -12,6 +12,9 @@
 
 #include "audioconversionutils.h"
 
+#define FFT_SAMPLE_COUNT    4096
+#define FFT_WINDOW_STEP     1024
+
 enum AudioDisplayMode : uint8_t
 {
     ADM_None,
@@ -27,6 +30,7 @@ class AudioManager : public QWidget
     Q_OBJECT
 public:
     explicit AudioManager(QWidget *parent = nullptr);
+    ~AudioManager() override;
 
     // Const functions
     bool isStarted() const { return m_audioOutput && m_audioDevice; }
@@ -45,6 +49,7 @@ protected:
 
 signals:
     void drawSignal();
+    void newFFTBufferDataSignal();
 
 public slots:
     void setVolume(int volume);
@@ -52,11 +57,18 @@ public slots:
     void displaySampleChanged(int count);
     void drawSlot();
 
+    void newFFTBufferDataSlot();
+
 private:
     // Raw wave
     void resetRawWaveData();
     void resetRawWaveData_NonTS();
-    void writeRawWaveData(QAudioFormat const& format, const char* samples, size_t sampleSize);
+    void writeRawWaveData(QVector<float> const& newData);
+
+    // Spectrogram
+    void resetFFTBufferData();
+    void resetFFTBufferData_NonTS();
+    void writeFFTBufferData(QVector<float> const& newData);
 
     // Display
     void paintEvent_NonTS();
@@ -80,6 +92,15 @@ private:
     int                 m_rawWaveDataSize;
 
     // Spectrogram data
+    QMutex              m_fftDataMutex;
+    QVector<float>      m_fftBufferData;
+    int                 m_fftNewDataStart;
+    int                 m_fftAnalysisStart;
+
+    QVector<float>      m_hanningFunction;
+    fftwf_complex*      m_fftDataIn;
+    fftwf_complex*      m_fftDataOut;
+    QVector<float>      m_spectrogramData;
 };
 
 #endif // AUDIOMANAGER_H
