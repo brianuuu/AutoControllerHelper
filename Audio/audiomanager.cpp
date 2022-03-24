@@ -572,7 +572,7 @@ QColor AudioManager::getMagnitudeColor(float v)
 {
     if (v <= 0.0f)
     {
-        return QColor(0,0,0);
+        return QColor(0, 0, 127);
     }
     else if (v < 0.125f)
     {
@@ -589,14 +589,14 @@ QColor AudioManager::getMagnitudeColor(float v)
     }
     else if (v < 0.875f)
     {
-        return QColor(255, 255 - int((v - 0.625f) * 1020.f), 0);
+        return QColor(255, 255 - int((v - 0.625f) * 1020.0f), 0);
     }
     else if (v <= 1.0f)
     {
-        return QColor(255 - int((v - 0.875f) * 1020.f), 0, 0);
+        return QColor(255 - int((v - 0.875f) * 1020.0f), 0, 0);
     }
     else
     {
-        return QColor(255, 255, 255);
+        return QColor(127, 0, 0);
     }
 }
