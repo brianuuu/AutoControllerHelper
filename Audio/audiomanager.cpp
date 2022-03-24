@@ -370,7 +370,7 @@ void AudioManager::writeFFTBufferData(QVector<float> const& newData)
         int const frameCount = newData.size() / 2;
         if (frameCount > FFT_WINDOW_STEP)
         {
-            qDebug() << "ERROR: Input data sample size" << frameCount << "is larger than" << FFT_WINDOW_STEP;
+            emit printLog("ERROR: Input data sample size " + QString::number(frameCount) + " is larger than " + QString::number(FFT_WINDOW_STEP), LOG_ERROR);
         }
 
         // Push new data to buffer

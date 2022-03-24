@@ -7,6 +7,8 @@
 #include <QPainter>
 #include <QWidget>
 
+#include "autocontrollerdefines.h"
+
 #define VIDEO_WIDTH   1280
 #define VIDEO_HEIGHT  720
 
@@ -76,6 +78,7 @@ protected:
     virtual void paintEvent(QPaintEvent* event) override;
 
 signals:
+    void printLog(QString const log, QColor color = QColor(0,0,0));
     void timeout();
 
 public slots:

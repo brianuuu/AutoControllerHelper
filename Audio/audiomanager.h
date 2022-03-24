@@ -10,6 +10,7 @@
 #include <QWidget>
 #include <QtMath>
 
+#include "autocontrollerdefines.h"
 #include "audioconversionutils.h"
 
 #define FFT_SAMPLE_COUNT    4096
@@ -48,6 +49,7 @@ protected:
     virtual void paintEvent(QPaintEvent* event) override;
 
 signals:
+    void printLog(QString const log, QColor color = QColor(0,0,0));
     void drawSignal();
     void newFFTBufferDataSignal();
 

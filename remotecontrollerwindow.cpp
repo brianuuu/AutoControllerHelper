@@ -167,6 +167,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     connect(m_vlcWrapper, &VLCWrapper::stateChanged, this, &RemoteControllerWindow::on_VLCState_changed);
     VideoManager* videoManager = m_vlcWrapper->getVideoManager();
     ui->VL_MediaView->insertWidget(0, videoManager);
+    connect(videoManager, &VideoManager::printLog, this, &RemoteControllerWindow::on_SmartProgram_printLog);
 
     // Audio
     AudioManager* audioManager = m_vlcWrapper->getAudioManager();
@@ -176,6 +177,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     connect(ui->S_Volume, &QSlider::valueChanged, audioManager, &AudioManager::setVolume);
     connect(ui->SB_AudioFreqLow, SIGNAL(valueChanged(int)), audioManager, SLOT(freqLowChanged(int)));
     connect(ui->SB_AudioFreqHigh, SIGNAL(valueChanged(int)), audioManager, SLOT(freqHighChanged(int)));
+    connect(audioManager, &AudioManager::printLog, this, &RemoteControllerWindow::on_SmartProgram_printLog);
 
     if (!QDir(SCREENSHOT_PATH).exists())
     {
@@ -1707,7 +1709,11 @@ void RemoteControllerWindow::on_SP6_CB_Skips_clicked()
 
 void RemoteControllerWindow::on_SmartProgram_printLog(const QString log, QColor color)
 {
-    if (!CanRunSmartProgram()) return;
+    if (!CanRunSmartProgram())
+    {
+        PrintLog(log, color);
+        return;
+    }
 
     PrintLog("[" + m_smartProgram->getProgramName() + "]: " + log, color);
 
