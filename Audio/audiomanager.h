@@ -12,9 +12,7 @@
 
 #include "autocontrollerdefines.h"
 #include "audioconversionutils.h"
-
-#define FFT_SAMPLE_COUNT    4096
-#define FFT_WINDOW_STEP     1024
+#include "audiofileholder.h"
 
 enum AudioDisplayMode : uint8_t
 {
@@ -102,7 +100,6 @@ private:
     int                 m_fftNewDataStart;
     int                 m_fftAnalysisStart;
 
-    QVector<float>      m_hanningFunction;
     fftwf_complex*      m_fftDataIn;
     fftwf_complex*      m_fftDataOut;
     QVector<float>      m_spectrogramData;

@@ -45,14 +45,6 @@ AudioManager::AudioManager(QWidget *parent) : QWidget(parent)
     m_spectrogramData.resize(FFT_SAMPLE_COUNT / 2);
     connect(this, &AudioManager::newFFTBufferDataSignal, this, &AudioManager::newFFTBufferDataSlot);
 
-    // Cache hanning function
-    m_hanningFunction.resize(FFT_SAMPLE_COUNT);
-    for (int i = 0; i < FFT_SAMPLE_COUNT / 2; i++)
-    {
-        m_hanningFunction[i] = 0.5f - 0.5f * std::cos((2.0f * float(M_PI) * i) / (FFT_SAMPLE_COUNT - 1));
-        m_hanningFunction[FFT_SAMPLE_COUNT - 1 - i] = m_hanningFunction[i];
-    }
-
     m_freqLow = 100;
     m_freqHigh = 10500;
 }
@@ -206,10 +198,11 @@ void AudioManager::newFFTBufferDataSlot()
             doFFT = true;
 
             // Grab input FFT data, apply Hanning window to reduce leakage
+            QVector<float> const& hanningFunction = AudioConversionUtils::getHanningFunction();
             int pos = m_fftAnalysisStart;
             for (int i = 0; i < FFT_SAMPLE_COUNT; i++)
             {
-                m_fftDataIn[i][REAL] = m_fftBufferData[pos] * m_hanningFunction[i];
+                m_fftDataIn[i][REAL] = m_fftBufferData[pos] * hanningFunction[i];
                 m_fftDataIn[i][IMAG] = 0.0f;
 
                 pos++;
@@ -357,6 +350,13 @@ void AudioManager::resetFFTBufferData_NonTS()
     for (float& f : m_spectrogramData)
     {
         f = 0.0f;
+    }
+    for (int i = 0; i < FFT_SAMPLE_COUNT; i++)
+    {
+        m_fftDataIn[i][REAL] = 0.0f;
+        m_fftDataIn[i][IMAG] = 0.0f;
+        m_fftDataOut[i][REAL] = 0.0f;
+        m_fftDataOut[i][IMAG] = 0.0f;
     }
 
     m_displayImage.fill(Qt::black);
@@ -510,6 +510,8 @@ void AudioManager::paintEvent_NonTS()
             for (int i = 0; i < width; i++)
             {
                 int sampleIndex = indexStart + int(sampleRatio * i);
+                if (sampleIndex >= m_spectrogramData.size()) break;
+
                 float const logMag = m_spectrogramData[sampleIndex];
                 if (logMag > 0.0f)
                 {

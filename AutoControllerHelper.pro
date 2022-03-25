@@ -22,7 +22,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     Audio/audioconversionutils.cpp \
+    Audio/audiofileholder.cpp \
     Audio/audiomanager.cpp \
+    Audio/peakfinder.cpp \
+    Audio/wavfile.cpp \
     SmartPrograms/Dev/smartbrightnessmeanfinder.cpp \
     SmartPrograms/Dev/smartcolorcalibrator.cpp \
     SmartPrograms/Dev/smartdelaycalibrator.cpp \
@@ -61,7 +64,10 @@ SOURCES += \
 
 HEADERS += \
     Audio/audioconversionutils.h \
+    Audio/audiofileholder.h \
     Audio/audiomanager.h \
+    Audio/peakfinder.h \
+    Audio/wavfile.h \
     SmartPrograms/Dev/smartbrightnessmeanfinder.h \
     SmartPrograms/Dev/smartcolorcalibrator.h \
     SmartPrograms/Dev/smartdelaycalibrator.h \

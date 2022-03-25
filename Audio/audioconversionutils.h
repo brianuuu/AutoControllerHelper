@@ -10,9 +10,21 @@
 #define REAL 0
 #define IMAG 1
 
+#define FFT_SAMPLE_COUNT    4096
+#define FFT_WINDOW_STEP     1024
+
 class AudioConversionUtils
 {
+private:
+    static AudioConversionUtils& instance();
+    AudioConversionUtils();
+
 public:
+    // Utils
+    static void debugAudioFormat(QAudioFormat const& audioFormat);
+    static QVector<float> const& getHanningFunction();
+    static QVector<float> const& getSpikeConvFunction();
+
     // Main conversion function
     static bool convertSamplesToFloat(const QAudioFormat& format, const char* data, size_t dataSize, QVector<float>& out);
 
@@ -21,6 +33,7 @@ public:
     static void ifft(int sampleSize, fftwf_complex *in, fftwf_complex *out);
     static void debugComplex(fftwf_complex *c, int size);
     static void fftOutToSpectrogram(int sampleSize, fftwf_complex const* in, QVector<float>& out);
+    static void spikeConvolution(int indexStart, int indexEnd, QVector<float> const& in, QVector<float>& out, float threshold = 1.0f);
 
 private:
     // Byte swap template functions
@@ -36,6 +49,10 @@ private:
     static void normalizeType(const QAudioFormat& format, const char* data, size_t dataSize, QVector<float>& out);
     template <typename Type>
     static void normalizeAudio(const Type* in, float* out, size_t outSize, bool isLittleEndian);
+
+private:
+    QVector<float> m_hanningFunction;
+    QVector<float> m_spikeConvFunction;
 };
 
 #endif // AUDIOCONVERSIONUTILS_H

@@ -1,5 +1,57 @@
 #include "audioconversionutils.h"
 
+AudioConversionUtils& AudioConversionUtils::instance()
+{
+    static AudioConversionUtils utils;
+    return utils;
+}
+
+AudioConversionUtils::AudioConversionUtils()
+{
+    m_hanningFunction.resize(FFT_SAMPLE_COUNT);
+    for (int i = 0; i < FFT_SAMPLE_COUNT / 2; i++)
+    {
+        m_hanningFunction[i] = 0.5f - 0.5f * std::cos((2.0f * float(M_PI) * i) / (FFT_SAMPLE_COUNT - 1));
+        m_hanningFunction[FFT_SAMPLE_COUNT - 1 - i] = m_hanningFunction[i];
+    }
+
+    m_spikeConvFunction.resize(18);
+    for (int i = 0; i < 9; i++)
+    {
+        m_spikeConvFunction[i] = -4.0f + 8.f * i / 8.0f;
+        m_spikeConvFunction[17 - i];
+    }
+}
+
+void AudioConversionUtils::debugAudioFormat(const QAudioFormat &audioFormat)
+{
+    qDebug() << "Debug Audio Format:";
+
+    QString str = "Sample type: ";
+    switch(audioFormat.sampleType())
+    {
+    case QAudioFormat::SampleType::Float:       str += "Float";         break;
+    case QAudioFormat::SampleType::SignedInt:   str += "SignedInt";     break;
+    case QAudioFormat::SampleType::UnSignedInt: str += "UnSignedInt";   break;
+    default:                                    str += "Error";         break;
+    }
+
+    qDebug() << "Bytes per Sample:" << audioFormat.bytesPerFrame() / audioFormat.channelCount();
+    qDebug() << "Channel Count:" << audioFormat.channelCount();
+    qDebug() << "Sample Rate:" << audioFormat.sampleRate();
+    qDebug() << "Codec:" << audioFormat.codec();
+}
+
+const QVector<float> &AudioConversionUtils::getHanningFunction()
+{
+    return instance().m_hanningFunction;
+}
+
+const QVector<float> &AudioConversionUtils::getSpikeConvFunction()
+{
+    return instance().m_spikeConvFunction;
+}
+
 //-----------------------------------------
 // Normalize (type to float)
 //-----------------------------------------
@@ -113,6 +165,11 @@ void AudioConversionUtils::debugComplex(fftwf_complex *c, int size)
 
 void AudioConversionUtils::fftOutToSpectrogram(int sampleSize, const fftwf_complex *in, QVector<float> &out)
 {
+    if (out.size() != sampleSize / 2)
+    {
+        out.resize(sampleSize / 2);
+    }
+
     for (int i = 0; i < sampleSize / 2; i++)
     {
         float const& real = in[i][REAL];
@@ -130,6 +187,30 @@ void AudioConversionUtils::fftOutToSpectrogram(int sampleSize, const fftwf_compl
             {
                 out[i] = 1.0f - ((maxMag - logMag) / (maxMag - minMag));
             }
+        }
+    }
+}
+
+void AudioConversionUtils::spikeConvolution(int indexStart, int indexEnd, const QVector<float> &in, QVector<float> &out, float threshold)
+{
+    QVector<float> const& spikeConvFunc = instance().getSpikeConvFunction();
+    int outSize = (indexEnd - indexStart) - spikeConvFunc.size() + 1;
+    if (out.size() != outSize)
+    {
+        out.resize(outSize);
+    }
+
+    for(int i = 0; i < outSize; i++)
+    {
+        out[i] = 0.0f;
+        for(int j = 0; j < spikeConvFunc.size(); j++)
+        {
+            out[i] += in[indexStart + i + j] * spikeConvFunc[j];
+        }
+
+        if (out[i] <= threshold)
+        {
+            out[i] = 0.0f;
         }
     }
 }
