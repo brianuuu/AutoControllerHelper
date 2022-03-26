@@ -3,8 +3,11 @@
 AudioFileHolder::AudioFileHolder(QObject *parent) : QObject(parent)
 {
     m_wavFile = nullptr;
-    m_freqStart = 20.0f;
-    m_freqEnd = 20000.0f;
+    m_freqStart = 20;
+    m_freqEnd = 20000;
+
+    m_minScore = 10000.0f;
+    m_windowSkipCounter = 0;
 }
 
 AudioFileHolder::~AudioFileHolder()
@@ -17,7 +20,7 @@ AudioFileHolder::~AudioFileHolder()
     }
 }
 
-bool AudioFileHolder::loadWaveFile(const QString &filename, const QAudioFormat &audioFormat, int lowFreqFilter, QString &errorStr)
+bool AudioFileHolder::loadWaveFile(const QString &filename, const QAudioFormat &audioFormat, float minScore, int lowFreqFilter, QString &errorStr)
 {
     if (m_wavFile)
     {
@@ -59,7 +62,7 @@ bool AudioFileHolder::loadWaveFile(const QString &filename, const QAudioFormat &
 
     /*QFile file(QString(RESOURCES_PATH) + "/output.csv");
     file.open(QIODevice::WriteOnly | QIODevice::Text);
-    QTextStream out(&file)*/;
+    QTextStream out(&file);*/
 
     // Convert raw samples to float
     QVector<float> floatData;
@@ -95,17 +98,18 @@ bool AudioFileHolder::loadWaveFile(const QString &filename, const QAudioFormat &
     m_freqEnd = 20000.0f;
     float const freqRes = float(wavAudioFormat.sampleRate()) / FFT_SAMPLE_COUNT;
     int const indexStart = int(float(m_freqStart) / freqRes);
-    int const indexEnd = int(m_freqEnd / freqRes);
+    int const indexEnd = int(m_freqEnd / freqRes) + 1;
 
     int const sampleCount = floatData.size();
     int const windowCount = (sampleCount < FFT_SAMPLE_COUNT) ? 1 : (sampleCount - FFT_SAMPLE_COUNT) / FFT_WINDOW_STEP + 1;
+
     int dataStart = 0;
     for(int i = 0; i < windowCount; i++)
     {
-        for (int i = 0; i < FFT_SAMPLE_COUNT; i++)
+        for (int j = 0; j < FFT_SAMPLE_COUNT; j++)
         {
-            fftDataIn[i][REAL] = (i < sampleCount) ? floatData[dataStart + i] * hanningFunction[i] : 0.0f;
-            fftDataIn[i][IMAG] = 0.0f;
+            fftDataIn[j][REAL] = (j < sampleCount) ? floatData[dataStart + j] * hanningFunction[j] : 0.0f;
+            fftDataIn[j][IMAG] = 0.0f;
         }
 
         AudioConversionUtils::fft(FFT_SAMPLE_COUNT, fftDataIn, fftDataOut);
@@ -114,11 +118,15 @@ bool AudioFileHolder::loadWaveFile(const QString &filename, const QAudioFormat &
 
         dataStart += FFT_WINDOW_STEP;
 
+        SpikeIDScore spikes;
+        PeakFinder::findPeaks(convData, spikes, indexStart, false);
+        m_spikesCollection.push_back(spikes);
+
         // Output log
-        /*for (int j = 0; j < convData.size(); j++)
+        /*for (int j = 0; j < spikes.size(); j++)
         {
             if (j > 0) out << ",";
-            out << convData[j];
+            out << spikes[j];
         }
         out << "\n";*/
     }
@@ -128,5 +136,22 @@ bool AudioFileHolder::loadWaveFile(const QString &filename, const QAudioFormat &
 
     qDebug() << "Finished analyzing wave file with" << windowCount << "windows";
 
+    m_minScore = minScore;
     return true;
+}
+
+void AudioFileHolder::getFrequencyRange(int &start, int &end)
+{
+    start = m_freqStart;
+    end = m_freqEnd;
+}
+
+int AudioFileHolder::getWindowCount() const
+{
+    return m_spikesCollection.size();
+}
+
+const QVector<SpikeIDScore> &AudioFileHolder::getSpikesCollection()
+{
+    return m_spikesCollection;
 }

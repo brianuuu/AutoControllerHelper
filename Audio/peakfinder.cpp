@@ -75,7 +75,7 @@ void scalarProduct(float scalar, std::vector<float> in, std::vector<float>& out)
     }
 }
 
-void PeakFinder::findPeaks(QVector<float> const& in, QVector<int>& peakInds, bool includeEndpoints, float extrema)
+void PeakFinder::findPeaks(QVector<float> const& in, SpikeIDScore& peakInds, int indexStart, bool includeEndpoints, float extrema)
 {
     std::vector<float> x0 = in.toStdVector();
     std::vector<int> peakIndsStd;
@@ -271,5 +271,8 @@ void PeakFinder::findPeaks(QVector<float> const& in, QVector<int>& peakInds, boo
         //input signal length <= 2
     //}
 
-    peakInds = QVector<int>::fromStdVector(peakIndsStd);
+    for (int index : peakIndsStd)
+    {
+        peakInds[index + indexStart] = in[index];
+    }
 }

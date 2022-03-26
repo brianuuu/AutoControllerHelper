@@ -20,7 +20,15 @@ public:
     ~AudioFileHolder();
 
     // Interface
-    bool loadWaveFile(QString const & filename, QAudioFormat const& audioFormat, int lowFreqFilter, QString& errorStr);
+    bool loadWaveFile(QString const & filename, QAudioFormat const& audioFormat, float minScore, int lowFreqFilter, QString& errorStr);
+
+    // Getters
+    void getFrequencyRange(int& start, int& end);
+    int getWindowCount() const;
+    QString const& getFileName() { return m_fileName; }
+    float getMinScore() { return m_minScore; }
+    int& getWindowSkipCounter() { return m_windowSkipCounter; }
+    QVector<SpikeIDScore> const& getSpikesCollection();
 
 signals:
 
@@ -29,8 +37,12 @@ public slots:
 private:
     WavFile*    m_wavFile;
     QString     m_fileName;
-    float       m_freqStart;
-    float       m_freqEnd;
+    int         m_freqStart;
+    int         m_freqEnd;
+
+    float       m_minScore;
+    int         m_windowSkipCounter;
+    QVector<SpikeIDScore> m_spikesCollection;
 };
 
 #endif // AUDIOFILEHOLDER_H

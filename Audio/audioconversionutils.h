@@ -13,6 +13,8 @@
 #define FFT_SAMPLE_COUNT    4096
 #define FFT_WINDOW_STEP     1024
 
+typedef QMap<int, float> SpikeIDScore;
+
 class AudioConversionUtils
 {
 private:

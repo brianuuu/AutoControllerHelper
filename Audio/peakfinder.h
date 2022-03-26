@@ -6,6 +6,8 @@
 #include <QWidget>
 #include <QtMath>
 
+#include "audioconversionutils.h"
+
 class PeakFinder
 {
     static constexpr float EPS = 2.2204e-16f;
@@ -20,7 +22,7 @@ class PeakFinder
     */
 
 public:
-    static void findPeaks(QVector<float> const& in, QVector<int>& peakInds, bool includeEndpoints = true, float extrema = 1);
+    static void findPeaks(QVector<float> const& in, SpikeIDScore& peakInds, int indexStart, bool includeEndpoints = true, float extrema = 1);
 };
 
 #endif

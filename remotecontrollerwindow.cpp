@@ -1709,7 +1709,7 @@ void RemoteControllerWindow::on_SP6_CB_Skips_clicked()
 
 void RemoteControllerWindow::on_SmartProgram_printLog(const QString log, QColor color)
 {
-    if (!CanRunSmartProgram())
+    if (!CanRunSmartProgram() || !m_smartProgram)
     {
         PrintLog(log, color);
         return;

@@ -47,17 +47,27 @@ AudioManager::AudioManager(QWidget *parent) : QWidget(parent)
 
     m_freqLow = 100;
     m_freqHigh = 10500;
+
+    // Sound detection
+    m_cachedSpikes.reserve(MAX_DETECTION_WINDOW);
+    m_detectedWindowSize = 0;
 }
 
 AudioManager::~AudioManager()
 {
     fftwf_free(m_fftDataIn);
     fftwf_free(m_fftDataOut);
+
+    for (AudioFileHolder* holder : m_audioFileHolders)
+    {
+        delete holder;
+    }
 }
 
 void AudioManager::start()
 {
     m_audioDevice = m_audioOutput->start();
+    m_detectedWindowSize = 0;
     QWidget::update();
 }
 
@@ -72,6 +82,7 @@ void AudioManager::stop()
 
     resetRawWaveData();
     resetFFTBufferData();
+    stopDetection();
     QWidget::update();
 }
 
@@ -183,6 +194,7 @@ void AudioManager::freqHighChanged(int value)
 
 void AudioManager::newFFTBufferDataSlot()
 {
+    // TODO: if we have more data ready, do multiple FFT a frame instead of waiting another signal?
     bool doFFT = false;
     m_fftDataMutex.lock();
     {
@@ -228,6 +240,7 @@ void AudioManager::newFFTBufferDataSlot()
         AudioConversionUtils::fft(FFT_SAMPLE_COUNT, m_fftDataIn, m_fftDataOut);
         AudioConversionUtils::fftOutToSpectrogram(FFT_SAMPLE_COUNT, m_fftDataOut, m_spectrogramData);
 
+        doDetection();
         QWidget::update();
     }
 }
@@ -288,6 +301,112 @@ void AudioManager::pushAudioData(const void *samples, unsigned int count, int64_
 }
 
 //---------------------------------------------
+// Detection
+//---------------------------------------------
+bool AudioManager::startDetection(const QString &fileName, float minScore, int lowFreqFilter)
+{
+    if (!m_audioFileHolders.contains(fileName))
+    {
+        QString errorStr;
+        AudioFileHolder* holder = new AudioFileHolder(this);
+        if (!holder->loadWaveFile(fileName, m_audioFormat, minScore, lowFreqFilter, errorStr))
+        {
+            emit printLog(errorStr, LOG_ERROR);
+            delete holder;
+            return false;
+        }
+
+        if (holder->getWindowCount() > MAX_DETECTION_WINDOW)
+        {
+            emit printLog("Detection sound has " + QString::number(holder->getWindowCount()) + " windows exceeded " + QString::number(MAX_DETECTION_WINDOW) + " limit");
+            delete holder;
+            return false;
+        }
+
+        m_audioFileHolders[fileName] = holder;
+    }
+
+    m_detectingSounds.push_back( m_audioFileHolders[fileName] );
+    return true;
+}
+
+void AudioManager::doDetection()
+{
+    if (m_detectingSounds.isEmpty()) return;
+
+    // Get spikes for the current spectrogram
+    QVector<float> convData;
+    AudioConversionUtils::spikeConvolution(0, m_spectrogramData.size(), m_spectrogramData, convData);
+
+    SpikeIDScore spikes;
+    PeakFinder::findPeaks(convData, spikes, 0, false);
+
+    if (m_cachedSpikes.size() == MAX_DETECTION_WINDOW)
+    {
+        m_cachedSpikes.pop_front();
+    }
+    m_cachedSpikes.push_back(spikes);
+
+    for (AudioFileHolder* holder : m_detectingSounds)
+    {
+        // Need to wait for enough windows to compare
+        int windowCount = holder->getWindowCount();
+        if (m_cachedSpikes.size() < windowCount)
+        {
+            continue;
+        }
+
+        // Previously detected
+        int& windowSkipCounter = holder->getWindowSkipCounter();
+        if (windowSkipCounter > 0)
+        {
+            windowSkipCounter--;
+            continue;
+        }
+
+        // Get the score by finding if current windows contains the template's spikes
+        // If so add the score by the magnitude of the spike and average to no. in the window
+        float score = 0.0f;
+        QVector<SpikeIDScore> const& spikesCollection = holder->getSpikesCollection();
+        for (int i = 0; i < spikesCollection.size(); i++)
+        {
+            float tempScore = 0.0f;
+            SpikeIDScore const& curCachedSpikes = m_cachedSpikes[m_cachedSpikes.size() - spikesCollection.size() + i];
+            SpikeIDScore const& curSpikesCollection = spikesCollection[i];
+            for (auto iter = curSpikesCollection.begin(); iter != curSpikesCollection.end(); iter++)
+            {
+                if (curCachedSpikes.contains(iter.key()))
+                {
+                    tempScore += iter.value();
+                }
+            }
+            tempScore /= curSpikesCollection.size();
+            score += tempScore;
+        }
+        score /= spikesCollection.size();
+
+        if (score > holder->getMinScore())
+        {
+            emit printLog(holder->getFileName() + " detected with score " + QString::number(score) + " > " + QString::number(holder->getMinScore()), LOG_SUCCESS);
+            // TODO: emit signals for Smart Program
+            windowSkipCounter = spikesCollection.size();
+            m_detectedWindowSize = spikesCollection.size();
+        }
+    }
+}
+
+void AudioManager::stopDetection()
+{
+    for (AudioFileHolder* holder : m_detectingSounds)
+    {
+        holder->getWindowSkipCounter() = 0;
+    }
+    m_detectingSounds.clear();
+    m_cachedSpikes.clear();
+    m_detectedWindowSize = 0;
+}
+
+//---------------------------------------------
 // Raw Wave
 //---------------------------------------------
 void AudioManager::resetRawWaveData()
@@ -330,6 +449,9 @@ void AudioManager::writeRawWaveData(QVector<float> const& newData)
     emit drawSignal();
 }
 
+//---------------------------------------------
+// FFT Spectrogram
+//---------------------------------------------
 void AudioManager::resetFFTBufferData()
 {
     m_fftDataMutex.lock();
@@ -500,8 +622,8 @@ void AudioManager::paintEvent_NonTS()
 
         float const freqRes = float(m_audioFormat.sampleRate()) / FFT_SAMPLE_COUNT;
         int const indexStart = int(float(m_freqLow) / freqRes);
-        int const indexEnd = int(float(m_freqHigh) / freqRes);
-        int const drawWidth = indexEnd - indexStart + 1;
+        int const indexEnd = int(float(m_freqHigh) / freqRes) + 1;
+        int const drawWidth = indexEnd - indexStart;
 
         if (drawWidth >= width)
         {
@@ -560,6 +682,17 @@ void AudioManager::paintEvent_NonTS()
 
             imagePainter.setPen(getMagnitudeColor(m_spectrogramData[sampleIndex]));
             imagePainter.drawPoint(width - 1, i);
+        }
+
+        // A sound is detected!
+        if (m_detectedWindowSize > 0)
+        {
+            QPen pen;
+            pen.setWidth(4);
+            pen.setColor(Qt::red);
+            imagePainter.setPen(pen);
+            imagePainter.drawRect(width - m_detectedWindowSize - 1, 0, m_detectedWindowSize, height);
+            m_detectedWindowSize = 0;
         }
 
         // Finally draw the image on widget

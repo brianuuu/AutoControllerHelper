@@ -14,6 +14,8 @@
 #include "audioconversionutils.h"
 #include "audiofileholder.h"
 
+#define MAX_DETECTION_WINDOW 100
+
 enum AudioDisplayMode : uint8_t
 {
     ADM_None,
@@ -42,6 +44,11 @@ public:
 
     // Input
     void pushAudioData(const void *samples, unsigned int count, int64_t pts);
+
+    // Sound detection
+    bool startDetection(QString const& fileName, float minScore, int lowFreqFilter);
+    void doDetection();
+    void stopDetection();
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
@@ -105,6 +112,12 @@ private:
     QVector<float>      m_spectrogramData;
     int                 m_freqLow;
     int                 m_freqHigh;
+
+    // Sound detection
+    QMap<QString, AudioFileHolder*>     m_audioFileHolders;
+    QVector<AudioFileHolder*>           m_detectingSounds;
+    QVector<SpikeIDScore>               m_cachedSpikes;
+    int                                 m_detectedWindowSize;
 };
 
 #endif // AUDIOMANAGER_H
