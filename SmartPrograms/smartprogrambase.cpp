@@ -29,6 +29,7 @@ bool SmartProgramBase::run()
         m_runNextState = true;
         m_runStateTimer.start();
 
+        m_audioManager->stopDetection();
         m_videoManager->clearCaptures();
         return true;
     }
@@ -45,6 +46,7 @@ void SmartProgramBase::stop()
     m_runStateTimer.stop();
     m_runStateDelayTimer.stop();
 
+    m_audioManager->stopDetection();
     m_videoManager->clearCaptures();
 }
 

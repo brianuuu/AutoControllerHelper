@@ -21,8 +21,10 @@ public:
 
     // Interface
     bool loadWaveFile(QString const & filename, QAudioFormat const& audioFormat, float minScore, int lowFreqFilter, QString& errorStr);
+    void setID(int id) { m_id = id; }
 
     // Getters
+    int getID() { return m_id; }
     void getFrequencyRange(int& start, int& end);
     int getWindowCount() const;
     QString const& getFileName() { return m_fileName; }
@@ -37,6 +39,7 @@ public slots:
 private:
     WavFile*    m_wavFile;
     QString     m_fileName;
+    int         m_id;
     int         m_freqStart;
     int         m_freqEnd;
 

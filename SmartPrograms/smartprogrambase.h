@@ -115,7 +115,7 @@ public:
             case SP_BDSP_DuplicateItem1to30:return "Duplicate Item 1 to 30";
 
             case SP_PLA_NuggetFarmer:       return "Nugget Farmer";
-            case SP_PLA_ResetAlphaPokemon:  return "Reset Alpha Pokemon";
+            case SP_PLA_ResetAlphaPokemon:  return "Reset Alpha Gallade/Crobat";
             case SP_PLA_BraviaryGainHeight: return "Braviary Gain Height";
             case SP_PLA_DistortionWaiter:   return "Distortion Waiter";
             case SP_PLA_OutbreakFinder:     return "Outbreak Finder";

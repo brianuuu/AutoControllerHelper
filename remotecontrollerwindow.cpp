@@ -178,6 +178,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     connect(ui->SB_AudioFreqLow, SIGNAL(valueChanged(int)), audioManager, SLOT(freqLowChanged(int)));
     connect(ui->SB_AudioFreqHigh, SIGNAL(valueChanged(int)), audioManager, SLOT(freqHighChanged(int)));
     connect(audioManager, &AudioManager::printLog, this, &RemoteControllerWindow::on_SmartProgram_printLog);
+    connect(audioManager, &AudioManager::soundDetectionRequired, this, &RemoteControllerWindow::on_SoundDetection_required);
 
     if (!QDir(SCREENSHOT_PATH).exists())
     {
@@ -1707,6 +1708,16 @@ void RemoteControllerWindow::on_SP6_CB_Skips_clicked()
     ui->SP6_SB_Skips->setEnabled(ui->SP6_CB_Skips->isChecked());
 }
 
+void RemoteControllerWindow::on_SoundDetection_required(int min, int max)
+{
+    ui->CB_AudioDisplayMode->setCurrentIndex(ADM_Spectrogram);
+    ui->CB_AudioDisplayMode->setEnabled(false);
+    ui->SB_AudioFreqLow->setEnabled(false);
+    ui->SB_AudioFreqLow->setValue(min);
+    ui->SB_AudioFreqHigh->setEnabled(false);
+    ui->SB_AudioFreqHigh->setValue(max);
+}
+
 void RemoteControllerWindow::on_SmartProgram_printLog(const QString log, QColor color)
 {
     if (!CanRunSmartProgram() || !m_smartProgram)
@@ -2285,6 +2296,10 @@ void RemoteControllerWindow::StopSmartProgram()
     ui->LE_CommandSender->setEnabled(true);
     ui->PB_SendCommand->setText("Send");
     ui->PB_SendCommand->setEnabled(!ui->LE_CommandSender->text().isEmpty());
+
+    ui->CB_AudioDisplayMode->setEnabled(true);
+    ui->SB_AudioFreqLow->setEnabled(true);
+    ui->SB_AudioFreqHigh->setEnabled(true);
 }
 
 void RemoteControllerWindow::SetEnableNonExceptionButtons(bool enabled)

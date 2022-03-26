@@ -303,31 +303,59 @@ void AudioManager::pushAudioData(const void *samples, unsigned int count, int64_
 //---------------------------------------------
 // Detection
 //---------------------------------------------
-bool AudioManager::startDetection(const QString &fileName, float minScore, int lowFreqFilter)
+int AudioManager::addDetection(const QString &fileName, float minScore, int lowFreqFilter)
 {
+    AudioFileHolder* holder = nullptr;
     if (!m_audioFileHolders.contains(fileName))
     {
         QString errorStr;
-        AudioFileHolder* holder = new AudioFileHolder(this);
+        holder = new AudioFileHolder(this);
         if (!holder->loadWaveFile(fileName, m_audioFormat, minScore, lowFreqFilter, errorStr))
         {
             emit printLog(errorStr, LOG_ERROR);
             delete holder;
-            return false;
+            return 0;
         }
 
         if (holder->getWindowCount() > MAX_DETECTION_WINDOW)
         {
             emit printLog("Detection sound has " + QString::number(holder->getWindowCount()) + " windows exceeded " + QString::number(MAX_DETECTION_WINDOW) + " limit");
             delete holder;
-            return false;
+            return 0;
         }
 
         m_audioFileHolders[fileName] = holder;
+        holder->setID(m_audioFileHolders.size());
+    }
+    else
+    {
+        holder = m_audioFileHolders[fileName];
     }
 
-    m_detectingSounds.push_back( m_audioFileHolders[fileName] );
-    return true;
+    // If we are adding that means a smart program required detection
+    int min, max;
+    holder->getFrequencyRange(min, max);
+    emit soundDetectionRequired(min, max);
+
+    // Return the ID of the sound
+    emit printLog(holder->getFileName() + " cached (" + QString::number(holder->getWindowCount()) + " windows, ID: " + QString::number(holder->getID()) + ")");
+    return holder->getID();
+}
+
+void AudioManager::startDetection(int id)
+{
+    for (AudioFileHolder* holder : m_audioFileHolders)
+    {
+        if (holder->getID() == id)
+        {
+            holder->getWindowSkipCounter() = 0;
+            m_detectingSounds.insert(holder);
+            qDebug() << "Started detecting" << holder->getFileName();
+            return;
+        }
+    }
+
+    emit printLog("Invalid sound detection ID", LOG_ERROR);
 }
 
 void AudioManager::doDetection()
@@ -388,15 +416,33 @@ void AudioManager::doDetection()
         if (score > holder->getMinScore())
         {
             emit printLog(holder->getFileName() + " detected with score " + QString::number(score) + " > " + QString::number(holder->getMinScore()), LOG_SUCCESS);
-            // TODO: emit signals for Smart Program
+            emit soundDetected(holder->getID());
             windowSkipCounter = spikesCollection.size();
             m_detectedWindowSize = spikesCollection.size();
         }
     }
 }
 
-void AudioManager::stopDetection()
+void AudioManager::stopDetection(int id)
 {
+    // If specified ID, just remove that one
+    if (id > 0)
+    {
+        for (AudioFileHolder* holder : m_detectingSounds)
+        {
+            if (holder->getID() == id)
+            {
+                holder->getWindowSkipCounter() = 0;
+                m_detectingSounds.remove(holder);
+                qDebug() << "Stopped detecting" << holder->getFileName();
+                return;
+            }
+        }
+        emit printLog("Invalid sound detection ID", LOG_ERROR);
+        return;
+    }
+
+    // Clear all
     for (AudioFileHolder* holder : m_detectingSounds)
     {
         holder->getWindowSkipCounter() = 0;

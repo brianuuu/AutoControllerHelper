@@ -151,6 +151,7 @@ private slots:
 
     void on_SP6_CB_Skips_clicked();
 
+    void on_SoundDetection_required(int min, int max);
     void on_SmartProgram_printLog(QString const log, QColor color);
     void on_SmartProgram_completed();
     void on_SmartProgram_runSequence(QString const sequence);

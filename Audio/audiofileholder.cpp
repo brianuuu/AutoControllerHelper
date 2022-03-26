@@ -134,7 +134,7 @@ bool AudioFileHolder::loadWaveFile(const QString &filename, const QAudioFormat &
     fftwf_free(fftDataIn);
     fftwf_free(fftDataOut);
 
-    qDebug() << "Finished analyzing wave file with" << windowCount << "windows";
+    qDebug() << "Finished adding" << m_fileName << "with" << windowCount << "windows";
 
     m_minScore = minScore;
     return true;

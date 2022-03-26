@@ -46,9 +46,10 @@ public:
     void pushAudioData(const void *samples, unsigned int count, int64_t pts);
 
     // Sound detection
-    bool startDetection(QString const& fileName, float minScore, int lowFreqFilter);
+    int addDetection(QString const& fileName, float minScore, int lowFreqFilter);
+    void startDetection(int id);
     void doDetection();
-    void stopDetection();
+    void stopDetection(int id = 0);
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
@@ -57,6 +58,8 @@ signals:
     void printLog(QString const log, QColor color = QColor(0,0,0));
     void drawSignal();
     void newFFTBufferDataSignal();
+    void soundDetectionRequired(int min, int max);
+    void soundDetected(int id);
 
 public slots:
     void setVolume(int volume);
@@ -115,7 +118,7 @@ private:
 
     // Sound detection
     QMap<QString, AudioFileHolder*>     m_audioFileHolders;
-    QVector<AudioFileHolder*>           m_detectingSounds;
+    QSet<AudioFileHolder*>              m_detectingSounds;
     QVector<SpikeIDScore>               m_cachedSpikes;
     int                                 m_detectedWindowSize;
 };
