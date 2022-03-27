@@ -3,10 +3,12 @@
 SmartPLAResetAlphaPokemon::SmartPLAResetAlphaPokemon
 (
     AlphaType type,
+    bool ignoreNonAlpha,
     SmartProgramParameter parameter
 )
     : SmartProgramBase(parameter)
     , m_type(type)
+    , m_ignoreNonAlpha(ignoreNonAlpha)
 {
     init();
 
@@ -98,6 +100,7 @@ void SmartPLAResetAlphaPokemon::runNextState()
                     incrementStat(m_statAttempts);
                     m_substage = SS_Walk;
                     setState_runCommand(m_type == AT_Gallade ? C_WalkGallade : C_WalkCrobat);
+                    m_timer.restart();
 
                     m_audioManager->startDetection(m_shinySoundID);
                     m_videoManager->clearCaptures();
@@ -112,13 +115,7 @@ void SmartPLAResetAlphaPokemon::runNextState()
     }
     case SS_Walk:
     {
-        if (m_shinyDetected)
-        {
-            emit printLog("SHINY POKEMON FOUND!", LOG_SUCCESS);
-            m_substage = SS_Capture;
-            setState_runCommand("Capture,22,Minus,1");
-        }
-        else if (state == S_CommandFinished)
+        if (state == S_CommandFinished)
         {
             emit printLog("No shiny found, restarting...", LOG_WARNING);
             m_substage = SS_Restart;
@@ -131,7 +128,12 @@ void SmartPLAResetAlphaPokemon::runNextState()
     }
     case SS_Capture:
     {
-        if (state == S_CommandFinished)
+        if (m_shinyDetected)
+        {
+            setState_runCommand("Capture,22,Minus,1");
+            m_shinyDetected = false;
+        }
+        else if (state == S_CommandFinished)
         {
             setState_completed();
         }
@@ -149,8 +151,18 @@ void SmartPLAResetAlphaPokemon::soundDetected(int id)
     if (m_substage == SS_Walk)
     {
         incrementStat(m_statShiny);
-        m_shinyDetected = true;
-        runNextStateContinue();
+        if (m_ignoreNonAlpha && m_timer.elapsed() < (m_type == AT_Gallade ? 26500 : 7700))
+        {
+            emit printLog("Shiny sound detected but user has set ignore Non-Alpha shinies...", LOG_WARNING);
+        }
+        else
+        {
+            m_shinyDetected = true;
+
+            emit printLog("SHINY POKEMON FOUND!", LOG_SUCCESS);
+            m_substage = SS_Capture;
+            runNextStateContinue();
+        }
     }
     else
     {

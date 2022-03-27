@@ -2197,12 +2197,12 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     }
     case SP_PLA_NuggetFarmer:
     {
-        m_smartProgram = new SmartPLANuggetFarmer(parameter);
+        m_smartProgram = new SmartPLANuggetFarmer(ui->SP15_CB_Shiny->isChecked(), parameter);
         break;
     }
     case SP_PLA_ResetAlphaPokemon:
     {
-        m_smartProgram = new SmartPLAResetAlphaPokemon((SmartPLAResetAlphaPokemon::AlphaType)ui->SP12_CB_AlphaType->currentIndex(), parameter);
+        m_smartProgram = new SmartPLAResetAlphaPokemon((SmartPLAResetAlphaPokemon::AlphaType)ui->SP12_CB_AlphaType->currentIndex(), ui->SP12_CB_IgnoreNonAlpha->isChecked(), parameter);
         break;
     }
     case SP_PLA_BraviaryGainHeight:

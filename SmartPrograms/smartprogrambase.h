@@ -207,7 +207,7 @@ public:
             case SP_BDSP_ShinyLegendary:    return 11;
             case SP_BDSP_DuplicateItem1to30:return 0;
 
-            case SP_PLA_NuggetFarmer:       return 0;
+            case SP_PLA_NuggetFarmer:       return 15;
             case SP_PLA_ResetAlphaPokemon:  return 12;
             case SP_PLA_BraviaryGainHeight: return 0;
             case SP_PLA_DistortionWaiter:   return 0;

@@ -1,6 +1,7 @@
 #ifndef SMARTPLARESETALPHAPOKEMON_H
 #define SMARTPLARESETALPHAPOKEMON_H
 
+#include <QElapsedTimer>
 #include <QWidget>
 #include "../smartprogrambase.h"
 
@@ -17,6 +18,7 @@ public:
 public:
     explicit SmartPLAResetAlphaPokemon(
             AlphaType type,
+            bool ignoreNonAlpha,
             SmartProgramParameter parameter
             );
 
@@ -57,7 +59,9 @@ private:
     Substage m_substage;
 
     // Members
+    QElapsedTimer m_timer;
     AlphaType m_type;
+    bool m_ignoreNonAlpha;
     int m_shinySoundID;
     bool m_shinyDetected;
 

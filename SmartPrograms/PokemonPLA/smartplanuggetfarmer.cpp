@@ -1,6 +1,8 @@
 #include "smartplanuggetfarmer.h"
 
-SmartPLANuggetFarmer::SmartPLANuggetFarmer(SmartProgramParameter parameter) : SmartProgramBase(parameter)
+SmartPLANuggetFarmer::SmartPLANuggetFarmer(bool isFindShiny, SmartProgramParameter parameter)
+    : SmartProgramBase(parameter)
+    , m_isFindShiny(isFindShiny)
 {
     init();
 }
@@ -44,6 +46,15 @@ void SmartPLANuggetFarmer::runNextState()
         initStat(m_statCharmFound, "Charm");
         initStat(m_statCoinFound, "Coin");
         initStat(m_statError, "Error");
+        initStat(m_statShiny, "Shinies");
+
+        // Setup sound detection
+        if (m_isFindShiny)
+        {
+            m_shinySoundID = m_audioManager->addDetection("PokemonLA/ShinySFX", 0.19f, 5000);
+            m_shinyDetected = false;
+            connect(m_audioManager, &AudioManager::soundDetected, this, &SmartPLANuggetFarmer::soundDetected);
+        }
 
         m_substage = SS_Restart;
         setState_runCommand(C_Restart);
@@ -267,6 +278,7 @@ void SmartPLANuggetFarmer::runNextState()
             m_substage = SS_FindSister;
             setState_runCommand(m_isCoin ? C_FindCoin : C_FindCharm, true);
 
+            m_audioManager->startDetection(m_shinySoundID);
             m_videoManager->clearCaptures();
             m_videoManager->setAreas({A_Dialog, A_Royal});
         }
@@ -304,6 +316,7 @@ void SmartPLANuggetFarmer::runNextState()
             m_substage = SS_FlyToHeightCamp;
             setState_runCommand(C_FlyToHeightCamp);
 
+            m_audioManager->stopDetection(m_shinySoundID);
             m_videoManager->clearCaptures();
         }
         if (state == S_CaptureReady)
@@ -313,12 +326,14 @@ void SmartPLANuggetFarmer::runNextState()
                 // This will interrupt the currently running command
                 m_substage = SS_StartBattle;
                 setState_runCommand("Nothing,20");
+                m_audioManager->stopDetection(m_shinySoundID);
             }
             else if (checkImageMatchTarget(A_Royal.m_rect, C_Color_RoyalWhite, m_imageMatch_RoyalWyrdeer, 0.5))
             {
                 // This will interrupt the currently running command
                 m_substage = SS_AlphaKnockOff;
                 setState_runCommand("Nothing,20");
+                m_audioManager->stopDetection(m_shinySoundID);
             }
             else
             {
@@ -381,6 +396,7 @@ void SmartPLANuggetFarmer::runNextState()
                 m_substage = SS_AfterBattle;
                 setState_runCommand(m_isCoin ? C_AfterBattle : C_AfterBattleCharm);
 
+                m_audioManager->startDetection(m_shinySoundID);
                 m_videoManager->clearCaptures();
             }
             else
@@ -407,6 +423,8 @@ void SmartPLANuggetFarmer::runNextState()
 
             m_substage = SS_FlyToHeightCamp;
             setState_runCommand(C_FlyToHeightCamp);
+
+            m_audioManager->stopDetection(m_shinySoundID);
         }
         break;
     }
@@ -558,7 +576,35 @@ void SmartPLANuggetFarmer::runNextState()
         }
         break;
     }
+    case SS_Capture:
+    {
+        if (m_shinyDetected)
+        {
+            setState_runCommand("Capture,22,Minus,1");
+            m_shinyDetected = false;
+        }
+        else if (state == S_CommandFinished)
+        {
+            setState_completed();
+        }
+        break;
+    }
     }
 
     SmartProgramBase::runNextState();
+}
+
+void SmartPLANuggetFarmer::soundDetected(int id)
+{
+    if (!m_isFindShiny || id != m_shinySoundID) return;
+
+    if (m_substage == SS_FindSister || m_substage == SS_AfterBattle)
+    {
+        incrementStat(m_statShiny);
+        m_shinyDetected = true;
+
+        emit printLog("SHINY POKEMON FOUND!", LOG_SUCCESS);
+        m_substage = SS_Capture;
+        runNextStateContinue();
+    }
 }

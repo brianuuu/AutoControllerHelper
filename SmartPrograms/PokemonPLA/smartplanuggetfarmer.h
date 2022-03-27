@@ -8,9 +8,12 @@
 class SmartPLANuggetFarmer : public SmartProgramBase
 {
 public:
-    explicit SmartPLANuggetFarmer(SmartProgramParameter parameter);
+    explicit SmartPLANuggetFarmer(bool isFindShiny, SmartProgramParameter parameter);
 
     virtual SmartProgram getProgramEnum() { return SP_PLA_NuggetFarmer; }
+
+private slots:
+    void soundDetected(int id);
 
 private:
     virtual void init();
@@ -80,6 +83,8 @@ private:
         SS_LoadingToVillageEnd,
         SS_LoadingToObsidianEnd,
         SS_DetectMap,
+
+        SS_Capture,
     };
     Substage m_substage;
 
@@ -94,11 +99,16 @@ private:
     bool m_isFirstTimeSave;
     bool m_isCoin;
 
+    bool m_isFindShiny;
+    int m_shinySoundID;
+    bool m_shinyDetected;
+
     // Stats
     Stat m_statSearches;
     Stat m_statCharmFound;
     Stat m_statCoinFound;
     Stat m_statError;
+    Stat m_statShiny;
 };
 
 #endif // SMARTPLANUGGETFARMER_H
