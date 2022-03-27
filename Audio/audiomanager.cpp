@@ -412,6 +412,7 @@ void AudioManager::doDetection()
             score += tempScore;
         }
         score /= spikesCollection.size();
+        holder->setScore(score);
 
         if (score > holder->getMinScore())
         {
@@ -735,7 +736,7 @@ void AudioManager::paintEvent_NonTS()
         {
             QPen pen;
             pen.setWidth(4);
-            pen.setColor(Qt::red);
+            pen.setColor(Qt::green);
             imagePainter.setPen(pen);
             imagePainter.drawRect(width - m_detectedWindowSize - 1, 0, m_detectedWindowSize, height);
             m_detectedWindowSize = 0;
@@ -743,6 +744,24 @@ void AudioManager::paintEvent_NonTS()
 
         // Finally draw the image on widget
         painter.drawImage(this->rect(), m_displayImage);
+
+        // Debug draw the score of detecting sounds
+        if (!m_detectingSounds.isEmpty())
+        {
+            QFont font = painter.font();
+            font.setPointSize(12);
+            painter.setFont(font);
+            int textPos = height - 4;
+            for (AudioFileHolder* holder : m_detectingSounds)
+            {
+                QString text = holder->getFileName() + ": " + QString::number(holder->getScore());
+                painter.setPen(Qt::black);
+                painter.drawText(QPoint(4, textPos), text);
+                painter.setPen(Qt::red);
+                painter.drawText(QPoint(3, textPos-1), text);
+                textPos += 15;
+            }
+        }
         break;
     }
     default: break;

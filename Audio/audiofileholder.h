@@ -22,9 +22,11 @@ public:
     // Interface
     bool loadWaveFile(QString const & filename, QAudioFormat const& audioFormat, float minScore, int lowFreqFilter, QString& errorStr);
     void setID(int id) { m_id = id; }
+    void setScore(float score) { m_score = score; }
 
     // Getters
     int getID() { return m_id; }
+    float getScore() { return m_score; }
     void getFrequencyRange(int& start, int& end);
     int getWindowCount() const;
     QString const& getFileName() { return m_fileName; }
@@ -43,6 +45,7 @@ private:
     int         m_freqStart;
     int         m_freqEnd;
 
+    float       m_score;    // last detected score, for drawing only
     float       m_minScore;
     int         m_windowSkipCounter;
     QVector<SpikeIDScore> m_spikesCollection;

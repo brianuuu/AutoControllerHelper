@@ -6,6 +6,7 @@ AudioFileHolder::AudioFileHolder(QObject *parent) : QObject(parent)
     m_freqStart = 20;
     m_freqEnd = 20000;
 
+    m_score = 0.0f;
     m_minScore = 10000.0f;
     m_windowSkipCounter = 0;
 }
