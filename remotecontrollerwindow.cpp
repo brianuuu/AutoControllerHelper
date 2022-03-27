@@ -244,6 +244,9 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     }
 
     // Set last used audio settings
+    ui->L_AudioFreq->setHidden(true);
+    ui->SB_AudioFreqLow->setHidden(true);
+    ui->SB_AudioFreqHigh->setHidden(true);
     ui->S_Volume->setValue(m_settings->value("Volume", 100).toInt());
     audioManager->setVolume(ui->S_Volume->value());
     ui->CB_AudioDisplayMode->setCurrentIndex(m_settings->value("AudioDisplayMode", 0).toInt());
