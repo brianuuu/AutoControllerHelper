@@ -60,9 +60,7 @@ void SmartBDSPShinyLegendary::runNextState()
             setState_frameAnalyzeRequest();
             m_substage = SS_Intro;
 
-            m_videoManager->clearCaptures();
             m_videoManager->setAreas({A_Title});
-
             m_elapsedTimer.restart();
         }
         break;
@@ -121,9 +119,7 @@ void SmartBDSPShinyLegendary::runNextState()
             setState_frameAnalyzeRequest();
             m_substage = SS_Detect1;
 
-            m_videoManager->clearCaptures();
             m_videoManager->setAreas({A_Dialog});
-
             m_dialogWasFound = false;
             m_elapsedTimer.restart();
         }
@@ -182,7 +178,6 @@ void SmartBDSPShinyLegendary::runNextState()
                             m_substage = SS_DetectBattle;
                             setState_frameAnalyzeRequest();
 
-                            m_videoManager->clearCaptures();
                             m_videoManager->setAreas({A_Battle});
                             break;
                         }

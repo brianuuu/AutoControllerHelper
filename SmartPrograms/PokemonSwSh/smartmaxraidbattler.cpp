@@ -69,7 +69,6 @@ void SmartMaxRaidBattler::runNextState()
                 setState_frameAnalyzeRequest();
                 emit printLog("Inviting others...");
 
-                m_videoManager->clearCaptures();
                 m_videoManager->setAreas({A_RaidMenu[1],A_RaidMenu[2],A_RaidMenu[3]});
             }
             else

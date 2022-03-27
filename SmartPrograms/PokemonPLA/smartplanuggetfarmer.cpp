@@ -77,8 +77,6 @@ void SmartPLANuggetFarmer::runNextState()
             else
             {
                 setState_frameAnalyzeRequest();
-
-                m_videoManager->clearCaptures();
                 m_videoManager->setAreas({A_Title});
 
                 m_substage = SS_Title;
@@ -148,7 +146,6 @@ void SmartPLANuggetFarmer::runNextState()
             m_elapsedTimer.restart();
             setState_frameAnalyzeRequest();
 
-            m_videoManager->clearCaptures();
             m_videoManager->setAreas({A_BattleEnd});
         }
         else if (state == S_CaptureReady)
@@ -227,7 +224,6 @@ void SmartPLANuggetFarmer::runNextState()
             m_substage = SS_SelectWyrdeer;
             setState_frameAnalyzeRequest();
 
-            m_videoManager->clearCaptures();
             m_videoManager->setAreas({A_Royal});
         }
         break;
@@ -279,7 +275,6 @@ void SmartPLANuggetFarmer::runNextState()
             setState_runCommand(m_isCoin ? C_FindCoin : C_FindCharm, true);
 
             m_audioManager->startDetection(m_shinySoundID);
-            m_videoManager->clearCaptures();
             m_videoManager->setAreas({A_Dialog, A_Royal});
         }
         break;
@@ -367,7 +362,6 @@ void SmartPLANuggetFarmer::runNextState()
 
             if (elapsed > 20000)
             {
-                m_videoManager->clearCaptures();
                 m_videoManager->setAreas({A_BattleEnd});
             }
             else
@@ -475,8 +469,6 @@ void SmartPLANuggetFarmer::runNextState()
         if (state == S_CommandFinished)
         {
             m_elapsedTimer.restart();
-
-            m_videoManager->clearAreas();
             m_videoManager->setAreas({A_Loading});
         }
         else if (state == S_CaptureReady)

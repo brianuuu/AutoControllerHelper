@@ -92,8 +92,6 @@ void SmartPLAOutbreakFinder::runNextState()
         if (state == S_CommandFinished)
         {
             m_timer.restart();
-
-            m_videoManager->clearAreas();
             m_videoManager->setAreas({A_Loading});
         }
         else if (state == S_CaptureReady)

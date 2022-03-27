@@ -25,8 +25,6 @@ void SmartPLADistortionWaiter::runNextState()
     case SS_Init:
     {
         m_startTime = QDateTime::currentDateTime();
-
-        m_videoManager->clearAreas();
         m_videoManager->setAreas({A_Text});
 
         emit printLog("Game Language = " + PokemonDatabase::getGameLanguageName(m_settings->getGameLanguage()));

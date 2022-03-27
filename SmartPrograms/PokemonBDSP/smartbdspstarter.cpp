@@ -47,9 +47,7 @@ void SmartBDSPStarter::runNextState()
             setState_frameAnalyzeRequest();
             m_substage = SS_Intro;
 
-            m_videoManager->clearCaptures();
             m_videoManager->setAreas({A_Title});
-
             m_elapsedTimer.restart();
         }
         break;
@@ -126,9 +124,7 @@ void SmartBDSPStarter::runNextState()
             setState_frameAnalyzeRequest();
             m_substage = SS_Detect1;
 
-            m_videoManager->clearCaptures();
             m_videoManager->setAreas({A_Dialog});
-
             m_dialogWasFound = false;
             m_elapsedTimer.restart();
         }
@@ -165,7 +161,6 @@ void SmartBDSPStarter::runNextState()
                     }
                     else
                     {
-                        m_videoManager->clearCaptures();
                         m_videoManager->setAreas({A_Battle});
                         m_substage = SS_Detect3;
                     }

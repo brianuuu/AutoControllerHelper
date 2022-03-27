@@ -31,7 +31,6 @@ void SmartYCommGlitch::runNextState()
     {
     case SS_Init:
     {
-        m_videoManager->clearCaptures();
         m_videoManager->setAreas({A_Internet});
 
         m_substage = SS_CheckInternet;
@@ -47,7 +46,6 @@ void SmartYCommGlitch::runNextState()
             m_substage = SS_GotoYComm;
             setState_runCommand(C_GotoYComm);
 
-            m_videoManager->clearCaptures();
             m_videoManager->setAreas(A_YCommMenu);
         }
         break;
@@ -75,7 +73,6 @@ void SmartYCommGlitch::runNextState()
                     setState_runCommand(C_LinkBattle);
                     emit printLog("Internect already connected, starting battle...");
 
-                    m_videoManager->clearCaptures();
                     m_videoManager->setAreas({A_Dialog});
                 }
                 else
@@ -113,7 +110,6 @@ void SmartYCommGlitch::runNextState()
                 setState_runCommand(C_LinkBattle);
                 emit printLog("Starting link battle...");
 
-                m_videoManager->clearCaptures();
                 m_videoManager->setAreas({A_Dialog});
             }
             else

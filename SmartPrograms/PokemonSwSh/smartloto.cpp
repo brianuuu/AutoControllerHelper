@@ -79,7 +79,6 @@ void SmartLoto::runNextState()
             m_substage = SS_BSpam;
             setState_frameAnalyzeRequest();
 
-            m_videoManager->clearCaptures();
             m_videoManager->setAreas({A_Dialog});
         }
         break;

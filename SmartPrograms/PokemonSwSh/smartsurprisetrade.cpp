@@ -69,7 +69,6 @@ void SmartSurpriseTrade::runNextState()
         m_substage = SS_CheckInternet;
         setState_frameAnalyzeRequest();
 
-        m_videoManager->clearCaptures();
         m_videoManager->setAreas({A_YComm});
         break;
     }
@@ -82,7 +81,6 @@ void SmartSurpriseTrade::runNextState()
             m_substage = SS_GotoYComm;
             setState_runCommand(C_GotoYComm);
 
-            m_videoManager->clearCaptures();
             m_videoManager->setAreas(A_YCommMenu);
         }
         break;
@@ -109,7 +107,6 @@ void SmartSurpriseTrade::runNextState()
                     m_substage = SS_GotoPokemon;
                     setState_runCommand(getGotoPokemon());
 
-                    m_videoManager->clearCaptures();
                     m_videoManager->setAreas({A_PokemonName, A_DynamaxLevel});
                 }
                 else
@@ -127,7 +124,6 @@ void SmartSurpriseTrade::runNextState()
                 setState_runCommand("BSpam,80");
                 emit printLog("Not at Y-comm (trade evolution?), attemping recover...");
 
-                m_videoManager->clearCaptures();
                 m_videoManager->setAreas({A_YComm});
             }
         }
@@ -152,7 +148,6 @@ void SmartSurpriseTrade::runNextState()
                 m_substage = SS_GotoPokemon;
                 setState_runCommand(getGotoPokemon());
 
-                m_videoManager->clearCaptures();
                 m_videoManager->setAreas({A_PokemonName, A_DynamaxLevel});
             }
             else
@@ -204,7 +199,6 @@ void SmartSurpriseTrade::runNextState()
                     setState_runCommand(C_ConfirmTrade);
                     emit printLog(location + ": Trading...");
 
-                    m_videoManager->clearCaptures();
                     m_videoManager->setAreas({A_TradeDialogBIG});
                 }
                 else
@@ -278,7 +272,6 @@ void SmartSurpriseTrade::runNextState()
                 setState_runCommand(C_FinishTrade);
                 emit printLog("Trade complete!");
 
-                m_videoManager->clearCaptures();
                 m_videoManager->setAreas({A_YComm});
                 m_calibrateBtn->setEnabled(false);
             }
