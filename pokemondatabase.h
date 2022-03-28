@@ -66,6 +66,29 @@ public:
         return "Unknown";
     }
 
+    enum PLAAreaType : uint8_t
+    {
+        PLAAT_ObsidianFieldlands,
+        PLAAT_CrimsonMirelands,
+        PLAAT_CobaltCoastlands,
+        PLAAT_CoronetHighlands,
+        PLAAT_AlabasterIcelands,
+    };
+
+    static QString PLAAreaTypeToString(PLAAreaType type)
+    {
+        switch (type)
+        {
+        case PLAAT_ObsidianFieldlands: return "Obsidian Fieldlands";
+        case PLAAT_CrimsonMirelands:   return "Crimson Mirelands";
+        case PLAAT_CobaltCoastlands:   return "Cobalt Coastlands";
+        case PLAAT_CoronetHighlands:   return "Coronet Highlands";
+        case PLAAT_AlabasterIcelands:  return "Alabaster Icelands";
+        }
+
+        return "INVALID AREA";
+    }
+
 private:
     static PokemonDatabase& instance();
     PokemonDatabase();

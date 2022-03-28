@@ -56,7 +56,7 @@ void SmartPLAOutbreakFinder::reset()
 
     m_substage = SS_Init;
     m_firstCheck = true;
-    m_areaType = AT_AlabasterIcelands;
+    m_areaType = PokemonDatabase::PLAAT_AlabasterIcelands;
     m_readyNextCheck = false;
 }
 
@@ -166,7 +166,7 @@ void SmartPLAOutbreakFinder::runNextState()
                 setState_runCommand(QString(m_firstCheck ? "LUpRight,30," : "") + "DLeft,1,Nothing,1,DLeft,1,Nothing,1,DLeft,1,Nothing,21");
 
                 m_firstCheck = false;
-                m_areaType = AT_AlabasterIcelands;
+                m_areaType = PokemonDatabase::PLAAT_AlabasterIcelands;
                 m_readyNextCheck = true;
 
                 m_videoManager->clearAreas();
@@ -188,13 +188,13 @@ void SmartPLAOutbreakFinder::runNextState()
                 QString result = matchStringDatabase(m_allOutbreakEntries);
                 if (!result.isEmpty() && m_outbreakPokemonList.contains(result))
                 {
-                    emit printLog("Mass Outbreak for \"" + result + "\" is found in " + AreaTypeToString(m_areaType) + "!", LOG_SUCCESS);
+                    emit printLog("Mass Outbreak for \"" + result + "\" is found in " + PokemonDatabase::PLAAreaTypeToString(m_areaType) + "!", LOG_SUCCESS);
                     setState_completed();
                     break;
                 }
 
-                emit printLog ("No matching outbreak found in " + AreaTypeToString(m_areaType));
-                if (m_areaType == AT_ObsidianFieldlands)
+                emit printLog ("No matching outbreak found in " + PokemonDatabase::PLAAreaTypeToString(m_areaType));
+                if (m_areaType == PokemonDatabase::PLAAT_ObsidianFieldlands)
                 {
                     emit printLog("No desired outbreak found, entering Obsidian Fieldlands...", LOG_WARNING);
 
@@ -208,7 +208,7 @@ void SmartPLAOutbreakFinder::runNextState()
                 else
                 {
                     // Goto next area
-                    m_areaType = (AreaType)((int)m_areaType - 1);
+                    m_areaType = (PokemonDatabase::PLAAreaType)((int)m_areaType - 1);
                 }
             }
 
@@ -230,7 +230,7 @@ void SmartPLAOutbreakFinder::runNextState()
         {
             // Immediately goto next area while we wait for OCR result to save time
             incrementStat(m_statChecks);
-            setState_runCommand(m_areaType == AT_ObsidianFieldlands ? "Nothing,1" : "DLeft,1,Nothing,21");
+            setState_runCommand(m_areaType == PokemonDatabase::PLAAT_ObsidianFieldlands ? "Nothing,1" : "DLeft,1,Nothing,21");
             m_readyNextCheck = false;
         }
     }

@@ -21,29 +21,6 @@ private:
     virtual void reset();
     virtual void runNextState();
 
-    enum AreaType : uint8_t
-    {
-        AT_ObsidianFieldlands,
-        AT_CrimsonMirelands,
-        AT_CobaltCoastlands,
-        AT_CoronetHighlands,
-        AT_AlabasterIcelands,
-    };
-
-    static QString AreaTypeToString(AreaType type)
-    {
-        switch (type)
-        {
-        case AT_ObsidianFieldlands: return "Obsidian Fieldlands";
-        case AT_CrimsonMirelands:   return "Crimson Mirelands";
-        case AT_CobaltCoastlands:   return "Cobalt Coastlands";
-        case AT_CoronetHighlands:   return "Coronet Highlands";
-        case AT_AlabasterIcelands:  return "Alabaster Icelands";
-        }
-
-        return "INVALID AREA";
-    }
-
     // Command indices
     Command const C_TalkToLaventon  = 0;
     Command const C_COUNT           = 1;
@@ -80,7 +57,7 @@ private:
     QStringList m_outbreakPokemonList;  // desired pokemon
     PokemonDatabase::OCREntries m_allOutbreakEntries;   // cached OCR entries for all outbreak pokemon
     bool m_firstCheck;      // for extra up cursor movement when first entering map
-    AreaType m_areaType;    // current area being detected for OCR
+    PokemonDatabase::PLAAreaType m_areaType;    // current area being detected for OCR
     bool m_readyNextCheck;  // for when it's ready to do OCR for next area
 
     // Stats
