@@ -99,8 +99,7 @@ void SmartPLAOutbreakFinder::runNextState()
             if (m_timer.elapsed() > 5000)
             {
                 incrementStat(m_statError);
-                emit printLog("Unable to detect loading screen for too long...", LOG_ERROR);
-                setState_completed();
+                setState_error("Unable to detect loading screen for too long...");
                 break;
             }
             else if (checkBrightnessMeanTarget(A_Loading.m_rect, C_Color_Loading, 240))

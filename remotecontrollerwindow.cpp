@@ -218,6 +218,8 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     ui->SP2_GV_PreviewMasked->setScene(m_SP2_graphicSceneMasked);
     ui->SP2_Frame_Hide->setVisible(false);
 
+    SmartPLAStaticSpawn::populateStaticPokemon(ui->SP16_CB_StaticPokemon);
+
     // Call this after all smart program values are set up above
     //ui->LW_SmartProgram->setCurrentRow(0);
     on_CB_SmartProgram_currentIndexChanged(0);
@@ -2231,6 +2233,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         settings.m_livingDexShiny = ui->SP14_CB_Shiny->isChecked();
         settings.m_livingDexAlpha = ui->SP14_CB_Alpha->isChecked();
         m_smartProgram = new SmartPLAPastureSorter(settings, parameter);
+        break;
+    }
+    case SP_PLA_StaticSpawn:
+    {
+        m_smartProgram = new SmartPLAStaticSpawn(ui->SP16_CB_StaticPokemon->currentText(), ui->SP16_CB_IgnoreEarly->isChecked(), parameter);
         break;
     }
     default:

@@ -136,7 +136,6 @@ void SmartPLAResetAlphaPokemon::runNextState()
             setState_runCommand(C_Restart);
 
             m_audioManager->stopDetection(m_shinySoundID);
-            m_videoManager->clearCaptures();
         }
         break;
     }
