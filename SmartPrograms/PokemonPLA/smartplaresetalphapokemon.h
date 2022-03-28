@@ -1,7 +1,7 @@
 #ifndef SMARTPLARESETALPHAPOKEMON_H
 #define SMARTPLARESETALPHAPOKEMON_H
 
-#include <QElapsedTimer>
+#include <QTimer>
 #include <QWidget>
 #include "../smartprogrambase.h"
 
@@ -25,6 +25,7 @@ public:
     virtual SmartProgram getProgramEnum() { return SP_PLA_ResetAlphaPokemon; }
 
 private slots:
+    void ignoreShinyTimeout();
     void soundDetected(int id);
 
 private:
@@ -59,7 +60,7 @@ private:
     Substage m_substage;
 
     // Members
-    QElapsedTimer m_timer;
+    QTimer m_timer;
     AlphaType m_type;
     bool m_ignoreNonAlpha;
     int m_shinySoundID;

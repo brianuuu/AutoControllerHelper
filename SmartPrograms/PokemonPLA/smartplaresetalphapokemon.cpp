@@ -47,6 +47,12 @@ void SmartPLAResetAlphaPokemon::runNextState()
         m_shinyDetected = false;
         connect(m_audioManager, &AudioManager::soundDetected, this, &SmartPLAResetAlphaPokemon::soundDetected);
 
+        if (m_ignoreNonAlpha)
+        {
+            m_timer.setSingleShot(true);
+            connect(&m_timer, &QTimer::timeout, this, &SmartPLAResetAlphaPokemon::ignoreShinyTimeout);
+        }
+
         m_substage = SS_Restart;
         setState_runCommand(C_Restart);
         break;
@@ -98,7 +104,11 @@ void SmartPLAResetAlphaPokemon::runNextState()
                     incrementStat(m_statAttempts);
                     m_substage = SS_Walk;
                     setState_runCommand(m_type == AT_Gallade ? C_WalkGallade : C_WalkCrobat);
-                    m_timer.restart();
+
+                    if (m_ignoreNonAlpha)
+                    {
+                        m_timer.start(m_type == AT_Gallade ? 26000 : 7000);
+                    }
 
                     m_audioManager->startDetection(m_shinySoundID);
                     m_videoManager->clearCaptures();
@@ -115,7 +125,13 @@ void SmartPLAResetAlphaPokemon::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            emit printLog("No shiny found, restarting...", LOG_WARNING);
+            // We might have found a shiny but chose to ignore
+            if (!m_shinyDetected)
+            {
+                emit printLog("No shiny found, restarting...", LOG_WARNING);
+            }
+            m_shinyDetected = false;
+
             m_substage = SS_Restart;
             setState_runCommand(C_Restart);
 
@@ -142,6 +158,11 @@ void SmartPLAResetAlphaPokemon::runNextState()
     SmartProgramBase::runNextState();
 }
 
+void SmartPLAResetAlphaPokemon::ignoreShinyTimeout()
+{
+    emit printLog("Shiny ignore timeout");
+}
+
 void SmartPLAResetAlphaPokemon::soundDetected(int id)
 {
     if (id != m_shinySoundID) return;
@@ -149,14 +170,14 @@ void SmartPLAResetAlphaPokemon::soundDetected(int id)
     if (m_substage == SS_Walk)
     {
         incrementStat(m_statShiny);
-        if (m_ignoreNonAlpha && m_timer.elapsed() < (m_type == AT_Gallade ? 26500 : 7700))
+        m_shinyDetected = true;
+
+        if (m_ignoreNonAlpha && m_timer.remainingTime() > 0)
         {
             emit printLog("Shiny sound detected but user has set ignore Non-Alpha shinies...", LOG_WARNING);
         }
         else
         {
-            m_shinyDetected = true;
-
             emit printLog("SHINY POKEMON FOUND!", LOG_SUCCESS);
             m_substage = SS_Capture;
             runNextStateContinue();
