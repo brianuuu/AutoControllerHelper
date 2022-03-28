@@ -1716,9 +1716,12 @@ void RemoteControllerWindow::on_SoundDetection_required(int min, int max)
     ui->CB_AudioDisplayMode->setCurrentIndex(ADM_Spectrogram);
     ui->CB_AudioDisplayMode->setEnabled(false);
     ui->SB_AudioFreqLow->setEnabled(false);
-    ui->SB_AudioFreqLow->setValue(min);
     ui->SB_AudioFreqHigh->setEnabled(false);
+
+    // Set min twice in case min & max both larger than previous max
+    ui->SB_AudioFreqLow->setValue(min);
     ui->SB_AudioFreqHigh->setValue(max);
+    ui->SB_AudioFreqLow->setValue(min);
 }
 
 void RemoteControllerWindow::on_SmartProgram_printLog(const QString log, QColor color)

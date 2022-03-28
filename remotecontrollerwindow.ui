@@ -1927,7 +1927,7 @@
                  </sizepolicy>
                 </property>
                 <property name="currentIndex">
-                 <number>15</number>
+                 <number>11</number>
                 </property>
                 <widget class="QWidget" name="page">
                  <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1959,8 +1959,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>384</width>
-                       <height>64</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -2374,8 +2374,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>252</width>
-                       <height>125</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -2549,8 +2549,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>279</width>
-                       <height>102</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -2682,8 +2682,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>199</width>
-                       <height>49</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -3051,8 +3051,8 @@ check the manual</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>289</width>
+                       <height>57</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_22">
@@ -3653,7 +3653,7 @@ If the list doesn't have the specific Pokemon, select Others.</string>
                           </item>
                           <item>
                            <property name="text">
-                            <string>Regigigas</string>
+                            <string>Regigigas/Heatran</string>
                            </property>
                           </item>
                           <item>
@@ -3737,8 +3737,8 @@ If the list doesn't have the specific Pokemon, select Others.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>352</width>
+                       <height>80</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_33">
@@ -3849,8 +3849,8 @@ If the list doesn't have the specific Pokemon, select Others.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>397</width>
+                       <height>68</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_35">
@@ -3914,8 +3914,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>294</width>
+                       <height>115</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_37">
