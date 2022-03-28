@@ -4069,7 +4069,7 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <item>
                        <widget class="QCheckBox" name="SP15_CB_Shiny">
                         <property name="text">
-                         <string>Stop program if any Shinies are found</string>
+                         <string>Stop program if any shinies are found</string>
                         </property>
                        </widget>
                       </item>

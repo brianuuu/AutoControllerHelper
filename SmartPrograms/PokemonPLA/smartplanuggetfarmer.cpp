@@ -49,11 +49,15 @@ void SmartPLANuggetFarmer::runNextState()
         initStat(m_statShiny, "Shinies");
 
         // Setup sound detection
+        m_shinyDetected = false;
         if (m_isFindShiny)
         {
             m_shinySoundID = m_audioManager->addDetection("PokemonLA/ShinySFX", 0.19f, 5000);
-            m_shinyDetected = false;
             connect(m_audioManager, &AudioManager::soundDetected, this, &SmartPLANuggetFarmer::soundDetected);
+        }
+        else
+        {
+            m_shinySoundID = 0;
         }
 
         m_substage = SS_Restart;

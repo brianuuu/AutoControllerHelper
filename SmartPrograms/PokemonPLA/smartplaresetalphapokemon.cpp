@@ -68,8 +68,6 @@ void SmartPLAResetAlphaPokemon::runNextState()
             else
             {
                 setState_frameAnalyzeRequest();
-
-                m_videoManager->clearCaptures();
                 m_videoManager->setAreas({A_Title});
 
                 m_substage = SS_Title;

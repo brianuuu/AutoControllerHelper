@@ -344,6 +344,8 @@ int AudioManager::addDetection(const QString &fileName, float minScore, int lowF
 
 void AudioManager::startDetection(int id)
 {
+    if (id == 0) return;
+
     for (AudioFileHolder* holder : m_audioFileHolders)
     {
         if (holder->getID() == id)
