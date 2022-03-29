@@ -177,14 +177,16 @@ void SmartPLAStaticSpawn::runNextState()
             }
             else if (checkBrightnessMeanTarget(A_Map.m_rect, C_Color_Map, 240))
             {
-                // TODO: Display name
-                emit printLog("Map detected");
-
-                // TODO: goto area
+                emit printLog("Map detected, heading to " + PokemonDatabase::PLAAreaTypeToString(PokemonDatabase::PLAAreaType(m_areaID - 1)) + " camp " + QString::number(m_campID));
                 m_substage = SS_EnterArea;
+                QString downPresses = "";
+                if (m_campID > 1)
+                {
+                    downPresses = "DDown,1,Nothing,1,Loop," + QString::number(m_campID - 1);
+                }
+                setState_runCommand("DRight,1,Nothing,1,Loop," + QString::number(m_areaID) + ",A,16,Loop,1" + downPresses + ",ASpam,80");
 
                 m_videoManager->clearAreas();
-                setState_completed();
             }
             else
             {
@@ -225,15 +227,13 @@ void SmartPLAStaticSpawn::runNextState()
             // Detect entering village/obsidian fieldlands
             if (!checkBrightnessMeanTarget(A_Loading.m_rect, C_Color_Loading, 240))
             {
-                // TODO: run command
                 incrementStat(m_statAttempts);
                 m_substage = SS_DetectShiny;
-                setState_runCommand("Nothing,1");
+                setState_runCommand(m_navigateCommands);
 
                 if (m_ignoreEarlyShiny)
                 {
-                    // TODO: set actual timer
-                    m_timer.start(1000);
+                    m_timer.start(m_ignoreShinyTimeMS);
                 }
 
                 m_audioManager->startDetection(m_shinySoundID);
@@ -260,6 +260,7 @@ void SmartPLAStaticSpawn::runNextState()
             m_substage = SS_Restart;
             runRestartCommand();
 
+            m_timer.stop();
             m_audioManager->stopDetection(m_shinySoundID);
         }
         break;

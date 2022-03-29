@@ -73,7 +73,7 @@ private:
     QString m_navigateCommands;
     int m_areaID;
     int m_campID;
-    qint64 m_ignoreShinyTimeMS;
+    int m_ignoreShinyTimeMS;
 
     bool m_ignoreEarlyShiny;
     int m_shinySoundID;
