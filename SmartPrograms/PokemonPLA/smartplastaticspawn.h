@@ -59,6 +59,7 @@ private:
         SS_DetectMap,
         SS_EnterArea,
         SS_LoadingToArea,
+        SS_GotoCamp,
 
         SS_DetectShiny,
         SS_Capture,
@@ -71,7 +72,7 @@ private:
 
     QString m_staticPokemon;
     QString m_navigateCommands;
-    int m_areaID;
+    PLAAreaType m_areaType;
     int m_campID;
     int m_ignoreShinyTimeMS;
 

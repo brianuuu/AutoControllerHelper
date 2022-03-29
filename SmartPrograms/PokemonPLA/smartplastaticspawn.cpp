@@ -21,15 +21,18 @@ SmartPLAStaticSpawn::SmartPLAStaticSpawn
     }
 
     settings.beginGroup(staticPokemon);
-    m_areaID = settings.value("AreaID", 0).toInt();
-    if (m_areaID < 1 || m_areaID > 5)
+    int areaID = settings.value("AreaID", 0).toInt();
+    if (areaID < 1 || areaID > 5)
     {
         setState_error("Invalid AreaID");
         return;
     }
+    m_areaType = PLAAreaType(areaID - 1);
 
     m_campID = settings.value("CampID", 0).toInt();
-    if (m_campID < 1)
+    bool validCamp = false;
+    PokemonDatabase::getPLACampString(m_areaType, m_campID, &validCamp);
+    if (!validCamp)
     {
         setState_error("Invalid CampID");
         return;
@@ -87,8 +90,10 @@ void SmartPLAStaticSpawn::runNextState()
         initStat(m_statShiny, "Shinies");
         initStat(m_statError, "Errors");
 
-        emit printLog("Pokemon: " + m_staticPokemon + ", AreaID: " + QString::number(m_areaID)
-                      + ", CampID: " + QString::number(m_campID) + ", Ignore Shiny Time: " + QString::number(m_ignoreShinyTimeMS) + "ms");
+        emit printLog("Pokemon: " + m_staticPokemon
+                      + ", Area: " + PokemonDatabase::PLAAreaTypeToString(m_areaType)
+                      + ", Camp: " + PokemonDatabase::getPLACampString(m_areaType, m_campID)
+                      + ", Ignore Shiny Time: " + QString::number(m_ignoreShinyTimeMS) + "ms");
 
         // Setup sound detection
         m_shinySoundID = m_audioManager->addDetection("PokemonLA/ShinySFX", 0.19f, 5000);
@@ -177,14 +182,26 @@ void SmartPLAStaticSpawn::runNextState()
             }
             else if (checkBrightnessMeanTarget(A_Map.m_rect, C_Color_Map, 240))
             {
-                emit printLog("Map detected, heading to " + PokemonDatabase::PLAAreaTypeToString(PokemonDatabase::PLAAreaType(m_areaID - 1)) + " camp " + QString::number(m_campID));
                 m_substage = SS_EnterArea;
-                QString downPresses = "";
-                if (m_campID > 1)
+                QString const toAreaCommand = "DRight,1,Nothing,1,Loop," + QString::number(m_areaType + 1);
+
+                if (PokemonDatabase::getIsPLACampSelectableAtVillage(m_areaType, m_campID))
                 {
-                    downPresses = "DDown,1,Nothing,1,Loop," + QString::number(m_campID - 1);
+                    // Head to camp
+                    emit printLog("Map detected, heading to " + PokemonDatabase::PLAAreaTypeToString(m_areaType) + " " + PokemonDatabase::getPLACampString(m_areaType, m_campID));
+                    QString downPresses = "";
+                    if (m_campID > 1)
+                    {
+                        downPresses = ",DDown,1,Nothing,1,Loop," + QString::number(m_campID - 1);
+                    }
+                    setState_runCommand(toAreaCommand + ",A,16,Loop,1" + downPresses + ",ASpam,80");
                 }
-                setState_runCommand("DRight,1,Nothing,1,Loop," + QString::number(m_areaID) + ",A,16,Loop,1" + downPresses + ",ASpam,80");
+                else
+                {
+                    // Can't head the camp from village, do it again after we entered area
+                    emit printLog(PokemonDatabase::getPLACampString(m_areaType, m_campID) + " not accessable from village, heading to " + PokemonDatabase::PLAAreaTypeToString(m_areaType) + " first");
+                    setState_runCommand(toAreaCommand + ",ASpam,80");
+                }
 
                 m_videoManager->clearAreas();
             }
@@ -213,7 +230,7 @@ void SmartPLAStaticSpawn::runNextState()
             else if (checkBrightnessMeanTarget(A_Loading.m_rect, C_Color_Loading, 240))
             {
                 // Detect loading screen
-                m_substage = SS_LoadingToArea;
+                m_substage = PokemonDatabase::getIsPLACampSelectableAtVillage(m_areaType, m_campID) ? SS_GotoCamp : SS_LoadingToArea;
             }
         }
 
@@ -221,23 +238,44 @@ void SmartPLAStaticSpawn::runNextState()
         break;
     }
     case SS_LoadingToArea:
+    case SS_GotoCamp:
     {
-        if (state == S_CaptureReady)
+        if (state == S_CommandFinished)
         {
-            // Detect entering village/obsidian fieldlands
+            setState_frameAnalyzeRequest();
+        }
+        else if (state == S_CaptureReady)
+        {
+            // Detect entering area
             if (!checkBrightnessMeanTarget(A_Loading.m_rect, C_Color_Loading, 240))
             {
-                incrementStat(m_statAttempts);
-                m_substage = SS_DetectShiny;
-                setState_runCommand(m_navigateCommands);
-
-                if (m_ignoreEarlyShiny)
+                if (m_substage == SS_GotoCamp)
                 {
-                    m_timer.start(m_ignoreShinyTimeMS);
-                }
+                    incrementStat(m_statAttempts);
+                    m_substage = SS_DetectShiny;
+                    setState_runCommand(m_navigateCommands);
 
-                m_audioManager->startDetection(m_shinySoundID);
-                m_videoManager->clearCaptures();
+                    if (m_ignoreEarlyShiny)
+                    {
+                        m_timer.start(m_ignoreShinyTimeMS);
+                    }
+
+                    m_audioManager->startDetection(m_shinySoundID);
+                    m_videoManager->clearCaptures();
+                }
+                else
+                {
+                    // Goto the arena/settlement that weren't accessible in village
+                    m_substage = SS_GotoCamp;
+
+                    emit printLog("Heading to " + PokemonDatabase::getPLACampString(m_areaType, m_campID));
+                    QString downPresses = "";
+                    if (m_campID > 1)
+                    {
+                        downPresses = ",DDown,1,Nothing,1,Loop," + QString::number(m_campID - 1);
+                    }
+                    setState_runCommand("Minus,1,Nothing,20,X,16,Loop,1" + downPresses + ",ASpam,60");
+                }
             }
             else
             {

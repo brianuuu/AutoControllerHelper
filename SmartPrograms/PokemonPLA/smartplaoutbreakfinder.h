@@ -57,7 +57,7 @@ private:
     QStringList m_outbreakPokemonList;  // desired pokemon
     PokemonDatabase::OCREntries m_allOutbreakEntries;   // cached OCR entries for all outbreak pokemon
     bool m_firstCheck;      // for extra up cursor movement when first entering map
-    PokemonDatabase::PLAAreaType m_areaType;    // current area being detected for OCR
+    PLAAreaType m_areaType;    // current area being detected for OCR
     bool m_readyNextCheck;  // for when it's ready to do OCR for next area
 
     // Stats

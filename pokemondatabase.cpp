@@ -11,6 +11,143 @@ PokemonDatabase::PokemonDatabase()
 
 }
 
+QString PokemonDatabase::getGameLanguagePrefix(GameLanguage sp)
+{
+    switch (sp)
+    {
+    case GL_English:            return "eng";
+    case GL_ChineseSimplified:  return "chi_sim";
+    case GL_ChineseTraditional: return "chi_tra";
+    case GL_French:             return "fra";
+    case GL_German:             return "deu";
+    case GL_Italian:            return "ita";
+    case GL_Japanese:           return "jpn";
+    case GL_Korean:             return "kor";
+    case GL_Spanish:            return "spa";
+    case GL_COUNT:              return "invalid";
+    }
+    return "invalid";
+}
+
+QString PokemonDatabase::getGameLanguageName(GameLanguage sp)
+{
+    switch (sp)
+    {
+    case GL_English:            return "English";
+    case GL_ChineseSimplified:  return "Chinese (Simplified)";
+    case GL_ChineseTraditional: return "Chinese (Traditional)";
+    case GL_French:             return "French";
+    case GL_German:             return "German";
+    case GL_Italian:            return "Italian";
+    case GL_Japanese:           return "Japanese";
+    case GL_Korean:             return "Korean";
+    case GL_Spanish:            return "Spanish";
+    case GL_COUNT:              return "Unknown";
+    }
+    return "Unknown";
+}
+
+QString PokemonDatabase::PLAAreaTypeToString(PLAAreaType type)
+{
+    switch (type)
+    {
+    case PLAAT_ObsidianFieldlands: return "Obsidian Fieldlands";
+    case PLAAT_CrimsonMirelands:   return "Crimson Mirelands";
+    case PLAAT_CobaltCoastlands:   return "Cobalt Coastlands";
+    case PLAAT_CoronetHighlands:   return "Coronet Highlands";
+    case PLAAT_AlabasterIcelands:  return "Alabaster Icelands";
+    }
+    return "INVALID AREA";
+}
+
+QString PokemonDatabase::getPLACampString(PLAAreaType type, int campID, bool *valid)
+{
+    if (valid)
+    {
+        *valid = true;
+    }
+
+    switch (type)
+    {
+    case PLAAT_ObsidianFieldlands:
+    {
+        switch (campID)
+        {
+        case 1: return "Fieldlands Camp";
+        case 2: return "Heights Camp";
+        case 3: return "Grandtree Arena";
+        }
+        break;
+    }
+    case PLAAT_CrimsonMirelands:
+
+    {
+        switch (campID)
+        {
+        case 1: return "Mirelands Camp";
+        case 2: return "Bogbound Camp";
+        case 3: return "Diamond Settlement";
+        case 4: return "Brava Arena";
+        }
+        break;
+    }
+    case PLAAT_CobaltCoastlands:
+    {
+        switch (campID)
+        {
+        case 1: return "Beachside Camp";
+        case 2: return "Coastlands Camp";
+        case 3: return "Molten Arena";
+        }
+        break;
+    }
+    case PLAAT_CoronetHighlands:
+    {
+        switch (campID)
+        {
+        case 1: return "Highlands Camp";
+        case 2: return "Mountain Camp";
+        case 3: return "Summit Camp";
+        case 4: return "Moonview Arena";
+        }
+        break;
+    }
+    case PLAAT_AlabasterIcelands:
+    {
+        switch (campID)
+        {
+        case 1: return "Snowfields Camp";
+        case 2: return "Icepeak Camp";
+        case 3: return "Pearl Settlement";
+        case 4: return "Icepeak Arena";
+        }
+        break;
+    }
+    }
+
+    if (valid)
+    {
+        *valid = false;
+    }
+    return "INVALID AREA/CAMP";
+}
+
+bool PokemonDatabase::getIsPLACampSelectableAtVillage(PLAAreaType type, int campID)
+{
+    bool selectable = campID > 0;
+    switch (type)
+    {
+    case PLAAT_ObsidianFieldlands:
+    case PLAAT_CrimsonMirelands:
+    case PLAAT_CobaltCoastlands:
+    case PLAAT_AlabasterIcelands:
+        return selectable && campID < 3;
+    case PLAAT_CoronetHighlands:
+        return selectable && campID < 4;
+    }
+    return false;
+}
+
 // -----------------------------------------------
 // String manipulation
 // -----------------------------------------------
