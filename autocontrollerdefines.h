@@ -31,7 +31,7 @@
 #define CLEAR_BIT(var,pos) (var &= ~(1U << pos))
 #define CHECK_BIT(var,pos) (var & (1U << pos))
 #define COMMAND_MAX 30
-#define SMART_HEX_VERSION 4
+#define SMART_HEX_VERSION 5
 
 #define LOG_SUCCESS QColor(0,170,0)
 #define LOG_WARNING QColor(255,120,0)
