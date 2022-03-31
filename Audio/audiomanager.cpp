@@ -715,6 +715,9 @@ void AudioManager::paintEvent_NonTS()
         QPainter painter(this);
         painter.fillRect(this->rect(), Qt::black);
 
+        // Don't draw spectrogram if audio is not started
+        if (!isStarted()) return;
+
         // Shift previously drawn spectrogram data
         m_displayImage = m_displayImage.copy(1, 0, width, height);
         QPainter imagePainter(&m_displayImage);
