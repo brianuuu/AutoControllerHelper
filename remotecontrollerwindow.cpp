@@ -1857,10 +1857,14 @@ void RemoteControllerWindow::on_PB_ModifySmartCommands_clicked()
 {
     QString name = ui->LW_SmartProgram->currentItem()->text();
     SmartProgram const sp = SmartProgramBase::getProgramEnumFromName(name);
-    QString xmlName = SmartProgramBase::getProgramInternalNameFromEnum(sp) + ".xml";
-    if (QFile::exists(SMART_COMMAND_PATH + xmlName))
+    QString programName = SmartProgramBase::getProgramInternalNameFromEnum(sp);
+    if (QFile::exists(SMART_COMMAND_PATH + programName + ".xml"))
     {
-        QDesktopServices::openUrl(QUrl::fromLocalFile(SMART_COMMAND_PATH + xmlName));
+        QDesktopServices::openUrl(QUrl::fromLocalFile(SMART_COMMAND_PATH + programName + ".xml"));
+    }
+    else if (QFile::exists(SMART_COMMAND_PATH + programName + ".ini"))
+    {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(SMART_COMMAND_PATH + programName + ".ini"));
     }
 }
 
@@ -1897,8 +1901,8 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
         return;
     }
 
-    QString xmlName = SmartProgramBase::getProgramInternalNameFromEnum(sp) + ".xml";
-    ui->PB_ModifySmartCommands->setEnabled(QFile::exists(SMART_COMMAND_PATH + xmlName));
+    QString programName = SmartProgramBase::getProgramInternalNameFromEnum(sp);
+    ui->PB_ModifySmartCommands->setEnabled(QFile::exists(SMART_COMMAND_PATH + programName + ".xml") || QFile::exists(SMART_COMMAND_PATH + programName + ".ini"));
 
     int tabIndex = SmartProgramBase::getProgramTabID(sp);
     if (tabIndex < 0 || tabIndex >= ui->SW_Settings->count())
