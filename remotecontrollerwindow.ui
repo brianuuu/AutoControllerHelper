@@ -1927,7 +1927,7 @@
                  </sizepolicy>
                 </property>
                 <property name="currentIndex">
-                 <number>16</number>
+                 <number>11</number>
                 </property>
                 <widget class="QWidget" name="page">
                  <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1959,8 +1959,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>384</width>
+                       <height>64</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -2019,7 +2019,7 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>438</width>
+                       <width>323</width>
                        <height>284</height>
                       </rect>
                      </property>
@@ -2374,8 +2374,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>252</width>
+                       <height>125</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -2549,8 +2549,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>279</width>
+                       <height>102</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -2682,8 +2682,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>199</width>
+                       <height>49</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -2797,8 +2797,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>405</width>
+                       <height>158</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -2950,8 +2950,8 @@ check the manual</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>318</width>
+                       <height>56</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_19">
@@ -3155,8 +3155,8 @@ check the manual</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>392</width>
+                       <height>137</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_24">
@@ -3358,8 +3358,8 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>418</width>
+                       <height>69</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_27">
@@ -3460,8 +3460,8 @@ This is for duplicating Pokemon, for items, use Box Operation program instead.</
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>262</width>
+                       <height>84</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_29">
@@ -3653,7 +3653,7 @@ If the list doesn't have the specific Pokemon, select Others.</string>
                           </item>
                           <item>
                            <property name="text">
-                            <string>Regigigas/Heatran</string>
+                            <string>Regigigas/Heatran/Darkrai</string>
                            </property>
                           </item>
                           <item>
