@@ -143,7 +143,7 @@ void SmartPLAResetAlphaPokemon::runNextState()
     {
         if (m_shinyDetected)
         {
-            setState_runCommand("Capture,22,Minus,1");
+            setState_runCommand("Capture,22,Minus,1,Nothing,20,Home,1");
             m_shinyDetected = false;
         }
         else if (state == S_CommandFinished)
