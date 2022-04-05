@@ -14,6 +14,7 @@ public:
         LT_Regigigas,
         LT_Shaymin,
         LT_Arceus,
+        LT_Darkrai,
         LT_Others,
         LT_COUNT,
     };
@@ -41,8 +42,9 @@ private:
     Command const C_TalkRegigigas       = 5;
     Command const C_TalkShaymin         = 6;
     Command const C_TalkArceus          = 7;
-    Command const C_Capture             = 8;
-    Command const C_COUNT               = 9;
+    Command const C_TalkDarkrai         = 8;
+    Command const C_Capture             = 9;
+    Command const C_COUNT               = 10;
 
     // List of test color
     HSVRange const C_Color_Dialog = HSVRange(0,0,230,359,30,255);

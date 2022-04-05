@@ -93,6 +93,7 @@ void SmartBDSPShinyLegendary::runNextState()
                         case LT_Regigigas: setState_runCommand(C_TalkRegigigas); break;
                         case LT_Shaymin: m_substage = SS_RestartShaymin; setState_runCommand("Nothing,21"); break;
                         case LT_Arceus: setState_runCommand(C_TalkArceus); break;
+                        case LT_Darkrai: setState_runCommand(C_TalkDarkrai); break;
                         case LT_Others: setState_runCommand(C_Talk); break;
                         default: setState_error("Invalid legendary type"); break;
                     }
