@@ -126,6 +126,7 @@ void SmartPLAStaticSpawn::runNextState()
             }
             else
             {
+                m_elapsedTimer.restart();
                 setState_frameAnalyzeRequest();
                 m_videoManager->setAreas({A_Title});
 
@@ -139,11 +140,18 @@ void SmartPLAStaticSpawn::runNextState()
     {
         if (state == S_CommandFinished)
         {
+            m_elapsedTimer.restart();
             setState_frameAnalyzeRequest();
         }
         else if (state == S_CaptureReady)
         {
-            if (!checkAverageColorMatch(A_Title.m_rect, QColor(0,0,0)))
+            if (m_elapsedTimer.elapsed() > 10000)
+            {
+                incrementStat(m_statError);
+                emit printLog("Unable to detect title screen or game starting, the game might have crashed, restarting...", LOG_ERROR);
+                runRestartCommand();
+            }
+            else if (!checkAverageColorMatch(A_Title.m_rect, QColor(0,0,0)))
             {
                 if (m_substage == SS_Title)
                 {
