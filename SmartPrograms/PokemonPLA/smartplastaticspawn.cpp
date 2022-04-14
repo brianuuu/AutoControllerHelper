@@ -145,7 +145,7 @@ void SmartPLAStaticSpawn::runNextState()
         }
         else if (state == S_CaptureReady)
         {
-            if (m_elapsedTimer.elapsed() > 10000)
+            if (m_elapsedTimer.elapsed() > 20000)
             {
                 incrementStat(m_statError);
                 emit printLog("Unable to detect title screen or game starting, the game might have crashed, restarting...", LOG_ERROR);
