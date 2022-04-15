@@ -2128,6 +2128,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartColorCalibrator(ui->SP8_L_Battle, ui->SP8_L_Pokemon, ui->SP8_L_Bag, ui->SP8_L_Run, parameter);
         break;
     }
+    case SP_SoundDetection:
+    {
+        m_smartProgram = new SmartSoundDetection(ui->SP17_LE_SoundFile->text(), float(ui->SP17_SP_MinScore->value()), ui->SP17_SP_LPF->value(), parameter);
+        break;
+    }
     case SP_Test:
     {
         m_smartProgram = new SmartTestProgram(parameter);

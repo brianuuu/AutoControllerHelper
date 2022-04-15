@@ -24,6 +24,7 @@ enum SmartProgram : uint32_t
     SP_DelayCalibrator = 0,
     SP_BrightnessMeanFinder,
     SP_ColorCalibrator,
+    SP_SoundDetection,
     SP_Test,
 
     SP_PurpleBeamFinder,
@@ -95,6 +96,7 @@ public:
             case SP_DelayCalibrator:        return "Dev: Camera Delay Checker";
             case SP_BrightnessMeanFinder:   return "Dev: Brightness Mean Finder";
             case SP_ColorCalibrator:        return "Dev: Color Calibrator";
+            case SP_SoundDetection:         return "Dev: Sound Detection";
             case SP_Test:                   return "Test Program";
 
             case SP_PurpleBeamFinder:       return "Purple Beam Finder";
@@ -149,6 +151,7 @@ public:
             case SP_DelayCalibrator:        return "SmartDelayCalibrator";
             case SP_BrightnessMeanFinder:   return "SmartBrightnessMeanFinder";
             case SP_ColorCalibrator:        return "SmartColorCalibrator";
+            case SP_SoundDetection:         return "SmartSoundDetection";
             case SP_Test:                   return "SmartTestProgram";
 
             case SP_PurpleBeamFinder:       return "SmartPurpleBeamFilder";
@@ -190,6 +193,7 @@ public:
             case SP_DelayCalibrator:        return 0;
             case SP_BrightnessMeanFinder:   return 1;
             case SP_ColorCalibrator:        return 8;
+            case SP_SoundDetection:         return 17;
             case SP_Test:                   return 0;
 
             case SP_PurpleBeamFinder:       return 2;
@@ -254,6 +258,7 @@ public:
         case SP_DelayCalibrator:
         case SP_BrightnessMeanFinder:
         case SP_ColorCalibrator:
+        case SP_SoundDetection:
         case SP_Test:
         case SP_BattleTower:
         case SP_BDSP_MenuGlitch113:

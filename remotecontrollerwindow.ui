@@ -1927,7 +1927,7 @@
                  </sizepolicy>
                 </property>
                 <property name="currentIndex">
-                 <number>11</number>
+                 <number>17</number>
                 </property>
                 <widget class="QWidget" name="page">
                  <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1959,8 +1959,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>384</width>
-                       <height>64</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -3742,8 +3742,8 @@ If the list doesn't have the specific Pokemon, select Others.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>352</width>
-                       <height>80</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_33">
@@ -3854,8 +3854,8 @@ If the list doesn't have the specific Pokemon, select Others.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>397</width>
-                       <height>68</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_35">
@@ -3919,8 +3919,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>294</width>
-                       <height>115</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_37">
@@ -4066,8 +4066,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>198</width>
-                       <height>35</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_41">
@@ -4127,8 +4127,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>224</width>
-                       <height>63</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_43">
@@ -4182,6 +4182,132 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                          <size>
                           <width>20</width>
                           <height>144</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </widget>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+                <widget class="QWidget" name="page_17">
+                 <layout class="QVBoxLayout" name="verticalLayout_44">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QScrollArea" name="scrollArea_19">
+                    <property name="frameShape">
+                     <enum>QFrame::Panel</enum>
+                    </property>
+                    <property name="lineWidth">
+                     <number>2</number>
+                    </property>
+                    <property name="widgetResizable">
+                     <bool>true</bool>
+                    </property>
+                    <widget class="QWidget" name="scrollAreaWidgetContents_19">
+                     <property name="geometry">
+                      <rect>
+                       <x>0</x>
+                       <y>0</y>
+                       <width>448</width>
+                       <height>210</height>
+                      </rect>
+                     </property>
+                     <layout class="QVBoxLayout" name="verticalLayout_45">
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_42">
+                        <item>
+                         <widget class="QLabel" name="label_70">
+                          <property name="text">
+                           <string>Sound File: Resources/</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="SP17_LE_SoundFile">
+                          <property name="text">
+                           <string>PokemonLA/ShinySFX</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_71">
+                          <property name="text">
+                           <string>.wav</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_43">
+                        <item>
+                         <widget class="QLabel" name="label_72">
+                          <property name="text">
+                           <string>Min Score:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QDoubleSpinBox" name="SP17_SP_MinScore">
+                          <property name="decimals">
+                           <number>3</number>
+                          </property>
+                          <property name="maximum">
+                           <double>10.000000000000000</double>
+                          </property>
+                          <property name="singleStep">
+                           <double>0.010000000000000</double>
+                          </property>
+                          <property name="value">
+                           <double>0.190000000000000</double>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_73">
+                          <property name="text">
+                           <string>Low Pass Filter:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSpinBox" name="SP17_SP_LPF">
+                          <property name="maximum">
+                           <number>19000</number>
+                          </property>
+                          <property name="singleStep">
+                           <number>100</number>
+                          </property>
+                          <property name="value">
+                           <number>5000</number>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <spacer name="verticalSpacer_16">
+                        <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>20</width>
+                          <height>140</height>
                          </size>
                         </property>
                        </spacer>
