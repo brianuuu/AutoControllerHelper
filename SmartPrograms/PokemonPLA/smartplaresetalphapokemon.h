@@ -2,6 +2,7 @@
 #define SMARTPLARESETALPHAPOKEMON_H
 
 #include <QTimer>
+#include <QElapsedTimer>
 #include <QWidget>
 #include "../smartprogrambase.h"
 
@@ -61,6 +62,7 @@ private:
 
     // Members
     QTimer m_timer;
+    QElapsedTimer m_elapsedTimer;
     AlphaType m_type;
     bool m_ignoreNonAlpha;
     int m_shinySoundID;
