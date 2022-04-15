@@ -110,11 +110,11 @@ private:
     int                 m_fftNewDataStart;
     int                 m_fftAnalysisStart;
 
-    fftwf_complex*      m_fftDataIn;
-    fftwf_complex*      m_fftDataOut;
-    QVector<float>      m_spectrogramData;
-    int                 m_freqLow;
-    int                 m_freqHigh;
+    fftwf_complex*              m_fftDataIn;
+    fftwf_complex*              m_fftDataOut;
+    QVector< QVector<float> >   m_spectrogramData;
+    int                         m_freqLow;
+    int                         m_freqHigh;
 
     // Sound detection
     QMap<QString, AudioFileHolder*>     m_audioFileHolders;

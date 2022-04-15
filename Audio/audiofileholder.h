@@ -23,6 +23,8 @@ public:
     bool loadWaveFile(QString const & filename, QAudioFormat const& audioFormat, float minScore, int lowFreqFilter, QString& errorStr);
     void setID(int id) { m_id = id; }
     void setScore(float score) { m_score = score; }
+    void setMinScore(float minScore) { m_minScore = minScore; }
+    void setFreqStart(int freqStart) { m_freqStart = freqStart; }
 
     // Getters
     int getID() { return m_id; }
