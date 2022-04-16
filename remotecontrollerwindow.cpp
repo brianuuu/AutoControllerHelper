@@ -2253,6 +2253,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartPLAStaticSpawn(ui->SP16_CB_StaticPokemon->currentText(), ui->SP16_CB_IgnoreEarly->isChecked(), parameter);
         break;
     }
+    case SP_PLA_MMORespawn:
+    {
+        m_smartProgram = new SmartPLAMMORespawn(parameter);
+        break;
+    }
     default:
     {
         QMessageBox::critical(this, "Error", "No code exist for this Smart Program!");

@@ -52,6 +52,7 @@ enum SmartProgram : uint32_t
     SP_PLA_OutbreakFinder,
     SP_PLA_PastureSorter,
     SP_PLA_StaticSpawn,
+    SP_PLA_MMORespawn,
 
     SP_COUNT
 };
@@ -124,6 +125,7 @@ public:
             case SP_PLA_OutbreakFinder:     return "Outbreak Finder";
             case SP_PLA_PastureSorter:      return "Pasture Sorter";
             case SP_PLA_StaticSpawn:        return "Static Spawn Reset";
+            case SP_PLA_MMORespawn:         return "MMO Respawn Reset";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -179,6 +181,7 @@ public:
             case SP_PLA_OutbreakFinder:     return "SmartPLAOutbreakFinder";
             case SP_PLA_PastureSorter:      return "SmartPLAPastureSorter";
             case SP_PLA_StaticSpawn:        return "SmartPLAStaticSpawn";
+            case SP_PLA_MMORespawn:         return "SmartPLAMMORespawn";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -221,6 +224,7 @@ public:
             case SP_PLA_OutbreakFinder:     return 13;
             case SP_PLA_PastureSorter:      return 14;
             case SP_PLA_StaticSpawn:        return 16;
+            case SP_PLA_MMORespawn:         return 0;
 
             case SP_COUNT:                  return -1;
         }

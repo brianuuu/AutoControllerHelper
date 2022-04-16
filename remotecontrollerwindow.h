@@ -62,6 +62,7 @@
 #include "SmartPrograms/PokemonPLA/smartplaoutbreakfinder.h"
 #include "SmartPrograms/PokemonPLA/smartplapasturesorter.h"
 #include "SmartPrograms/PokemonPLA/smartplastaticspawn.h"
+#include "SmartPrograms/PokemonPLA/smartplammorespawn.h"
 
 #include "SmartPrograms/Widgets/pokemonautofilllineedit.h"
 

@@ -36,6 +36,7 @@ SOURCES += \
     SmartPrograms/PokemonBDSP/smartbdspshinylegendary.cpp \
     SmartPrograms/PokemonBDSP/smartbdspstarter.cpp \
     SmartPrograms/PokemonPLA/smartpladistortionwaiter.cpp \
+    SmartPrograms/PokemonPLA/smartplammorespawn.cpp \
     SmartPrograms/PokemonPLA/smartplanuggetfarmer.cpp \
     SmartPrograms/PokemonPLA/smartplaoutbreakfinder.cpp \
     SmartPrograms/PokemonPLA/smartplapasturesorter.cpp \
@@ -80,6 +81,7 @@ HEADERS += \
     SmartPrograms/PokemonBDSP/smartbdspshinylegendary.h \
     SmartPrograms/PokemonBDSP/smartbdspstarter.h \
     SmartPrograms/PokemonPLA/smartpladistortionwaiter.h \
+    SmartPrograms/PokemonPLA/smartplammorespawn.h \
     SmartPrograms/PokemonPLA/smartplanuggetfarmer.h \
     SmartPrograms/PokemonPLA/smartplaoutbreakfinder.h \
     SmartPrograms/PokemonPLA/smartplapasturesorter.h \
