@@ -244,6 +244,7 @@ public:
         switch (sp)
         {
         case SP_BrightnessMeanFinder:
+        case SP_SoundDetection:
             return true;
         default:
             return false;
