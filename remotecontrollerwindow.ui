@@ -1879,6 +1879,11 @@
                   </item>
                   <item>
                    <property name="text">
+                    <string>Pokemon Scarlet/Violet</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
                     <string>Others</string>
                    </property>
                   </item>
@@ -1927,7 +1932,7 @@
                  </sizepolicy>
                 </property>
                 <property name="currentIndex">
-                 <number>17</number>
+                 <number>9</number>
                 </property>
                 <widget class="QWidget" name="page">
                  <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -2019,7 +2024,7 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>323</width>
+                       <width>438</width>
                        <height>284</height>
                       </rect>
                      </property>
@@ -2374,8 +2379,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>252</width>
-                       <height>125</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -2549,8 +2554,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>279</width>
-                       <height>102</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -2682,8 +2687,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>199</width>
-                       <height>49</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -2797,8 +2802,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>405</width>
-                       <height>158</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -2950,8 +2955,8 @@ check the manual</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>318</width>
-                       <height>56</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_19">
@@ -3051,8 +3056,8 @@ check the manual</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>289</width>
-                       <height>57</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_22">
@@ -3155,8 +3160,8 @@ check the manual</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>392</width>
-                       <height>137</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_24">
@@ -3358,13 +3363,13 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>418</width>
-                       <height>69</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_27">
                       <item>
-                       <widget class="QLabel" name="label_52">
+                       <widget class="QLabel" name="SP9_L_Note">
                         <property name="text">
                          <string>Note: You MUST have Menu Glitch active, which can be patched by Nintendo at some point.
 This is for duplicating Pokemon, for items, use Box Operation program instead.</string>
@@ -3374,14 +3379,14 @@ This is for duplicating Pokemon, for items, use Box Operation program instead.</
                       <item>
                        <layout class="QHBoxLayout" name="horizontalLayout_26">
                         <item>
-                         <widget class="QLabel" name="label_49">
+                         <widget class="QLabel" name="SP9_L_Label">
                           <property name="text">
                            <string>No. of Boxes to Duplicate:</string>
                           </property>
                          </widget>
                         </item>
                         <item>
-                         <widget class="QSpinBox" name="SP9_SB_Box">
+                         <widget class="QSpinBox" name="SP9_SB_Count">
                           <property name="minimumSize">
                            <size>
                             <width>55</width>
@@ -3460,8 +3465,8 @@ This is for duplicating Pokemon, for items, use Box Operation program instead.</
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>262</width>
-                       <height>84</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_29">

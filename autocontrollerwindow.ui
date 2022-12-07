@@ -73,6 +73,11 @@
         </item>
         <item>
          <property name="text">
+          <string>Pokemon Scarlet/Violet</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
           <string>Others</string>
          </property>
         </item>
@@ -300,7 +305,7 @@
           <item>
            <widget class="QStackedWidget" name="SW_Settings">
             <property name="currentIndex">
-             <number>19</number>
+             <number>23</number>
             </property>
             <widget class="QWidget" name="page">
              <layout class="QHBoxLayout" name="horizontalLayout_10">
@@ -3092,6 +3097,71 @@
                    </item>
                    <item>
                     <spacer name="horizontalSpacer_11">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="page_23">
+             <layout class="QVBoxLayout" name="verticalLayout_39">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QGroupBox" name="GB_SVItemDuplication">
+                <property name="title">
+                 <string>Settings</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_47">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_53">
+                   <item>
+                    <widget class="QLabel" name="label_54">
+                     <property name="text">
+                      <string>Item Count:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QSpinBox" name="SVItemDuplication_Count">
+                     <property name="minimumSize">
+                      <size>
+                       <width>55</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="minimum">
+                      <number>1</number>
+                     </property>
+                     <property name="maximum">
+                      <number>999</number>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_46">
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
                      </property>

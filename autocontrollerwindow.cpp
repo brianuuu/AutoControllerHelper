@@ -53,6 +53,8 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_programEnumMap["PLA_ResetAlphaCrobat"]    = P_PLA_ResetAlphaCrobat;
     m_programEnumMap["PLA_ResetAlphaGallade"]   = P_PLA_ResetAlphaGallade;
 
+    m_programEnumMap["SV_ItemDuplication"]   = P_SV_ItemDuplication;
+
     m_tabID[P_DaySkipper]           = 1;
     m_tabID[P_DaySkipper_Unlimited] = 2;
     m_tabID[P_WattFarmer]           = 17; // 3 now use for error
@@ -91,6 +93,8 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
 
     m_tabID[P_PLA_ResetAlphaCrobat]     = 0;
     m_tabID[P_PLA_ResetAlphaGallade]    = 0;
+
+    m_tabID[P_SV_ItemDuplication]   = 23;
 
     if (!QDir(HEX_PATH).exists())
     {
@@ -568,6 +572,10 @@ void autocontrollerwindow::on_CB_Bots_currentIndexChanged(int index)
         else if (item->text().startsWith("PLA"))
         {
             item->setHidden(ui->CB_Bots->currentText() != "Pokemon Legends: Arceus");
+        }
+        else if (item->text().startsWith("SV"))
+        {
+            item->setHidden(ui->CB_Bots->currentText() != "Pokemon Scarlet/Violet");
         }
         else
         {
@@ -1596,6 +1604,21 @@ void autocontrollerwindow::LoadConfig()
         break;
     }
 
+        //--------------------------------------------------------
+        case P_SV_ItemDuplication:
+        {
+            QTextStream in(&configFile);
+            while (!in.atEnd())
+            {
+                QString line = in.readLine();
+                if (line.indexOf("m_maxCycle = ") != -1)
+                {
+                    ui->SVItemDuplication_Count->setValue(GetVariableString(line).toInt());
+                }
+            }
+            break;
+        }
+
     //--------------------------------------------------------
     case P_INVALID:
     {
@@ -1859,6 +1882,13 @@ void autocontrollerwindow::SaveConfig()
     {
         out << "int m_boxCount = " << QString::number(ui->BDSPBoxOperation_Count->value()) << ";\n";
         out << "int m_operationType = " << QString::number(ui->BDSPBoxOperation_Type->currentIndex()) << ";\n";
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_SV_ItemDuplication:
+    {
+        out << "int m_maxCycle = " << QString::number(ui->SVItemDuplication_Count->value()) << ";\n";
         break;
     }
 
@@ -2343,6 +2373,14 @@ void autocontrollerwindow::UpdateInfo()
         info = "Time per soft-reset: " + GetTimeString(name, 0);
         info += "\nThis program DOES NOT stop by itself, you MUST listen for the shiny sound!";
         info += "\nIf shiny is found unplug the board or take the Switch out from dock IMMEDIATELY!!";
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_SV_ItemDuplication:
+    {
+        info = "Program Duration: " + GetTimeString(name, ui->SVItemDuplication_Count->value());
+        info += "\nThis program requires you to have cloned Koraidon/Miraidon prior to v1.1.0 update!";
         break;
     }
 

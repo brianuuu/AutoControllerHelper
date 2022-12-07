@@ -191,6 +191,9 @@ private:
         P_PLA_ResetAlphaCrobat,
         P_PLA_ResetAlphaGallade,
 
+        // SV Programs
+        P_SV_ItemDuplication,
+
         P_INVALID
     };
     QMap<QString, Program> m_programEnumMap;

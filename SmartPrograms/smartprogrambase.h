@@ -54,6 +54,8 @@ enum SmartProgram : uint32_t
     SP_PLA_StaticSpawn,
     SP_PLA_MMORespawn,
 
+    SP_SV_ItemDuplication,
+
     SP_COUNT
 };
 
@@ -127,6 +129,8 @@ public:
             case SP_PLA_StaticSpawn:        return "Static Spawn Reset";
             case SP_PLA_MMORespawn:         return "MMO Respawn Reset";
 
+            case SP_SV_ItemDuplication:     return "Item Duplication";
+
             case SP_COUNT:                  return "Invalid";
         }
         return "Invalid";
@@ -183,6 +187,8 @@ public:
             case SP_PLA_StaticSpawn:        return "SmartPLAStaticSpawn";
             case SP_PLA_MMORespawn:         return "SmartPLAMMORespawn";
 
+            case SP_SV_ItemDuplication:     return "SmartSVItemDuplication";
+
             case SP_COUNT:                  return "Invalid";
         }
         return "Invalid";
@@ -225,6 +231,8 @@ public:
             case SP_PLA_PastureSorter:      return 14;
             case SP_PLA_StaticSpawn:        return 16;
             case SP_PLA_MMORespawn:         return 0;
+
+            case SP_SV_ItemDuplication:     return 9;
 
             case SP_COUNT:                  return -1;
         }
@@ -269,6 +277,7 @@ public:
         case SP_BDSP_MenuGlitch113:
         case SP_BDSP_BoxDuplication:
         case SP_PLA_BraviaryGainHeight:
+        case SP_SV_ItemDuplication:
             return false;
         default:
             return true;
@@ -277,7 +286,11 @@ public:
 
     static QString getProgramGamePrefix(SmartProgram sp)
     {
-        if (sp >= SP_PLA_NuggetFarmer)
+        if (sp >= SP_SV_ItemDuplication)
+        {
+            return "Pokemon Scarlet/Violet";
+        }
+        else if (sp >= SP_PLA_NuggetFarmer)
         {
             return "Pokemon Legends: Arceus";
         }

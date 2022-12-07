@@ -1860,11 +1860,11 @@ void RemoteControllerWindow::on_PB_ModifySmartCommands_clicked()
     QString programName = SmartProgramBase::getProgramInternalNameFromEnum(sp);
     if (QFile::exists(SMART_COMMAND_PATH + programName + ".xml"))
     {
-        QDesktopServices::openUrl(QUrl::fromLocalFile(SMART_COMMAND_PATH + programName + ".xml"));
+        system((QString("start notepad++ ") + SMART_COMMAND_PATH + programName + ".xml").toStdString().c_str());
     }
     else if (QFile::exists(SMART_COMMAND_PATH + programName + ".ini"))
     {
-        QDesktopServices::openUrl(QUrl::fromLocalFile(SMART_COMMAND_PATH + programName + ".ini"));
+        system((QString("start notepad++ ") + SMART_COMMAND_PATH + programName + ".ini").toStdString().c_str());
     }
 }
 
@@ -1929,6 +1929,20 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
         useArea = true;
         QRect rect(ui->SP2_SB_X->value(),ui->SP2_SB_Y->value(),140,80);
         m_vlcWrapper->getVideoManager()->setDefaultArea(rect);
+        break;
+    }
+    case SP_BDSP_BoxDuplication:
+    {
+        ui->SP9_L_Note->setText("Note: You MUST have Menu Glitch active, which has been patched in the newest version.\nThis is for duplicating Pokemon, for items, use Box Operation program instead.");
+        ui->SP9_L_Label->setText("No. of Boxes to Duplicate:");
+        ui->SP9_SB_Count->setMaximum(39);
+        break;
+    }
+    case SP_SV_ItemDuplication:
+    {
+        ui->SP9_L_Note->setText("Note: This requires you to have duplicated Koraidon/Miraidon before v1.1.0.");
+        ui->SP9_L_Label->setText("No. of Items:");
+        ui->SP9_SB_Count->setMaximum(999);
         break;
     }
     default: break;
@@ -2195,7 +2209,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     }
     case SP_BDSP_BoxDuplication:
     {
-        m_smartProgram = new SmartSimpleProgram(SP_BDSP_BoxDuplication, ui->SP9_SB_Box->value(), parameter);
+        m_smartProgram = new SmartSimpleProgram(SP_BDSP_BoxDuplication, ui->SP9_SB_Count->value(), parameter);
         break;
     }
     case SP_BDSP_BoxOperation:
@@ -2256,6 +2270,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     case SP_PLA_MMORespawn:
     {
         m_smartProgram = new SmartPLAMMORespawn(parameter);
+        break;
+    }
+    case SP_SV_ItemDuplication:
+    {
+        m_smartProgram = new SmartSimpleProgram(SP_SV_ItemDuplication, ui->SP9_SB_Count->value(), parameter);
         break;
     }
     default:
