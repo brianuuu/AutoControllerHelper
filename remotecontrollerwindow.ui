@@ -3369,14 +3369,6 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_27">
                       <item>
-                       <widget class="QLabel" name="SP9_L_Note">
-                        <property name="text">
-                         <string>Note: You MUST have Menu Glitch active, which can be patched by Nintendo at some point.
-This is for duplicating Pokemon, for items, use Box Operation program instead.</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
                        <layout class="QHBoxLayout" name="horizontalLayout_26">
                         <item>
                          <widget class="QLabel" name="SP9_L_Label">
@@ -3415,6 +3407,14 @@ This is for duplicating Pokemon, for items, use Box Operation program instead.</
                          </spacer>
                         </item>
                        </layout>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="SP9_L_Note">
+                        <property name="text">
+                         <string>Note: You MUST have Menu Glitch active, which can be patched by Nintendo at some point.
+This is for duplicating Pokemon, for items, use Box Operation program instead.</string>
+                        </property>
+                       </widget>
                       </item>
                       <item>
                        <spacer name="verticalSpacer_8">

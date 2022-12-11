@@ -64,6 +64,8 @@
 #include "SmartPrograms/PokemonPLA/smartplastaticspawn.h"
 #include "SmartPrograms/PokemonPLA/smartplammorespawn.h"
 
+#include "SmartPrograms/PokemonSV/smartsvsurprisetrade.h"
+
 #include "SmartPrograms/Widgets/pokemonautofilllineedit.h"
 
 namespace Ui {

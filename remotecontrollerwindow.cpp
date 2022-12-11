@@ -1945,6 +1945,13 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
         ui->SP9_SB_Count->setMaximum(999);
         break;
     }
+    case SP_SV_SurpriseTrade:
+    {
+        ui->SP9_L_Note->setText("");
+        ui->SP9_L_Label->setText("No. of Boxes to Trade:");
+        ui->SP9_SB_Count->setMaximum(39);
+        break;
+    }
     default: break;
     }
 
@@ -2275,6 +2282,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     case SP_SV_ItemDuplication:
     {
         m_smartProgram = new SmartSimpleProgram(SP_SV_ItemDuplication, ui->SP9_SB_Count->value(), parameter);
+        break;
+    }
+    case SP_SV_SurpriseTrade:
+    {
+        m_smartProgram = new SmartSVSurpriseTrade(ui->SP9_SB_Count->value(), parameter);
         break;
     }
     default:

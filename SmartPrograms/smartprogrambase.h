@@ -55,6 +55,7 @@ enum SmartProgram : uint32_t
     SP_PLA_MMORespawn,
 
     SP_SV_ItemDuplication,
+    SP_SV_SurpriseTrade,
 
     SP_COUNT
 };
@@ -130,6 +131,7 @@ public:
             case SP_PLA_MMORespawn:         return "MMO Respawn Reset";
 
             case SP_SV_ItemDuplication:     return "Item Duplication";
+            case SP_SV_SurpriseTrade:       return "Auto Surprise Trade (SV)";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -188,6 +190,7 @@ public:
             case SP_PLA_MMORespawn:         return "SmartPLAMMORespawn";
 
             case SP_SV_ItemDuplication:     return "SmartSVItemDuplication";
+            case SP_SV_SurpriseTrade:       return "SmartSVSurpriseTrade";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -233,6 +236,7 @@ public:
             case SP_PLA_MMORespawn:         return 0;
 
             case SP_SV_ItemDuplication:     return 9;
+            case SP_SV_SurpriseTrade:       return 9;
 
             case SP_COUNT:                  return -1;
         }

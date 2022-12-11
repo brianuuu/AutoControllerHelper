@@ -42,6 +42,7 @@ SOURCES += \
     SmartPrograms/PokemonPLA/smartplapasturesorter.cpp \
     SmartPrograms/PokemonPLA/smartplaresetalphapokemon.cpp \
     SmartPrograms/PokemonPLA/smartplastaticspawn.cpp \
+    SmartPrograms/PokemonSV/smartsvsurprisetrade.cpp \
     SmartPrograms/PokemonSwSh/smartberryfarmer.cpp \
     SmartPrograms/PokemonSwSh/smartdailyhighlight.cpp \
     SmartPrograms/PokemonSwSh/smartdayskipper.cpp \
@@ -87,6 +88,7 @@ HEADERS += \
     SmartPrograms/PokemonPLA/smartplapasturesorter.h \
     SmartPrograms/PokemonPLA/smartplaresetalphapokemon.h \
     SmartPrograms/PokemonPLA/smartplastaticspawn.h \
+    SmartPrograms/PokemonSV/smartsvsurprisetrade.h \
     SmartPrograms/PokemonSwSh/smartberryfarmer.h \
     SmartPrograms/PokemonSwSh/smartdailyhighlight.h \
     SmartPrograms/PokemonSwSh/smartdayskipper.h \
