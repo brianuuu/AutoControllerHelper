@@ -2,11 +2,11 @@
 
 SmartSVSurpriseTrade::SmartSVSurpriseTrade
 (
-    int boxCount,
+    int tradeTarget,
     SmartProgramParameter parameter
 )
     : SmartProgramBase(parameter)
-    , m_boxCount(boxCount)
+    , m_tradeTarget(tradeTarget)
 {
     init();
 }
@@ -21,7 +21,7 @@ void SmartSVSurpriseTrade::reset()
     SmartProgramBase::reset();
 
     m_substage = SS_Init;
-    m_box = 1;
+    m_tradeCount = 0;
     m_pos = QPoint(0,1); // x=0 is invalid, but we add it at SS_Init
 }
 
@@ -32,8 +32,8 @@ void SmartSVSurpriseTrade::runNextState()
     {
     case SS_Init:
     {
-        initStat(m_tradeCount, "Trades");
-        initStat(m_error, "Errors");
+        initStat(m_statTrade, "Trades");
+        initStat(m_statError, "Errors");
 
         m_timer.restart();
         m_substage = SS_AtBox;
@@ -52,6 +52,13 @@ void SmartSVSurpriseTrade::runNextState()
             if (checkBrightnessMeanTarget(A_Box.m_rect, C_Color_Yellow, 200)
              && checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Yellow, 200))
             {
+                if (m_tradeCount >= m_tradeTarget)
+                {
+                    m_substage = SS_Finish;
+                    setState_runCommand("Home,4,Nothing,10");
+                    break;
+                }
+
                 m_substage = SS_ToPokemon;
                 if (m_pos.x() < 6)
                 {
@@ -64,21 +71,11 @@ void SmartSVSurpriseTrade::runNextState()
                 }
                 else
                 {
-                    if (m_box < m_boxCount)
-                    {
-                        m_pos = QPoint(1,1);
-                        m_box++;
-                        setState_runCommand("R,5,Nothing,5");
-                        emit printLog("Selecting box " + QString::number(m_box) + " pokemon at pos 1,1");
-                        m_videoManager->clearCaptures();
-                        break;
-                    }
-                    else
-                    {
-                        m_substage = SS_Finish;
-                        setState_runCommand("Home,4,Nothing,10");
-                        break;
-                    }
+                    m_pos = QPoint(1,1);
+                    setState_runCommand("R,5,Nothing,5");
+                    emit printLog("Selecting next box's pokemon at pos 1,1");
+                    m_videoManager->clearCaptures();
+                    break;
                 }
 
                 QString command = "Nothing,2,Loop,1";
@@ -96,7 +93,7 @@ void SmartSVSurpriseTrade::runNextState()
             }
             else if (m_timer.elapsed() > 120000)
             {
-                incrementStat(m_error);
+                incrementStat(m_statError);
                 setState_error("Unable to detect being in Box menu for too long");
             }
             else
@@ -130,7 +127,7 @@ void SmartSVSurpriseTrade::runNextState()
             {
                 if (m_timer.elapsed() > 30000)
                 {
-                    incrementStat(m_error);
+                    incrementStat(m_statError);
                     setState_error("Unable to detect PokePortal for too long");
                     break;
                 }
@@ -146,14 +143,16 @@ void SmartSVSurpriseTrade::runNextState()
             {
                 if (m_timer.elapsed() > 120000)
                 {
-                    incrementStat(m_error);
+                    incrementStat(m_statError);
                     setState_error("Unable to detect trade complete for too long");
                     break;
                 }
                 else if (checkBrightnessMeanTarget(A_Tick.m_rect, C_Color_Green, 120))
                 {
-                    incrementStat(m_tradeCount);
-                    emit printLog("Trade completed!");
+                    m_tradeCount++;
+                    incrementStat(m_statTrade);
+
+                    emit printLog("Trade completed! (Total: " + QString::number(m_tradeCount) + ")" );
                     m_timer.restart();
                     m_substage = SS_AtBox;
                     setState_runCommand("ASpam,200");

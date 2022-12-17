@@ -9,7 +9,7 @@ class SmartSVSurpriseTrade : public SmartProgramBase
 {
 public:
     explicit SmartSVSurpriseTrade(
-            int boxCount,
+            int tradeTarget,
             SmartProgramParameter parameter
             );
 
@@ -49,13 +49,13 @@ private:
 
     // Members
     QElapsedTimer m_timer;
-    int m_boxCount;
-    int m_box;
+    int m_tradeTarget;
+    int m_tradeCount;
     QPoint m_pos;
 
     // Stats
-    Stat m_tradeCount;
-    Stat m_error;
+    Stat m_statTrade;
+    Stat m_statError;
 };
 
 #endif // SMARTSVSURPRISETRADE_H

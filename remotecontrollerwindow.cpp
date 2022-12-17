@@ -1955,8 +1955,8 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
     case SP_SV_SurpriseTrade:
     {
         ui->SPGeneric1_Note->setText("");
-        ui->SPGeneric1_Label->setText("No. of Boxes to Trade:");
-        ui->SPGeneric1_Count->setRange(1,32);
+        ui->SPGeneric1_Label->setText("No. of Pokemon to Trade:");
+        ui->SPGeneric1_Count->setRange(1,960);
         break;
     }
     default: break;
