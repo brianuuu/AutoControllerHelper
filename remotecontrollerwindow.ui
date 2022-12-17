@@ -2707,14 +2707,14 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <item>
                        <layout class="QHBoxLayout" name="horizontalLayout_15">
                         <item>
-                         <widget class="QLabel" name="label_36">
+                         <widget class="QLabel" name="SPGeneric1_Label">
                           <property name="text">
-                           <string>Wishing Pieces to Spend:</string>
+                           <string>Label1:</string>
                           </property>
                          </widget>
                         </item>
                         <item>
-                         <widget class="QSpinBox" name="SP4_SB_Count">
+                         <widget class="QSpinBox" name="SPGeneric1_Count">
                           <property name="minimumSize">
                            <size>
                             <width>55</width>
@@ -2746,6 +2746,13 @@ Some programs may require settings like &quot;Game Language&quot; or
                          </spacer>
                         </item>
                        </layout>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="SPGeneric1_Note">
+                        <property name="text">
+                         <string>Note1</string>
+                        </property>
+                       </widget>
                       </item>
                       <item>
                        <spacer name="verticalSpacer_3">
@@ -3369,65 +3376,14 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_27">
                       <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_26">
-                        <item>
-                         <widget class="QLabel" name="SP9_L_Label">
-                          <property name="text">
-                           <string>No. of Boxes to Duplicate:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QSpinBox" name="SP9_SB_Count">
-                          <property name="minimumSize">
-                           <size>
-                            <width>55</width>
-                            <height>0</height>
-                           </size>
-                          </property>
-                          <property name="minimum">
-                           <number>1</number>
-                          </property>
-                          <property name="maximum">
-                           <number>39</number>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <spacer name="horizontalSpacer_9">
-                          <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
-                          </property>
-                          <property name="sizeHint" stdset="0">
-                           <size>
-                            <width>40</width>
-                            <height>20</height>
-                           </size>
-                          </property>
-                         </spacer>
-                        </item>
-                       </layout>
-                      </item>
-                      <item>
-                       <widget class="QLabel" name="SP9_L_Note">
+                       <widget class="QLabel" name="label_36">
                         <property name="text">
-                         <string>Note: You MUST have Menu Glitch active, which can be patched by Nintendo at some point.
-This is for duplicating Pokemon, for items, use Box Operation program instead.</string>
+                         <string>UNUSED</string>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignCenter</set>
                         </property>
                        </widget>
-                      </item>
-                      <item>
-                       <spacer name="verticalSpacer_8">
-                        <property name="orientation">
-                         <enum>Qt::Vertical</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                         <size>
-                          <width>20</width>
-                          <height>258</height>
-                         </size>
-                        </property>
-                       </spacer>
                       </item>
                      </layout>
                     </widget>

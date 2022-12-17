@@ -211,7 +211,7 @@ public:
             case SP_PurpleBeamFinder:       return 2;
             case SP_YCommGlitch:            return 0;
             case SP_SurpriseTrade:          return 3;
-            case SP_MaxRaidBattler:         return 4;
+            case SP_MaxRaidBattler:         return 4; // 4 is generic with one spinbox + label
             case SP_DaySkipper:             return 5;
             case SP_BattleTower:            return 0;
             case SP_Loto:                   return 6;
@@ -221,7 +221,7 @@ public:
 
             case SP_BDSP_Starter:           return 7;
             case SP_BDSP_MenuGlitch113:     return 0;
-            case SP_BDSP_BoxDuplication:    return 9;
+            case SP_BDSP_BoxDuplication:    return 4; // 9 deprecated
             case SP_BDSP_BoxOperation:      return 10;
             case SP_BDSP_ShinyLegendary:    return 11;
             case SP_BDSP_DuplicateItem1to30:return 0;
@@ -235,8 +235,8 @@ public:
             case SP_PLA_StaticSpawn:        return 16;
             case SP_PLA_MMORespawn:         return 0;
 
-            case SP_SV_ItemDuplication:     return 9;
-            case SP_SV_SurpriseTrade:       return 9;
+            case SP_SV_ItemDuplication:     return 4;
+            case SP_SV_SurpriseTrade:       return 4;
 
             case SP_COUNT:                  return -1;
         }

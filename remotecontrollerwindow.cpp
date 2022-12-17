@@ -1931,25 +1931,32 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
         m_vlcWrapper->getVideoManager()->setDefaultArea(rect);
         break;
     }
+    case SP_MaxRaidBattler:
+    {
+        ui->SPGeneric1_Note->setText("");
+        ui->SPGeneric1_Label->setText("Wishing Pieces to Spend:");
+        ui->SPGeneric1_Count->setRange(1,999);
+        break;
+    }
     case SP_BDSP_BoxDuplication:
     {
-        ui->SP9_L_Note->setText("Note: You MUST have Menu Glitch active, which has been patched in the newest version.\nThis is for duplicating Pokemon, for items, use Box Operation program instead.");
-        ui->SP9_L_Label->setText("No. of Boxes to Duplicate:");
-        ui->SP9_SB_Count->setMaximum(39);
+        ui->SPGeneric1_Note->setText("Note: You MUST have Menu Glitch active, which has been patched in the newest version.\nThis is for duplicating Pokemon, for items, use Box Operation program instead.");
+        ui->SPGeneric1_Label->setText("No. of Boxes to Duplicate:");
+        ui->SPGeneric1_Count->setRange(1,39);
         break;
     }
     case SP_SV_ItemDuplication:
     {
-        ui->SP9_L_Note->setText("Note: This requires you to have duplicated Koraidon/Miraidon before v1.1.0.");
-        ui->SP9_L_Label->setText("No. of Items:");
-        ui->SP9_SB_Count->setMaximum(999);
+        ui->SPGeneric1_Note->setText("Note: This requires you to have duplicated Koraidon/Miraidon before v1.1.0.");
+        ui->SPGeneric1_Label->setText("No. of Items:");
+        ui->SPGeneric1_Count->setRange(1,998);
         break;
     }
     case SP_SV_SurpriseTrade:
     {
-        ui->SP9_L_Note->setText("");
-        ui->SP9_L_Label->setText("No. of Boxes to Trade:");
-        ui->SP9_SB_Count->setMaximum(39);
+        ui->SPGeneric1_Note->setText("");
+        ui->SPGeneric1_Label->setText("No. of Boxes to Trade:");
+        ui->SPGeneric1_Count->setRange(1,32);
         break;
     }
     default: break;
@@ -2171,7 +2178,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     }
     case SP_MaxRaidBattler:
     {
-        m_smartProgram = new SmartMaxRaidBattler(ui->SP4_SB_Count->value(), parameter);
+        m_smartProgram = new SmartMaxRaidBattler(ui->SPGeneric1_Count->value(), parameter);
         break;
     }
     case SP_DaySkipper:
@@ -2216,7 +2223,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     }
     case SP_BDSP_BoxDuplication:
     {
-        m_smartProgram = new SmartSimpleProgram(SP_BDSP_BoxDuplication, ui->SP9_SB_Count->value(), parameter);
+        m_smartProgram = new SmartSimpleProgram(SP_BDSP_BoxDuplication, ui->SPGeneric1_Count->value(), parameter);
         break;
     }
     case SP_BDSP_BoxOperation:
@@ -2281,12 +2288,12 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     }
     case SP_SV_ItemDuplication:
     {
-        m_smartProgram = new SmartSimpleProgram(SP_SV_ItemDuplication, ui->SP9_SB_Count->value(), parameter);
+        m_smartProgram = new SmartSimpleProgram(SP_SV_ItemDuplication, ui->SPGeneric1_Count->value(), parameter);
         break;
     }
     case SP_SV_SurpriseTrade:
     {
-        m_smartProgram = new SmartSVSurpriseTrade(ui->SP9_SB_Count->value(), parameter);
+        m_smartProgram = new SmartSVSurpriseTrade(ui->SPGeneric1_Count->value(), parameter);
         break;
     }
     default:
