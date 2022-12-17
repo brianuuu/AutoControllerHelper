@@ -61,16 +61,16 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_tabID[P_FriendDeleteAdd]      = 4;
     m_tabID[P_BerryFarmer]          = 17; // 5 deprecated
     m_tabID[P_AutoLoto]             = 6;
-    m_tabID[P_BoxRelease]           = 7;
+    m_tabID[P_BoxRelease]           = 7; // 7 is generic 1 spinbox
     m_tabID[P_AutoFossil]           = 8;
     m_tabID[P_AutoFossil_GR]        = 8;
     m_tabID[P_Auto3DaySkipper]      = 9;
     m_tabID[P_BoxSurpriseTrade]     = 10;
     m_tabID[P_AutoHost]             = 11;
-    m_tabID[P_EggCollector]         = 12;
-    m_tabID[P_EggCollector_IT]      = 12;
+    m_tabID[P_EggCollector]         = 7; // 12 deprecated
+    m_tabID[P_EggCollector_IT]      = 7;
     m_tabID[P_EggHatcher]           = 13;
-    m_tabID[P_GodEggDuplication]    = 14;
+    m_tabID[P_GodEggDuplication]    = 7; // 14 deprecated
     m_tabID[P_ShinyFiveRegi]        = 15;
     m_tabID[P_ShinySwordTrio]       = 16;
     m_tabID[P_DailyHighlightFarmer] = 17;
@@ -85,7 +85,7 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_tabID[P_BDSP_ResetDialgaPalkia]   = 0;
     m_tabID[P_BDSP_ResetStarter]        = 20;
     m_tabID[P_BDSP_MenuGlitch113]       = 0;
-    m_tabID[P_BDSP_BoxDuplication]      = 21;
+    m_tabID[P_BDSP_BoxDuplication]      = 7; // 21 deprecated
     m_tabID[P_BDSP_BoxOperation]        = 22;
     m_tabID[P_BDSP_ResetLegendary]      = 0;
     m_tabID[P_BDSP_ResetShaymin]        = 0;
@@ -94,7 +94,7 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_tabID[P_PLA_ResetAlphaCrobat]     = 0;
     m_tabID[P_PLA_ResetAlphaGallade]    = 0;
 
-    m_tabID[P_SV_ItemDuplication]   = 23;
+    m_tabID[P_SV_ItemDuplication]   = 7; // 23 deprecated
 
     if (!QDir(HEX_PATH).exists())
     {
@@ -680,9 +680,9 @@ void autocontrollerwindow::on_AutoLoto_DaysToSkip_valueChanged(int arg1)
 }
 
 //---------------------------------------------------------------------------
-// BoxRelease signals
+// Generic1 signals
 //---------------------------------------------------------------------------
-void autocontrollerwindow::on_BoxRelease_Count_valueChanged(int arg1)
+void autocontrollerwindow::on_Generic1_Count_valueChanged(int arg1)
 {
     UpdateInfo();
 }
@@ -831,14 +831,6 @@ void autocontrollerwindow::on_AutoHost_Online_clicked()
 }
 
 //---------------------------------------------------------------------------
-// EggCollector signals
-//---------------------------------------------------------------------------
-void autocontrollerwindow::on_EggCollector_Count_valueChanged(int arg1)
-{
-    UpdateInfo();
-}
-
-//---------------------------------------------------------------------------
 // EggHatcher signals
 //---------------------------------------------------------------------------
 void autocontrollerwindow::on_EggHatcher_Pokemon_currentIndexChanged(const QString &arg1)
@@ -850,14 +842,6 @@ void autocontrollerwindow::on_EggHatcher_Pokemon_currentIndexChanged(const QStri
 }
 
 void autocontrollerwindow::on_EggHatcher_Column_valueChanged(int arg1)
-{
-    UpdateInfo();
-}
-
-//---------------------------------------------------------------------------
-// GodEggDuplication signals
-//---------------------------------------------------------------------------
-void autocontrollerwindow::on_GodEgg_Count_valueChanged(int arg1)
 {
     UpdateInfo();
 }
@@ -994,14 +978,6 @@ void autocontrollerwindow::on_RemoteControl_Tool_clicked()
 }
 
 //---------------------------------------------------------------------------
-// BDSP Box Duplication signals
-//---------------------------------------------------------------------------
-void autocontrollerwindow::on_BDSPBoxDuplication_Count_valueChanged(int arg1)
-{
-    UpdateInfo();
-}
-
-//---------------------------------------------------------------------------
 // BDSP Box Operation signals
 //---------------------------------------------------------------------------
 void autocontrollerwindow::on_BDSPBoxOperation_Count_valueChanged(int arg1)
@@ -1056,20 +1032,33 @@ void autocontrollerwindow::LoadConfig()
     ui->GB_DaySkipper->setHidden(program != P_DaySkipper);
     ui->GB_DaySkipper_Unlimited->setHidden(program != P_DaySkipper_Unlimited);
     ui->GB_FriendDeleteAdd->setHidden(program != P_FriendDeleteAdd);
-    ui->GB_BerryFarmer->setHidden(false);
     ui->GB_AutoLoto->setHidden(program != P_AutoLoto);
-    ui->GB_BoxRelease->setHidden(program != P_BoxRelease);
+    ui->GB_Generic1->setHidden
+    (
+            program != P_BoxRelease
+            && program != P_EggCollector
+            && program != P_EggCollector_IT
+            && program != P_GodEggDuplication
+            && program != P_BDSP_BoxDuplication
+            && program != P_SV_ItemDuplication
+    );
     ui->GB_AutoFossil->setHidden(program != P_AutoFossil && program != P_AutoFossil_GR);
     ui->GB_Auto3DaySkipper->setHidden(program != P_Auto3DaySkipper);
     ui->GB_BoxSurpriseTrade->setHidden(program != P_BoxSurpriseTrade);
     ui->GB_AutoHost->setHidden(program != P_AutoHost);
-    ui->GB_EggCollector->setHidden(program != P_EggCollector && program != P_EggCollector_IT);
     ui->GB_EggHatcher->setHidden(program != P_EggHatcher);
-    ui->GB_GodEgg->setHidden(program != P_GodEggDuplication);
     ui->GB_ShinyRegi->setHidden(program != P_ShinyFiveRegi);
     ui->GB_ShinySword->setHidden(program != P_ShinySwordTrio);
     ui->GB_Farmer->setHidden(program != P_DailyHighlightFarmer && program != P_WattFarmer && program != P_BerryFarmer);
     ui->GB_ShinyRegigigas->setHidden(program != P_ShinyRegigigas);
+    ui->RemoteControl_Tool->setHidden(program != P_SmartProgram);
+    ui->GB_BDSPStarter->setHidden(program != P_BDSP_ResetStarter);
+    ui->GB_BDSPBoxOperation->setHidden(program != P_BDSP_BoxOperation);
+    ui->GB_UNUSED1->setHidden(true);
+    ui->GB_UNUSED2->setHidden(true);
+    ui->GB_UNUSED3->setHidden(true);
+    ui->GB_UNUSED4->setHidden(true);
+    ui->GB_UNUSED5->setHidden(true);
 
     ui->PB_Unsync->setHidden(program == P_INVALID || program == P_DaySkipper || program == P_DaySkipper_Unlimited || program == P_FriendDeleteAdd);
     ui->L_Unsync->setHidden(program == P_INVALID || program == P_DaySkipper || program == P_DaySkipper_Unlimited || program == P_FriendDeleteAdd);
@@ -1190,13 +1179,16 @@ void autocontrollerwindow::LoadConfig()
     //--------------------------------------------------------
     case P_BoxRelease:
     {
+        ui->Generic1_Label->setText("Boxes to Release:");
+        ui->Generic1_Count->setRange(1,32);
+
         QTextStream in(&configFile);
         while (!in.atEnd())
         {
             QString line = in.readLine();
             if (line.indexOf("m_boxCount = ") != -1)
             {
-                ui->BoxRelease_Count->setValue(GetVariableString(line).toInt());
+                ui->Generic1_Count->setValue(GetVariableString(line).toInt());
             }
         }
         break;
@@ -1360,13 +1352,16 @@ void autocontrollerwindow::LoadConfig()
     case P_EggCollector:
     case P_EggCollector_IT:
     {
+        ui->Generic1_Label->setText("Target No. of Eggs (0 = Infinite):");
+        ui->Generic1_Count->setRange(0,960);
+
         QTextStream in(&configFile);
         while (!in.atEnd())
         {
             QString line = in.readLine();
             if (line.indexOf("m_maxCycle = ") != -1)
             {
-                ui->EggCollector_Count->setValue(GetVariableString(line).toInt());
+                ui->Generic1_Count->setValue(GetVariableString(line).toInt());
             }
         }
         break;
@@ -1394,13 +1389,16 @@ void autocontrollerwindow::LoadConfig()
     //--------------------------------------------------------
     case P_GodEggDuplication:
     {
+        ui->Generic1_Label->setText("Target No. of Duplication (0 = Infinite):");
+        ui->Generic1_Count->setRange(0,960);
+
         QTextStream in(&configFile);
         while (!in.atEnd())
         {
             QString line = in.readLine();
             if (line.indexOf("m_maxCycle = ") != -1)
             {
-                ui->GodEgg_Count->setValue(GetVariableString(line).toInt());
+                ui->Generic1_Count->setValue(GetVariableString(line).toInt());
             }
         }
         break;
@@ -1573,13 +1571,16 @@ void autocontrollerwindow::LoadConfig()
     //--------------------------------------------------------
     case P_BDSP_BoxDuplication:
     {
+        ui->Generic1_Label->setText("Boxes to Duplicate:");
+        ui->Generic1_Count->setRange(1,39);
+
         QTextStream in(&configFile);
         while (!in.atEnd())
         {
             QString line = in.readLine();
             if (line.indexOf("m_boxCount = ") != -1)
             {
-                ui->BDSPBoxDuplication_Count->setValue(GetVariableString(line).toInt());
+                ui->Generic1_Count->setValue(GetVariableString(line).toInt());
             }
         }
         break;
@@ -1604,20 +1605,23 @@ void autocontrollerwindow::LoadConfig()
         break;
     }
 
-        //--------------------------------------------------------
-        case P_SV_ItemDuplication:
+    //--------------------------------------------------------
+    case P_SV_ItemDuplication:
+    {
+    ui->Generic1_Label->setText("Item Count:");
+    ui->Generic1_Count->setRange(1,998);
+
+        QTextStream in(&configFile);
+        while (!in.atEnd())
         {
-            QTextStream in(&configFile);
-            while (!in.atEnd())
+            QString line = in.readLine();
+            if (line.indexOf("m_maxCycle = ") != -1)
             {
-                QString line = in.readLine();
-                if (line.indexOf("m_maxCycle = ") != -1)
-                {
-                    ui->SVItemDuplication_Count->setValue(GetVariableString(line).toInt());
-                }
+                ui->Generic1_Count->setValue(GetVariableString(line).toInt());
             }
-            break;
         }
+        break;
+    }
 
     //--------------------------------------------------------
     case P_INVALID:
@@ -1724,7 +1728,7 @@ void autocontrollerwindow::SaveConfig()
     //--------------------------------------------------------
     case P_BoxRelease:
     {
-        out << "int m_boxCount = " << QString::number(ui->BoxRelease_Count->value()) << ";\n";
+        out << "int m_boxCount = " << QString::number(ui->Generic1_Count->value()) << ";\n";
         break;
     }
 
@@ -1791,7 +1795,7 @@ void autocontrollerwindow::SaveConfig()
     case P_EggCollector:
     case P_EggCollector_IT:
     {
-        out << "int m_maxCycle = " << QString::number(ui->EggCollector_Count->value()) << ";\n";
+        out << "int m_maxCycle = " << QString::number(ui->Generic1_Count->value()) << ";\n";
         break;
     }
 
@@ -1820,7 +1824,7 @@ void autocontrollerwindow::SaveConfig()
     //--------------------------------------------------------
     case P_GodEggDuplication:
     {
-        out << "int m_maxCycle = " << QString::number(ui->GodEgg_Count->value()) << ";\n";
+        out << "int m_maxCycle = " << QString::number(ui->Generic1_Count->value()) << ";\n";
         break;
     }
 
@@ -1873,7 +1877,7 @@ void autocontrollerwindow::SaveConfig()
     //--------------------------------------------------------
     case P_BDSP_BoxDuplication:
     {
-        out << "int m_boxCount = " << QString::number(ui->BDSPBoxDuplication_Count->value()) << ";\n";
+        out << "int m_boxCount = " << QString::number(ui->Generic1_Count->value()) << ";\n";
         break;
     }
 
@@ -1888,7 +1892,7 @@ void autocontrollerwindow::SaveConfig()
     //--------------------------------------------------------
     case P_SV_ItemDuplication:
     {
-        out << "int m_maxCycle = " << QString::number(ui->SVItemDuplication_Count->value()) << ";\n";
+        out << "int m_maxCycle = " << QString::number(ui->Generic1_Count->value()) << ";\n";
         break;
     }
 
@@ -2049,7 +2053,7 @@ void autocontrollerwindow::UpdateInfo()
     //--------------------------------------------------------
     case P_BoxRelease:
     {
-        info = "Program Duration: " + GetTimeString(name, ui->BoxRelease_Count->value());
+        info = "Program Duration: " + GetTimeString(name, ui->Generic1_Count->value());
         break;
     }
 
@@ -2114,7 +2118,7 @@ void autocontrollerwindow::UpdateInfo()
     case P_EggCollector:
     case P_EggCollector_IT:
     {
-        int count = ui->EggCollector_Count->value();
+        int count = ui->Generic1_Count->value();
         if (count > 0)
         {
             info = "Program Duration: " + GetTimeString(name, count);
@@ -2171,7 +2175,7 @@ void autocontrollerwindow::UpdateInfo()
     //--------------------------------------------------------
     case P_GodEggDuplication:
     {
-        int count = ui->GodEgg_Count->value();
+        int count = ui->Generic1_Count->value();
         if (count > 0)
         {
             info = "Program Duration: " + GetTimeString(name, count);
@@ -2334,7 +2338,7 @@ void autocontrollerwindow::UpdateInfo()
     //--------------------------------------------------------
     case P_BDSP_BoxDuplication:
     {
-        info = "Program Duration: " + GetTimeString(name, ui->BDSPBoxDuplication_Count->value());
+        info = "Program Duration: " + GetTimeString(name, ui->Generic1_Count->value());
         info += "\nFor item duplication, use BDSP_BoxOperation instead.";
         break;
     }
@@ -2379,7 +2383,7 @@ void autocontrollerwindow::UpdateInfo()
     //--------------------------------------------------------
     case P_SV_ItemDuplication:
     {
-        info = "Program Duration: " + GetTimeString(name, ui->SVItemDuplication_Count->value());
+        info = "Program Duration: " + GetTimeString(name, ui->Generic1_Count->value());
         info += "\nThis program requires you to have cloned Koraidon/Miraidon prior to v1.1.0 update!";
         break;
     }

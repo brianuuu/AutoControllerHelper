@@ -796,7 +796,7 @@
                <number>0</number>
               </property>
               <item>
-               <widget class="QGroupBox" name="GB_BerryFarmer">
+               <widget class="QGroupBox" name="GB_UNUSED1">
                 <property name="title">
                  <string>Settings</string>
                 </property>
@@ -963,7 +963,7 @@
                <number>0</number>
               </property>
               <item>
-               <widget class="QGroupBox" name="GB_BoxRelease">
+               <widget class="QGroupBox" name="GB_Generic1">
                 <property name="title">
                  <string>Settings</string>
                 </property>
@@ -971,7 +971,7 @@
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_18">
                    <item>
-                    <widget class="QLabel" name="label_13">
+                    <widget class="QLabel" name="Generic1_Label">
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -984,10 +984,10 @@
                     </widget>
                    </item>
                    <item>
-                    <widget class="QSpinBox" name="BoxRelease_Count">
+                    <widget class="QSpinBox" name="Generic1_Count">
                      <property name="minimumSize">
                       <size>
-                       <width>50</width>
+                       <width>80</width>
                        <height>0</height>
                       </size>
                      </property>
@@ -1874,59 +1874,20 @@
                <number>0</number>
               </property>
               <item>
-               <widget class="QGroupBox" name="GB_EggCollector">
+               <widget class="QGroupBox" name="GB_UNUSED2">
                 <property name="title">
                  <string>Settings</string>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_52">
                  <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_35">
-                   <item>
-                    <widget class="QLabel" name="label_23">
-                     <property name="minimumSize">
-                      <size>
-                       <width>120</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>Target No. of Eggs (0 = Infinite):</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QSpinBox" name="EggCollector_Count">
-                     <property name="minimumSize">
-                      <size>
-                       <width>50</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="minimum">
-                      <number>0</number>
-                     </property>
-                     <property name="maximum">
-                      <number>960</number>
-                     </property>
-                     <property name="value">
-                      <number>1</number>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_31">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
+                  <widget class="QLabel" name="label_13">
+                   <property name="text">
+                    <string>DEPRECATED</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -2093,59 +2054,20 @@
                <number>0</number>
               </property>
               <item>
-               <widget class="QGroupBox" name="GB_GodEgg">
+               <widget class="QGroupBox" name="GB_UNUSED3">
                 <property name="title">
                  <string>Settings</string>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_56">
                  <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_37">
-                   <item>
-                    <widget class="QLabel" name="label_27">
-                     <property name="minimumSize">
-                      <size>
-                       <width>120</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>Target No. of Duplication (0 = Infinite):</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QSpinBox" name="GodEgg_Count">
-                     <property name="minimumSize">
-                      <size>
-                       <width>50</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="minimum">
-                      <number>0</number>
-                     </property>
-                     <property name="maximum">
-                      <number>960</number>
-                     </property>
-                     <property name="value">
-                      <number>1</number>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_34">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
+                  <widget class="QLabel" name="label_23">
+                   <property name="text">
+                    <string>DEPRECATED</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -2942,59 +2864,20 @@
                <number>0</number>
               </property>
               <item>
-               <widget class="QGroupBox" name="GB_BDSPBoxDuplication">
+               <widget class="QGroupBox" name="GB_UNUSED4">
                 <property name="title">
                  <string>Settings</string>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_44">
                  <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_50">
-                   <item>
-                    <widget class="QLabel" name="label_40">
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>Boxes to Duplicate:</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QSpinBox" name="BDSPBoxDuplication_Count">
-                     <property name="minimumSize">
-                      <size>
-                       <width>50</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="minimum">
-                      <number>1</number>
-                     </property>
-                     <property name="maximum">
-                      <number>39</number>
-                     </property>
-                     <property name="value">
-                      <number>1</number>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_32">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
+                  <widget class="QLabel" name="label_27">
+                   <property name="text">
+                    <string>DEPRECATED</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -3130,50 +3013,20 @@
                <number>0</number>
               </property>
               <item>
-               <widget class="QGroupBox" name="GB_SVItemDuplication">
+               <widget class="QGroupBox" name="GB_UNUSED5">
                 <property name="title">
                  <string>Settings</string>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_47">
                  <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_53">
-                   <item>
-                    <widget class="QLabel" name="label_54">
-                     <property name="text">
-                      <string>Item Count:</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QSpinBox" name="SVItemDuplication_Count">
-                     <property name="minimumSize">
-                      <size>
-                       <width>55</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="minimum">
-                      <number>1</number>
-                     </property>
-                     <property name="maximum">
-                      <number>999</number>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_46">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
+                  <widget class="QLabel" name="label_40">
+                   <property name="text">
+                    <string>DEPRECATED</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>

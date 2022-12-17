@@ -70,7 +70,7 @@ private slots:
     void on_AutoLoto_CheckBox_stateChanged(int arg1);
     void on_AutoLoto_DaysToSkip_valueChanged(int arg1);
 
-    void on_BoxRelease_Count_valueChanged(int arg1);
+    void on_Generic1_Count_valueChanged(int arg1);
 
     void on_AutoFossil_First_currentIndexChanged(int index);
     void on_AutoFossil_Second_currentIndexChanged(int index);
@@ -96,12 +96,8 @@ private slots:
     void on_AutoHost_Local_clicked();
     void on_AutoHost_Online_clicked();
 
-    void on_EggCollector_Count_valueChanged(int arg1);
-
     void on_EggHatcher_Pokemon_currentIndexChanged(const QString &arg1);
     void on_EggHatcher_Column_valueChanged(int arg1);
-
-    void on_GodEgg_Count_valueChanged(int arg1);
 
     void on_ShinyRegi_Type_currentIndexChanged(int index);
     void on_ShinyRegi_Slow_clicked();
@@ -124,8 +120,6 @@ private slots:
     void on_ShinyRegigigas_Berry_valueChanged(int arg1);
 
     void on_RemoteControl_Tool_clicked();
-
-    void on_BDSPBoxDuplication_Count_valueChanged(int arg1);
 
     void on_BDSPBoxOperation_Count_valueChanged(int arg1);
     void on_BDSPBoxOperation_Type_currentIndexChanged(int index);
