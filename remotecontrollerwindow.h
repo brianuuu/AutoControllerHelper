@@ -65,6 +65,7 @@
 #include "SmartPrograms/PokemonPLA/smartplammorespawn.h"
 
 #include "SmartPrograms/PokemonSV/smartsvsurprisetrade.h"
+#include "SmartPrograms/PokemonSV/smartsvboxrelease.h"
 
 #include "SmartPrograms/Widgets/pokemonautofilllineedit.h"
 

@@ -1959,6 +1959,13 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
         ui->SPGeneric1_Count->setRange(1,960);
         break;
     }
+    case SP_SV_BoxRelease:
+    {
+        ui->SPGeneric1_Note->setText("Note: Pokemon sort from left to right, top to bottom");
+        ui->SPGeneric1_Label->setText("No. of Pokemon to Release:");
+        ui->SPGeneric1_Count->setRange(1,960);
+        break;
+    }
     default: break;
     }
 
@@ -2294,6 +2301,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     case SP_SV_SurpriseTrade:
     {
         m_smartProgram = new SmartSVSurpriseTrade(ui->SPGeneric1_Count->value(), parameter);
+        break;
+    }
+    case SP_SV_BoxRelease:
+    {
+        m_smartProgram = new SmartSVBoxRelease(ui->SPGeneric1_Count->value(), parameter);
         break;
     }
     default:
