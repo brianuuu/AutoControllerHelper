@@ -124,6 +124,11 @@ private slots:
     void on_BDSPBoxOperation_Count_valueChanged(int arg1);
     void on_BDSPBoxOperation_Type_currentIndexChanged(int index);
 
+    void on_SVEggCollector_Count_valueChanged(int arg1);
+
+    void on_SVEggHatcher_Cycle_currentIndexChanged(int index);
+    void on_SVEggHatcher_Column_valueChanged(int arg1);
+
 private:
     QString GetVariableString(QString const& _str);
     void LoadConfig();
@@ -187,6 +192,9 @@ private:
 
         // SV Programs
         P_SV_ItemDuplication,
+        P_SV_EggCollector,
+        P_SV_EggHatcher,
+        P_SV_BoxRelease,
 
         P_INVALID
     };

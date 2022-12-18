@@ -53,13 +53,16 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_programEnumMap["PLA_ResetAlphaCrobat"]    = P_PLA_ResetAlphaCrobat;
     m_programEnumMap["PLA_ResetAlphaGallade"]   = P_PLA_ResetAlphaGallade;
 
-    m_programEnumMap["SV_ItemDuplication"]   = P_SV_ItemDuplication;
+    m_programEnumMap["SV_ItemDuplication"]  = P_SV_ItemDuplication;
+    m_programEnumMap["SV_EggCollector"]     = P_SV_EggCollector;
+    m_programEnumMap["SV_EggHatcher"]       = P_SV_EggHatcher;
+    m_programEnumMap["SV_BoxRelease"]       = P_SV_BoxRelease;
 
     m_tabID[P_DaySkipper]           = 1;
     m_tabID[P_DaySkipper_Unlimited] = 2;
     m_tabID[P_WattFarmer]           = 17; // 3 now use for error
     m_tabID[P_FriendDeleteAdd]      = 4;
-    m_tabID[P_BerryFarmer]          = 17; // 5 deprecated
+    m_tabID[P_BerryFarmer]          = 17;
     m_tabID[P_AutoLoto]             = 6;
     m_tabID[P_BoxRelease]           = 7; // 7 is generic 1 spinbox
     m_tabID[P_AutoFossil]           = 8;
@@ -67,7 +70,7 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_tabID[P_Auto3DaySkipper]      = 9;
     m_tabID[P_BoxSurpriseTrade]     = 10;
     m_tabID[P_AutoHost]             = 11;
-    m_tabID[P_EggCollector]         = 7; // 12 deprecated
+    m_tabID[P_EggCollector]         = 7;
     m_tabID[P_EggCollector_IT]      = 7;
     m_tabID[P_EggHatcher]           = 13;
     m_tabID[P_GodEggDuplication]    = 7; // 14 deprecated
@@ -95,6 +98,9 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_tabID[P_PLA_ResetAlphaGallade]    = 0;
 
     m_tabID[P_SV_ItemDuplication]   = 7; // 23 deprecated
+    m_tabID[P_SV_EggCollector]      = 5;
+    m_tabID[P_SV_EggHatcher]        = 12;
+    m_tabID[P_SV_BoxRelease]        = 7;
 
     if (!QDir(HEX_PATH).exists())
     {
@@ -991,6 +997,27 @@ void autocontrollerwindow::on_BDSPBoxOperation_Type_currentIndexChanged(int inde
 }
 
 //---------------------------------------------------------------------------
+// SV Egg Collector signals
+//---------------------------------------------------------------------------
+void autocontrollerwindow::on_SVEggCollector_Count_valueChanged(int arg1)
+{
+    UpdateInfo();
+}
+
+//---------------------------------------------------------------------------
+// SV Egg Hatcher signals
+//---------------------------------------------------------------------------
+void autocontrollerwindow::on_SVEggHatcher_Cycle_currentIndexChanged(int index)
+{
+    UpdateInfo();
+}
+
+void autocontrollerwindow::on_SVEggHatcher_Column_valueChanged(int arg1)
+{
+    UpdateInfo();
+}
+
+//---------------------------------------------------------------------------
 // Get <variable> from "xxxxx = <variable>;"
 //---------------------------------------------------------------------------
 QString autocontrollerwindow::GetVariableString(const QString &_str)
@@ -1041,6 +1068,7 @@ void autocontrollerwindow::LoadConfig()
             && program != P_GodEggDuplication
             && program != P_BDSP_BoxDuplication
             && program != P_SV_ItemDuplication
+            && program != P_SV_BoxRelease
     );
     ui->GB_AutoFossil->setHidden(program != P_AutoFossil && program != P_AutoFossil_GR);
     ui->GB_Auto3DaySkipper->setHidden(program != P_Auto3DaySkipper);
@@ -1054,8 +1082,8 @@ void autocontrollerwindow::LoadConfig()
     ui->RemoteControl_Tool->setHidden(program != P_SmartProgram);
     ui->GB_BDSPStarter->setHidden(program != P_BDSP_ResetStarter);
     ui->GB_BDSPBoxOperation->setHidden(program != P_BDSP_BoxOperation);
-    ui->GB_UNUSED1->setHidden(true);
-    ui->GB_UNUSED2->setHidden(true);
+    ui->GB_SVEggCollector->setHidden(program != P_SV_EggCollector);
+    ui->GB_SVEggHatcher->setHidden(program != P_SV_EggHatcher);
     ui->GB_UNUSED3->setHidden(true);
     ui->GB_UNUSED4->setHidden(true);
     ui->GB_UNUSED5->setHidden(true);
@@ -1624,6 +1652,66 @@ void autocontrollerwindow::LoadConfig()
     }
 
     //--------------------------------------------------------
+    case P_SV_EggCollector:
+    {
+        QTextStream in(&configFile);
+        while (!in.atEnd())
+        {
+            QString line = in.readLine();
+            if (line.indexOf("m_maxCycle = ") != -1)
+            {
+                ui->SVEggCollector_Count->setValue(GetVariableString(line).toInt());
+            }
+            else if (line.indexOf("m_sandwichX = ") != -1)
+            {
+                ui->SVEggCollector_X->setValue(GetVariableString(line).toInt());
+            }
+            else if (line.indexOf("m_sandwichY = ") != -1)
+            {
+                ui->SVEggCollector_Y->setValue(GetVariableString(line).toInt());
+            }
+        }
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_SV_EggHatcher:
+    {
+        QTextStream in(&configFile);
+        while (!in.atEnd())
+        {
+            QString line = in.readLine();
+            if (line.indexOf("m_eggGroup = ") != -1)
+            {
+                ui->SVEggHatcher_Cycle->setCurrentIndex(GetVariableString(line).toInt());
+            }
+            else if (line.indexOf("m_columns = ") != -1)
+            {
+                ui->SVEggHatcher_Column->setValue(GetVariableString(line).toInt());
+            }
+        }
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_SV_BoxRelease:
+    {
+    ui->Generic1_Label->setText("Pokemon to Release:");
+    ui->Generic1_Count->setRange(1,960);
+
+        QTextStream in(&configFile);
+        while (!in.atEnd())
+        {
+            QString line = in.readLine();
+            if (line.indexOf("m_releases = ") != -1)
+            {
+                ui->Generic1_Count->setValue(GetVariableString(line).toInt());
+            }
+        }
+        break;
+    }
+
+    //--------------------------------------------------------
     case P_INVALID:
     {
         if (configExist)
@@ -1893,6 +1981,30 @@ void autocontrollerwindow::SaveConfig()
     case P_SV_ItemDuplication:
     {
         out << "int m_maxCycle = " << QString::number(ui->Generic1_Count->value()) << ";\n";
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_SV_EggCollector:
+    {
+        out << "int m_maxCycle = " << QString::number(ui->SVEggCollector_Count->value()) << ";\n";
+        out << "int m_sandwichX = " << QString::number(ui->SVEggCollector_X->value()) << ";\n";
+        out << "int m_sandwichY = " << QString::number(ui->SVEggCollector_Y->value()) << ";\n";
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_SV_EggHatcher:
+    {
+        out << "int m_maxCycle = " << QString::number(ui->SVEggHatcher_Cycle->currentIndex()) << ";\n";
+        out << "int m_columns = " << QString::number(ui->SVEggHatcher_Column->value()) << ";\n";
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_SV_BoxRelease:
+    {
+        out << "int m_releases = " << QString::number(ui->Generic1_Count->value()) << ";\n";
         break;
     }
 
@@ -2385,6 +2497,28 @@ void autocontrollerwindow::UpdateInfo()
     {
         info = "Program Duration: " + GetTimeString(name, ui->Generic1_Count->value());
         info += "\nThis program requires you to have cloned Koraidon/Miraidon prior to v1.1.0 update!";
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_SV_EggCollector:
+    {
+        info = "Program Duration: " + GetTimeString(name, ui->SVEggCollector_Count->value());
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_SV_EggHatcher:
+    {
+        int index = ui->SVEggHatcher_Cycle->currentIndex();
+        info = "Program Duration: " + GetTimeString(name + QString::number(index), ui->SVEggHatcher_Column->value());
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_SV_BoxRelease:
+    {
+        info = "Program Duration: " + GetTimeString(name, ui->Generic1_Count->value());
         break;
     }
 
