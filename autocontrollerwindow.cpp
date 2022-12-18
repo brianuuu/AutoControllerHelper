@@ -1996,7 +1996,7 @@ void autocontrollerwindow::SaveConfig()
     //--------------------------------------------------------
     case P_SV_EggHatcher:
     {
-        out << "int m_maxCycle = " << QString::number(ui->SVEggHatcher_Cycle->currentIndex()) << ";\n";
+        out << "int m_eggGroup = " << QString::number(ui->SVEggHatcher_Cycle->currentIndex()) << ";\n";
         out << "int m_columns = " << QString::number(ui->SVEggHatcher_Column->value()) << ";\n";
         break;
     }
