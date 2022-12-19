@@ -6,7 +6,7 @@ SmartPLAPastureSorter::SmartPLAPastureSorter
     SmartProgramParameter parameter
 )
     : SmartProgramBase(parameter)
-    , m_settings(setting)
+    , m_programSettings(setting)
 {
     init();
 }
@@ -52,8 +52,8 @@ void SmartPLAPastureSorter::runNextState()
             m_videoManager->setAreas({A_Level, A_Stat, A_Shiny, A_Alpha});
 
             // Reserve pokemon data
-            m_pokemonData.resize(m_settings.m_pastureCount * 30);
-            emit printLog("Scanning " + QString::number(m_settings.m_pastureCount) + " Pasture(s)...");
+            m_pokemonData.resize(m_programSettings.m_pastureCount * 30);
+            emit printLog("Scanning " + QString::number(m_programSettings.m_pastureCount) + " Pasture(s)...");
         }
         break;
     }
@@ -104,12 +104,12 @@ void SmartPLAPastureSorter::runNextState()
                 m_pokemonData[getIDFromPosition(m_positionTemp)] = m_dataTemp;
                 m_dataTemp = PokemonData();
 
-                if (m_positionTemp.m_pasture == m_settings.m_pastureCount && m_positionTemp.m_point == QPoint(6,5))
+                if (m_positionTemp.m_pasture == m_programSettings.m_pastureCount && m_positionTemp.m_point == QPoint(6,5))
                 {
                     emit printLog("Scan completed, now sorting...");
 
                     // Finished scanning, sort
-                    if (m_settings.m_livingDex)
+                    if (m_programSettings.m_livingDex)
                     {
                         QSet<int> idUsedForLivingDex;
 
@@ -125,7 +125,7 @@ void SmartPLAPastureSorter::runNextState()
                                 continue;
                             }
 
-                            PokemonData dexEntry(i, m_settings.m_livingDexShiny, m_settings.m_livingDexAlpha);
+                            PokemonData dexEntry(i, m_programSettings.m_livingDexShiny, m_programSettings.m_livingDexAlpha);
                             int idResult = findUnsortedResult(m_pokemonData, dexEntry);
                             if (idResult < 0)
                             {
@@ -200,7 +200,7 @@ void SmartPLAPastureSorter::runNextState()
                         std::sort(m_pokemonDataSorted.begin() + livingDexBoxes * 30, m_pokemonDataSorted.end(), PastureSort());
 
                         // Update pasture count, expand data if necessary, assuming they are empty
-                        int pastureCount = m_settings.m_pastureCount;
+                        int pastureCount = m_programSettings.m_pastureCount;
                         int pastureCountSorted = m_pokemonDataSorted.size() / 30;
                         if (pastureCount > pastureCountSorted)
                         {
@@ -214,7 +214,7 @@ void SmartPLAPastureSorter::runNextState()
                         else if (pastureCount < pastureCountSorted)
                         {
                             // Require extra pastures
-                            m_settings.m_pastureCount = pastureCountSorted;
+                            m_programSettings.m_pastureCount = pastureCountSorted;
 
                             qDebug() << "Extra pasture count =" << pastureCountSorted - pastureCount;
                             QString warning = "Creating Living Dex required " + QString::number(pastureCountSorted - pastureCount) + " extra pastures!";
@@ -298,7 +298,7 @@ void SmartPLAPastureSorter::runNextState()
         if (isGotoNextPokemon)
         {
             m_positionTemp = m_position; // cache position
-            if (m_positionTemp.m_pasture == m_settings.m_pastureCount && m_positionTemp.m_point == QPoint(6,5))
+            if (m_positionTemp.m_pasture == m_programSettings.m_pastureCount && m_positionTemp.m_point == QPoint(6,5))
             {
                 setState_runCommand("Nothing,2");
             }

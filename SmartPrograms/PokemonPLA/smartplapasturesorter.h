@@ -83,7 +83,7 @@ private:
 
     // Members
     QElapsedTimer m_timer;
-    Settings m_settings;
+    Settings m_programSettings;
     bool m_readyNextCheck;
 
     // Pasture data/functions
