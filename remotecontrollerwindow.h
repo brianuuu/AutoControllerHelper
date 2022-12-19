@@ -66,6 +66,7 @@
 
 #include "SmartPrograms/PokemonSV/smartsvsurprisetrade.h"
 #include "SmartPrograms/PokemonSV/smartsvboxrelease.h"
+#include "SmartPrograms/PokemonSV/smartsveggoperation.h"
 
 #include "SmartPrograms/Widgets/pokemonautofilllineedit.h"
 
@@ -156,6 +157,8 @@ private slots:
     void on_SP2_SB_Y_valueChanged(int arg1);
 
     void on_SP6_CB_Skips_clicked();
+
+    void on_SP9_CB_Mode_currentIndexChanged(int index);
 
     void on_SoundDetection_required(int min, int max);
     void on_SmartProgram_printLog(QString const log, QColor color);

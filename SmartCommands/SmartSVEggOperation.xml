@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SmartSVEggOperation>
+	<C_Restart>Home,1,Nothing,21,X,1,ASpam,180</C_Restart>
+	<C_Picnic>Nothing,30,L,3,X,40,LRight,3,DDown,3,LDown,3,ASpam,10,Nothing,160,LRight,6,Nothing,10,LUp,16,Nothing,10,LLeft,6,Nothing,10,LDown,8,L,3,ASpam,40</C_Picnic>
+	<C_Fly>Y,3,Nothing,50,LRight,1,LLeft,1,ASpam,140</C_Fly>
+	<C_Sandwich>ASpam,40,Nothing,150,Loop,1,LUp,30,LDown,4,LDownA,12,Loop,3,LUp,30,ASpam,320,Nothing,400,A,4,Nothing,20,LDown,1,Nothing,20</C_Sandwich>
+</SmartSVEggOperation>

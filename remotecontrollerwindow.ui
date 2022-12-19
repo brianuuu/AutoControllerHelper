@@ -3376,14 +3376,189 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_27">
                       <item>
-                       <widget class="QLabel" name="label_36">
-                        <property name="text">
-                         <string>UNUSED</string>
+                       <layout class="QHBoxLayout" name="horizontalLayout_26">
+                        <item>
+                         <widget class="QLabel" name="label_36">
+                          <property name="text">
+                           <string>Egg Operaion:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QComboBox" name="SP9_CB_Mode">
+                          <property name="minimumSize">
+                           <size>
+                            <width>130</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                          <item>
+                           <property name="text">
+                            <string>Collector Mode</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>Hatcher Mode</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>Shiny Mode</string>
+                           </property>
+                          </item>
+                         </widget>
+                        </item>
+                        <item>
+                         <spacer name="horizontalSpacer_9">
+                          <property name="orientation">
+                           <enum>Qt::Horizontal</enum>
+                          </property>
+                          <property name="sizeHint" stdset="0">
+                           <size>
+                            <width>40</width>
+                            <height>20</height>
+                           </size>
+                          </property>
+                         </spacer>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_44">
+                        <item>
+                         <widget class="QLabel" name="label_49">
+                          <property name="text">
+                           <string>No. of Sandwiches to Make (Collector Mode only):</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSpinBox" name="SP9_SB_Sandwich">
+                          <property name="minimum">
+                           <number>1</number>
+                          </property>
+                          <property name="maximum">
+                           <number>100</number>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_45">
+                        <item>
+                         <widget class="QLabel" name="label_52">
+                          <property name="text">
+                           <string>Great Peanut Butter Sandbox Position (x,y):</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSpinBox" name="SP9_SB_X">
+                          <property name="maximum">
+                           <number>1</number>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSpinBox" name="SP9_SB_Y"/>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_46">
+                        <item>
+                         <widget class="QLabel" name="label_74">
+                          <property name="text">
+                           <string>Egg Cycle Group:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QComboBox" name="SP9_CB_EggGroup">
+                          <property name="enabled">
+                           <bool>false</bool>
+                          </property>
+                          <item>
+                           <property name="text">
+                            <string>1280</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>2560</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>3840</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>5120</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>6400</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>7680</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>8960</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>10240</string>
+                           </property>
+                          </item>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="SP9_CB_HatchSandwich">
+                        <property name="enabled">
+                         <bool>false</bool>
                         </property>
-                        <property name="alignment">
-                         <set>Qt::AlignCenter</set>
+                        <property name="text">
+                         <string>Make Sandwich for Hatching</string>
+                        </property>
+                        <property name="checked">
+                         <bool>true</bool>
                         </property>
                        </widget>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="SP9_CB_Sound">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
+                        <property name="text">
+                         <string>Shiny Sound Detection (Allows Capture after Egg Hatched)</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="verticalSpacer_8">
+                        <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>20</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                       </spacer>
                       </item>
                      </layout>
                     </widget>
@@ -3421,8 +3596,8 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>262</width>
+                       <height>84</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_29">
@@ -3577,8 +3752,8 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>274</width>
+                       <height>186</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_31">
@@ -3703,8 +3878,8 @@ If the list doesn't have the specific Pokemon, select Others.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>352</width>
+                       <height>80</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_33">
@@ -3815,8 +3990,8 @@ If the list doesn't have the specific Pokemon, select Others.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>397</width>
+                       <height>68</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_35">
@@ -3880,8 +4055,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>294</width>
+                       <height>115</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_37">
@@ -4027,8 +4202,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>198</width>
+                       <height>35</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_41">
@@ -4088,8 +4263,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>224</width>
+                       <height>63</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_43">
