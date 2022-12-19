@@ -65,11 +65,11 @@ void SmartSVEggOperation::runNextState()
                 m_substage = SS_Restart;
                 setState_runCommand(C_Restart);
             }
-            else if (checkAverageColorMatch(A_Title.m_rect, QColor(253,253,253)))
+            else if (!checkAverageColorMatch(A_Title.m_rect, QColor(0,0,0)))
             {
                 emit printLog("Title detected!");
                 m_substage = SS_Title;
-                setState_runCommand("ASpam,270");
+                setState_runCommand("ASpam,310");
 
                 m_videoManager->clearCaptures();
             }
@@ -229,13 +229,14 @@ void SmartSVEggOperation::runNextState()
                     {
                         // make more sandwich!
                         m_substage = SS_Picnic;
-                        setState_runCommand("LUp,8,ASpam,40");
+                        setState_runCommand("LUp,5,ASpam,40");
                         m_videoManager->clearCaptures();
                     }
                     else
                     {
                         // completed
-                        setState_completed();
+                        m_substage = SS_Finished;
+                        setState_runCommand("Home,2,Nothing,20");
                     }
                 }
                 else
@@ -279,6 +280,14 @@ void SmartSVEggOperation::runNextState()
             }
 
             setState_frameAnalyzeRequest();
+        }
+        break;
+    }
+    case SS_Finished:
+    {
+        if (state == S_CommandFinished)
+        {
+            setState_completed();
         }
         break;
     }

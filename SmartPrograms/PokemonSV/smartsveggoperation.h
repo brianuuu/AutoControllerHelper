@@ -69,6 +69,8 @@ private:
         SS_MakeSandwich,
 
         SS_CollectEggs,
+
+        SS_Finished,
     };
     Substage m_substage;
 
