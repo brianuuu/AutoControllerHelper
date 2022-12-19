@@ -22,6 +22,7 @@ void SmartSVEggOperation::reset()
     SmartProgramBase::reset();
 
     m_substage = SS_Init;
+    m_sandwichCount = 0;
     m_eggsCollected = 0;
     m_eggCollectCount = 0;
     m_eggCollectDialog = false;
@@ -51,6 +52,8 @@ void SmartSVEggOperation::runNextState()
             setState_frameAnalyzeRequest();
             m_videoManager->setAreas({A_Title});
             m_timer.restart();
+
+            m_sandwichCount = 0;
         }
         else if (state == S_CaptureReady)
         {
@@ -129,10 +132,16 @@ void SmartSVEggOperation::runNextState()
             if (m_timer.elapsed() > 10000)
             {
                 incrementStat(m_statError);
-                emit printLog("Unable to detect sandwich menu, forcing restart", LOG_ERROR);
-
-                m_substage = SS_Restart;
-                setState_runCommand(C_Restart);
+                if (m_programSettings.m_operation == EOT_Collector && m_sandwichCount > 0)
+                {
+                    setState_error("Unable to detect sandwich menu, but there are already eggs collected, stopping program");
+                }
+                else
+                {
+                    emit printLog("Unable to detect sandwich menu, forcing restart", LOG_ERROR);
+                    m_substage = SS_Restart;
+                    setState_runCommand(C_Restart);
+                }
             }
             else if (checkAverageColorMatch(A_Sandwich.m_rect, C_Color_Sandwich))
             {
@@ -144,7 +153,6 @@ void SmartSVEggOperation::runNextState()
 
                 m_substage = SS_ToSandwich;
                 setState_runCommand(command);
-
                 m_videoManager->clearCaptures();
             }
             else
@@ -164,7 +172,7 @@ void SmartSVEggOperation::runNextState()
 
             if (m_programSettings.m_operation == EOT_Collector)
             {
-                m_programSettings.m_sandwichCount--;
+                m_sandwichCount++;
             }
         }
         break;
@@ -201,17 +209,23 @@ void SmartSVEggOperation::runNextState()
             if (m_eggCollectCount > 0 && !m_eggCollectDialog)
             {
                 incrementStat(m_statError);
-                emit printLog("Unable to talk to egg basket, forcing restart", LOG_ERROR);
-
-                m_substage = SS_Restart;
-                setState_runCommand(C_Restart);
+                if (m_programSettings.m_operation == EOT_Collector && m_sandwichCount > 0)
+                {
+                    setState_error("Unable to talk to egg basket, but there are already eggs collected, stopping program");
+                }
+                else
+                {
+                    emit printLog("Unable to talk to egg basket, forcing restart", LOG_ERROR);
+                    m_substage = SS_Restart;
+                    setState_runCommand(C_Restart);
+                }
             }
             else if (m_eggCollectCount >= 15)
             {
                 emit printLog("Total eggs collected: " + QString::number(m_eggsCollected));
                 if (m_programSettings.m_operation == EOT_Collector)
                 {
-                    if (m_programSettings.m_sandwichCount > 0)
+                    if (m_sandwichCount < m_programSettings.m_sandwichCount)
                     {
                         // make more sandwich!
                         m_substage = SS_Picnic;

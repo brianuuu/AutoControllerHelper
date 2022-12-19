@@ -1721,7 +1721,6 @@ void RemoteControllerWindow::on_SP9_CB_Mode_currentIndexChanged(int index)
 {
     SmartSVEggOperation::EggOperationType type = SmartSVEggOperation::EggOperationType(ui->SP9_CB_Mode->currentIndex());
     ui->SP9_SB_Sandwich->setEnabled(type == SmartSVEggOperation::EOT_Collector);
-    ui->SP9_CB_EggGroup->setEnabled(type != SmartSVEggOperation::EOT_Collector);
     ui->SP9_CB_Sound->setEnabled(type != SmartSVEggOperation::EOT_Collector);
     ui->SP9_CB_HatchSandwich->setEnabled(type != SmartSVEggOperation::EOT_Collector);
 }
@@ -2320,11 +2319,10 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     case SP_SV_EggOperation:
     {
         SmartSVEggOperation::Settings settings;
-        settings.m_operation = SmartSVEggOperation::EggOperationType(ui->SP9_CB_EggGroup->currentIndex());
+        settings.m_operation = SmartSVEggOperation::EggOperationType(ui->SP9_CB_Mode->currentIndex());
         settings.m_sandwichCount = ui->SP9_SB_Sandwich->value();
         settings.m_sandwichPosX = ui->SP9_SB_X->value();
         settings.m_sandwichPosY = ui->SP9_SB_Y->value();
-        settings.m_eggGroup = ui->SP9_CB_EggGroup->currentIndex();
         settings.m_isHatchWithSandwich = ui->SP9_CB_HatchSandwich->isChecked();
         settings.m_isShinyDetection = ui->SP9_CB_Sound->isChecked();
         m_smartProgram = new SmartSVEggOperation(settings, parameter);

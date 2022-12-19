@@ -22,7 +22,6 @@ public:
         int m_sandwichCount;
         int m_sandwichPosX;
         int m_sandwichPosY;
-        int m_eggGroup;
         bool m_isHatchWithSandwich;
         bool m_isShinyDetection;
     };
@@ -76,6 +75,7 @@ private:
     // Members
     QElapsedTimer m_timer;
     Settings m_programSettings;
+    int m_sandwichCount; // collector mode only
     int m_eggsCollected; // for counting how many eggs actually collected
     int m_eggCollectCount; // 15 times, every 2 mins in 30 mins
     bool m_eggCollectDialog; // for checking if we are able to talk to egg basket

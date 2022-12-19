@@ -1964,8 +1964,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>384</width>
+                       <height>64</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -2024,7 +2024,7 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>438</width>
+                       <width>323</width>
                        <height>284</height>
                       </rect>
                      </property>
@@ -2379,8 +2379,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>252</width>
+                       <height>125</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -2554,8 +2554,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>279</width>
+                       <height>102</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -2687,8 +2687,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>120</width>
+                       <height>66</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -2809,8 +2809,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>405</width>
+                       <height>158</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -2962,8 +2962,8 @@ check the manual</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>318</width>
+                       <height>56</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_19">
@@ -3063,8 +3063,8 @@ check the manual</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>289</width>
+                       <height>57</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_22">
@@ -3167,8 +3167,8 @@ check the manual</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>392</width>
+                       <height>137</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_24">
@@ -3467,70 +3467,12 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                        </layout>
                       </item>
                       <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_46">
-                        <item>
-                         <widget class="QLabel" name="label_74">
-                          <property name="text">
-                           <string>Egg Cycle Group:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QComboBox" name="SP9_CB_EggGroup">
-                          <property name="enabled">
-                           <bool>false</bool>
-                          </property>
-                          <item>
-                           <property name="text">
-                            <string>1280</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>2560</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>3840</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>5120</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>6400</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>7680</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>8960</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>10240</string>
-                           </property>
-                          </item>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
-                      <item>
                        <widget class="QCheckBox" name="SP9_CB_HatchSandwich">
                         <property name="enabled">
                          <bool>false</bool>
                         </property>
                         <property name="text">
-                         <string>Make Sandwich for Hatching</string>
+                         <string>Make Sandwich for Hatching (Faster Hatch Time)</string>
                         </property>
                         <property name="checked">
                          <bool>true</bool>
@@ -4358,8 +4300,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>238</width>
+                       <height>67</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_45">
