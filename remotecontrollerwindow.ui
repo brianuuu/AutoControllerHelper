@@ -3380,7 +3380,7 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                         <item>
                          <widget class="QLabel" name="label_36">
                           <property name="text">
-                           <string>Egg Operaion:</string>
+                           <string>Egg Operation:</string>
                           </property>
                          </widget>
                         </item>

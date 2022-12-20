@@ -140,7 +140,7 @@ void SmartSVEggOperation::runNextState()
                     else
                     {
                         // go up to lighthouse immediately
-                        emit printLog("Heading up to Poco Path lighthouse");
+                        emit printLog("Heading up to Poco Path Lighthouse");
                         m_substage = SS_PackUp;
                         setState_runCommand("LDown,40");
                         m_videoManager->clearCaptures();
@@ -263,7 +263,7 @@ void SmartSVEggOperation::runNextState()
             m_sandwichTimer.restart();
             if (m_programSettings.m_operation == EOT_Hatcher)
             {
-                emit printLog("Heading up to Poco Path lighthouse");
+                emit printLog("Heading up to Poco Path Lighthouse");
                 m_substage = SS_PackUp;
                 setState_runCommand(C_PackUp);
             }
@@ -381,7 +381,7 @@ void SmartSVEggOperation::runNextState()
         {
             if (m_timer.elapsed() > 10000)
             {
-                runRestartCommand("Unable to detect screen fade to black when going on Poco Path lighthouse, forcing restart", m_programSettings.m_isErrorCapture);
+                runRestartCommand("Unable to detect screen fade to black when going on Poco Path Lighthouse, forcing restart", m_programSettings.m_isErrorCapture);
             }
             else if (checkAverageColorMatch(A_Title.m_rect, QColor(0,0,0)))
             {
@@ -687,7 +687,7 @@ void SmartSVEggOperation::runNextState()
                 }
                 else
                 {
-                    emit printLog("Unable to fly to Poco Path lighthouse, retrying...", LOG_WARNING);
+                    emit printLog("Unable to fly to Poco Path Lighthouse, retrying...", LOG_WARNING);
                     m_substage = SS_Hatching;
                     setState_runCommand("B,2,Nothing,20");
 
