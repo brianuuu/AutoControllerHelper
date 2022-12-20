@@ -283,6 +283,10 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
             break;
         }
     }
+
+    // values we want to load
+    ui->SP9_SB_X->setValue(m_settings->value("SandwichX", 0).toInt());
+    ui->SP9_SB_Y->setValue(m_settings->value("SandwichY", 0).toInt());
 }
 
 RemoteControllerWindow::~RemoteControllerWindow()
@@ -379,6 +383,10 @@ void RemoteControllerWindow::closeEvent(QCloseEvent *event)
     {
         m_settings->setValue("SmartProgramName", ui->LW_SmartProgram->currentItem()->text());
     }
+
+    // values we want to save
+    m_settings->setValue("SandwichX", ui->SP9_SB_X->value());
+    m_settings->setValue("SandwichY", ui->SP9_SB_Y->value());
 
     if (m_smartSetting->isVisible())
     {

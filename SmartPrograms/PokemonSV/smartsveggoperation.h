@@ -42,7 +42,7 @@ private:
     virtual void runNextState();
     void runRestartCommand(QString error = "", bool capture = false);
     void runPicnicCommand();
-    void runToBoxCommand();
+    void runToBoxCommand(QString command = "");
     static CaptureArea const GetBoxCaptureAreaOfPos(int x, int y);
     static CaptureArea const GetPartyCaptureAreaOfPos(int y);
 
@@ -68,7 +68,7 @@ private:
     CaptureArea const A_Sandwich = CaptureArea(1080,260,160,100);
     CaptureArea const A_Dialog = CaptureArea(700,596,200,40);
     CaptureArea const A_Yes = CaptureArea(1076,406,80,40);
-    CaptureArea const A_Pokemon = CaptureArea(1168,12,100,30);
+    CaptureArea const A_Pokemon = CaptureArea(836,4,21,46);
     CaptureArea const A_Box = CaptureArea(1110,226,100,30);
     CaptureArea const A_Picnic = CaptureArea(1110,280,100,30);
     CaptureArea const A_PartyFirst = CaptureArea(84,140,134,12);
@@ -101,6 +101,7 @@ private:
         SS_Hatching,
         SS_CheckShiny,
         SS_NextColumn,
+        SS_Fly,
 
         SS_Finished,
     };
@@ -124,6 +125,9 @@ private:
     int m_eggColumnsHatched;
     int m_eggsToHatch; // how many eggs we hatching for this loop? mostly 5 except last column
     int m_checkShinyCount; // counter for checking shiny
+    int m_shinyFound; // how many shiny we found this session
+    int m_flyAttempts;
+    bool m_flySuccess; // check if we were able to fly
 
     // Stats
     Stat m_statError;
