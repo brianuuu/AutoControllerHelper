@@ -3467,6 +3467,30 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                        </layout>
                       </item>
                       <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_46">
+                        <item>
+                         <widget class="QLabel" name="label_74">
+                          <property name="text">
+                           <string>Columns of Eggs to Hatch (Hatcher Mode only):</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSpinBox" name="SP9_SB_Column">
+                          <property name="enabled">
+                           <bool>false</bool>
+                          </property>
+                          <property name="minimum">
+                           <number>1</number>
+                          </property>
+                          <property name="maximum">
+                           <number>192</number>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
                        <widget class="QCheckBox" name="SP9_CB_HatchSandwich">
                         <property name="enabled">
                          <bool>false</bool>
@@ -3486,6 +3510,19 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                         </property>
                         <property name="text">
                          <string>Shiny Sound Detection (Allows Capture after Egg Hatched)</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="SP9_CB_Error">
+                        <property name="enabled">
+                         <bool>true</bool>
+                        </property>
+                        <property name="text">
+                         <string>Capture Video when Error Occurs for Bug Reporting</string>
+                        </property>
+                        <property name="checked">
+                         <bool>true</bool>
                         </property>
                        </widget>
                       </item>

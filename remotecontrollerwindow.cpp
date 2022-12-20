@@ -1722,6 +1722,7 @@ void RemoteControllerWindow::on_SP9_CB_Mode_currentIndexChanged(int index)
     SmartSVEggOperation::EggOperationType type = SmartSVEggOperation::EggOperationType(ui->SP9_CB_Mode->currentIndex());
     ui->SP9_SB_Sandwich->setEnabled(type == SmartSVEggOperation::EOT_Collector);
     ui->SP9_CB_Sound->setEnabled(type != SmartSVEggOperation::EOT_Collector);
+    ui->SP9_SB_Column->setEnabled(type == SmartSVEggOperation::EOT_Hatcher);
     ui->SP9_CB_HatchSandwich->setEnabled(type != SmartSVEggOperation::EOT_Collector);
 }
 
@@ -2323,8 +2324,10 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         settings.m_sandwichCount = ui->SP9_SB_Sandwich->value();
         settings.m_sandwichPosX = ui->SP9_SB_X->value();
         settings.m_sandwichPosY = ui->SP9_SB_Y->value();
+        settings.m_columnsToHatch = ui->SP9_SB_Column->value();
         settings.m_isHatchWithSandwich = ui->SP9_CB_HatchSandwich->isChecked();
         settings.m_isShinyDetection = ui->SP9_CB_Sound->isChecked();
+        settings.m_isErrorCapture = ui->SP9_CB_Error->isChecked();
         m_smartProgram = new SmartSVEggOperation(settings, parameter);
         break;
     }

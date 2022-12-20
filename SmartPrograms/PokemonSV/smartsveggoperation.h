@@ -22,8 +22,10 @@ public:
         int m_sandwichCount;
         int m_sandwichPosX;
         int m_sandwichPosY;
+        int m_columnsToHatch;
         bool m_isHatchWithSandwich;
         bool m_isShinyDetection;
+        bool m_isErrorCapture;
     };
 
 public:
@@ -38,24 +40,41 @@ private:
     virtual void init();
     virtual void reset();
     virtual void runNextState();
+    void runRestartCommand(QString error = "", bool capture = false);
+    void runPicnicCommand();
+    void runToBoxCommand();
+    static CaptureArea const GetBoxCaptureAreaOfPos(int x, int y);
+    static CaptureArea const GetPartyCaptureAreaOfPos(int y);
 
     // Command indices
     Command const C_Restart     = 0;
     Command const C_Picnic      = 1;
     Command const C_Fly         = 2;
     Command const C_Sandwich    = 3;
-    Command const C_COUNT       = 4;
+    Command const C_PackUp      = 4;
+    Command const C_HatchInit   = 5;
+    Command const C_MultiSelect = 6;
+    Command const C_COUNT       = 7;
 
     // List of test color
     QColor const C_Color_Sandwich = QColor(239,236,221);
     HSVRange const C_Color_Dialog = HSVRange(170,130,20,230,190,60); // >220
-    HSVRange const C_Color_Yellow = HSVRange(30,200,200,70,255,255); // >200
+    HSVRange const C_Color_Yellow = HSVRange(30,200,200,70,255,255); // >200 (box: >130) (battle: >180)
+    HSVRange const C_Color_Green = HSVRange(100,170,200,140,230,255); // >200
+    HSVRange const C_Color_Shiny = HSVRange(0,0,200,359,255,255); // >25
 
     // List of test point/area
     CaptureArea const A_Title = CaptureArea(480,110,320,100);
     CaptureArea const A_Sandwich = CaptureArea(1080,260,160,100);
     CaptureArea const A_Dialog = CaptureArea(700,596,200,40);
     CaptureArea const A_Yes = CaptureArea(1076,406,80,40);
+    CaptureArea const A_Pokemon = CaptureArea(1168,12,100,30);
+    CaptureArea const A_Box = CaptureArea(1110,226,100,30);
+    CaptureArea const A_Picnic = CaptureArea(1110,280,100,30);
+    CaptureArea const A_PartyFirst = CaptureArea(84,140,134,12);
+    CaptureArea const A_Battle = CaptureArea(1148,466,100,48);
+    CaptureArea const A_Health = CaptureArea(69,634,80,20);
+    CaptureArea const A_Shiny = CaptureArea(1126,60,30,30);
 
     // Substages
     enum Substage
@@ -63,12 +82,25 @@ private:
         SS_Init,
         SS_Restart,
         SS_Title,
+        SS_GameStart,
+
+        SS_MainMenu,
 
         SS_Picnic,
         SS_ToSandwich,
         SS_MakeSandwich,
 
         SS_CollectEggs,
+        SS_PackUp,
+        SS_HatchInit,
+        SS_ToBox,
+        SS_CheckHasEgg,
+        SS_ExitBox,
+        SS_HatchEggs,
+        SS_Battle,
+        SS_Hatching,
+        SS_CheckShiny,
+        SS_NextColumn,
 
         SS_Finished,
     };
@@ -76,12 +108,22 @@ private:
 
     // Members
     QElapsedTimer m_timer;
+    QElapsedTimer m_sandwichTimer;
     Settings m_programSettings;
+
+    Substage m_substageAfterMainMenu;
+    QString m_commandAfterMainMenu;
+    bool m_isToBoxAfterMainMenu;
+
     int m_sandwichCount; // collector mode only
     int m_eggsCollected; // for counting how many eggs actually collected
     int m_eggCollectCount; // 15 times, every 2 mins in 30 mins
     bool m_eggCollectDialog; // for checking if we are able to talk to egg basket
     bool m_eggCollectDetected; // for detecting Yes/No when collecting eggs
+
+    int m_eggColumnsHatched;
+    int m_eggsToHatch; // how many eggs we hatching for this loop? mostly 5 except last column
+    int m_checkShinyCount; // counter for checking shiny
 
     // Stats
     Stat m_statError;
