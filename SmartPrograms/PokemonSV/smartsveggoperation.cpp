@@ -580,26 +580,33 @@ void SmartSVEggOperation::runNextState()
                 m_eggColumnsHatched++;
                 if (m_programSettings.m_isHatchWithSandwich && m_sandwichTimer.elapsed() > 30 * 60 * 1000)
                 {
-                    // 30 minutes passed, try to make another sandwich
-                    if (m_flyAttempts == 0)
+                    if (m_eggColumnsHatched >= m_programSettings.m_columnsToHatch - 2)
                     {
-                        // don't print log if we're retrying
-                        emit printLog("30 minutes passed, attempt making another sandwich");
+                        emit printLog("Fewer than 2 columns of eggs remaining, not making sandwich!");
                     }
-                    m_substage = SS_Fly;
-                    setState_runCommand(C_Fly, true);
-                    m_flySuccess = false;
-                    m_videoManager->setAreas({A_Title});
+                    else
+                    {
+                        // 30 minutes passed, try to make another sandwich
+                        if (m_flyAttempts == 0)
+                        {
+                            // don't print log if we're retrying
+                            emit printLog("30 minutes passed, attempt making another sandwich");
+                        }
+                        m_substage = SS_Fly;
+                        setState_runCommand(C_Fly, true);
+                        m_flySuccess = false;
+                        m_videoManager->setAreas({A_Title});
+                        break;
+                    }
                 }
-                else
+
+                if (m_programSettings.m_isHatchWithSandwich)
                 {
-                    if (m_programSettings.m_isHatchWithSandwich)
-                    {
-                        qint64 timeRemain = 30 - (m_sandwichTimer.elapsed() / 60000);
-                        emit printLog("Sandwich time remaining: " + QString::number(timeRemain) + " min");
-                    }
-                    runToBoxCommand();
+                    qint64 timeRemain = 30 - (m_sandwichTimer.elapsed() / 60000);
+                    timeRemain = qMax(timeRemain, 0ll);
+                    emit printLog("Sandwich time remaining: " + QString::number(timeRemain) + " min");
                 }
+                runToBoxCommand();
             }
             else
             {
