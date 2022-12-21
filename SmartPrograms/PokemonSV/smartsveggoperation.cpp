@@ -426,9 +426,9 @@ void SmartSVEggOperation::runNextState()
             }
             else if (checkBrightnessMeanTarget(GetBoxCaptureAreaOfPos(1,1).m_rect, C_Color_Yellow, 130))
             {
-                m_missedInputRetryCount = 0;
                 if (m_eggColumnsHatched > 0)
                 {
+                    m_missedInputRetryCount = 0;
                     m_substage = SS_CheckShiny;
                     setState_runCommand("LLeft,3,DDown,3,Minus,3,Nothing,20");
                     m_checkShinyCount = 0;
@@ -445,6 +445,7 @@ void SmartSVEggOperation::runNextState()
                 }
                 else
                 {
+                    //m_missedInputRetryCount = 0; // now set in runToBoxCommand()
                     m_eggsToHatch = 5;
                     m_substage = SS_CheckHasEgg;
                     setState_runCommand(m_commands[C_MultiSelect] + ",LLeft,3,LDown,3,A,3,Nothing,3,Loop,1,LDown,3,DDown,3,Loop,4,Nothing,20");
@@ -489,18 +490,35 @@ void SmartSVEggOperation::runNextState()
                 else
                 {
                     // current party position doesn't have an egg
-                    m_missedInputRetryCount = 0;
                     m_eggsToHatch--;
                     setState_runCommand("DUp,3,Nothing,20");
                 }
             }
             else
             {
-                if (m_eggsToHatch < 5 && m_missedInputRetryCount < 3)
+                if (m_missedInputRetryCount < 3)
                 {
                     m_missedInputRetryCount++;
-                    emit printLog("Unable to detect cursor on current party, input might be missed, retrying...", LOG_WARNING);
-                    setState_runCommand("DUp,3,Nothing,20");
+                    if (m_eggsToHatch == 5)
+                    {
+                        // right after puting eggs to party
+                        emit printLog("Unable to detect cursor on current party, input might be missed, exiting Box and retrying...", LOG_WARNING);
+
+                        // don't call runToBoxCommand() so it doesn't reset m_missedInputRetryCount
+                        m_substage = SS_MainMenu;
+                        setState_runCommand("B,5,Nothing,5,Loop,2");
+                        m_videoManager->clearCaptures();
+
+                        m_substageAfterMainMenu = SS_ToBox;
+                        m_commandAfterMainMenu = "ASpam,10,Nothing,20";
+                        m_isToBoxAfterMainMenu = true;
+                    }
+                    else
+                    {
+                        // when checking if there's egg in party
+                        emit printLog("Unable to detect cursor on party slot " + QString::number(m_eggsToHatch + 1) + ", input might be missed, retrying...", LOG_WARNING);
+                        setState_runCommand("DUp,3,Nothing,20");
+                    }
                 }
                 else
                 {
@@ -515,14 +533,34 @@ void SmartSVEggOperation::runNextState()
         if (state == S_CommandFinished)
         {
             setState_frameAnalyzeRequest();
-            m_videoManager->setAreas({A_Box});
+            m_videoManager->setAreas({A_Box, A_Pokemon});
             m_timer.restart();
         }
         else if (state == S_CaptureReady)
         {
-            if (m_timer.elapsed() > 10000)
+            if (m_timer.elapsed() > 5000)
             {
-                runRestartCommand("Unable to detect exiting Box, forcing restart", m_programSettings.m_isErrorCapture);
+                if (m_missedInputRetryCount < 3 && checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Yellow, 200))
+                {
+                    m_missedInputRetryCount++;
+                    emit printLog("Detected still inside Box, input might be missed when putting eggs to party, exiting Box and retrying...", LOG_WARNING);
+
+                    // don't call runToBoxCommand() so it doesn't reset m_missedInputRetryCount
+                    m_substage = SS_MainMenu;
+                    setState_runCommand("B,5,Nothing,5");
+                    m_videoManager->clearCaptures();
+
+                    m_substageAfterMainMenu = SS_ToBox;
+                    m_commandAfterMainMenu = "ASpam,10,Nothing,20";
+                    m_isToBoxAfterMainMenu = true;
+
+                    // this can go really wrong if it was able to put eggs to party but just missed B input when exiting Box...
+                    // but should be able to just force restart after
+                }
+                else
+                {
+                    runRestartCommand("Unable to detect exiting Box, forcing restart", m_programSettings.m_isErrorCapture);
+                }
             }
             else if (checkBrightnessMeanTarget(A_Box.m_rect, C_Color_Yellow, 200))
             {
@@ -644,24 +682,21 @@ void SmartSVEggOperation::runNextState()
             }
 
             m_missedInputRetryCount = 0;
+            QString log = "Column " + QString::number(m_eggColumnsHatched) + " row " + QString::number(m_checkShinyCount);
             if (!checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Yellow, 200))
             {
-                // no pokemon, skip
+                emit printLog(log + " has pokemon");
+            }
+            else if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
+            {
+                // SHINY FOUND!
+                m_shinyFound++;
+                incrementStat(m_statShinyHatched);
+                emit printLog(log + " is SHINY!!!", LOG_SUCCESS);
             }
             else
             {
-                QString log = "Column " + QString::number(m_eggColumnsHatched) + " row " + QString::number(m_checkShinyCount);
-                if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
-                {
-                    // SHINY FOUND!
-                    m_shinyFound++;
-                    incrementStat(m_statShinyHatched);
-                    emit printLog(log + " is SHINY!!!", LOG_SUCCESS);
-                }
-                else
-                {
-                    emit printLog(log + " is not shiny...");
-                }
+                emit printLog(log + " is not shiny...");
             }
 
             if (m_checkShinyCount >= 5)
@@ -829,11 +864,12 @@ void SmartSVEggOperation::runPicnicCommand()
 
 void SmartSVEggOperation::runToBoxCommand(QString command)
 {
+    m_missedInputRetryCount = 0;
+
     m_substage = SS_MainMenu;
     setState_runCommand(command.isEmpty() ? "X,3" : command);
     m_videoManager->clearCaptures();
 
-    // make sandwich before hatching
     m_substageAfterMainMenu = SS_ToBox;
     m_commandAfterMainMenu = "ASpam,10,Nothing,20";
     m_isToBoxAfterMainMenu = true;
