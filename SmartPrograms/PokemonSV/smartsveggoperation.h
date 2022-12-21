@@ -66,7 +66,7 @@ private:
     // List of test point/area
     CaptureArea const A_Title = CaptureArea(480,110,320,100);
     CaptureArea const A_Sandwich = CaptureArea(1080,260,160,100);
-    CaptureArea const A_Dialog = CaptureArea(700,596,200,40);
+    CaptureArea const A_Dialog = CaptureArea(800,596,100,40);
     CaptureArea const A_Yes = CaptureArea(1076,406,80,40);
     CaptureArea const A_Pokemon = CaptureArea(836,4,21,46);
     CaptureArea const A_Box = CaptureArea(1110,226,100,30);
