@@ -27,6 +27,8 @@ void SmartSVEggOperation::reset()
     m_commandAfterMainMenu = "Nothing,10";
     m_isToBoxAfterMainMenu = false;
 
+    m_missedInputRetryCount = 0;
+
     m_sandwichCount = 0;
     m_eggsCollected = 0;
     m_eggCollectCount = 0;
@@ -35,6 +37,7 @@ void SmartSVEggOperation::reset()
 
     m_eggColumnsHatched = 0;
     m_eggsToHatch = 0;
+    m_eggsHatched = 0;
     m_checkShinyCount = 0;
     m_shinyFound = 0;
     m_flyAttempts = 0;
@@ -56,9 +59,6 @@ void SmartSVEggOperation::runNextState()
         //runToBoxCommand();
         //m_eggColumnsHatched = 1;
 
-        //m_substage = SS_ToBox;
-        //setState_runCommand("ASpam,10,Nothing,20");
-
         m_substage = SS_Restart;
         setState_runCommand(C_Restart);
         break;
@@ -71,8 +71,12 @@ void SmartSVEggOperation::runNextState()
             m_videoManager->setAreas({A_Title});
             m_timer.restart();
 
+            m_missedInputRetryCount = 0;
             m_sandwichCount = 0;
+            m_eggsCollected = 0;
             m_eggColumnsHatched = 0;
+            m_eggsHatched = 0;
+            m_shinyFound = 0;
         }
         else if (state == S_CaptureReady)
         {
@@ -422,12 +426,22 @@ void SmartSVEggOperation::runNextState()
             }
             else if (checkBrightnessMeanTarget(GetBoxCaptureAreaOfPos(1,1).m_rect, C_Color_Yellow, 130))
             {
+                m_missedInputRetryCount = 0;
                 if (m_eggColumnsHatched > 0)
                 {
                     m_substage = SS_CheckShiny;
                     setState_runCommand("LLeft,3,DDown,3,Minus,3,Nothing,20");
                     m_checkShinyCount = 0;
-                    m_videoManager->setAreas({A_Pokemon,A_Shiny});
+                    m_videoManager->setAreas(
+                                {
+                                    A_Pokemon,
+                                    A_Shiny,
+                                    GetPartyCaptureAreaOfPos(2),
+                                    GetPartyCaptureAreaOfPos(3),
+                                    GetPartyCaptureAreaOfPos(4),
+                                    GetPartyCaptureAreaOfPos(5),
+                                    GetPartyCaptureAreaOfPos(6)
+                                });
                 }
                 else
                 {
@@ -466,7 +480,7 @@ void SmartSVEggOperation::runNextState()
                 {
                     emit printLog("Hatching column " + QString::number(m_eggColumnsHatched + 1) + " with " + QString::number(m_eggsToHatch) + " eggs");
                     m_substage = SS_ExitBox;
-                    setState_runCommand("BSpam,10");
+                    setState_runCommand("B,5,Nothing,5");
                 }
                 else if (m_eggsToHatch <= 1)
                 {
@@ -475,13 +489,23 @@ void SmartSVEggOperation::runNextState()
                 else
                 {
                     // current party position doesn't have an egg
+                    m_missedInputRetryCount = 0;
                     m_eggsToHatch--;
                     setState_runCommand("DUp,3,Nothing,20");
                 }
             }
             else
             {
-                runRestartCommand("Unable to detect cursor on current party, forcing restart", m_programSettings.m_isErrorCapture);
+                if (m_eggsToHatch < 5 && m_missedInputRetryCount < 3)
+                {
+                    m_missedInputRetryCount++;
+                    emit printLog("Unable to detect cursor on current party, input might be missed, retrying...", LOG_WARNING);
+                    setState_runCommand("DUp,3,Nothing,20");
+                }
+                else
+                {
+                    runRestartCommand("Unable to detect cursor on current party, forcing restart", m_programSettings.m_isErrorCapture);
+                }
             }
         }
         break;
@@ -595,20 +619,42 @@ void SmartSVEggOperation::runNextState()
         }
         else if (state == S_CaptureReady)
         {
+            // m_checkShinyCount = [1,5]
+            if (!checkBrightnessMeanTarget(GetPartyCaptureAreaOfPos(m_checkShinyCount + 1).m_rect, C_Color_Yellow, 200))
+            {
+                if (m_missedInputRetryCount < 3)
+                {
+                    m_checkShinyCount--;
+                    m_missedInputRetryCount++;
+                    emit printLog("Unable to detect cursor on current party, input might be missed, retrying...", LOG_WARNING);
+                    setState_runCommand("DDown,3,Nothing,20");
+                }
+                else
+                {
+                    runRestartCommand("Unable to detect cursor on current party, forcing restart", m_programSettings.m_isErrorCapture);
+                }
+                break;
+            }
+
+            m_missedInputRetryCount = 0;
             if (!checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Yellow, 200))
             {
                 // no pokemon, skip
             }
-            else if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
-            {
-                // SHINY FOUND!
-                m_shinyFound++;
-                incrementStat(m_statShinyHatched);
-                emit printLog("Column " + QString::number(m_eggColumnsHatched) + " row " + QString::number(m_checkShinyCount) + " is SHINY!!!", LOG_SUCCESS);
-            }
             else
             {
-                emit printLog("Not shiny...");
+                QString log = "Column " + QString::number(m_eggColumnsHatched) + " row " + QString::number(m_checkShinyCount);
+                if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
+                {
+                    // SHINY FOUND!
+                    m_shinyFound++;
+                    incrementStat(m_statShinyHatched);
+                    emit printLog(log + " is SHINY!!!", LOG_SUCCESS);
+                }
+                else
+                {
+                    emit printLog(log + " is not shiny...");
+                }
             }
 
             if (m_checkShinyCount >= 5)
@@ -620,7 +666,7 @@ void SmartSVEggOperation::runNextState()
                     // TODO: shiny mode
                     if (m_shinyFound > 0)
                     {
-                        emit printLog(QString::number(m_shinyFound) + "SHINY POKEMON IS FOUND!!!");
+                        emit printLog(QString::number(m_shinyFound) + " SHINY POKEMON IS FOUND!!!", LOG_SUCCESS);
                     }
                     else
                     {
@@ -728,6 +774,21 @@ void SmartSVEggOperation::runNextState()
 
 void SmartSVEggOperation::runRestartCommand(QString error, bool capture)
 {
+    if (m_shinyFound > 0)
+    {
+        if (!error.isEmpty())
+        {
+            emit printLog(error, LOG_ERROR);
+        }
+        emit printLog("An error has occurred but " + QString::number(m_shinyFound) + " SHINY Pokemon is found, preventing restart");
+        setState_completed();
+        return;
+    }
+
+    // remove how many eggs we've collected/hatched
+    incrementStat(m_statEggCollected, -m_eggsCollected);
+    incrementStat(m_statEggHatched, -m_eggsHatched);
+
     incrementStat(m_statError);
     if (!error.isEmpty())
     {
@@ -793,5 +854,5 @@ const CaptureArea SmartSVEggOperation::GetPartyCaptureAreaOfPos(int y)
     }
 
     y--;
-    return CaptureArea(36, 142 + y * 84, 100, 30);
+    return CaptureArea(29, 138 + y * 84, 10, 70);
 }

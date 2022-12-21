@@ -116,6 +116,8 @@ private:
     QString m_commandAfterMainMenu;
     bool m_isToBoxAfterMainMenu;
 
+    int m_missedInputRetryCount;
+
     int m_sandwichCount; // collector mode only
     int m_eggsCollected; // for counting how many eggs actually collected
     int m_eggCollectCount; // 15 times, every 2 mins in 30 mins
@@ -124,6 +126,7 @@ private:
 
     int m_eggColumnsHatched;
     int m_eggsToHatch; // how many eggs we hatching for this loop? mostly 5 except last column
+    int m_eggsHatched; // how many eggs we have hatched this session
     int m_checkShinyCount; // counter for checking shiny
     int m_shinyFound; // how many shiny we found this session
     int m_flyAttempts;

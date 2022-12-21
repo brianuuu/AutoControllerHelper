@@ -1054,6 +1054,7 @@ void SmartProgramBase::incrementStat(Stat &stat, int addCount)
     // Grab value from ini, increment and save
     stat.first = stats.value(stat.second).toInt();
     stat.first += addCount;
+    stat.first = qMax(stat.first, 0); // no negative, but something probably went wrong...?
     stats.setValue(stat.second, stat.first);
 
     updateStats();
