@@ -127,6 +127,7 @@ private:
     int m_eggColumnsHatched;
     int m_eggsToHatch; // how many eggs we hatching for this loop? mostly 5 except last column
     int m_eggsHatched; // how many eggs we have hatched this session
+    int m_hasPokemonCount; // counter for check if pokemon exist in party
     int m_checkShinyCount; // counter for checking shiny
     int m_shinyFound; // how many shiny we found this session
     int m_flyAttempts;

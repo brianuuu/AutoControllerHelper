@@ -429,6 +429,7 @@ void SmartSVEggOperation::runNextState()
                 if (m_eggColumnsHatched > 0)
                 {
                     m_missedInputRetryCount = 0;
+                    m_hasPokemonCount = 0;
                     m_substage = SS_CheckShiny;
                     setState_runCommand("LLeft,3,DDown,3,Minus,3,Nothing,20");
                     m_checkShinyCount = 0;
@@ -595,6 +596,7 @@ void SmartSVEggOperation::runNextState()
             else if (checkBrightnessMeanTarget(A_Dialog.m_rect, C_Color_Dialog, 220))
             {
                 --m_eggsToHatch;
+                m_eggsHatched++;
                 incrementStat(m_statEggHatched);
                 emit printLog("Oh? Egg is hatching! (" + QString::number(m_eggsToHatch) + " remaining)");
                 m_substage = SS_Hatching;
@@ -685,23 +687,38 @@ void SmartSVEggOperation::runNextState()
             QString log = "Column " + QString::number(m_eggColumnsHatched) + " row " + QString::number(m_checkShinyCount);
             if (!checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Yellow, 200))
             {
-                emit printLog(log + " has pokemon");
-            }
-            else if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
-            {
-                // SHINY FOUND!
-                m_shinyFound++;
-                incrementStat(m_statShinyHatched);
-                emit printLog(log + " is SHINY!!!", LOG_SUCCESS);
+                emit printLog(log + " has no pokemon");
             }
             else
             {
-                emit printLog(log + " is not shiny...");
+                m_hasPokemonCount++;
+                if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
+                {
+                    // SHINY FOUND!
+                    m_shinyFound++;
+                    incrementStat(m_statShinyHatched);
+                    emit printLog(log + " is SHINY!!!", LOG_SUCCESS);
+                }
+                else
+                {
+                    emit printLog(log + " is not shiny...");
+                }
             }
 
             if (m_checkShinyCount >= 5)
             {
                 // m_eggColumnsHatched = [1,6]
+                if (m_hasPokemonCount == 0)
+                {
+                    // this happens when we have checked shiny of the previous column but unable to put down the next column of eggs
+                    emit printLog("No pokemon is detected in party, attempting to put eggs to party again", LOG_WARNING);
+                    QString command = "A,3,Nothing,3,LRight,3,DDown,3,LDown,3,Loop,1,LRight,3,Nothing,3,Loop," + QString::number(m_eggColumnsHatched % 6);
+
+                    m_substage = SS_NextColumn;
+                    setState_runCommand(command);
+                    break;
+                }
+
                 QString command = "A,3,Nothing,3,LUp,3,Loop,1,LRight,3,Nothing,3,Loop," + QString::number(((m_eggColumnsHatched - 1) % 6) + 1) + ",A,3,Nothing,3";
                 if (m_eggColumnsHatched >= m_programSettings.m_columnsToHatch)
                 {
@@ -816,14 +833,35 @@ void SmartSVEggOperation::runNextState()
 
 void SmartSVEggOperation::runRestartCommand(QString error, bool capture)
 {
+    incrementStat(m_statError);
+    if (!error.isEmpty())
+    {
+        emit printLog(error, LOG_ERROR);
+    }
+
     if (m_shinyFound > 0)
     {
-        if (!error.isEmpty())
+        error = "An error has occurred but " + QString::number(m_shinyFound) + " SHINY Pokemon is found, preventing restart";
+        if (capture)
         {
-            emit printLog(error, LOG_ERROR);
+            error += ", a capture has been taken";
         }
-        emit printLog("An error has occurred but " + QString::number(m_shinyFound) + " SHINY Pokemon is found, preventing restart");
-        setState_completed();
+        emit printLog(error);
+        m_substage = SS_Finished;
+        setState_runCommand(capture ? "Capture,22,Nothing,200" : "Nothing,10");
+        return;
+    }
+
+    if (m_programSettings.m_operation == EOT_Hatcher && m_eggColumnsHatched > 0)
+    {
+        error = "An error has occurred but " + QString::number(m_eggColumnsHatched) + " column(s) of eggs has been hatched, preventing restart";
+        if (capture)
+        {
+            error += ", a capture has been taken";
+        }
+        emit printLog(error);
+        m_substage = SS_Finished;
+        setState_runCommand(capture ? "Capture,22,Nothing,200" : "Nothing,10");
         return;
     }
 
@@ -831,11 +869,6 @@ void SmartSVEggOperation::runRestartCommand(QString error, bool capture)
     incrementStat(m_statEggCollected, -m_eggsCollected);
     incrementStat(m_statEggHatched, -m_eggsHatched);
 
-    incrementStat(m_statError);
-    if (!error.isEmpty())
-    {
-        emit printLog(error, LOG_ERROR);
-    }
     m_substage = SS_Restart;
     m_videoManager->clearCaptures();
     if (capture)
