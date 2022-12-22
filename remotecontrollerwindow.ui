@@ -3515,9 +3515,6 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       </item>
                       <item>
                        <widget class="QCheckBox" name="SP9_CB_Error">
-                        <property name="enabled">
-                         <bool>true</bool>
-                        </property>
                         <property name="text">
                          <string>Capture Video when Error Occurs for Bug Reporting</string>
                         </property>
@@ -3732,7 +3729,7 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                        <x>0</x>
                        <y>0</y>
                        <width>274</width>
-                       <height>186</height>
+                       <height>70</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_31">

@@ -342,7 +342,7 @@ void SmartSVEggOperation::runNextState()
                 else
                 {
                     // calculate how many columns of eggs are there
-                    m_programSettings.m_columnsToHatch = m_eggsCollected / 30 + qMin(m_eggsCollected % 30, 6);
+                    m_programSettings.m_columnsToHatch = (m_eggsCollected / 30) * 6 + qMin(m_eggsCollected % 30, 6);
                     emit printLog("No. of columns to hatch: " + QString::number(m_programSettings.m_columnsToHatch));
 
                     if (m_programSettings.m_isHatchWithSandwich && m_sandwichCount == 1)
@@ -688,8 +688,8 @@ void SmartSVEggOperation::runNextState()
             }
             else
             {
+                setState_runCommand((m_substage = SS_Battle) ? "LUpRight,30,LRight,3750" : "LRight,3750",true);
                 m_substage = SS_HatchEggs;
-                setState_runCommand("LRight,3750",true);
                 m_videoManager->setAreas({A_Health,A_Battle,A_Dialog});
             }
         }
@@ -914,9 +914,17 @@ void SmartSVEggOperation::runRestartCommand(QString error, bool capture)
         return;
     }
 
-    // remove how many eggs we've collected/hatched
-    incrementStat(m_statEggCollected, -m_eggsCollected);
-    incrementStat(m_statEggHatched, -m_eggsHatched);
+    if (m_programSettings.m_operation == EOT_Hatcher)
+    {
+        // removed number of hatched eggs, since we are hatching them again...
+        incrementStat(m_statEggHatched, -m_eggsHatched);
+    }
+    else
+    {
+        // remove those eggs collected that weren't able to hatch
+        int collectedButNotHatched = m_eggsCollected - m_eggsHatched;
+        incrementStat(m_statEggCollected, -collectedButNotHatched);
+    }
 
     m_substage = SS_Restart;
     m_videoManager->clearCaptures();
