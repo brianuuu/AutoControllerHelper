@@ -7,4 +7,5 @@
 	<C_PackUp>Y,2,ASpam,200,LUp,45</C_PackUp>
 	<C_HatchInit>Nothing,80,Plus,2,LUp,20,Nothing,20,LRight,2,Nothing,20</C_HatchInit>
 	<C_MultiSelect>Minus,3,Nothing,3,Loop,1,LDown,3,DDown,3,Loop,4,A,3,Nothing,3</C_MultiSelect>
+	<C_SwapToHatch>LUp,3,DLeft,3,LDown,3,Y,3,Nothing,3,LLeft,3,Y,3,Nothing,3,LDown,3,Y,3,Nothing,3,LRight,3,DRight,3,LUp,3,Y,3,Nothing,3,LUp,3,DRight,3,B,5,Nothing,5</C_SwapToHatch>
 </SmartSVEggOperation>

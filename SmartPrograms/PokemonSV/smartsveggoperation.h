@@ -54,7 +54,8 @@ private:
     Command const C_PackUp      = 4;
     Command const C_HatchInit   = 5;
     Command const C_MultiSelect = 6;
-    Command const C_COUNT       = 7;
+    Command const C_SwapToHatch = 7;
+    Command const C_COUNT       = 8;
 
     // List of test color
     QColor const C_Color_Sandwich = QColor(239,236,221);
@@ -118,7 +119,7 @@ private:
 
     int m_missedInputRetryCount;
 
-    int m_sandwichCount; // collector mode only
+    int m_sandwichCount; // collector & shiny mode only
     int m_eggsCollected; // for counting how many eggs actually collected
     int m_eggCollectCount; // 15 times, every 2 mins in 30 mins
     bool m_eggCollectDialog; // for checking if we are able to talk to egg basket
@@ -129,9 +130,9 @@ private:
     int m_eggsHatched; // how many eggs we have hatched this session
     int m_hasPokemonCount; // counter for check if pokemon exist in party
     int m_checkShinyCount; // counter for checking shiny
-    int m_shinyFound; // how many shiny we found this session
     int m_flyAttempts;
     bool m_flySuccess; // check if we were able to fly
+    QVector<QPoint> m_shinyPositions; // how many shiny we found this session
 
     // Stats
     Stat m_statError;

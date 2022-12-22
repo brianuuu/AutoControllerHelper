@@ -39,9 +39,9 @@ void SmartSVEggOperation::reset()
     m_eggsToHatch = 0;
     m_eggsHatched = 0;
     m_checkShinyCount = 0;
-    m_shinyFound = 0;
     m_flyAttempts = 0;
     m_flySuccess = true;
+    m_shinyPositions.clear();
 }
 
 void SmartSVEggOperation::runNextState()
@@ -76,7 +76,7 @@ void SmartSVEggOperation::runNextState()
             m_eggsCollected = 0;
             m_eggColumnsHatched = 0;
             m_eggsHatched = 0;
-            m_shinyFound = 0;
+            m_shinyPositions.clear();
         }
         else if (state == S_CaptureReady)
         {
@@ -222,7 +222,9 @@ void SmartSVEggOperation::runNextState()
                 if (m_programSettings.m_operation == EOT_Collector && m_sandwichCount > 0)
                 {
                     incrementStat(m_statError);
-                    setState_error("Unable to detect sandwich menu, but there are already eggs collected, stopping program");
+                    emit printLog("Unable to detect sandwich menu, but there are already eggs collected, stopping program", LOG_ERROR);
+                    m_substage = SS_Finished;
+                    setState_runCommand("Home,2,Nothing,20");
                 }
                 else
                 {
@@ -265,8 +267,12 @@ void SmartSVEggOperation::runNextState()
         if (state == S_CommandFinished)
         {
             m_sandwichTimer.restart();
-            if (m_programSettings.m_operation == EOT_Hatcher)
+            if (m_programSettings.m_operation == EOT_Hatcher
+            || (m_programSettings.m_operation == EOT_Shiny && m_sandwichCount >= 2))
             {
+                // if shiny mode has made 2 sandwiches, it must start hatching eggs
+                m_sandwichCount = 10; // magic number for shiny mode
+
                 emit printLog("Heading up to Poco Path Lighthouse");
                 m_substage = SS_PackUp;
                 setState_runCommand(C_PackUp);
@@ -296,7 +302,9 @@ void SmartSVEggOperation::runNextState()
                 if (m_programSettings.m_operation == EOT_Collector && m_sandwichCount > 0)
                 {
                     incrementStat(m_statError);
-                    setState_error("Unable to talk to egg basket, but there are already eggs collected, stopping program");
+                    emit printLog("Unable to talk to egg basket, but there are already eggs collected, stopping program", LOG_ERROR);
+                    m_substage = SS_Finished;
+                    setState_runCommand("Home,2,Nothing,20");
                 }
                 else
                 {
@@ -308,7 +316,9 @@ void SmartSVEggOperation::runNextState()
                 if (m_eggsCollected == 0)
                 {
                     // no eggs? most likely color issue with Yes/No box, don't restart
-                    setState_error("No eggs has been collected, something went really wrong");
+                    emit printLog("No eggs has been collected, something went really wrong", LOG_ERROR);
+                    m_substage = SS_Finished;
+                    setState_runCommand("Home,2,Nothing,20");
                     break;
                 }
 
@@ -331,8 +341,27 @@ void SmartSVEggOperation::runNextState()
                 }
                 else
                 {
-                    // TODO: shiny mode
-                    setState_completed();
+                    // calculate how many columns of eggs are there
+                    m_programSettings.m_columnsToHatch = m_eggsCollected / 30 + qMin(m_eggsCollected % 30, 6);
+                    emit printLog("No. of columns to hatch: " + QString::number(m_programSettings.m_columnsToHatch));
+
+                    if (m_programSettings.m_isHatchWithSandwich && m_sandwichCount == 1)
+                    {
+                        // make more sandwich!
+                        m_substage = SS_Picnic;
+                        setState_runCommand("LUp,5,ASpam,40");
+                        m_videoManager->clearCaptures();
+                    }
+                    else
+                    {
+                        // magic number
+                        m_sandwichCount = 10;
+
+                        // this must be shiny mode
+                        emit printLog("Heading up to Poco Path Lighthouse");
+                        m_substage = SS_PackUp;
+                        setState_runCommand(C_PackUp);
+                    }
                 }
             }
             else if (timeElapsed < timeElapsedExpected)
@@ -426,7 +455,16 @@ void SmartSVEggOperation::runNextState()
             }
             else if (checkBrightnessMeanTarget(GetBoxCaptureAreaOfPos(1,1).m_rect, C_Color_Yellow, 130))
             {
-                if (m_eggColumnsHatched > 0)
+                if (m_programSettings.m_operation == EOT_Shiny && m_sandwichCount == 10)
+                {
+                    // fake more sandwich so we don't repeat this
+                    m_sandwichCount++;
+
+                    // swap 2 pokemon in party with flame body pokemon in box
+                    runToBoxCommand(m_commands[C_SwapToHatch]);
+                    m_videoManager->clearCaptures();
+                }
+                else if (m_eggColumnsHatched > 0)
                 {
                     m_missedInputRetryCount = 0;
                     m_hasPokemonCount = 0;
@@ -695,7 +733,7 @@ void SmartSVEggOperation::runNextState()
                 if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
                 {
                     // SHINY FOUND!
-                    m_shinyFound++;
+                    m_shinyPositions.push_back(QPoint(m_eggColumnsHatched, m_checkShinyCount));
                     incrementStat(m_statShinyHatched);
                     emit printLog(log + " is SHINY!!!", LOG_SUCCESS);
                 }
@@ -722,10 +760,21 @@ void SmartSVEggOperation::runNextState()
                 QString command = "A,3,Nothing,3,LUp,3,Loop,1,LRight,3,Nothing,3,Loop," + QString::number(((m_eggColumnsHatched - 1) % 6) + 1) + ",A,3,Nothing,3";
                 if (m_eggColumnsHatched >= m_programSettings.m_columnsToHatch)
                 {
-                    // TODO: shiny mode
-                    if (m_shinyFound > 0)
+                    if (!m_shinyPositions.empty())
                     {
-                        emit printLog(QString::number(m_shinyFound) + " SHINY POKEMON IS FOUND!!!", LOG_SUCCESS);
+                        emit printLog(QString::number(m_shinyPositions.size()) + " SHINY POKEMON IS FOUND!!!", LOG_SUCCESS);
+                        for (QPoint const& pos : m_shinyPositions)
+                        {
+                            emit printLog("Shiny at column " + QString::number(pos.x()) + " row " + QString::number(pos.y()), LOG_SUCCESS);
+                        }
+                    }
+                    else if (m_programSettings.m_operation == EOT_Shiny)
+                    {
+                        emit printLog("No shiny pokemon is found...restarting game");
+                        m_substage = SS_Restart;
+                        m_videoManager->clearCaptures();
+                        setState_runCommand(C_Restart);
+                        break;
                     }
                     else
                     {
@@ -839,9 +888,9 @@ void SmartSVEggOperation::runRestartCommand(QString error, bool capture)
         emit printLog(error, LOG_ERROR);
     }
 
-    if (m_shinyFound > 0)
+    if (!m_shinyPositions.empty())
     {
-        error = "An error has occurred but " + QString::number(m_shinyFound) + " SHINY Pokemon is found, preventing restart";
+        error = "An error has occurred but " + QString::number(m_shinyPositions.size()) + " SHINY Pokemon is found, preventing restart";
         if (capture)
         {
             error += ", a capture has been taken";
