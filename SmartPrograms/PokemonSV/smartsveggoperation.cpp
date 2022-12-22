@@ -231,7 +231,7 @@ void SmartSVEggOperation::runNextState()
                     runRestartCommand("Unable to detect sandwich menu, forcing restart", m_programSettings.m_isErrorCapture);
                 }
             }
-            else if (checkAverageColorMatch(A_Sandwich.m_rect, C_Color_Sandwich))
+            else if (checkBrightnessMeanTarget(A_Sandwich.m_rect, C_Color_Sandwich, 220))
             {
                 QString command = m_programSettings.m_sandwichPosX > 0 ? "DRight,2,Nothing,3,Loop,1" : "Nothing,2,Loop,1";
                 if (m_programSettings.m_sandwichPosY > 0)

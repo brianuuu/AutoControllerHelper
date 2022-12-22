@@ -58,10 +58,10 @@ private:
     Command const C_COUNT       = 8;
 
     // List of test color
-    QColor const C_Color_Sandwich = QColor(239,236,221);
-    HSVRange const C_Color_Dialog = HSVRange(170,130,20,230,190,60); // >220
+    HSVRange const C_Color_Sandwich = HSVRange(0,0,220,359,40,255); // >220
+    HSVRange const C_Color_Dialog = HSVRange(170,130,20,230,255,60); // >220
     HSVRange const C_Color_Yellow = HSVRange(30,200,200,70,255,255); // >200 (box: >130) (battle: >180)
-    HSVRange const C_Color_Green = HSVRange(100,170,200,140,230,255); // >200
+    HSVRange const C_Color_Green = HSVRange(100,170,200,140,255,255); // >200
     HSVRange const C_Color_Shiny = HSVRange(0,0,200,359,255,255); // >25
 
     // List of test point/area
