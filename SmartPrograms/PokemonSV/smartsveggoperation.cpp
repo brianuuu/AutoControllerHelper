@@ -774,7 +774,7 @@ void SmartSVEggOperation::runNextState()
                 {
                     // this happens when we have checked shiny of the previous column but unable to put down the next column of eggs
                     emit printLog("No pokemon is detected in party, attempting to put eggs to party again", LOG_WARNING);
-                    QString command = "A,3,Nothing,3,LRight,3,DDown,3,LDown,3,DLeft,3,Loop,1,LRight,3,Nothing,3,Loop," + QString::number((m_eggColumnsHatched % 6) + 1);
+                    QString command = "A,3,Nothing,3,Loop,1,LUp,3,DUp,3,Loop,4,LRight,3,Nothing,3,Loop," + QString::number((m_eggColumnsHatched % 6) + 1);
 
                     m_substage = SS_NextColumn;
                     setState_runCommand(command);
