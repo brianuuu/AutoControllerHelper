@@ -98,6 +98,7 @@ private:
         SS_CheckHasEgg,
         SS_ExitBox,
         SS_HatchEggs,
+        SS_ConfirmHatching,
         SS_Battle,
         SS_Hatching,
         SS_CheckShiny,

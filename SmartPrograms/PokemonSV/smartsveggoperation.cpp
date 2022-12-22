@@ -633,6 +633,27 @@ void SmartSVEggOperation::runNextState()
             }
             else if (checkBrightnessMeanTarget(A_Dialog.m_rect, C_Color_Dialog, 220))
             {
+                // check screen again after 0.2s in case it was a false positive
+                m_substage = SS_ConfirmHatching;
+                setState_runCommand("LRight,5");
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
+            }
+        }
+        break;
+    }
+    case SS_ConfirmHatching:
+    {
+        if (state == S_CommandFinished)
+        {
+            setState_frameAnalyzeRequest();
+        }
+        if (state == S_CaptureReady)
+        {
+            if (checkBrightnessMeanTarget(A_Dialog.m_rect, C_Color_Dialog, 220))
+            {
                 --m_eggsToHatch;
                 m_eggsHatched++;
                 incrementStat(m_statEggHatched);
@@ -643,7 +664,10 @@ void SmartSVEggOperation::runNextState()
             }
             else
             {
-                setState_frameAnalyzeRequest();
+                // false positive
+                emit printLog("Dialog box did not stay as expected, might have been a false positive detection", LOG_WARNING);
+                setState_runCommand("LRight,3750", true);
+                m_substage = SS_HatchEggs;
             }
         }
         break;
@@ -688,7 +712,7 @@ void SmartSVEggOperation::runNextState()
             }
             else
             {
-                setState_runCommand((m_substage = SS_Battle) ? "LUpRight,30,LRight,3750" : "LRight,3750",true);
+                setState_runCommand((m_substage == SS_Battle) ? "LUpRight,30,LRight,3750" : "LRight,3750", true);
                 m_substage = SS_HatchEggs;
                 m_videoManager->setAreas({A_Health,A_Battle,A_Dialog});
             }
