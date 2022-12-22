@@ -9,6 +9,8 @@ SmartBrightnessMeanFinder::SmartBrightnessMeanFinder
     QPushButton* ocrBtn,
     QLineEdit* ocrLE,
     QPushButton* ocrNumBtn,
+    QPushButton* fixedImageBtn,
+    QCheckBox* fixedImageCheck,
     SmartProgramParameter parameter
 )
     : SmartProgramBase(parameter)
@@ -19,6 +21,8 @@ SmartBrightnessMeanFinder::SmartBrightnessMeanFinder
     , m_ocrBtn(ocrBtn)
     , m_ocrLE(ocrLE)
     , m_ocrNumBtn(ocrNumBtn)
+    , m_fixedImageBtn(fixedImageBtn)
+    , m_fixedImageCheck(fixedImageCheck)
 {
     init();
 
@@ -51,6 +55,9 @@ void SmartBrightnessMeanFinder::init()
 
     connect(m_ocrNumBtn, &QPushButton::clicked, this, &SmartBrightnessMeanFinder::orcNumRequested);
     m_ocrNumRequested = false;
+
+    connect(m_fixedImageBtn, &QPushButton::clicked, this, &SmartBrightnessMeanFinder::fixedImageAdd);
+    connect(m_fixedImageCheck, &QCheckBox::stateChanged, this, &SmartBrightnessMeanFinder::fixImageStateChanged);
 }
 
 void SmartBrightnessMeanFinder::reset()
@@ -190,3 +197,25 @@ void SmartBrightnessMeanFinder::imageMatchAdd()
         }
     }*/
 }
+
+void SmartBrightnessMeanFinder::fixedImageAdd()
+{
+    QString file = QFileDialog::getOpenFileName(this, tr("Import Image"), "", "PNG file (*.png)");
+    if (file.isEmpty()) return;
+
+    QImage tempImage(file);
+    if (tempImage.width() != 1280 || tempImage.height() != 720)
+    {
+        emit printLog("Image dimension must be 1280x720", LOG_ERROR);
+        return;
+    }
+
+    m_videoManager->setFixedImage(tempImage.convertToFormat(QImage::Format_ARGB32));
+}
+
+void SmartBrightnessMeanFinder::fixImageStateChanged(int state)
+{
+    m_videoManager->setFixedImageUsed(state == Qt::Checked);
+}
+
+

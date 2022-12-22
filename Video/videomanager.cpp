@@ -5,6 +5,7 @@ VideoManager::VideoManager(QWidget *parent) : QWidget(parent)
     this->setFixedSize(640,360);
     connect(&m_displayTimer, &QTimer::timeout, this, &VideoManager::displayTimeout);
 
+    m_isUseFixedImage = false;
     m_defaultAreaEnable = false;
     m_defaultArea = CaptureArea(QRect(0,0,VIDEO_WIDTH,VIDEO_HEIGHT), QColor(255,0,0));
     stop();
@@ -18,6 +19,7 @@ void VideoManager::start()
 
         m_displayImage = QImage(VIDEO_WIDTH, VIDEO_HEIGHT, QImage::Format_ARGB32);
         m_displayImage.fill(Qt::black);
+        m_fixedImage = m_displayImage;
 
         // ~60fps (actual: 62.5fps)
         m_displayTimer.start(16);
@@ -37,6 +39,24 @@ void VideoManager::stop()
     this->hide();
 }
 
+void VideoManager::setFixedImage(const QImage &fixedImage)
+{
+    m_displayMutex.lock();
+    {
+        m_fixedImage = fixedImage;
+    }
+    m_displayMutex.unlock();
+}
+
+void VideoManager::setFixedImageUsed(bool used)
+{
+    m_displayMutex.lock();
+    {
+        m_isUseFixedImage = used;
+    }
+    m_displayMutex.unlock();
+}
+
 void VideoManager::displayTimeout()
 {
     emit timeout();
@@ -50,7 +70,7 @@ void VideoManager::pushVideoData(const unsigned char *data)
 {
     m_displayMutex.lock();
     {
-        m_displayImage = QImage(data, VIDEO_WIDTH, VIDEO_HEIGHT, QImage::Format_ARGB32);
+        m_displayImage = m_isUseFixedImage ? m_fixedImage : QImage(data, VIDEO_WIDTH, VIDEO_HEIGHT, QImage::Format_ARGB32);
     }
     m_displayMutex.unlock();
 

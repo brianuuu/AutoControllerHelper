@@ -58,6 +58,8 @@ public:
     void stop();
 
     // Input
+    void setFixedImage(QImage const& fixedImage);
+    void setFixedImageUsed(bool used);
     void pushVideoData(unsigned char const* data);
 
     // Output
@@ -92,6 +94,9 @@ private:
     QMutex  m_displayMutex;
     QTimer  m_displayTimer;
     QImage  m_displayImage;
+
+    bool    m_isUseFixedImage;
+    QImage  m_fixedImage;
 
     // Capture areas/points
     bool        m_defaultAreaEnable;

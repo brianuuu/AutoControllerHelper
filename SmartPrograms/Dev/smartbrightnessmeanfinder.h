@@ -1,6 +1,7 @@
 #ifndef SMARTBRIGHTNESSMEANFINDER_H
 #define SMARTBRIGHTNESSMEANFINDER_H
 
+#include <QCheckBox>
 #include <QLineEdit>
 #include <QSpinBox>
 #include <QWidget>
@@ -17,6 +18,8 @@ public:
             QPushButton* ocrBtn,
             QLineEdit* ocrLE,
             QPushButton* ocrNumBtn,
+            QPushButton* fixedImageBtn,
+            QCheckBox* fixedImageCheck,
             SmartProgramParameter parameter
             );
 
@@ -26,6 +29,8 @@ public slots:
     void imageMatchAdd();
     void orcRequested() { m_ocrRequested = true; }
     void orcNumRequested() { m_ocrNumRequested = true; }
+    void fixedImageAdd();
+    void fixImageStateChanged(int state);
 
 private:
     virtual void init();
@@ -61,6 +66,9 @@ private:
 
     bool m_ocrNumRequested;
     QPushButton* m_ocrNumBtn;
+
+    QPushButton* m_fixedImageBtn;
+    QCheckBox* m_fixedImageCheck;
 };
 
 #endif // SMARTBRIGHTNESSMEANFINDER_H
