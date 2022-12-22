@@ -43,6 +43,7 @@ SOURCES += \
     SmartPrograms/PokemonPLA/smartplaresetalphapokemon.cpp \
     SmartPrograms/PokemonPLA/smartplastaticspawn.cpp \
     SmartPrograms/PokemonSV/smartsvboxrelease.cpp \
+    SmartPrograms/PokemonSV/smartsvboxreleasesafe.cpp \
     SmartPrograms/PokemonSV/smartsveggoperation.cpp \
     SmartPrograms/PokemonSV/smartsvsurprisetrade.cpp \
     SmartPrograms/PokemonSwSh/smartberryfarmer.cpp \
@@ -91,6 +92,7 @@ HEADERS += \
     SmartPrograms/PokemonPLA/smartplaresetalphapokemon.h \
     SmartPrograms/PokemonPLA/smartplastaticspawn.h \
     SmartPrograms/PokemonSV/smartsvboxrelease.h \
+    SmartPrograms/PokemonSV/smartsvboxreleasesafe.h \
     SmartPrograms/PokemonSV/smartsveggoperation.h \
     SmartPrograms/PokemonSV/smartsvsurprisetrade.h \
     SmartPrograms/PokemonSwSh/smartberryfarmer.h \

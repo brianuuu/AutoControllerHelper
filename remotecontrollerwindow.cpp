@@ -1983,6 +1983,13 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
         ui->SPGeneric1_Count->setRange(1,960);
         break;
     }
+    case SP_SV_BoxReleaseSafe:
+    {
+        ui->SPGeneric1_Note->setText("");
+        ui->SPGeneric1_Label->setText("No. of Boxes to Release:");
+        ui->SPGeneric1_Count->setRange(1,32);
+        break;
+    }
     default: break;
     }
 
@@ -2335,6 +2342,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     case SP_SV_BoxRelease:
     {
         m_smartProgram = new SmartSVBoxRelease(ui->SPGeneric1_Count->value(), parameter);
+        break;
+    }
+    case SP_SV_BoxReleaseSafe:
+    {
+        m_smartProgram = new SmartSVBoxReleaseSafe(ui->SPGeneric1_Count->value(), parameter);
         break;
     }
     case SP_SV_EggOperation:

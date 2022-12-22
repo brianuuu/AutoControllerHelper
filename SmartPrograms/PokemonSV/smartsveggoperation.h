@@ -36,6 +36,10 @@ public:
 
     virtual SmartProgram getProgramEnum() { return SP_SV_EggOperation; }
 
+    // static public functions
+    static CaptureArea const GetBoxCaptureAreaOfPos(int x, int y);
+    static CaptureArea const GetPartyCaptureAreaOfPos(int y);
+
 private:
     virtual void init();
     virtual void reset();
@@ -43,8 +47,6 @@ private:
     void runRestartCommand(QString error = "", bool capture = false);
     void runPicnicCommand();
     void runToBoxCommand(QString command = "");
-    static CaptureArea const GetBoxCaptureAreaOfPos(int x, int y);
-    static CaptureArea const GetPartyCaptureAreaOfPos(int y);
 
     // Command indices
     Command const C_Restart     = 0;
