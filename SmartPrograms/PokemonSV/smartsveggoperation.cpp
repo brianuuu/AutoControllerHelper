@@ -44,6 +44,7 @@ void SmartSVEggOperation::reset()
     m_shinyPositions.clear();
 
     m_shinySoundID = -1;
+    m_shinySoundDetected = false;
 }
 
 void SmartSVEggOperation::runNextState()
@@ -64,11 +65,11 @@ void SmartSVEggOperation::runNextState()
         m_substage = SS_Restart;
         setState_runCommand(C_Restart);
 
+        m_shinySoundDetected = false;
         if (m_programSettings.m_isShinyDetection)
         {
             // Setup sound detection
             m_shinySoundID = m_audioManager->addDetection("PokemonSV/ShinySFXHatch", 0.2f, 5000);
-            m_shinySoundDetected = false;
             connect(m_audioManager, &AudioManager::soundDetected, this, &SmartSVEggOperation::soundDetected);
         }
         break;
