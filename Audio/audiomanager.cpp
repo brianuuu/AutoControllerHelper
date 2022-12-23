@@ -446,6 +446,19 @@ void AudioManager::doDetection()
     }
 }
 
+bool AudioManager::hasDetection(int id)
+{
+    for (AudioFileHolder* holder : m_detectingSounds)
+    {
+        if (holder->getID() == id)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void AudioManager::stopDetection(int id)
 {
     // If specified ID, just remove that one

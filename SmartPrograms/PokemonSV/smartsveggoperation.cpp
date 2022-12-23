@@ -42,6 +42,8 @@ void SmartSVEggOperation::reset()
     m_flyAttempts = 0;
     m_flySuccess = true;
     m_shinyPositions.clear();
+
+    m_shinySoundID = -1;
 }
 
 void SmartSVEggOperation::runNextState()
@@ -61,6 +63,14 @@ void SmartSVEggOperation::runNextState()
 
         m_substage = SS_Restart;
         setState_runCommand(C_Restart);
+
+        if (m_programSettings.m_isShinyDetection)
+        {
+            // Setup sound detection
+            m_shinySoundID = m_audioManager->addDetection("PokemonSV/ShinySFXHatch", 0.2f, 5000);
+            m_shinySoundDetected = false;
+            connect(m_audioManager, &AudioManager::soundDetected, this, &SmartSVEggOperation::soundDetected);
+        }
         break;
     }
     case SS_Restart:
@@ -271,7 +281,7 @@ void SmartSVEggOperation::runNextState()
             || (m_programSettings.m_operation == EOT_Shiny && m_sandwichCount >= 2))
             {
                 // if shiny mode has made 2 sandwiches, it must start hatching eggs
-                m_sandwichCount = 10; // magic number for shiny mode
+                m_sandwichCount = qMax(m_sandwichCount, 10);
 
                 emit printLog("Heading up to Poco Path Lighthouse");
                 m_substage = SS_PackUp;
@@ -341,6 +351,7 @@ void SmartSVEggOperation::runNextState()
                 }
                 else
                 {
+                    // must be shiny mode
                     // calculate how many columns of eggs are there
                     m_programSettings.m_columnsToHatch = (m_eggsCollected / 30) * 6 + qMin(m_eggsCollected % 30, 6);
                     emit printLog("No. of columns to hatch: " + QString::number(m_programSettings.m_columnsToHatch));
@@ -354,8 +365,9 @@ void SmartSVEggOperation::runNextState()
                     }
                     else
                     {
-                        // magic number
-                        m_sandwichCount = 10;
+                        // magic number for swapping team with Flame Body pokemon
+                        // but don't set to 10 if it has already done so
+                        m_sandwichCount = qMax(m_sandwichCount, 10);
 
                         // this must be shiny mode
                         emit printLog("Heading up to Poco Path Lighthouse");
@@ -519,6 +531,7 @@ void SmartSVEggOperation::runNextState()
                 if (checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Yellow, 200))
                 {
                     emit printLog("Hatching column " + QString::number(m_eggColumnsHatched + 1) + " with " + QString::number(m_eggsToHatch) + " eggs");
+                    m_eggsToHatchColumn = m_eggsToHatch;
                     m_substage = SS_ExitBox;
                     setState_runCommand("B,5,Nothing,5");
                 }
@@ -661,6 +674,12 @@ void SmartSVEggOperation::runNextState()
                 m_substage = SS_Hatching;
                 setState_runCommand("ASpam,450");
                 m_videoManager->clearCaptures();
+
+                // sound detection
+                if (m_programSettings.m_isShinyDetection)
+                {
+                    m_audioManager->startDetection(m_shinySoundID);
+                }
             }
             else
             {
@@ -677,7 +696,24 @@ void SmartSVEggOperation::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            if (m_eggsToHatch <= 0)
+            // sound detection
+            if (m_programSettings.m_isShinyDetection && m_audioManager->hasDetection(m_shinySoundID))
+            {
+                m_audioManager->stopDetection(m_shinySoundID);
+            }
+
+            if (m_shinySoundDetected)
+            {
+                incrementStat(m_statShinyHatched);
+                setState_runCommand("Capture,22");
+                m_shinySoundDetected = false;
+
+                QPoint pos(m_eggColumnsHatched + 1, m_eggsToHatchColumn - m_eggsToHatch);
+                QString log = "Column " + QString::number(pos.x()) + " row " + QString::number(pos.y());
+                emit printLog(log + " is SHINY!!! Capturing video!", LOG_SUCCESS);
+                m_shinyPositions.push_back(pos);
+            }
+            else if (m_eggsToHatch <= 0)
             {
                 m_eggColumnsHatched++;
                 if (m_programSettings.m_isHatchWithSandwich && m_sandwichTimer.elapsed() > 30 * 60 * 1000)
@@ -756,10 +792,18 @@ void SmartSVEggOperation::runNextState()
                 m_hasPokemonCount++;
                 if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
                 {
-                    // SHINY FOUND!
-                    m_shinyPositions.push_back(QPoint(m_eggColumnsHatched, m_checkShinyCount));
-                    incrementStat(m_statShinyHatched);
-                    emit printLog(log + " is SHINY!!!", LOG_SUCCESS);
+                    QPoint pos(m_eggColumnsHatched, m_checkShinyCount);
+                    if (m_shinyPositions.contains(pos))
+                    {
+                        emit printLog(log + " is SHINY!!! But we already know that ;)");
+                    }
+                    else
+                    {
+                        // SHINY FOUND!
+                        m_shinyPositions.push_back(pos);
+                        incrementStat(m_statShinyHatched);
+                        emit printLog(log + " is SHINY!!!", LOG_SUCCESS);
+                    }
                 }
                 else
                 {
@@ -1012,4 +1056,14 @@ const CaptureArea SmartSVEggOperation::GetPartyCaptureAreaOfPos(int y)
 
     y--;
     return CaptureArea(29, 138 + y * 84, 10, 70);
+}
+
+void SmartSVEggOperation::soundDetected(int id)
+{
+    if (id != m_shinySoundID) return;
+
+    if (m_substage == SS_Hatching)
+    {
+        m_shinySoundDetected = true;
+    }
 }

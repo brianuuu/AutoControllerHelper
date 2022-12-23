@@ -49,6 +49,7 @@ public:
     int addDetection(QString const& fileName, float minScore, int lowFreqFilter);
     void startDetection(int id);
     void doDetection();
+    bool hasDetection(int id);
     void stopDetection(int id = 0);
 
 protected:

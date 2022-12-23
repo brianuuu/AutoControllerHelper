@@ -40,6 +40,9 @@ public:
     static CaptureArea const GetBoxCaptureAreaOfPos(int x, int y);
     static CaptureArea const GetPartyCaptureAreaOfPos(int y);
 
+private slots:
+    void soundDetected(int id);
+
 private:
     virtual void init();
     virtual void reset();
@@ -103,6 +106,7 @@ private:
         SS_ConfirmHatching,
         SS_Battle,
         SS_Hatching,
+        SS_ShinyCapture,
         SS_CheckShiny,
         SS_NextColumn,
         SS_Fly,
@@ -129,13 +133,17 @@ private:
     bool m_eggCollectDetected; // for detecting Yes/No when collecting eggs
 
     int m_eggColumnsHatched;
-    int m_eggsToHatch; // how many eggs we hatching for this loop? mostly 5 except last column
+    int m_eggsToHatch; // how many eggs we still need to hatch for the current column?
+    int m_eggsToHatchColumn; // hatching for this loop? mostly 5 except last column (does not change)
     int m_eggsHatched; // how many eggs we have hatched this session
     int m_hasPokemonCount; // counter for check if pokemon exist in party
     int m_checkShinyCount; // counter for checking shiny
     int m_flyAttempts;
     bool m_flySuccess; // check if we were able to fly
     QVector<QPoint> m_shinyPositions; // how many shiny we found this session
+
+    int m_shinySoundID;
+    bool m_shinySoundDetected;
 
     // Stats
     Stat m_statError;
