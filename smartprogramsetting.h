@@ -39,6 +39,7 @@ public:
     // System
     bool isPreventUpdate();
     DateArrangement getDateArrangement();
+    QDate getDate();
     GameLanguage getGameLanguage();
     bool ensureTrainedDataExist();
 

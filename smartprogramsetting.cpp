@@ -83,6 +83,11 @@ DateArrangement SmartProgramSetting::getDateArrangement()
     return (DateArrangement)ui->CB_DateArrangement->currentIndex();
 }
 
+QDate SmartProgramSetting::getDate()
+{
+    return ui->CurrentDate->date();
+}
+
 GameLanguage SmartProgramSetting::getGameLanguage()
 {
     return (GameLanguage)ui->CB_GameLanguage->currentIndex();
