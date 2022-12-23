@@ -101,7 +101,12 @@ void SmartSVBoxReleaseSafe::runNextState()
             {
                 m_fixAttempt = 0;
                 QString command = "Box " + QString::number(m_currentBox) + " column " + QString::number(m_posToRelease.x()) + " row " + QString::number(m_posToRelease.y()) + ": ";
-                if (checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Yellow, 200))
+                if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
+                {
+                    emit printLog(command + "SHINY pokemon, NOT releasing", LOG_ERROR);
+                    runCommandToNextTarget();
+                }
+                else if (checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Yellow, 200))
                 {
                     emit printLog(command + "Releasing...");
                     m_substage = SS_Release1;
@@ -235,7 +240,7 @@ void SmartSVBoxReleaseSafe::runNextState()
 
 void SmartSVBoxReleaseSafe::setAreaAllPosition()
 {
-    QVector<CaptureArea> areas{A_Pokemon};
+    QVector<CaptureArea> areas{A_Pokemon, A_Shiny};
     for (int i = 1; i <= 6; i++)
     {
         areas.push_back(SmartSVEggOperation::GetPartyCaptureAreaOfPos(i));

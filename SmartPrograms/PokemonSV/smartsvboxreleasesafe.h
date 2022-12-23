@@ -33,11 +33,13 @@ private:
 
     // List of test color
     HSVRange const C_Color_Yellow = HSVRange(30,200,200,70,255,255); // >200 (box: >130)
+    HSVRange const C_Color_Shiny = HSVRange(0,0,200,359,255,255); // >25
 
     // List of test point/area
     CaptureArea const A_Pokemon = CaptureArea(836,4,21,46);
     CaptureArea const A_Yes = CaptureArea(1098,430,60,30);
     CaptureArea const A_Box = CaptureArea(1110,226,100,30);
+    CaptureArea const A_Shiny = CaptureArea(1126,60,30,30);
 
     // Substages
     enum Substage : uint8_t
