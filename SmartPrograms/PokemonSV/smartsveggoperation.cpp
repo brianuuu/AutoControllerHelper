@@ -85,6 +85,7 @@ void SmartSVEggOperation::runNextState()
             m_missedInputRetryCount = 0;
             m_sandwichCount = 0;
             m_eggsCollected = 0;
+            m_eggsRejected = 0;
             m_eggColumnsHatched = 0;
             m_eggsHatched = 0;
             m_shinyPositions.clear();
@@ -294,8 +295,10 @@ void SmartSVEggOperation::runNextState()
                 m_eggCollectCount = 0;
                 m_eggCollectDialog = false;
                 m_eggCollectDetected = false;
+                m_eggRejectDetected = false;
+                m_eggsRejected = 0;
                 m_timer.restart();
-                m_videoManager->setAreas({A_Dialog,A_Yes});
+                m_videoManager->setAreas({A_Dialog,A_Yes,A_No});
                 runNextStateContinue();
             }
         }
@@ -395,7 +398,26 @@ void SmartSVEggOperation::runNextState()
             {
                 emit printLog("Successfully talked to egg basket!");
                 m_eggCollectDialog = true;
-                m_videoManager->setAreas({A_Yes});
+                m_videoManager->setAreas({A_Yes,A_No});
+            }
+
+            // detect rejecting egg, but refuse to send to academy
+            bool isNoDetected = checkBrightnessMeanTarget(A_Yes.m_rect, C_Color_Yellow, 200);
+            if (!m_eggRejectDetected && isNoDetected)
+            {
+                m_eggsRejected++;
+                m_eggRejectDetected = true;
+
+                if (m_eggsRejected % 2 == 0)
+                {
+                    emit printLog("Two 'No' has been detected when collecting eggs, meaning we got 1 egg instead of 2", LOG_WARNING);
+                    incrementStat(m_statEggCollected, -1);
+                    m_eggsCollected--;
+                }
+            }
+            else if (m_eggRejectDetected && !isNoDetected)
+            {
+                 m_eggRejectDetected = false;
             }
 
             // detect how many eggs collected

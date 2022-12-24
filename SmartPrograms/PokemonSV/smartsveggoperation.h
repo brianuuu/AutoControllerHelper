@@ -74,6 +74,7 @@ private:
     CaptureArea const A_Sandwich = CaptureArea(1080,260,160,100);
     CaptureArea const A_Dialog = CaptureArea(800,596,100,40);
     CaptureArea const A_Yes = CaptureArea(1076,406,80,40);
+    CaptureArea const A_No = CaptureArea(1076,459,80,40);
     CaptureArea const A_Pokemon = CaptureArea(836,4,21,46);
     CaptureArea const A_Box = CaptureArea(1110,226,100,30);
     CaptureArea const A_Picnic = CaptureArea(1110,280,100,30);
@@ -127,9 +128,11 @@ private:
 
     int m_sandwichCount; // collector & shiny mode only
     int m_eggsCollected; // for counting how many eggs actually collected
+    int m_eggsRejected; // when rejecting egg, but twice means we get one anyway
     int m_eggCollectCount; // 15 times, every 2 mins in 30 mins
     bool m_eggCollectDialog; // for checking if we are able to talk to egg basket
-    bool m_eggCollectDetected; // for detecting Yes/No when collecting eggs
+    bool m_eggCollectDetected; // for detecting Yes when collecting eggs
+    bool m_eggRejectDetected; // for detecting No when collecting eggs
 
     int m_eggColumnsHatched;
     int m_eggsToHatch; // how many eggs we still need to hatch for the current column?
