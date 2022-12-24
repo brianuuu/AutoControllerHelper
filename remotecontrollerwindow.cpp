@@ -2363,6 +2363,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartSVEggOperation(settings, parameter);
         break;
     }
+    case SP_SV_GimmighoulFarmer:
+    {
+        m_smartProgram = new SmartSVGimmighoulFarmer(parameter);
+        break;
+    }
     default:
     {
         QMessageBox::critical(this, "Error", "No code exist for this Smart Program!");

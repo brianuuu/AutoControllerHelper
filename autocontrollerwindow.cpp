@@ -57,6 +57,7 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_programEnumMap["SV_EggCollector"]     = P_SV_EggCollector;
     m_programEnumMap["SV_EggHatcher"]       = P_SV_EggHatcher;
     m_programEnumMap["SV_BoxRelease"]       = P_SV_BoxRelease;
+    m_programEnumMap["SV_GimmighoulFarmer"] = P_SV_GimmighoulFarmer;
 
     m_tabID[P_DaySkipper]           = 1;
     m_tabID[P_DaySkipper_Unlimited] = 2;
@@ -101,6 +102,7 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_tabID[P_SV_EggCollector]      = 5;
     m_tabID[P_SV_EggHatcher]        = 12;
     m_tabID[P_SV_BoxRelease]        = 7;
+    m_tabID[P_SV_GimmighoulFarmer]  = 9;
 
     if (!QDir(HEX_PATH).exists())
     {
@@ -1071,7 +1073,7 @@ void autocontrollerwindow::LoadConfig()
             && program != P_SV_BoxRelease
     );
     ui->GB_AutoFossil->setHidden(program != P_AutoFossil && program != P_AutoFossil_GR);
-    ui->GB_Auto3DaySkipper->setHidden(program != P_Auto3DaySkipper);
+    ui->GB_Auto3DaySkipper->setHidden(program != P_Auto3DaySkipper && program != P_SV_GimmighoulFarmer);
     ui->GB_BoxSurpriseTrade->setHidden(program != P_BoxSurpriseTrade);
     ui->GB_AutoHost->setHidden(program != P_AutoHost);
     ui->GB_EggHatcher->setHidden(program != P_EggHatcher);
@@ -1252,6 +1254,7 @@ void autocontrollerwindow::LoadConfig()
 
     //--------------------------------------------------------
     case P_Auto3DaySkipper:
+    case P_SV_GimmighoulFarmer:
     {
         QTextStream in(&configFile);
         while (!in.atEnd())
@@ -1833,6 +1836,7 @@ void autocontrollerwindow::SaveConfig()
 
     //--------------------------------------------------------
     case P_Auto3DaySkipper:
+    case P_SV_GimmighoulFarmer:
     {
         out << "uint8_t m_JP_EU_US = " << QString::number(ui->Auto3DaySkipper_DateArrangement->currentIndex()) << ";\n";
         break;
@@ -2519,6 +2523,14 @@ void autocontrollerwindow::UpdateInfo()
     case P_SV_BoxRelease:
     {
         info = "Program Duration: " + GetTimeString(name, ui->Generic1_Count->value());
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_SV_GimmighoulFarmer:
+    {
+        info = "Time per soft-reset: " + GetTimeString(name, 0);
+        info += "\nEach reset does not guarantee encountering Gimmighoul!";
         break;
     }
 

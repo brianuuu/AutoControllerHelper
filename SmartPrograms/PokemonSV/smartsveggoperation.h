@@ -106,7 +106,6 @@ private:
         SS_ConfirmHatching,
         SS_Battle,
         SS_Hatching,
-        SS_ShinyCapture,
         SS_CheckShiny,
         SS_NextColumn,
         SS_Fly,

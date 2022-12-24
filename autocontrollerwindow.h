@@ -195,6 +195,7 @@ private:
         P_SV_EggCollector,
         P_SV_EggHatcher,
         P_SV_BoxRelease,
+        P_SV_GimmighoulFarmer,
 
         P_INVALID
     };

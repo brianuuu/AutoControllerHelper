@@ -68,6 +68,7 @@
 #include "SmartPrograms/PokemonSV/smartsvboxrelease.h"
 #include "SmartPrograms/PokemonSV/smartsvboxreleasesafe.h"
 #include "SmartPrograms/PokemonSV/smartsveggoperation.h"
+#include "SmartPrograms/PokemonSV/smartsvgimmighoulfarmer.h"
 
 #include "SmartPrograms/Widgets/pokemonautofilllineedit.h"
 
