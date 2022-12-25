@@ -496,6 +496,7 @@ void SmartSVEggOperation::runNextState()
                     m_sandwichCount++;
 
                     // swap 2 pokemon in party with flame body pokemon in box
+                    emit printLog("Swapping 2 Pokemon in party with Flame Body Pokemon in Box");
                     runToBoxCommand(m_commands[C_SwapToHatch]);
                     m_videoManager->clearCaptures();
                 }
