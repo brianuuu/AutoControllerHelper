@@ -402,7 +402,7 @@ void SmartSVEggOperation::runNextState()
             }
 
             // detect rejecting egg, but refuse to send to academy
-            bool isNoDetected = checkBrightnessMeanTarget(A_Yes.m_rect, C_Color_Yellow, 200);
+            bool isNoDetected = checkBrightnessMeanTarget(A_No.m_rect, C_Color_Yellow, 200);
             if (!m_eggRejectDetected && isNoDetected)
             {
                 m_eggsRejected++;
