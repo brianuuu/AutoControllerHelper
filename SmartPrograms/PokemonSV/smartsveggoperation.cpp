@@ -282,12 +282,20 @@ void SmartSVEggOperation::runNextState()
             if (m_programSettings.m_operation == EOT_Hatcher
             || (m_programSettings.m_operation == EOT_Shiny && m_sandwichCount >= 2))
             {
+                Command commandIndex = C_PackUp2;
+                if (m_programSettings.m_operation == EOT_Shiny && m_sandwichCount < 10)
+                {
+                    // if shiny mode and m_sandwichCount is >=2 but not >=10
+                    // that means we are further away from lighthouse
+                    commandIndex = C_PackUp;
+                }
+
                 // if shiny mode has made 2 sandwiches, it must start hatching eggs
                 m_sandwichCount = qMax(m_sandwichCount, 10);
 
                 emit printLog("Heading up to Poco Path Lighthouse");
                 m_substage = SS_PackUp;
-                setState_runCommand(C_PackUp);
+                setState_runCommand(commandIndex);
             }
             else
             {
@@ -755,7 +763,7 @@ void SmartSVEggOperation::runNextState()
                             emit printLog("30 minutes passed, attempt making another sandwich");
                         }
                         m_substage = SS_Fly;
-                        setState_runCommand(C_Fly, true);
+                        setState_runCommand(m_flyAttempts % 2 == 0 ? C_Fly : C_Fly2, true);
                         m_flySuccess = false;
                         m_videoManager->setAreas({A_Title});
                         break;
@@ -926,9 +934,9 @@ void SmartSVEggOperation::runNextState()
             else
             {
                 m_flyAttempts++;
-                if (m_flyAttempts >= 3)
+                if (m_flyAttempts >= 4)
                 {
-                    emit printLog("Failed 3 flying attempts, will try again next cycle...", LOG_WARNING);
+                    emit printLog("Failed 4 flying attempts, will try again next cycle...", LOG_WARNING);
                     runToBoxCommand("Y,1,Nothing,1,Loop,3,Nothing,20,Loop,1,X,1,Nothing,1,Loop,3");
                 }
                 else
@@ -1036,7 +1044,18 @@ void SmartSVEggOperation::runPicnicCommand()
 
     // make sandwich before hatching
     m_substageAfterMainMenu = SS_Picnic;
-    m_commandAfterMainMenu = m_commands[C_Picnic];
+
+    if (m_sandwichCount == 0 && m_programSettings.m_operation != EOT_Hatcher)
+    {
+        // for collector/shiny mode, we have to walk around to talk to egg basket
+        m_commandAfterMainMenu = m_commands[C_Picnic];
+    }
+    else
+    {
+        // for hatcher mode or when shiny mode is hatching eggs, just walk forward to make sandwich faster
+        m_commandAfterMainMenu = m_commands[C_Picnic2];
+    }
+
     m_isToBoxAfterMainMenu = false;
 }
 

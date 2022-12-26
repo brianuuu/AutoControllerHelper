@@ -54,13 +54,16 @@ private:
     // Command indices
     Command const C_Restart     = 0;
     Command const C_Picnic      = 1;
-    Command const C_Fly         = 2;
-    Command const C_Sandwich    = 3;
-    Command const C_PackUp      = 4;
-    Command const C_HatchInit   = 5;
-    Command const C_MultiSelect = 6;
-    Command const C_SwapToHatch = 7;
-    Command const C_COUNT       = 8;
+    Command const C_Picnic2     = 2;
+    Command const C_Fly         = 3;
+    Command const C_Fly2        = 4;
+    Command const C_Sandwich    = 5;
+    Command const C_PackUp      = 6;
+    Command const C_PackUp2     = 7;
+    Command const C_HatchInit   = 8;
+    Command const C_MultiSelect = 9;
+    Command const C_SwapToHatch = 10;
+    Command const C_COUNT       = 11;
 
     // List of test color
     HSVRange const C_Color_Sandwich = HSVRange(0,0,220,359,40,255); // >220
