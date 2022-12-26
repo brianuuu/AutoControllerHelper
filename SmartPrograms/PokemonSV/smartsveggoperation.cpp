@@ -929,7 +929,7 @@ void SmartSVEggOperation::runNextState()
                 if (m_flyAttempts >= 3)
                 {
                     emit printLog("Failed 3 flying attempts, will try again next cycle...", LOG_WARNING);
-                    runToBoxCommand("B,2,Nothing,20,X,2");
+                    runToBoxCommand("Y,1,Nothing,1,Loop,3,Nothing,20,Loop,1,X,1,Nothing,1,Loop,3");
                 }
                 else
                 {
@@ -977,16 +977,16 @@ void SmartSVEggOperation::runRestartCommand(QString error, bool capture)
     incrementStat(m_statError);
     if (!error.isEmpty())
     {
+        if (capture)
+        {
+            error += ", a capture has been taken";
+        }
         emit printLog(error, LOG_ERROR);
     }
 
     if (!m_shinyPositions.empty())
     {
         error = "An error has occurred but " + QString::number(m_shinyPositions.size()) + " SHINY Pokemon is found, preventing restart";
-        if (capture)
-        {
-            error += ", a capture has been taken";
-        }
         emit printLog(error);
         m_substage = SS_Finished;
         setState_runCommand(capture ? "Capture,22,Nothing,200" : "Nothing,10");
@@ -996,10 +996,6 @@ void SmartSVEggOperation::runRestartCommand(QString error, bool capture)
     if (m_programSettings.m_operation == EOT_Hatcher && m_eggColumnsHatched > 0)
     {
         error = "An error has occurred but " + QString::number(m_eggColumnsHatched) + " column(s) of eggs has been hatched, preventing restart";
-        if (capture)
-        {
-            error += ", a capture has been taken";
-        }
         emit printLog(error);
         m_substage = SS_Finished;
         setState_runCommand(capture ? "Capture,22,Nothing,200" : "Nothing,10");
@@ -1035,7 +1031,7 @@ void SmartSVEggOperation::runPicnicCommand()
 {
     // go picnic!
     m_substage = SS_MainMenu;
-    setState_runCommand("Nothing,30,L,3,X,3");
+    setState_runCommand("Nothing,30,L,3,Loop,1,X,1,Nothing,1,Loop,3");
     m_videoManager->clearCaptures();
 
     // make sandwich before hatching
@@ -1049,7 +1045,7 @@ void SmartSVEggOperation::runToBoxCommand(QString command)
     m_missedInputRetryCount = 0;
 
     m_substage = SS_MainMenu;
-    setState_runCommand(command.isEmpty() ? "X,3" : command);
+    setState_runCommand(command.isEmpty() ? "X,1,Nothing,1,Loop,3" : command);
     m_videoManager->clearCaptures();
 
     m_substageAfterMainMenu = SS_ToBox;
