@@ -510,7 +510,6 @@ void SmartSVEggOperation::runNextState()
                 }
                 else if (m_eggColumnsHatched > 0)
                 {
-                    m_missedInputRetryCount = 0;
                     m_hasPokemonCount = 0;
                     m_substage = SS_CheckShiny;
                     setState_runCommand("LLeft,3,DDown,3,Minus,3,Nothing,20");
@@ -528,7 +527,6 @@ void SmartSVEggOperation::runNextState()
                 }
                 else
                 {
-                    //m_missedInputRetryCount = 0; // now set in runToBoxCommand()
                     m_eggsToHatch = 5;
                     m_substage = SS_CheckHasEgg;
                     setState_runCommand(m_commands[C_MultiSelect] + ",LLeft,3,LDown,3,A,3,Nothing,3,Loop,1,LDown,3,DDown,3,Loop,4,Nothing,20");
@@ -803,8 +801,29 @@ void SmartSVEggOperation::runNextState()
                 {
                     m_checkShinyCount--;
                     m_missedInputRetryCount++;
-                    emit printLog("Unable to detect cursor on current party, input might be missed, retrying...", LOG_WARNING);
-                    setState_runCommand("DDown,3,Nothing,20");
+
+                    if (m_checkShinyCount == 0)
+                    {
+                        // 2nd slot in the party, "LLeft,3,DDown,3,Minus,3,Nothing,20"
+                        // if we miss LLeft or DDown it will not end up correct spot, exit box and try again
+                        // if Minus is missed...? it won't be handled here
+                        // right after puting eggs to party
+                        emit printLog("Unable to detect cursor on current party, input might be missed, exiting Box and retrying...", LOG_WARNING);
+
+                        // don't call runToBoxCommand() so it doesn't reset m_missedInputRetryCount
+                        m_substage = SS_MainMenu;
+                        setState_runCommand("B,5,Nothing,5,Loop,2");
+                        m_videoManager->clearCaptures();
+
+                        m_substageAfterMainMenu = SS_ToBox;
+                        m_commandAfterMainMenu = "ASpam,10,Nothing,20";
+                        m_isToBoxAfterMainMenu = true;
+                    }
+                    else
+                    {
+                        emit printLog("Unable to detect cursor on current party, input might be missed, retrying...", LOG_WARNING);
+                        setState_runCommand("DDown,3,Nothing,20");
+                    }
                 }
                 else
                 {
