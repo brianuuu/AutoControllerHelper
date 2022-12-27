@@ -1932,7 +1932,7 @@
                  </sizepolicy>
                 </property>
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>18</number>
                 </property>
                 <widget class="QWidget" name="page">
                  <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -2023,7 +2023,7 @@ Some programs may require settings like &quot;Game Language&quot; or
                      <property name="geometry">
                       <rect>
                        <x>0</x>
-                       <y>-74</y>
+                       <y>0</y>
                        <width>438</width>
                        <height>309</height>
                       </rect>
@@ -2397,8 +2397,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>252</width>
-                       <height>125</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -2572,8 +2572,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>279</width>
-                       <height>102</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -2705,8 +2705,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>120</width>
-                       <height>66</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -2827,8 +2827,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>405</width>
-                       <height>158</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -2980,8 +2980,8 @@ check the manual</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>318</width>
-                       <height>56</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_19">
@@ -3081,8 +3081,8 @@ check the manual</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>289</width>
-                       <height>57</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_22">
@@ -3185,8 +3185,8 @@ check the manual</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>392</width>
-                       <height>137</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_24">
@@ -4438,6 +4438,83 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                          <size>
                           <width>20</width>
                           <height>140</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </widget>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+                <widget class="QWidget" name="page_18">
+                 <layout class="QVBoxLayout" name="verticalLayout_46">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QScrollArea" name="scrollArea_20">
+                    <property name="frameShape">
+                     <enum>QFrame::Panel</enum>
+                    </property>
+                    <property name="lineWidth">
+                     <number>2</number>
+                    </property>
+                    <property name="widgetResizable">
+                     <bool>true</bool>
+                    </property>
+                    <widget class="QWidget" name="scrollAreaWidgetContents_20">
+                     <property name="geometry">
+                      <rect>
+                       <x>0</x>
+                       <y>0</y>
+                       <width>448</width>
+                       <height>210</height>
+                      </rect>
+                     </property>
+                     <layout class="QVBoxLayout" name="verticalLayout_47">
+                      <item>
+                       <widget class="QLabel" name="label_75">
+                        <property name="text">
+                         <string>Note: If the name has non-English characters, you must change the
+Game Language in General Settings, otherwise it will not be properly detected
+
+Enter the Trade Partner:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="SP18_LE_Name"/>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="SP18_CB_Spam">
+                        <property name="text">
+                         <string>Spam A to trade when the correct Trade Partner is found</string>
+                        </property>
+                        <property name="checked">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="verticalSpacer_17">
+                        <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>20</width>
+                          <height>40</height>
                          </size>
                         </property>
                        </spacer>

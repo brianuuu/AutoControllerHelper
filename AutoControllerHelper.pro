@@ -47,6 +47,7 @@ SOURCES += \
     SmartPrograms/PokemonSV/smartsveggoperation.cpp \
     SmartPrograms/PokemonSV/smartsvgimmighoulfarmer.cpp \
     SmartPrograms/PokemonSV/smartsvsurprisetrade.cpp \
+    SmartPrograms/PokemonSV/smartsvtradepartnerfinder.cpp \
     SmartPrograms/PokemonSwSh/smartberryfarmer.cpp \
     SmartPrograms/PokemonSwSh/smartdailyhighlight.cpp \
     SmartPrograms/PokemonSwSh/smartdayskipper.cpp \
@@ -97,6 +98,7 @@ HEADERS += \
     SmartPrograms/PokemonSV/smartsveggoperation.h \
     SmartPrograms/PokemonSV/smartsvgimmighoulfarmer.h \
     SmartPrograms/PokemonSV/smartsvsurprisetrade.h \
+    SmartPrograms/PokemonSV/smartsvtradepartnerfinder.h \
     SmartPrograms/PokemonSwSh/smartberryfarmer.h \
     SmartPrograms/PokemonSwSh/smartdailyhighlight.h \
     SmartPrograms/PokemonSwSh/smartdayskipper.h \

@@ -60,6 +60,7 @@ enum SmartProgram : uint32_t
     SP_SV_BoxReleaseSafe,
     SP_SV_EggOperation,
     SP_SV_GimmighoulFarmer,
+    SP_SV_TradePartnerFinder,
 
     SP_COUNT
 };
@@ -140,6 +141,7 @@ public:
             case SP_SV_BoxReleaseSafe:      return "Auto Box Release Safe (SV)";
             case SP_SV_EggOperation:        return "Egg Operation (SV)";
             case SP_SV_GimmighoulFarmer:    return "Gimmighoul Farmer";
+            case SP_SV_TradePartnerFinder:  return "Trade Partner Finder";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -203,6 +205,7 @@ public:
             case SP_SV_BoxReleaseSafe:      return "SmartSVBoxReleaseSafe";
             case SP_SV_EggOperation:        return "SmartSVEggOperation";
             case SP_SV_GimmighoulFarmer:    return "SmartSVGimmighoulFarmer";
+            case SP_SV_TradePartnerFinder:  return "SmartSVTradePartnerFinder";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -253,6 +256,7 @@ public:
             case SP_SV_BoxReleaseSafe:      return 4;
             case SP_SV_EggOperation:        return 9;
             case SP_SV_GimmighoulFarmer:    return 0;
+            case SP_SV_TradePartnerFinder:  return 18;
 
             case SP_COUNT:                  return -1;
         }
@@ -301,6 +305,7 @@ public:
         case SP_SV_BoxRelease:
         case SP_SV_BoxReleaseSafe:
         case SP_SV_GimmighoulFarmer:
+        case SP_SV_TradePartnerFinder:
             return false;
         default:
             return true;

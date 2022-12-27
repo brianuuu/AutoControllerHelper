@@ -2368,6 +2368,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartSVGimmighoulFarmer(parameter);
         break;
     }
+    case SP_SV_TradePartnerFinder:
+    {
+        m_smartProgram = new SmartSVTradePartnerFinder(ui->SP18_LE_Name->text(), ui->SP18_CB_Spam->isChecked(), parameter);
+        break;
+    }
     default:
     {
         QMessageBox::critical(this, "Error", "No code exist for this Smart Program!");
