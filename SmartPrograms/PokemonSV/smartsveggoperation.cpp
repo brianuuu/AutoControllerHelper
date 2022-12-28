@@ -962,7 +962,7 @@ void SmartSVEggOperation::runNextState()
                 {
                     emit printLog("Unable to fly to Poco Path Lighthouse, retrying...", LOG_WARNING);
                     m_substage = SS_Hatching;
-                    setState_runCommand("B,2,Nothing,20");
+                    setState_runCommand("Y,1,Nothing,1,Loop,3,Nothing,30");
 
                     // SS_Hatching state will add one to this again
                     m_eggColumnsHatched--;
