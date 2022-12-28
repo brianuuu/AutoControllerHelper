@@ -101,23 +101,24 @@ void SmartSVBoxReleaseSafe::runNextState()
             {
                 m_fixAttempt = 0;
                 QString command = "Box " + QString::number(m_currentBox) + " column " + QString::number(m_posToRelease.x()) + " row " + QString::number(m_posToRelease.y()) + ": ";
-                if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
+
+                if (!checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Yellow, 200))
+                {
+                    // no pokemon
+                    emit printLog(command + "No pokemon");
+                    runCommandToNextTarget();
+                }
+                else if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
                 {
                     emit printLog(command + "SHINY pokemon, NOT releasing", LOG_ERROR);
                     runCommandToNextTarget();
                 }
-                else if (checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Yellow, 200))
+                else
                 {
                     emit printLog(command + "Releasing...");
                     m_substage = SS_Release1;
                     setState_runCommand(C_Release1);
                     m_videoManager->setAreas({GetReleaseCaptureAreaOfPos(m_posToRelease.x()), A_Yes});
-                }
-                else
-                {
-                    // no pokemon
-                    emit printLog(command + "No pokemon");
-                    runCommandToNextTarget();
                 }
             }
             else
