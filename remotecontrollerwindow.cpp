@@ -639,7 +639,7 @@ void RemoteControllerWindow::on_SerialPort_readyRead()
                 if (m_hexVersion != byte)
                 {
                     // We expect the first byte returned to be the version number
-                    qDebug() << "Command has been inerrupted, discarding feedback for previous command!";
+                    qDebug() << "Command has been interrupted, discarding feedback from previous command!";
                     continue;
                 }
                 else

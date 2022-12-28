@@ -32,8 +32,7 @@ void SmartSVEggOperation::reset()
     m_sandwichCount = 0;
     m_eggsCollected = 0;
     m_eggCollectCount = 0;
-    m_eggCollectDialog = false;
-    m_eggCollectDetected = false;
+    m_eggDialogDetected = false;
 
     m_eggColumnsHatched = 0;
     m_eggsToHatch = 0;
@@ -301,12 +300,10 @@ void SmartSVEggOperation::runNextState()
             {
                 m_substage = SS_CollectEggs;
                 m_eggCollectCount = 0;
-                m_eggCollectDialog = false;
-                m_eggCollectDetected = false;
+                m_eggDialogDetected = false;
                 m_eggRejectDetected = false;
                 m_eggsRejected = 0;
-                m_timer.restart();
-                m_videoManager->setAreas({A_Dialog,A_Yes,A_No});
+                m_videoManager->setAreas({A_Dialog,A_No});
                 runNextStateContinue();
             }
         }
@@ -317,23 +314,9 @@ void SmartSVEggOperation::runNextState()
         if (state == S_CommandFinished)
         {
             qint64 timeElapsedExpected = (m_eggCollectCount + 1) * 120000;
-            qint64 timeElapsed = m_timer.elapsed();
+            qint64 timeElapsed = m_sandwichTimer.elapsed();
 
-            if (m_eggCollectCount > 0 && !m_eggCollectDialog)
-            {
-                if (m_programSettings.m_operation == EOT_Collector && m_sandwichCount > 0)
-                {
-                    incrementStat(m_statError);
-                    emit printLog("Unable to talk to egg basket, but there are already eggs collected, stopping program", LOG_ERROR);
-                    m_substage = SS_Finished;
-                    setState_runCommand("Home,2,Nothing,20");
-                }
-                else
-                {
-                    runRestartCommand("Unable to talk to egg basket, forcing restart", m_programSettings.m_isErrorCapture);
-                }
-            }
-            else if (m_eggCollectCount >= 15)
+            if (m_eggCollectCount >= 15)
             {
                 if (m_eggsCollected == 0)
                 {
@@ -395,18 +378,47 @@ void SmartSVEggOperation::runNextState()
             }
             else
             {
-                setState_runCommand("ASpam,280,BSpam,60", true);
+                // hit A to talk to basket and spam B to collect eggs
+                setState_runCommand("ASpam,4,Loop,1,BSpam,2,Loop,0", true);
                 m_eggCollectCount++;
+                m_timer.restart();
             }
         }
         else if (state == S_CaptureReady)
         {
             // check if we can talk to egg basket
-            if (!m_eggCollectDialog && checkBrightnessMeanTarget(A_Dialog.m_rect, C_Color_Dialog, 220))
+            bool isDialogDetected = checkBrightnessMeanTarget(A_Dialog.m_rect, C_Color_Dialog, 200);
+            if (!m_eggDialogDetected && isDialogDetected)
             {
-                emit printLog("Successfully talked to egg basket!");
-                m_eggCollectDialog = true;
-                m_videoManager->setAreas({A_Yes,A_No});
+                if (m_eggCollectCount == 1)
+                {
+                    emit printLog("Successfully talked to egg basket!");
+                }
+                m_eggDialogDetected = true;
+            }
+            else if (m_eggDialogDetected && !isDialogDetected)
+            {
+                // finished collecting eggs for this cycle, stop spamming B
+                m_eggDialogDetected = false;
+                setState_runCommand("Nothing,10");
+                break;
+            }
+
+            // check if we can talk to the basket within 5 seconds
+            if (!m_eggDialogDetected && m_timer.elapsed() > 5000)
+            {
+                if (m_programSettings.m_operation == EOT_Collector && m_eggsCollected > 0)
+                {
+                    incrementStat(m_statError);
+                    emit printLog("Unable to talk to egg basket, but there are already eggs collected, stopping program", LOG_ERROR);
+                    m_substage = SS_Finished;
+                    setState_runCommand("Home,2,Nothing,20");
+                }
+                else
+                {
+                    runRestartCommand("Unable to talk to egg basket, forcing restart", m_programSettings.m_isErrorCapture);
+                }
+                break;
             }
 
             // detect rejecting egg, but refuse to send to academy
@@ -418,27 +430,14 @@ void SmartSVEggOperation::runNextState()
 
                 if (m_eggsRejected % 2 == 0)
                 {
-                    emit printLog("Two 'No' has been detected when collecting eggs, meaning we got 1 egg instead of 2", LOG_WARNING);
-                    incrementStat(m_statEggCollected, -1);
-                    m_eggsCollected--;
+                    // two No means we have collected an egg
+                    incrementStat(m_statEggCollected);
+                    m_eggsCollected++;
                 }
             }
             else if (m_eggRejectDetected && !isNoDetected)
             {
                  m_eggRejectDetected = false;
-            }
-
-            // detect how many eggs collected
-            bool isYesDetected = checkBrightnessMeanTarget(A_Yes.m_rect, C_Color_Yellow, 200);
-            if (!m_eggCollectDetected && isYesDetected)
-            {
-                incrementStat(m_statEggCollected);
-                m_eggsCollected++;
-                m_eggCollectDetected = true;
-            }
-            else if (m_eggCollectDetected && !isYesDetected)
-            {
-                m_eggCollectDetected = false;
             }
 
             setState_frameAnalyzeRequest();
@@ -588,7 +587,7 @@ void SmartSVEggOperation::runNextState()
 
                         // don't call runToBoxCommand() so it doesn't reset m_missedInputRetryCount
                         m_substage = SS_MainMenu;
-                        setState_runCommand("B,5,Nothing,5,Loop,2");
+                        setState_runCommand("B,10,Nothing,10,Loop,2");
                         m_videoManager->clearCaptures();
 
                         m_substageAfterMainMenu = SS_ToBox;
@@ -629,7 +628,7 @@ void SmartSVEggOperation::runNextState()
 
                     // don't call runToBoxCommand() so it doesn't reset m_missedInputRetryCount
                     m_substage = SS_MainMenu;
-                    setState_runCommand("B,5,Nothing,5");
+                    setState_runCommand("B,10,Nothing,10");
                     m_videoManager->clearCaptures();
 
                     m_substageAfterMainMenu = SS_ToBox;
@@ -674,7 +673,7 @@ void SmartSVEggOperation::runNextState()
                 setState_runCommand("DUp,3,ASpam,100");
                 m_videoManager->clearCaptures();
             }
-            else if (checkBrightnessMeanTarget(A_Dialog.m_rect, C_Color_Dialog, 220))
+            else if (checkBrightnessMeanTarget(A_Dialog.m_rect, C_Color_Dialog, 200))
             {
                 // check screen again after 0.2s in case it was a false positive
                 m_substage = SS_ConfirmHatching;
@@ -695,7 +694,7 @@ void SmartSVEggOperation::runNextState()
         }
         if (state == S_CaptureReady)
         {
-            if (checkBrightnessMeanTarget(A_Dialog.m_rect, C_Color_Dialog, 220))
+            if (checkBrightnessMeanTarget(A_Dialog.m_rect, C_Color_Dialog, 200))
             {
                 --m_eggsToHatch;
                 m_eggsHatched++;
@@ -812,7 +811,7 @@ void SmartSVEggOperation::runNextState()
 
                         // don't call runToBoxCommand() so it doesn't reset m_missedInputRetryCount
                         m_substage = SS_MainMenu;
-                        setState_runCommand("B,5,Nothing,5,Loop,2");
+                        setState_runCommand("B,10,Nothing,10,Loop,2");
                         m_videoManager->clearCaptures();
 
                         m_substageAfterMainMenu = SS_ToBox;

@@ -67,7 +67,7 @@ private:
 
     // List of test color
     HSVRange const C_Color_Sandwich = HSVRange(0,0,220,359,40,255); // >220
-    HSVRange const C_Color_Dialog = HSVRange(170,130,20,230,255,60); // >220
+    HSVRange const C_Color_Dialog = HSVRange(170,130,20,230,255,60); // >200
     HSVRange const C_Color_Yellow = HSVRange(30,200,200,70,255,255); // >200 (box: >130) (battle: >180)
     HSVRange const C_Color_Green = HSVRange(100,170,200,140,255,255); // >200
     HSVRange const C_Color_Shiny = HSVRange(0,0,200,359,255,255); // >25
@@ -75,7 +75,7 @@ private:
     // List of test point/area
     CaptureArea const A_Title = CaptureArea(480,110,320,100);
     CaptureArea const A_Sandwich = CaptureArea(1080,260,160,100);
-    CaptureArea const A_Dialog = CaptureArea(800,596,100,40);
+    CaptureArea const A_Dialog = CaptureArea(846,600,100,40);
     CaptureArea const A_Yes = CaptureArea(1076,406,80,40);
     CaptureArea const A_No = CaptureArea(1076,459,80,40);
     CaptureArea const A_Pokemon = CaptureArea(836,4,21,46);
@@ -133,8 +133,7 @@ private:
     int m_eggsCollected; // for counting how many eggs actually collected
     int m_eggsRejected; // when rejecting egg, but twice means we get one anyway
     int m_eggCollectCount; // 15 times, every 2 mins in 30 mins
-    bool m_eggCollectDialog; // for checking if we are able to talk to egg basket
-    bool m_eggCollectDetected; // for detecting Yes when collecting eggs
+    bool m_eggDialogDetected; // for checking if we are able to talk to egg basket
     bool m_eggRejectDetected; // for detecting No when collecting eggs
 
     int m_eggColumnsHatched;
