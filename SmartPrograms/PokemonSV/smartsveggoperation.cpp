@@ -43,7 +43,7 @@ void SmartSVEggOperation::reset()
     m_flySuccess = true;
     m_shinyPositions.clear();
 
-    m_shinySoundID = -1;
+    m_shinySoundID = 0;
     m_shinySoundDetected = false;
 }
 
@@ -66,7 +66,7 @@ void SmartSVEggOperation::runNextState()
         setState_runCommand(C_Restart);
 
         m_shinySoundDetected = false;
-        if (m_programSettings.m_isShinyDetection)
+        if (m_programSettings.m_isShinyDetection && m_programSettings.m_operation != EOT_Collector)
         {
             // Setup sound detection
             m_shinySoundID = m_audioManager->addDetection("PokemonSV/ShinySFXHatch", 0.2f, 5000);
