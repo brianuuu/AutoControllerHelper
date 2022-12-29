@@ -15,7 +15,7 @@ public:
 
     virtual SmartProgram getProgramEnum() { return SP_SV_BoxReleaseSafe; }
 
-    static CaptureArea const GetReleaseCaptureAreaOfPos(int x);
+    static CaptureArea const GetReleaseCaptureAreaOfPos(int x, bool hasItem);
 
 private:
     virtual void init();

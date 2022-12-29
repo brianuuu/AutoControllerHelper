@@ -118,7 +118,7 @@ void SmartSVBoxReleaseSafe::runNextState()
                     emit printLog(command + "Releasing...");
                     m_substage = SS_Release1;
                     setState_runCommand(C_Release1);
-                    m_videoManager->setAreas({GetReleaseCaptureAreaOfPos(m_posToRelease.x()), A_Yes});
+                    m_videoManager->setAreas({GetReleaseCaptureAreaOfPos(m_posToRelease.x(), false), GetReleaseCaptureAreaOfPos(m_posToRelease.x(), true), A_Yes});
                 }
             }
             else
@@ -139,7 +139,8 @@ void SmartSVBoxReleaseSafe::runNextState()
         }
         else if (state == S_CaptureReady)
         {
-            if (checkBrightnessMeanTarget(GetReleaseCaptureAreaOfPos(m_posToRelease.x()).m_rect, C_Color_Yellow, 200))
+            if (checkBrightnessMeanTarget(GetReleaseCaptureAreaOfPos(m_posToRelease.x(), false).m_rect, C_Color_Yellow, 200)
+             || checkBrightnessMeanTarget(GetReleaseCaptureAreaOfPos(m_posToRelease.x(), true).m_rect, C_Color_Yellow, 200))
             {
                 m_substage = SS_Release2;
                 setState_runCommand(C_Release2);
@@ -256,7 +257,7 @@ void SmartSVBoxReleaseSafe::setAreaAllPosition()
     m_videoManager->setAreas(areas);
 }
 
-const CaptureArea SmartSVBoxReleaseSafe::GetReleaseCaptureAreaOfPos(int x)
+const CaptureArea SmartSVBoxReleaseSafe::GetReleaseCaptureAreaOfPos(int x, bool hasItem)
 {
     if (x < 1 || x > 6)
     {
@@ -264,7 +265,7 @@ const CaptureArea SmartSVBoxReleaseSafe::GetReleaseCaptureAreaOfPos(int x)
     }
 
     x--;
-    return CaptureArea(576 + x * 84, 306, 60, 30);
+    return hasItem ? CaptureArea(560 + x * 84, 344, 60, 30) : CaptureArea(576 + x * 84, 306, 60, 30);
 }
 
 void SmartSVBoxReleaseSafe::runCommandToTargetPosition(QPoint current, QPoint target)
