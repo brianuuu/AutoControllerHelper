@@ -144,7 +144,8 @@ private:
     int m_checkShinyCount; // counter for checking shiny
     int m_flyAttempts;
     bool m_flySuccess; // check if we were able to fly
-    QVector<QPoint> m_shinyPositions; // how many shiny we found this session
+    typedef QPair<QPoint,int> PosEggCountMap;
+    QVector<PosEggCountMap> m_shinyPositions; // how many shiny we found this session (pos,egg no)
 
     int m_shinySoundID;
     bool m_shinySoundDetected;

@@ -699,7 +699,7 @@ void SmartSVEggOperation::runNextState()
                 --m_eggsToHatch;
                 m_eggsHatched++;
                 incrementStat(m_statEggHatched);
-                emit printLog("Oh? Egg is hatching! (" + QString::number(m_eggsToHatch) + " remaining)");
+                emit printLog("Oh? Egg no." + QString::number(m_statEggHatched.first) + " is hatching! (" + QString::number(m_eggsToHatch) + " remaining)");
                 m_substage = SS_Hatching;
                 setState_runCommand("ASpam,450");
                 m_videoManager->clearCaptures();
@@ -738,9 +738,9 @@ void SmartSVEggOperation::runNextState()
                 m_shinySoundDetected = false;
 
                 QPoint pos(m_eggColumnsHatched + 1, m_eggsToHatchColumn - m_eggsToHatch);
-                QString log = "Column " + QString::number(pos.x()) + " row " + QString::number(pos.y());
+                QString log = "Column " + QString::number(pos.x()) + " row " + QString::number(pos.y()) + " (Egg no." + QString::number(m_statEggHatched.first) + ")";
                 emit printLog(log + " is SHINY!!! Capturing video!", LOG_SUCCESS);
-                m_shinyPositions.push_back(pos);
+                m_shinyPositions.push_back(PosEggCountMap(pos, m_statEggHatched.first));
             }
             else if (m_eggsToHatch <= 0)
             {
@@ -840,17 +840,19 @@ void SmartSVEggOperation::runNextState()
             else
             {
                 m_hasPokemonCount++;
+                log += " (Egg no." + QString::number(m_statEggHatched.first - m_eggsToHatchColumn + m_hasPokemonCount) + ")";
                 if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
                 {
                     QPoint pos(m_eggColumnsHatched, m_checkShinyCount);
-                    if (m_shinyPositions.contains(pos))
+                    PosEggCountMap posEggCountMap(pos, m_statEggHatched.first - m_eggsToHatchColumn + m_hasPokemonCount);
+                    if (m_shinyPositions.contains(posEggCountMap))
                     {
                         emit printLog(log + " is SHINY!!! But we already know that ;)");
                     }
                     else
                     {
                         // SHINY FOUND!
-                        m_shinyPositions.push_back(pos);
+                        m_shinyPositions.push_back(posEggCountMap);
                         incrementStat(m_statShinyHatched);
                         emit printLog(log + " is SHINY!!!", LOG_SUCCESS);
                     }
@@ -881,9 +883,9 @@ void SmartSVEggOperation::runNextState()
                     if (!m_shinyPositions.empty())
                     {
                         emit printLog(QString::number(m_shinyPositions.size()) + " SHINY POKEMON IS FOUND!!!", LOG_SUCCESS);
-                        for (QPoint const& pos : m_shinyPositions)
+                        for (PosEggCountMap const& map : m_shinyPositions)
                         {
-                            emit printLog("Shiny at column " + QString::number(pos.x()) + " row " + QString::number(pos.y()), LOG_SUCCESS);
+                            emit printLog("Shiny at column " + QString::number(map.first.x()) + " row " + QString::number(map.first.y()) + " (Egg no." + QString::number(map.second) + ")", LOG_SUCCESS);
                         }
                     }
                     else if (m_programSettings.m_operation == EOT_Shiny)
