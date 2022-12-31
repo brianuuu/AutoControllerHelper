@@ -481,6 +481,7 @@ bool SmartProgramBase::validateCommand(const QString &commands, QString &errorMs
         "lupclick",
         "lleftb",
         "lrightb",
+        "bxdup",
 
         "aspam",
         "bspam",
