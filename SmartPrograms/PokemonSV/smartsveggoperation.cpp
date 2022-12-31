@@ -118,9 +118,17 @@ void SmartSVEggOperation::runNextState()
             }
             else if (!checkAverageColorMatch(A_Title.m_rect, QColor(0,0,0)))
             {
-                emit printLog("Title detected!");
+                if (m_programSettings.m_operation == EOT_Shiny && m_programSettings.m_isUseBackupSave)
+                {
+                    emit printLog("Title detected! Loading backup save...");
+                    setState_runCommand("Nothing,200,BXDUp,2,ASpam,120");
+                }
+                else
+                {
+                    emit printLog("Title detected!");
+                    setState_runCommand("ASpam,310");
+                }
                 m_substage = SS_GameStart;
-                setState_runCommand("ASpam,310");
                 m_videoManager->clearCaptures();
             }
             else
@@ -334,7 +342,7 @@ void SmartSVEggOperation::runNextState()
                     {
                         // make more sandwich!
                         m_substage = SS_Picnic;
-                        setState_runCommand("LUp,5,ASpam,40");
+                        setState_runCommand("LUp,2,Nothing,2,Loop,3,ASpam,40");
                         m_videoManager->clearCaptures();
                     }
                     else
@@ -355,7 +363,7 @@ void SmartSVEggOperation::runNextState()
                     {
                         // make more sandwich!
                         m_substage = SS_Picnic;
-                        setState_runCommand("LUp,5,ASpam,40");
+                        setState_runCommand("LUp,2,Nothing,2,Loop,3,ASpam,40");
                         m_videoManager->clearCaptures();
                     }
                     else
@@ -475,7 +483,15 @@ void SmartSVEggOperation::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            runToBoxCommand();
+            if (m_programSettings.m_operation == EOT_Shiny && m_programSettings.m_isUseBackupSave)
+            {
+                emit printLog("Saving game with normal save system...");
+                runToBoxCommand("", "R,2,Nothing,2,Loop,3,ASpam,30,Nothing,50,ASpam,10,Nothing,20");
+            }
+            else
+            {
+                runToBoxCommand();
+            }
         }
         break;
     }
@@ -1079,7 +1095,7 @@ void SmartSVEggOperation::runPicnicCommand()
     m_isToBoxAfterMainMenu = false;
 }
 
-void SmartSVEggOperation::runToBoxCommand(QString command)
+void SmartSVEggOperation::runToBoxCommand(QString command, QString commandAdter)
 {
     m_missedInputRetryCount = 0;
 
@@ -1088,7 +1104,7 @@ void SmartSVEggOperation::runToBoxCommand(QString command)
     m_videoManager->clearCaptures();
 
     m_substageAfterMainMenu = SS_ToBox;
-    m_commandAfterMainMenu = "ASpam,10,Nothing,20";
+    m_commandAfterMainMenu = commandAdter.isEmpty() ? "ASpam,10,Nothing,20" : commandAdter;
     m_isToBoxAfterMainMenu = true;
 }
 

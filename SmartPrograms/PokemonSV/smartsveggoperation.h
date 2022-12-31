@@ -26,6 +26,7 @@ public:
         bool m_isHatchWithSandwich;
         bool m_isShinyDetection;
         bool m_isErrorCapture;
+        bool m_isUseBackupSave;
     };
 
 public:
@@ -49,7 +50,7 @@ private:
     virtual void runNextState();
     void runRestartCommand(QString error = "", bool capture = false);
     void runPicnicCommand();
-    void runToBoxCommand(QString command = "");
+    void runToBoxCommand(QString command = "", QString commandAdter = "");
 
     // Command indices
     Command const C_Restart     = 0;
