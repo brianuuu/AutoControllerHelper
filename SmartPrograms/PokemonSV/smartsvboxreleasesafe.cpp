@@ -136,22 +136,27 @@ void SmartSVBoxReleaseSafe::runNextState()
         if (state == S_CommandFinished)
         {
             setState_frameAnalyzeRequest();
+            m_timer.restart();
         }
         else if (state == S_CaptureReady)
         {
-            if (checkBrightnessMeanTarget(GetReleaseCaptureAreaOfPos(m_posToRelease.x(), false).m_rect, C_Color_Yellow, 200)
-             || checkBrightnessMeanTarget(GetReleaseCaptureAreaOfPos(m_posToRelease.x(), true).m_rect, C_Color_Yellow, 200))
-            {
-                m_substage = SS_Release2;
-                setState_runCommand(C_Release2);
-            }
-            else
+            if (m_timer.elapsed() > 3000)
             {
                 // missed input, quit box and try again...?
                 emit printLog("Unable to detect pop up menu, exiting Box", LOG_WARNING);
                 m_substage = SS_MainMenu;
                 setState_runCommand("B,5,Nothing,5");
                 m_fixAttempt = 0;
+            }
+            else if (checkBrightnessMeanTarget(GetReleaseCaptureAreaOfPos(m_posToRelease.x(), false).m_rect, C_Color_Yellow, 200)
+                  || checkBrightnessMeanTarget(GetReleaseCaptureAreaOfPos(m_posToRelease.x(), true).m_rect, C_Color_Yellow, 200))
+            {
+                m_substage = SS_Release2;
+                setState_runCommand(C_Release2);
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
             }
         }
         break;
@@ -161,21 +166,26 @@ void SmartSVBoxReleaseSafe::runNextState()
         if (state == S_CommandFinished)
         {
             setState_frameAnalyzeRequest();
+            m_timer.restart();
         }
         else if (state == S_CaptureReady)
         {
-            if (checkBrightnessMeanTarget(A_Yes.m_rect, C_Color_Yellow, 200))
-            {
-                m_substage = SS_Release3;
-                setState_runCommand(C_Release3);
-            }
-            else
+            if (m_timer.elapsed() > 3000)
             {
                 // missed input, quit box and try again...?
                 emit printLog("Unable to detect yes/no menu, exiting Box", LOG_WARNING);
                 m_substage = SS_MainMenu;
                 setState_runCommand("B,5,Nothing,5");
                 m_fixAttempt = 0;
+            }
+            else if (checkBrightnessMeanTarget(A_Yes.m_rect, C_Color_Yellow, 200))
+            {
+                m_substage = SS_Release3;
+                setState_runCommand(C_Release3);
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
             }
         }
         break;
