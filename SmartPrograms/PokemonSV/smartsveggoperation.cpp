@@ -847,10 +847,16 @@ void SmartSVEggOperation::runNextState()
                 break;
             }
 
+            // when failed putting back hatched mon into 6th column in box we need to go back to the previous box
+            bool backToPreviousBox = m_eggColumnsHatched % 6 == 0 && m_missedInputRetryCount > 0;
+
             m_missedInputRetryCount = 0;
             QString log = "Column " + QString::number(m_eggColumnsHatched) + " row " + QString::number(m_checkShinyCount);
+            bool hasPokemon = true;
             if (!checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Yellow, 200))
             {
+                // can early out if cursor has no pokemon anymore
+                hasPokemon = false;
                 emit printLog(log + " has no pokemon");
             }
             else
@@ -879,7 +885,7 @@ void SmartSVEggOperation::runNextState()
                 }
             }
 
-            if (m_checkShinyCount >= 5)
+            if (m_checkShinyCount >= 5 || !hasPokemon)
             {
                 // m_eggColumnsHatched = [1,6]
                 if (m_hasPokemonCount == 0)
@@ -934,7 +940,15 @@ void SmartSVEggOperation::runNextState()
             }
             else
             {
-                setState_runCommand("DDown,3,Nothing,20");
+                if (backToPreviousBox && m_hasPokemonCount == 1)
+                {
+                    emit printLog("Failed to put hatched Pokemon back to 6th column of box and scrolled to the next box, going back to previous box", LOG_WARNING);
+                    setState_runCommand("B,3,Nothing,3,L,3,Nothing,3,Minus,3,Nothing,3,DDown,3,Nothing,20");
+                }
+                else
+                {
+                    setState_runCommand("DDown,3,Nothing,20");
+                }
             }
         }
         break;
