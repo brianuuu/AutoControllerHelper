@@ -909,6 +909,12 @@ void SmartSVEggOperation::runNextState()
                         {
                             emit printLog("Shiny at column " + QString::number(map.first.x()) + " row " + QString::number(map.first.y()) + " (Egg no." + QString::number(map.second) + ")", LOG_SUCCESS);
                         }
+
+                        if (m_programSettings.m_isSaveShiny)
+                        {
+                            // save after shiny is found
+                            command += ",Loop,1,B,1,Nothing,1,Loop,3,Nothing,60,Loop,1,R,2,Nothing,2,Loop,3,ASpam,30,Nothing,50";
+                        }
                     }
                     else if (m_programSettings.m_operation == EOT_Shiny)
                     {

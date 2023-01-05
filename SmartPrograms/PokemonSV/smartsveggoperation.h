@@ -26,6 +26,7 @@ public:
         bool m_isHatchWithSandwich;
         bool m_isShinyDetection;
         bool m_isErrorCapture;
+        bool m_isSaveShiny;
         bool m_isUseBackupSave;
     };
 

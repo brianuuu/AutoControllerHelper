@@ -3389,7 +3389,7 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                        <x>0</x>
                        <y>0</y>
                        <width>438</width>
-                       <height>213</height>
+                       <height>236</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_27">
@@ -3509,6 +3509,16 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                        </layout>
                       </item>
                       <item>
+                       <widget class="QCheckBox" name="SP9_CB_Error">
+                        <property name="text">
+                         <string>Capture Video when Error Occurs for Bug Reporting</string>
+                        </property>
+                        <property name="checked">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
                        <widget class="QCheckBox" name="SP9_CB_HatchSandwich">
                         <property name="enabled">
                          <bool>false</bool>
@@ -3532,9 +3542,12 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                        </widget>
                       </item>
                       <item>
-                       <widget class="QCheckBox" name="SP9_CB_Error">
+                       <widget class="QCheckBox" name="SP9_CB_ShinySave">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
                         <property name="text">
-                         <string>Capture Video when Error Occurs for Bug Reporting</string>
+                         <string>Save Game after Shiny is Found (Hatcher/Shiny Mode)</string>
                         </property>
                         <property name="checked">
                          <bool>true</bool>
@@ -3543,6 +3556,9 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       </item>
                       <item>
                        <widget class="QCheckBox" name="SP9_CB_BackupSave">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
                         <property name="text">
                          <string>Use Backup Save at Restart and Normal Save before Hatching (Shiny Mode Only)</string>
                         </property>
@@ -3597,8 +3613,8 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>262</width>
+                       <height>84</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_29">
@@ -3753,8 +3769,8 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>274</width>
+                       <height>186</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_31">
@@ -3879,8 +3895,8 @@ If the list doesn't have the specific Pokemon, select Others.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>352</width>
+                       <height>80</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_33">
@@ -4056,8 +4072,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>294</width>
+                       <height>115</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_37">
@@ -4264,8 +4280,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>224</width>
+                       <height>63</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_43">
@@ -4359,8 +4375,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>238</width>
+                       <height>67</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_45">
@@ -4485,8 +4501,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>357</width>
+                       <height>117</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_47">
