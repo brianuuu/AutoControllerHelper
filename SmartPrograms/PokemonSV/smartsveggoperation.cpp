@@ -483,7 +483,7 @@ void SmartSVEggOperation::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            if (m_programSettings.m_operation == EOT_Shiny && m_programSettings.m_isUseBackupSave)
+            if (m_programSettings.m_operation == EOT_Shiny && m_programSettings.m_isUseBackupSave && m_sandwichCount == 10)
             {
                 emit printLog("Saving game with normal save system...");
                 runToBoxCommand("", "R,2,Nothing,2,Loop,3,ASpam,30,Nothing,50,ASpam,10,Nothing,20");
