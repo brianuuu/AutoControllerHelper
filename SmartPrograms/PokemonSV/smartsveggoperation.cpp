@@ -500,7 +500,7 @@ void SmartSVEggOperation::runNextState()
         if (state == S_CommandFinished)
         {
             setState_frameAnalyzeRequest();
-            m_videoManager->setAreas({GetBoxCaptureAreaOfPos(1,1)});
+            m_videoManager->setAreas({GetBoxCaptureAreaOfPos(1,1), A_Pokemon});
             m_timer.restart();
 
             m_flyAttempts = 0;
@@ -511,7 +511,7 @@ void SmartSVEggOperation::runNextState()
             {
                 runRestartCommand("Unable to detect being in Box menu, forcing restart", m_programSettings.m_isErrorCapture);
             }
-            else if (checkBrightnessMeanTarget(GetBoxCaptureAreaOfPos(1,1).m_rect, C_Color_Yellow, 130))
+            else if (checkBrightnessMeanTarget(GetBoxCaptureAreaOfPos(1,1).m_rect, C_Color_Yellow, 130) || checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Yellow, 200))
             {
                 if (m_programSettings.m_operation == EOT_Shiny && m_sandwichCount == 10)
                 {
