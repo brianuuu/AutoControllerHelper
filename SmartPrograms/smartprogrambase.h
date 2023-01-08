@@ -26,6 +26,7 @@ enum SmartProgram : uint32_t
     SP_ColorCalibrator,
     SP_SoundDetection,
     SP_Test,
+    SP_CodeEntry,
 
     SP_PurpleBeamFinder,
     SP_YCommGlitch,
@@ -107,6 +108,7 @@ public:
             case SP_ColorCalibrator:        return "Dev: Color Calibrator";
             case SP_SoundDetection:         return "Dev: Sound Detection";
             case SP_Test:                   return "Test Program";
+            case SP_CodeEntry:              return "Code Entry";
 
             case SP_PurpleBeamFinder:       return "Purple Beam Finder";
             case SP_YCommGlitch:            return "Y-Comm Glitch";
@@ -171,6 +173,7 @@ public:
             case SP_ColorCalibrator:        return "SmartColorCalibrator";
             case SP_SoundDetection:         return "SmartSoundDetection";
             case SP_Test:                   return "SmartTestProgram";
+            case SP_CodeEntry:              return "SmartCodeEntry";
 
             case SP_PurpleBeamFinder:       return "SmartPurpleBeamFilder";
             case SP_YCommGlitch:            return "SmartYCommGlitch";
@@ -222,6 +225,7 @@ public:
             case SP_ColorCalibrator:        return 8;
             case SP_SoundDetection:         return 17;
             case SP_Test:                   return 0;
+            case SP_CodeEntry:              return 19;
 
             case SP_PurpleBeamFinder:       return 2;
             case SP_YCommGlitch:            return 0;
@@ -269,6 +273,7 @@ public:
         {
         case SP_BrightnessMeanFinder:
         case SP_SurpriseTrade:
+        case SP_CodeEntry:
             return true;
         default:
             return false;
@@ -297,6 +302,7 @@ public:
         case SP_ColorCalibrator:
         case SP_SoundDetection:
         case SP_Test:
+        case SP_CodeEntry:
         case SP_BattleTower:
         case SP_BDSP_MenuGlitch113:
         case SP_BDSP_BoxDuplication:

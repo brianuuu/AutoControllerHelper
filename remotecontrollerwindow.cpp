@@ -289,6 +289,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     // values we want to load
     ui->SP9_SB_X->setValue(m_settings->value("SandwichX", 0).toInt());
     ui->SP9_SB_Y->setValue(m_settings->value("SandwichY", 0).toInt());
+    ui->SP19_LE_Code->setMaxLength(ui->SP19_SP_Count->value());
 }
 
 RemoteControllerWindow::~RemoteControllerWindow()
@@ -1738,6 +1739,11 @@ void RemoteControllerWindow::on_SP9_CB_Mode_currentIndexChanged(int index)
     ui->SP9_CB_BackupSave->setEnabled(type == SmartSVEggOperation::EOT_Shiny);
 }
 
+void RemoteControllerWindow::on_SP19_SP_Count_valueChanged(int arg1)
+{
+    ui->SP19_LE_Code->setMaxLength(arg1);
+}
+
 void RemoteControllerWindow::on_SoundDetection_required(int min, int max)
 {
     ui->CB_AudioDisplayMode->setCurrentIndex(ADM_Spectrogram);
@@ -2213,6 +2219,15 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartTestProgram(parameter);
         break;
     }
+    case SP_CodeEntry:
+    {
+        SmartCodeEntry::Settings settings;
+        settings.m_type = SmartCodeEntry::InputType(ui->SP19_CB_Type->currentIndex());
+        settings.m_codeSize = ui->SP19_SP_Count->value();
+        settings.m_lineEdit = ui->SP19_LE_Code;
+        m_smartProgram = new SmartCodeEntry(settings, parameter);
+        break;
+    }
     case SP_YCommGlitch:
     {
         m_smartProgram = new SmartYCommGlitch(parameter);
@@ -2458,4 +2473,6 @@ void RemoteControllerWindow::SetEnableNonExceptionButtons(bool enabled)
 {
     // This is for when we allow enble UI when smart program is running but only allow some UI enabled within it
     ui->SP3_SB_Box->setEnabled(enabled);
+    ui->SP19_CB_Type->setEnabled(enabled);
+    ui->SP19_SP_Count->setEnabled(enabled);
 }

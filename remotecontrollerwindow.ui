@@ -1932,7 +1932,7 @@
                  </sizepolicy>
                 </property>
                 <property name="currentIndex">
-                 <number>9</number>
+                 <number>19</number>
                 </property>
                 <widget class="QWidget" name="page">
                  <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1964,8 +1964,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>384</width>
-                       <height>64</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -3613,8 +3613,8 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>262</width>
-                       <height>84</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_29">
@@ -3769,8 +3769,8 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>274</width>
-                       <height>186</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_31">
@@ -3895,8 +3895,8 @@ If the list doesn't have the specific Pokemon, select Others.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>352</width>
-                       <height>80</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_33">
@@ -4007,8 +4007,8 @@ If the list doesn't have the specific Pokemon, select Others.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>397</width>
-                       <height>68</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_35">
@@ -4072,8 +4072,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>294</width>
-                       <height>115</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_37">
@@ -4219,8 +4219,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>198</width>
-                       <height>35</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_41">
@@ -4280,8 +4280,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>224</width>
-                       <height>63</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_43">
@@ -4375,8 +4375,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>238</width>
-                       <height>67</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_45">
@@ -4501,8 +4501,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>357</width>
-                       <height>117</height>
+                       <width>448</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_47">
@@ -4531,6 +4531,148 @@ Enter the Trade Partner:</string>
                       </item>
                       <item>
                        <spacer name="verticalSpacer_17">
+                        <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>20</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </widget>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+                <widget class="QWidget" name="page_19">
+                 <layout class="QVBoxLayout" name="verticalLayout_48">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QScrollArea" name="scrollArea_21">
+                    <property name="frameShape">
+                     <enum>QFrame::Panel</enum>
+                    </property>
+                    <property name="lineWidth">
+                     <number>2</number>
+                    </property>
+                    <property name="widgetResizable">
+                     <bool>true</bool>
+                    </property>
+                    <widget class="QWidget" name="scrollAreaWidgetContents_21">
+                     <property name="geometry">
+                      <rect>
+                       <x>0</x>
+                       <y>0</y>
+                       <width>448</width>
+                       <height>210</height>
+                      </rect>
+                     </property>
+                     <layout class="QVBoxLayout" name="verticalLayout_49">
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_47">
+                        <item>
+                         <widget class="QLabel" name="label_76">
+                          <property name="text">
+                           <string>Code Type:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QComboBox" name="SP19_CB_Type">
+                          <item>
+                           <property name="text">
+                            <string>QWERTY Keyboard</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>Number Pad</string>
+                           </property>
+                          </item>
+                         </widget>
+                        </item>
+                        <item>
+                         <spacer name="horizontalSpacer_22">
+                          <property name="orientation">
+                           <enum>Qt::Horizontal</enum>
+                          </property>
+                          <property name="sizeHint" stdset="0">
+                           <size>
+                            <width>40</width>
+                            <height>20</height>
+                           </size>
+                          </property>
+                         </spacer>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_49">
+                        <item>
+                         <widget class="QLabel" name="label_77">
+                          <property name="text">
+                           <string>No. of Characters:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSpinBox" name="SP19_SP_Count">
+                          <property name="minimumSize">
+                           <size>
+                            <width>80</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                          <property name="minimum">
+                           <number>1</number>
+                          </property>
+                          <property name="value">
+                           <number>6</number>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <spacer name="horizontalSpacer_23">
+                          <property name="orientation">
+                           <enum>Qt::Horizontal</enum>
+                          </property>
+                          <property name="sizeHint" stdset="0">
+                           <size>
+                            <width>40</width>
+                            <height>20</height>
+                           </size>
+                          </property>
+                         </spacer>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="label_78">
+                        <property name="text">
+                         <string>Enter Code:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="SP19_LE_Code"/>
+                      </item>
+                      <item>
+                       <spacer name="verticalSpacer_18">
                         <property name="orientation">
                          <enum>Qt::Vertical</enum>
                         </property>

@@ -40,6 +40,7 @@
 #include "SmartPrograms/Dev/smartbrightnessmeanfinder.h"
 #include "SmartPrograms/Dev/smartsounddetection.h"
 #include "SmartPrograms/Dev/smarttestprogram.h"
+#include "SmartPrograms/Dev/smartcodeentry.h"
 
 #include "SmartPrograms/PokemonSwSh/smartpurplebeamfilder.h"
 #include "SmartPrograms/PokemonSwSh/smartycommglitch.h"
@@ -162,6 +163,8 @@ private slots:
     void on_SP6_CB_Skips_clicked();
 
     void on_SP9_CB_Mode_currentIndexChanged(int index);
+
+    void on_SP19_SP_Count_valueChanged(int arg1);
 
     void on_SoundDetection_required(int min, int max);
     void on_SmartProgram_printLog(QString const log, QColor color);

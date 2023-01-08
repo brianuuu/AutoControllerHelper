@@ -27,6 +27,7 @@ SOURCES += \
     Audio/peakfinder.cpp \
     Audio/wavfile.cpp \
     SmartPrograms/Dev/smartbrightnessmeanfinder.cpp \
+    SmartPrograms/Dev/smartcodeentry.cpp \
     SmartPrograms/Dev/smartcolorcalibrator.cpp \
     SmartPrograms/Dev/smartdelaycalibrator.cpp \
     SmartPrograms/Dev/smartsounddetection.cpp \
@@ -78,6 +79,7 @@ HEADERS += \
     Audio/peakfinder.h \
     Audio/wavfile.h \
     SmartPrograms/Dev/smartbrightnessmeanfinder.h \
+    SmartPrograms/Dev/smartcodeentry.h \
     SmartPrograms/Dev/smartcolorcalibrator.h \
     SmartPrograms/Dev/smartdelaycalibrator.h \
     SmartPrograms/Dev/smartsounddetection.h \
