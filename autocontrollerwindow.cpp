@@ -2419,7 +2419,7 @@ void autocontrollerwindow::UpdateInfo()
     case P_SmartProgram:
     {
         info = "This is an advanced program that allows you to control the game on PC.";
-        info += "\nYou are REQUIRED to also have CP201x chip and a capture card for this.";
+        info += "\nYou are REQUIRED to also have CP210x chip and a capture card for this.";
         info += "\nYou can also use this to run Smart Programs without recompiling.";
         info += "\nFor more details, please read Smart Program section of the manual.";
         break;
