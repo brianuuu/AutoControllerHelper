@@ -127,7 +127,6 @@ void SmartCodeEntry::textEdited(const QString &text)
 void SmartCodeEntry::dataChanged()
 {
     m_programSettings.m_lineEdit->setText(m_programSettings.m_clipboard->text());
-    m_programSettings.m_clipboard->clear();
 }
 
 void SmartCodeEntry::init()
@@ -145,7 +144,6 @@ void SmartCodeEntry::init()
 
     if (m_programSettings.m_clipboard && !m_programSettings.m_useOCR)
     {
-        m_programSettings.m_clipboard->clear();
         connect(m_programSettings.m_clipboard, &QClipboard::dataChanged, this, &SmartCodeEntry::dataChanged);
     }
 
