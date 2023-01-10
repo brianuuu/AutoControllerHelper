@@ -74,6 +74,7 @@
 #include "SmartPrograms/PokemonSV/smartsvtradepartnerfinder.h"
 
 #include "SmartPrograms/Widgets/pokemonautofilllineedit.h"
+#include "SmartPrograms/Widgets/selectorwidget.h"
 
 namespace Ui {
 class RemoteControllerWindow;
@@ -167,6 +168,7 @@ private slots:
 
     void on_SP19_SP_Count_valueChanged(int arg1);
     void on_SP19_CB_OCR_toggled(bool checked);
+    void on_SP19_SP_Select_clicked();
 
     void on_SoundDetection_required(int min, int max);
     void on_SmartProgram_printLog(QString const log, QColor color);

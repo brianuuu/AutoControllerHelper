@@ -3770,7 +3770,7 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                        <x>0</x>
                        <y>0</y>
                        <width>274</width>
-                       <height>186</height>
+                       <height>70</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_31">
@@ -4779,6 +4779,16 @@ Enter the Trade Partner:</string>
                          </widget>
                         </item>
                        </layout>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="SP19_SP_Select">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
+                        <property name="text">
+                         <string>Select Window on Primary Screen</string>
+                        </property>
+                       </widget>
                       </item>
                       <item>
                        <spacer name="verticalSpacer_18">

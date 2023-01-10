@@ -59,6 +59,7 @@ SOURCES += \
     SmartPrograms/PokemonSwSh/smartwattfarmer.cpp \
     SmartPrograms/PokemonSwSh/smartycommglitch.cpp \
     SmartPrograms/Widgets/pokemonautofilllineedit.cpp \
+    SmartPrograms/Widgets/selectorwidget.cpp \
     SmartPrograms/smartprogrambase.cpp \
     SmartPrograms/smartsimpleprogram.cpp \
     Video/videomanager.cpp \
@@ -111,6 +112,7 @@ HEADERS += \
     SmartPrograms/PokemonSwSh/smartwattfarmer.h \
     SmartPrograms/PokemonSwSh/smartycommglitch.h \
     SmartPrograms/Widgets/pokemonautofilllineedit.h \
+    SmartPrograms/Widgets/selectorwidget.h \
     SmartPrograms/smartprogrambase.h \
     SmartPrograms/smartsimpleprogram.h \
     Video/videomanager.h \

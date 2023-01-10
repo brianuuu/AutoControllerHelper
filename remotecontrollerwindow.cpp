@@ -289,6 +289,12 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     // values we want to load
     ui->SP9_SB_X->setValue(m_settings->value("SandwichX", 0).toInt());
     ui->SP9_SB_Y->setValue(m_settings->value("SandwichY", 0).toInt());
+
+    QSize screenSize = QGuiApplication::primaryScreen()->size();
+    ui->SP19_SB_X->setRange(0, screenSize.width() - 1);
+    ui->SP19_SB_Y->setRange(0, screenSize.height() - 1);
+    ui->SP19_SB_Width->setRange(1, screenSize.width());
+    ui->SP19_SB_Height->setRange(1, screenSize.height());
     ui->SP19_LE_Code->setMaxLength(ui->SP19_SP_Count->value());
 }
 
@@ -1753,6 +1759,19 @@ void RemoteControllerWindow::on_SP19_CB_OCR_toggled(bool checked)
     ui->SP19_SB_Y->setEnabled(checked);
     ui->SP19_SB_Width->setEnabled(checked);
     ui->SP19_SB_Height->setEnabled(checked);
+    ui->SP19_SP_Select->setEnabled(checked);
+}
+
+void RemoteControllerWindow::on_SP19_SP_Select_clicked()
+{
+    SelectorWidget w;
+    if (w.exec() == QDialog::Accepted)
+    {
+        ui->SP19_SB_X->setValue(w.selectedRect.x());
+        ui->SP19_SB_Y->setValue(w.selectedRect.y());
+        ui->SP19_SB_Width->setValue(w.selectedRect.width());
+        ui->SP19_SB_Height->setValue(w.selectedRect.height());
+    }
 }
 
 void RemoteControllerWindow::on_SoundDetection_required(int min, int max)
@@ -2492,4 +2511,5 @@ void RemoteControllerWindow::SetEnableNonExceptionButtons(bool enabled)
     ui->SP3_SB_Box->setEnabled(enabled);
     ui->SP19_CB_Type->setEnabled(enabled);
     ui->SP19_SP_Count->setEnabled(enabled);
+    ui->SP19_SP_Select->setEnabled(enabled);
 }
