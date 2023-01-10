@@ -81,6 +81,7 @@ private:
     CaptureArea const A_Yes = CaptureArea(1076,406,80,40);
     CaptureArea const A_No = CaptureArea(1076,459,80,40);
     CaptureArea const A_Pokemon = CaptureArea(836,4,21,46);
+    CaptureArea const A_Bag = CaptureArea(1110,172,100,30);
     CaptureArea const A_Box = CaptureArea(1110,226,100,30);
     CaptureArea const A_Picnic = CaptureArea(1110,280,100,30);
     CaptureArea const A_PartyFirst = CaptureArea(84,140,134,12);

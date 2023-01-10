@@ -186,7 +186,7 @@ void SmartSVEggOperation::runNextState()
         if (state == S_CommandFinished)
         {
             setState_frameAnalyzeRequest();
-            m_videoManager->setAreas({A_PartyFirst,A_Box,A_Picnic});
+            m_videoManager->setAreas({A_PartyFirst,A_Bag,A_Box,A_Picnic});
             m_timer.restart();
         }
         else if (state == S_CaptureReady)
@@ -197,26 +197,40 @@ void SmartSVEggOperation::runNextState()
             }
             else
             {
+                // check position again after if not reached destination
                 if (checkBrightnessMeanTarget(A_PartyFirst.m_rect, C_Color_Yellow, 200))
                 {
-                    m_substage = m_substageAfterMainMenu;
-                    QString command = m_isToBoxAfterMainMenu ? "LRight,3,DDown,3,Loop,1," : "LRight,3,DDown,3,LDown,3,Loop,1,";
-                    setState_runCommand(command + m_commandAfterMainMenu);
-                    m_videoManager->clearCaptures();
+                    setState_runCommand("LRight,3,Nothing,20");
+                }
+                else if (checkBrightnessMeanTarget(A_Bag.m_rect, C_Color_Yellow, 200))
+                {
+                    setState_runCommand(m_isToBoxAfterMainMenu ? "DDown,3,Nothing,20" : "DDown,3,LDown,3,Nothing,20");
                 }
                 else if (checkBrightnessMeanTarget(A_Box.m_rect, C_Color_Yellow, 200))
                 {
-                    m_substage = m_substageAfterMainMenu;
-                    QString command = m_isToBoxAfterMainMenu ? "" : "LDown,3,Loop,1,";
-                    setState_runCommand(command + m_commandAfterMainMenu);
-                    m_videoManager->clearCaptures();
+                    if (m_isToBoxAfterMainMenu)
+                    {
+                        m_substage = m_substageAfterMainMenu;
+                        setState_runCommand(m_commandAfterMainMenu);
+                        m_videoManager->clearCaptures();
+                    }
+                    else
+                    {
+                        setState_runCommand("LDown,3,Nothing,20");
+                    }
                 }
                 else if (checkBrightnessMeanTarget(A_Picnic.m_rect, C_Color_Yellow, 200))
                 {
-                    m_substage = m_substageAfterMainMenu;
-                    QString command = m_isToBoxAfterMainMenu ? "LUp,3,Loop,1," : "";
-                    setState_runCommand(command + m_commandAfterMainMenu);
-                    m_videoManager->clearCaptures();
+                    if (m_isToBoxAfterMainMenu)
+                    {
+                        setState_runCommand("LUp,3,Nothing,20");
+                    }
+                    else
+                    {
+                        m_substage = m_substageAfterMainMenu;
+                        setState_runCommand(m_commandAfterMainMenu);
+                        m_videoManager->clearCaptures();
+                    }
                 }
                 else
                 {
