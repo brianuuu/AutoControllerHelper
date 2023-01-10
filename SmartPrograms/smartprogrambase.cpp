@@ -75,6 +75,7 @@ void SmartProgramBase::init()
 
     // OCR
     m_ocrRect = QRect();
+    m_ocrCustomImage = Q_NULLPTR;
     connect(&m_ocrProcess, &QProcess::errorOccurred, this, &SmartProgramBase::on_OCRErrorOccurred);
     connect(&m_ocrProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_OCRFinished()));
 
@@ -658,6 +659,12 @@ void SmartProgramBase::setState_ocrRequest(QRect rect, HSVRange hsvRange)
     m_ocrHSVRange = hsvRange;
 }
 
+void SmartProgramBase::setState_ocrRequest(const QImage &image)
+{
+    m_state = S_OCRRequested;
+    m_ocrCustomImage = new QImage(image);
+}
+
 void SmartProgramBase::runStateLoop()
 {
     if (m_runNextState)
@@ -670,8 +677,17 @@ void SmartProgramBase::runStateLoop()
 bool SmartProgramBase::startOCR(QRect rectPos, SmartProgramBase::HSVRange hsvRange, bool isNumber)
 {
     // Get filtered image, flip black/white since black text detects better
-    QImage masked = getMonochromeImage(rectPos, hsvRange, false);
-    masked.save(QString(RESOURCES_PATH) + "Tesseract/capture.png", "PNG");
+    if (m_ocrCustomImage)
+    {
+        m_ocrCustomImage->save(QString(RESOURCES_PATH) + "Tesseract/capture.png", "PNG");
+        delete m_ocrCustomImage;
+        m_ocrCustomImage = Q_NULLPTR;
+    }
+    else
+    {
+        QImage masked = getMonochromeImage(rectPos, hsvRange, false);
+        masked.save(QString(RESOURCES_PATH) + "Tesseract/capture.png", "PNG");
+    }
 
     // Check if .traineddata exist
     GameLanguage gameLanguage = isNumber ? GL_English : m_settings->getGameLanguage();
@@ -1007,7 +1023,7 @@ void SmartProgramBase::runNextState()
     case S_OCRRequested:
     {
         m_videoManager->getFrame(m_capture);
-        if (!m_ocrRect.isNull())
+        if (!m_ocrRect.isNull() || m_ocrCustomImage)
         {
             startOCR(m_ocrRect, m_ocrHSVRange);
         }

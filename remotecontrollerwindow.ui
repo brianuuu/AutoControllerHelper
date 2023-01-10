@@ -1964,8 +1964,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>384</width>
+                       <height>64</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -3388,7 +3388,7 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>438</width>
+                       <width>389</width>
                        <height>236</height>
                       </rect>
                      </property>
@@ -3613,8 +3613,8 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>262</width>
+                       <height>84</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_29">
@@ -3769,8 +3769,8 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>274</width>
+                       <height>186</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_31">
@@ -3895,8 +3895,8 @@ If the list doesn't have the specific Pokemon, select Others.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>352</width>
+                       <height>80</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_33">
@@ -4007,8 +4007,8 @@ If the list doesn't have the specific Pokemon, select Others.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>397</width>
+                       <height>68</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_35">
@@ -4072,8 +4072,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>294</width>
+                       <height>115</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_37">
@@ -4219,8 +4219,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>198</width>
+                       <height>35</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_41">
@@ -4280,8 +4280,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>224</width>
+                       <height>63</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_43">
@@ -4375,8 +4375,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>238</width>
+                       <height>67</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_45">
@@ -4501,8 +4501,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>357</width>
+                       <height>117</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_47">
@@ -4670,6 +4670,115 @@ Enter the Trade Partner:</string>
                       </item>
                       <item>
                        <widget class="QLineEdit" name="SP19_LE_Code"/>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="SP19_CB_OCR">
+                        <property name="text">
+                         <string>Use Text Recognition (Must set Game Language to English in General Settings)</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_50">
+                        <item>
+                         <widget class="QLabel" name="label_80">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <property name="text">
+                           <string>X:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSpinBox" name="SP19_SB_X">
+                          <property name="enabled">
+                           <bool>false</bool>
+                          </property>
+                          <property name="maximum">
+                           <number>3839</number>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_79">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <property name="text">
+                           <string>Y:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSpinBox" name="SP19_SB_Y">
+                          <property name="enabled">
+                           <bool>false</bool>
+                          </property>
+                          <property name="maximum">
+                           <number>2159</number>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_81">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <property name="text">
+                           <string>Width:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSpinBox" name="SP19_SB_Width">
+                          <property name="enabled">
+                           <bool>false</bool>
+                          </property>
+                          <property name="minimum">
+                           <number>1</number>
+                          </property>
+                          <property name="maximum">
+                           <number>1280</number>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_82">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <property name="text">
+                           <string>Height:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSpinBox" name="SP19_SB_Height">
+                          <property name="enabled">
+                           <bool>false</bool>
+                          </property>
+                          <property name="minimum">
+                           <number>1</number>
+                          </property>
+                          <property name="maximum">
+                           <number>720</number>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
                       </item>
                       <item>
                        <spacer name="verticalSpacer_18">

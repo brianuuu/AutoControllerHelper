@@ -1744,6 +1744,17 @@ void RemoteControllerWindow::on_SP19_SP_Count_valueChanged(int arg1)
     ui->SP19_LE_Code->setMaxLength(arg1);
 }
 
+void RemoteControllerWindow::on_SP19_CB_OCR_toggled(bool checked)
+{
+    ui->SP19_LE_Code->clear();
+    ui->SP19_LE_Code->setEnabled(!checked);
+
+    ui->SP19_SB_X->setEnabled(checked);
+    ui->SP19_SB_Y->setEnabled(checked);
+    ui->SP19_SB_Width->setEnabled(checked);
+    ui->SP19_SB_Height->setEnabled(checked);
+}
+
 void RemoteControllerWindow::on_SoundDetection_required(int min, int max)
 {
     ui->CB_AudioDisplayMode->setCurrentIndex(ADM_Spectrogram);
@@ -2225,6 +2236,12 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         settings.m_type = SmartCodeEntry::InputType(ui->SP19_CB_Type->currentIndex());
         settings.m_codeSize = ui->SP19_SP_Count->value();
         settings.m_lineEdit = ui->SP19_LE_Code;
+        settings.m_clipboard = QGuiApplication::clipboard();
+        settings.m_useOCR = ui->SP19_CB_OCR->isChecked();
+        if (settings.m_useOCR)
+        {
+            settings.m_ocrImage = QGuiApplication::primaryScreen()->grabWindow(0).copy(ui->SP19_SB_X->value(), ui->SP19_SB_Y->value(), ui->SP19_SB_Width->value(), ui->SP19_SB_Height->value()).toImage();
+        }
         m_smartProgram = new SmartCodeEntry(settings, parameter);
         break;
     }

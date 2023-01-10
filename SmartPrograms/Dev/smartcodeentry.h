@@ -1,6 +1,7 @@
 #ifndef SMARTCODEENTRY_H
 #define SMARTCODEENTRY_H
 
+#include <QClipboard>
 #include <QElapsedTimer>
 #include <QLineEdit>
 #include <QWidget>
@@ -21,6 +22,10 @@ public:
         InputType m_type;
         int m_codeSize;
         QLineEdit* m_lineEdit;
+        QClipboard* m_clipboard;
+
+        bool m_useOCR;
+        QImage m_ocrImage;
     };
 
 public:
@@ -38,12 +43,14 @@ private slots:
     void cursorPositionChanged(int oldPos, int newPos);
     void selectionChanged();
     void textEdited(const QString &text);
+    void dataChanged();
 
 private:
     virtual void init();
     virtual void reset();
     virtual void runNextState();
 
+    bool verifyCode(QString const& code);
     void runCommandToKey();
 
     // Command indices
@@ -66,6 +73,7 @@ private:
     Settings m_programSettings;
     QPoint m_pos;
     QString m_code;
+    QString m_ocrCode;
 };
 
 #endif // SMARTCODEENTRY_H

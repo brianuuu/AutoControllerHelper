@@ -124,6 +124,12 @@ void SmartCodeEntry::textEdited(const QString &text)
     }
 }
 
+void SmartCodeEntry::dataChanged()
+{
+    m_programSettings.m_lineEdit->setText(m_programSettings.m_clipboard->text());
+    m_programSettings.m_clipboard->clear();
+}
+
 void SmartCodeEntry::init()
 {
     SmartProgramBase::init();
@@ -136,6 +142,12 @@ void SmartCodeEntry::init()
     connect(m_programSettings.m_lineEdit, &QLineEdit::cursorPositionChanged, this, &SmartCodeEntry::cursorPositionChanged);
     connect(m_programSettings.m_lineEdit, &QLineEdit::selectionChanged, this, &SmartCodeEntry::selectionChanged);
     connect(m_programSettings.m_lineEdit, &QLineEdit::textEdited, this, &SmartCodeEntry::textEdited);
+
+    if (m_programSettings.m_clipboard && !m_programSettings.m_useOCR)
+    {
+        m_programSettings.m_clipboard->clear();
+        connect(m_programSettings.m_clipboard, &QClipboard::dataChanged, this, &SmartCodeEntry::dataChanged);
+    }
 
     m_pos = QPoint(0,0);
     m_code = "";
@@ -155,57 +167,64 @@ void SmartCodeEntry::runNextState()
     {
     case SS_Init:
     {
-        // verify initial code
-        QString code = m_programSettings.m_lineEdit->text();
-        if (!code.isEmpty())
+        if (m_programSettings.m_useOCR)
         {
-            if (m_programSettings.m_type == IT_Keyboard)
-            {
-                for (QChar const& c : code)
-                {
-                    QPoint pos;
-                    if (!getKeyboardLocation(c.toLower(), pos))
-                    {
-                        emit printLog("Code contains invalid characters, please enter valid code", LOG_WARNING);
-                        m_programSettings.m_lineEdit->setText("");
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                for (QChar const& c : code)
-                {
-                    if (!c.isNumber())
-                    {
-                        emit printLog("Code contains non-number, please enter valid code", LOG_WARNING);
-                        m_programSettings.m_lineEdit->setText("");
-                        break;
-                    }
-                }
-            }
-        }
-
-        // grab first character
-        code = m_programSettings.m_lineEdit->text();
-        if (!code.isEmpty())
-        {
-            m_code = code.front();
-            emit printLog(QString("Adding character \"") + m_code.back() + "\"");
-            runCommandToKey();
+            m_substage = SS_Input;
+            setState_ocrRequest(m_programSettings.m_ocrImage);
         }
         else
         {
-            m_substage = SS_Input;
-            setState_runCommand("Nothing,1");
+            // verify initial code
+            QString code = m_programSettings.m_lineEdit->text();
+            if (!verifyCode(code))
+            {
+                m_programSettings.m_lineEdit->setText("");
+            }
+
+            // grab first character
+            code = m_programSettings.m_lineEdit->text();
+            if (!code.isEmpty())
+            {
+                m_code = code.front();
+                emit printLog(QString("Adding character \"") + m_code.back() + "\"");
+                runCommandToKey();
+            }
+            else
+            {
+                m_substage = SS_Input;
+                setState_runCommand("Nothing,1");
+            }
         }
         break;
     }
     case SS_Input:
     {
-        if (state == S_CommandFinished)
+        if (state == S_OCRReady)
         {
-            QString const code = m_programSettings.m_lineEdit->text();
+            m_ocrCode = getOCRStringRaw();
+            emit printLog("OCR returned string: " + m_ocrCode);
+
+            // verify if code is valid
+            if (m_ocrCode.size() != m_programSettings.m_codeSize)
+            {
+                setState_error("Expected " + QString::number(m_programSettings.m_codeSize) + "-letter code, found " + QString::number(m_ocrCode.size()));
+                break;
+            }
+
+            if (!verifyCode(m_ocrCode))
+            {
+                setState_error("Invalid code error");
+                break;
+            }
+
+            // start input!
+            m_code = m_ocrCode.front();
+            emit printLog(QString("Adding character \"") + m_code.back() + "\"");
+            runCommandToKey();
+        }
+        else if (state == S_CommandFinished)
+        {
+            QString const code = m_programSettings.m_useOCR ? m_ocrCode : m_programSettings.m_lineEdit->text();
             if (m_code.size() < code.size())
             {
                 // append next character
@@ -240,6 +259,38 @@ void SmartCodeEntry::runNextState()
     }
 
     SmartProgramBase::runNextState();
+}
+
+bool SmartCodeEntry::verifyCode(const QString &code)
+{
+    if (!code.isEmpty())
+    {
+        if (m_programSettings.m_type == IT_Keyboard)
+        {
+            for (QChar const& c : code)
+            {
+                QPoint pos;
+                if (!getKeyboardLocation(c.toLower(), pos))
+                {
+                    emit printLog("Code contains invalid characters, please try again", LOG_WARNING);
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            for (QChar const& c : code)
+            {
+                if (!c.isNumber())
+                {
+                    emit printLog("Code contains non-number, please try again", LOG_WARNING);
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
 }
 
 void SmartCodeEntry::runCommandToKey()

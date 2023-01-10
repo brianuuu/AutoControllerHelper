@@ -454,6 +454,7 @@ protected:
     void setState_runCommand(QString const& customCommand, bool requestFrameAnalyze = false);
     void setState_frameAnalyzeRequest();
     void setState_ocrRequest(QRect rect, HSVRange hsvRange);
+    void setState_ocrRequest(QImage const& image);
     void setState_error(QString _errorMsg) { m_state = S_Error; m_errorMsg = _errorMsg; }
 
     void initStat(Stat& stat, QString const& key);
@@ -486,6 +487,7 @@ private:
     QProcess    m_ocrProcess;
     QRect       m_ocrRect;
     HSVRange    m_ocrHSVRange;
+    QImage*     m_ocrCustomImage;
 };
 
 #endif // SMARTPROGRAMBASE_H
