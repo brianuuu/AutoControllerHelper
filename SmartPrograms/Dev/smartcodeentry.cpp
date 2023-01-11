@@ -126,7 +126,15 @@ void SmartCodeEntry::textEdited(const QString &text)
 
 void SmartCodeEntry::dataChanged()
 {
-    m_programSettings.m_lineEdit->setText(m_programSettings.m_lineEdit->text() + m_programSettings.m_clipboard->text());
+    QString code = m_programSettings.m_lineEdit->text() + m_programSettings.m_clipboard->text();
+    if (verifyCode(code))
+    {
+        m_programSettings.m_lineEdit->setText(code);
+    }
+    else
+    {
+        m_programSettings.m_lineEdit->setText("");
+    }
 }
 
 void SmartCodeEntry::init()
