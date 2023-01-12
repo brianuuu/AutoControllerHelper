@@ -613,7 +613,7 @@ void SmartSVEggOperation::runNextState()
                     if (m_eggsToHatch == 5)
                     {
                         // right after puting eggs to party
-                        emit printLog("Unable to detect cursor on current party, input might be missed, exiting Box and retrying...", LOG_WARNING);
+                        emit printLog("Unable to detect cursor on current party (SS_CheckHasEgg), input might be missed, exiting Box and retrying...", LOG_WARNING);
 
                         // don't call runToBoxCommand() so it doesn't reset m_missedInputRetryCount
                         m_substage = SS_MainMenu;
@@ -633,7 +633,7 @@ void SmartSVEggOperation::runNextState()
                 }
                 else
                 {
-                    runRestartCommand("Unable to detect cursor on current party, forcing restart", m_programSettings.m_isErrorCapture);
+                    runRestartCommand("Unable to detect cursor on current party (SS_CheckHasEgg), forcing restart", m_programSettings.m_isErrorCapture);
                 }
             }
         }
@@ -837,7 +837,7 @@ void SmartSVEggOperation::runNextState()
                         // if we miss LLeft or DDown it will not end up correct spot, exit box and try again
                         // if Minus is missed...? it won't be handled here
                         // right after puting eggs to party
-                        emit printLog("Unable to detect cursor on current party, input might be missed, exiting Box and retrying...", LOG_WARNING);
+                        emit printLog("Unable to detect cursor on current party (SS_CheckShiny: check = 0), input might be missed, exiting Box and retrying...", LOG_WARNING);
 
                         // don't call runToBoxCommand() so it doesn't reset m_missedInputRetryCount
                         m_substage = SS_MainMenu;
@@ -850,13 +850,13 @@ void SmartSVEggOperation::runNextState()
                     }
                     else
                     {
-                        emit printLog("Unable to detect cursor on current party, input might be missed, retrying...", LOG_WARNING);
+                        emit printLog("Unable to detect cursor on current party (SS_CheckShiny: check > 0), input might be missed, retrying...", LOG_WARNING);
                         setState_runCommand("DDown,3,Nothing,20");
                     }
                 }
                 else
                 {
-                    runRestartCommand("Unable to detect cursor on current party, forcing restart", m_programSettings.m_isErrorCapture);
+                    runRestartCommand("Unable to detect cursor on current party (SS_CheckShiny: miss input > 3), forcing restart", m_programSettings.m_isErrorCapture);
                 }
                 break;
             }
