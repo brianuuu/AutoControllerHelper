@@ -1743,6 +1743,7 @@ void RemoteControllerWindow::on_SP9_CB_Mode_currentIndexChanged(int index)
     ui->SP9_CB_HatchSandwich->setEnabled(type != SmartSVEggOperation::EOT_Collector);
     ui->SP9_CB_ShinySave->setEnabled(type != SmartSVEggOperation::EOT_Collector);
     ui->SP9_CB_BackupSave->setEnabled(type == SmartSVEggOperation::EOT_Shiny);
+    ui->SP9_CB_Wingull->setEnabled(type != SmartSVEggOperation::EOT_Collector);
 }
 
 void RemoteControllerWindow::on_SP19_SP_Count_valueChanged(int arg1)
@@ -2417,6 +2418,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         settings.m_isErrorCapture = ui->SP9_CB_Error->isChecked();
         settings.m_isSaveShiny = ui->SP9_CB_ShinySave->isChecked();
         settings.m_isUseBackupSave = ui->SP9_CB_BackupSave->isChecked();
+        settings.m_isShinyWingull = ui->SP9_CB_Wingull->isChecked();
         m_smartProgram = new SmartSVEggOperation(settings, parameter);
         break;
     }

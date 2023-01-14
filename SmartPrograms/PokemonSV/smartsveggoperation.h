@@ -28,6 +28,7 @@ public:
         bool m_isErrorCapture;
         bool m_isSaveShiny;
         bool m_isUseBackupSave;
+        bool m_isShinyWingull;
     };
 
 public:
@@ -151,6 +152,7 @@ private:
     QVector<PosEggCountMap> m_shinyPositions; // how many shiny we found this session (pos,egg no)
 
     int m_shinySoundID;
+    int m_shinyBattleID;
     bool m_shinySoundDetected;
 
     // Stats

@@ -65,10 +65,11 @@ void SmartSVEggOperation::runNextState()
         setState_runCommand(C_Restart);
 
         m_shinySoundDetected = false;
-        if (m_programSettings.m_isShinyDetection && m_programSettings.m_operation != EOT_Collector)
+        if ((m_programSettings.m_isShinyDetection || m_programSettings.m_isShinyWingull) && m_programSettings.m_operation != EOT_Collector)
         {
             // Setup sound detection
             m_shinySoundID = m_audioManager->addDetection("PokemonSV/ShinySFXHatch", 0.2f, 5000);
+            m_shinyBattleID = m_audioManager->addDetection("PokemonSV/ShinySFXBattle", 0.2f, 5000);
             connect(m_audioManager, &AudioManager::soundDetected, this, &SmartSVEggOperation::soundDetected);
         }
         break;
@@ -679,6 +680,12 @@ void SmartSVEggOperation::runNextState()
                 m_substage = SS_HatchEggs;
                 setState_runCommand("B,20,LRight,3750",true);
                 m_videoManager->setAreas({A_Health,A_Battle,A_Dialog});
+
+                // shiny wingull detection
+                if (m_programSettings.m_isShinyWingull)
+                {
+                    m_audioManager->startDetection(m_shinyBattleID);
+                }
             }
             else
             {
@@ -692,16 +699,30 @@ void SmartSVEggOperation::runNextState()
         if (state == S_CommandFinished)
         {
             runRestartCommand("Did not hatch any eggs for 3 minutes, forcing restart");
+            if (m_programSettings.m_isShinyWingull)
+            {
+                m_audioManager->stopDetection(m_shinyBattleID);
+            }
         }
         else if (state == S_CaptureReady)
         {
             if (checkBrightnessMeanTarget(A_Battle.m_rect, C_Color_Yellow, 180) && checkBrightnessMeanTarget(A_Health.m_rect, C_Color_Green, 200))
             {
-                // go into a battle
-                emit printLog("Encountered wild pokemon, running", LOG_WARNING);
-                m_substage = SS_Battle;
-                setState_runCommand("DUp,3,ASpam,100");
-                m_videoManager->clearCaptures();
+                if (m_shinySoundDetected)
+                {
+                    incrementStat(m_statShinyHatched);
+                    emit printLog("Encountered wild SHINY pokemon, capturing video!", LOG_SUCCESS);
+                    m_substage = SS_Finished;
+                    setState_runCommand("Capture,22,Home,2");
+                }
+                else
+                {
+                    // go into a battle
+                    emit printLog("Encountered wild pokemon, running", LOG_WARNING);
+                    m_substage = SS_Battle;
+                    setState_runCommand("DUp,3,ASpam,100");
+                    m_videoManager->clearCaptures();
+                }
             }
             else if (checkBrightnessMeanTarget(A_Dialog.m_rect, C_Color_Dialog, 200))
             {
@@ -735,6 +756,10 @@ void SmartSVEggOperation::runNextState()
                 m_videoManager->clearCaptures();
 
                 // sound detection
+                if (m_programSettings.m_isShinyWingull)
+                {
+                    m_audioManager->stopDetection(m_shinyBattleID);
+                }
                 if (m_programSettings.m_isShinyDetection)
                 {
                     m_audioManager->startDetection(m_shinySoundID);
@@ -810,6 +835,12 @@ void SmartSVEggOperation::runNextState()
                 setState_runCommand((m_substage == SS_Battle) ? "LUpRight,30,LRight,3750" : "LRight,3750", true);
                 m_substage = SS_HatchEggs;
                 m_videoManager->setAreas({A_Health,A_Battle,A_Dialog});
+
+                // shiny wingull detection
+                if (m_programSettings.m_isShinyWingull && m_substage == SS_Hatching)
+                {
+                    m_audioManager->startDetection(m_shinyBattleID);
+                }
             }
         }
         break;
@@ -1067,7 +1098,7 @@ void SmartSVEggOperation::runRestartCommand(QString error, bool capture)
         error = "An error has occurred but " + QString::number(m_shinyPositions.size()) + " SHINY Pokemon is found, preventing restart";
         emit printLog(error);
         m_substage = SS_Finished;
-        setState_runCommand(capture ? "Capture,22,Nothing,200" : "Nothing,10");
+        setState_runCommand(capture ? "Capture,22,Home,2" : "Home,2");
         return;
     }
 
@@ -1076,7 +1107,7 @@ void SmartSVEggOperation::runRestartCommand(QString error, bool capture)
         error = "An error has occurred but " + QString::number(m_eggColumnsHatched) + " column(s) of eggs has been hatched, preventing restart";
         emit printLog(error);
         m_substage = SS_Finished;
-        setState_runCommand(capture ? "Capture,22,Nothing,200" : "Nothing,10");
+        setState_runCommand(capture ? "Capture,22,Home,2" : "Home,2");
         return;
     }
 
@@ -1169,9 +1200,11 @@ const CaptureArea SmartSVEggOperation::GetPartyCaptureAreaOfPos(int y)
 
 void SmartSVEggOperation::soundDetected(int id)
 {
-    if (id != m_shinySoundID) return;
-
-    if (m_substage == SS_Hatching)
+    if (id == m_shinySoundID && m_substage == SS_Hatching)
+    {
+        m_shinySoundDetected = true;
+    }
+    else if (id == m_shinyBattleID && m_substage == SS_HatchEggs)
     {
         m_shinySoundDetected = true;
     }
