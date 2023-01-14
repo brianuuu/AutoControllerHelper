@@ -33,8 +33,8 @@ bool SmartCodeEntry::getKeyboardLocation(QChar key, QPoint &o_point)
         {'t', {4,1}},
         {'y', {5,1}},
         {'u', {6,1}},
-        {'i', {7,1}},
-        {'o', {8,1}},
+        //{'i', {7,1}},
+        //{'o', {8,1}},
         {'p', {9,1}},
 
         {'a', {0,2}},
@@ -47,7 +47,7 @@ bool SmartCodeEntry::getKeyboardLocation(QChar key, QPoint &o_point)
         {'k', {7,2}},
         {'l', {8,2}},
 
-        {'z', {0,3}},
+        //{'z', {0,3}},
         {'x', {1,3}},
         {'c', {2,3}},
         {'v', {3,3}},
@@ -209,6 +209,26 @@ void SmartCodeEntry::runNextState()
         {
             m_ocrCode = getOCRStringRaw();
             emit printLog("OCR returned string: " + m_ocrCode);
+
+            // Fix some impossible characters
+            for (QChar& c : m_ocrCode)
+            {
+                if (c.toLower() == 'i')
+                {
+                    emit printLog("I is probably a 1", LOG_WARNING);
+                    c = '1';
+                }
+                else if (c.toLower() == 'o')
+                {
+                    emit printLog("O is probably a 0", LOG_WARNING);
+                    c = '0';
+                }
+                else if (c == ')')
+                {
+                    emit printLog(") is probably a J", LOG_WARNING);
+                    c = 'J';
+                }
+            }
 
             // verify if code is valid
             if (m_ocrCode.size() != m_programSettings.m_codeSize)
