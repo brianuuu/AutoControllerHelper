@@ -52,6 +52,7 @@
 #include "SmartPrograms/PokemonSwSh/smartdailyhighlight.h"
 #include "SmartPrograms/PokemonSwSh/smartberryfarmer.h"
 #include "SmartPrograms/PokemonSwSh/smartwattfarmer.h"
+#include "SmartPrograms/PokemonSwSh/smarteggoperation.h"
 
 #include "SmartPrograms/PokemonBDSP/smartbdspstarter.h"
 #include "SmartPrograms/PokemonBDSP/smartbdspboxoperation.h"
@@ -169,6 +170,8 @@ private slots:
     void on_SP19_SP_Count_valueChanged(int arg1);
     void on_SP19_CB_OCR_toggled(bool checked);
     void on_SP19_SP_Select_clicked();
+
+    void on_SP20_CB_Mode_currentIndexChanged(int index);
 
     void on_SoundDetection_required(int min, int max);
     void on_SmartProgram_printLog(QString const log, QColor color);

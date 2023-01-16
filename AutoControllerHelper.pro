@@ -52,6 +52,7 @@ SOURCES += \
     SmartPrograms/PokemonSwSh/smartberryfarmer.cpp \
     SmartPrograms/PokemonSwSh/smartdailyhighlight.cpp \
     SmartPrograms/PokemonSwSh/smartdayskipper.cpp \
+    SmartPrograms/PokemonSwSh/smarteggoperation.cpp \
     SmartPrograms/PokemonSwSh/smartloto.cpp \
     SmartPrograms/PokemonSwSh/smartmaxraidbattler.cpp \
     SmartPrograms/PokemonSwSh/smartpurplebeamfilder.cpp \
@@ -105,6 +106,7 @@ HEADERS += \
     SmartPrograms/PokemonSwSh/smartberryfarmer.h \
     SmartPrograms/PokemonSwSh/smartdailyhighlight.h \
     SmartPrograms/PokemonSwSh/smartdayskipper.h \
+    SmartPrograms/PokemonSwSh/smarteggoperation.h \
     SmartPrograms/PokemonSwSh/smartloto.h \
     SmartPrograms/PokemonSwSh/smartmaxraidbattler.h \
     SmartPrograms/PokemonSwSh/smartpurplebeamfilder.h \

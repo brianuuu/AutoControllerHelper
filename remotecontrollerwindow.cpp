@@ -1775,6 +1775,13 @@ void RemoteControllerWindow::on_SP19_SP_Select_clicked()
     }
 }
 
+void RemoteControllerWindow::on_SP20_CB_Mode_currentIndexChanged(int index)
+{
+    SmartEggOperation::EggOperationType type = SmartEggOperation::EggOperationType(index);
+    ui->SP20_SB_Collect->setEnabled(type == SmartEggOperation::EOT_Collector);
+    ui->SP20_SB_Column->setEnabled(type == SmartEggOperation::EOT_Hatcher);
+}
+
 void RemoteControllerWindow::on_SoundDetection_required(int min, int max)
 {
     ui->CB_AudioDisplayMode->setCurrentIndex(ADM_Spectrogram);
@@ -2308,6 +2315,15 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     case SP_WattFarmer:
     {
         m_smartProgram = new SmartWattFarmer(ui->SP6_CB_Skips->isChecked() ? ui->SP6_SB_Skips->value() : 0, parameter);
+        break;
+    }
+    case SP_EggOperation:
+    {
+        SmartEggOperation::Settings settings;
+        settings.m_operation = SmartEggOperation::EggOperationType(ui->SP20_CB_Mode->currentIndex());
+        settings.m_targetEggCount = ui->SP20_SB_Collect->value();
+        settings.m_columnsToHatch = ui->SP20_SB_Column->value();
+        m_smartProgram = new SmartEggOperation(settings, parameter);
         break;
     }
     case SP_BDSP_Starter:
