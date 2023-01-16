@@ -1736,7 +1736,7 @@ void RemoteControllerWindow::on_SP6_CB_Skips_clicked()
 
 void RemoteControllerWindow::on_SP9_CB_Mode_currentIndexChanged(int index)
 {
-    SmartSVEggOperation::EggOperationType type = SmartSVEggOperation::EggOperationType(ui->SP9_CB_Mode->currentIndex());
+    SmartSVEggOperation::EggOperationType type = SmartSVEggOperation::EggOperationType(index);
     ui->SP9_SB_Sandwich->setEnabled(type == SmartSVEggOperation::EOT_Collector);
     ui->SP9_CB_Sound->setEnabled(type != SmartSVEggOperation::EOT_Collector);
     ui->SP9_SB_Column->setEnabled(type == SmartSVEggOperation::EOT_Hatcher);

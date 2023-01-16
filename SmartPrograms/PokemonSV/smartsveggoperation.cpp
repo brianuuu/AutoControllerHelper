@@ -267,6 +267,15 @@ void SmartSVEggOperation::runNextState()
             }
             else if (checkBrightnessMeanTarget(A_Sandwich.m_rect, C_Color_Sandwich, 220))
             {
+                if (m_timer.elapsed() < 500)
+                {
+                    incrementStat(m_statError);
+                    emit printLog("Picnic tablecloth is too bright, please change it to darker colors", LOG_ERROR);
+                    m_substage = SS_Finished;
+                    setState_runCommand("Home,2,Nothing,20");
+                    break;
+                }
+
                 QString command = m_programSettings.m_sandwichPosX > 0 ? "DRight,2,Nothing,3,Loop,1" : "Nothing,2,Loop,1";
                 if (m_programSettings.m_sandwichPosY > 0)
                 {
@@ -832,15 +841,15 @@ void SmartSVEggOperation::runNextState()
             }
             else
             {
-                setState_runCommand((m_substage == SS_Battle) ? "LUpRight,30,LRight,3750" : "LRight,3750", true);
-                m_substage = SS_HatchEggs;
-                m_videoManager->setAreas({A_Health,A_Battle,A_Dialog});
-
                 // shiny wingull detection
                 if (m_programSettings.m_isShinyWingull && m_substage == SS_Hatching)
                 {
                     m_audioManager->startDetection(m_shinyBattleID);
                 }
+
+                setState_runCommand((m_substage == SS_Battle) ? "LUpRight,30,LRight,3750" : "LRight,3750", true);
+                m_substage = SS_HatchEggs;
+                m_videoManager->setAreas({A_Health,A_Battle,A_Dialog});
             }
         }
         break;
