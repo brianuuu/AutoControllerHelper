@@ -39,6 +39,7 @@ enum SmartProgram : uint32_t
     SP_BerryFarmer,
     SP_WattFarmer,
     SP_EggOperation,
+    SP_BoxRelease,
 
     SP_BDSP_Starter,
     SP_BDSP_MenuGlitch113,
@@ -122,6 +123,7 @@ public:
             case SP_BerryFarmer:            return "Berry Farmer";
             case SP_WattFarmer:             return "Watt Farmer";
             case SP_EggOperation:           return "Egg Operation";
+            case SP_BoxRelease:             return "Box Release";
 
             case SP_BDSP_Starter:           return "Reset Starter";
             case SP_BDSP_MenuGlitch113:     return "Menu Glitch v1.1.3";
@@ -188,6 +190,7 @@ public:
             case SP_BerryFarmer:            return "SmartBerryFarmer";
             case SP_WattFarmer:             return "SmartWattFarmer";
             case SP_EggOperation:           return "SmartEggOperation";
+            case SP_BoxRelease:             return "SmartBoxReleases";
 
             case SP_BDSP_Starter:           return "SmartBDSPStarter";
             case SP_BDSP_MenuGlitch113:     return "SmartBDSPMenuGlitch113";
@@ -241,6 +244,7 @@ public:
             case SP_BerryFarmer:            return 6;
             case SP_WattFarmer:             return 6;
             case SP_EggOperation:           return 20;
+            case SP_BoxRelease:             return 4;
 
             case SP_BDSP_Starter:           return 7;
             case SP_BDSP_MenuGlitch113:     return 0;
@@ -308,6 +312,7 @@ public:
         case SP_Test:
         case SP_CodeEntry:
         case SP_BattleTower:
+        case SP_BoxRelease:
         case SP_BDSP_MenuGlitch113:
         case SP_BDSP_BoxDuplication:
         case SP_PLA_BraviaryGainHeight:

@@ -2032,6 +2032,7 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
         ui->SPGeneric1_Count->setRange(1,960);
         break;
     }
+    case SP_BoxRelease:
     case SP_SV_BoxReleaseSafe:
     {
         ui->SPGeneric1_Note->setText("");
@@ -2326,6 +2327,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         settings.m_columnsToHatch = ui->SP20_SB_Column->value();
         settings.m_targetReleaseBoxCount = ui->SP20_SB_Release->value();
         m_smartProgram = new SmartEggOperation(settings, parameter);
+        break;
+    }
+    case SP_BoxRelease:
+    {
+        m_smartProgram = new SmartBoxRelease(ui->SPGeneric1_Count->value(), parameter);
         break;
     }
     case SP_BDSP_Starter:

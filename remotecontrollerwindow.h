@@ -53,6 +53,7 @@
 #include "SmartPrograms/PokemonSwSh/smartberryfarmer.h"
 #include "SmartPrograms/PokemonSwSh/smartwattfarmer.h"
 #include "SmartPrograms/PokemonSwSh/smarteggoperation.h"
+#include "SmartPrograms/PokemonSwSh/smartboxrelease.h"
 
 #include "SmartPrograms/PokemonBDSP/smartbdspstarter.h"
 #include "SmartPrograms/PokemonBDSP/smartbdspboxoperation.h"
