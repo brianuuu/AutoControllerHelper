@@ -31,6 +31,11 @@ void SmartEggOperation::reset()
     m_eggsToHatchCount = 0;
     m_eggsToHatchColumn = 0;
     m_blackScreenDetected = false;
+    m_keepColumnCount = 0;
+
+    m_releaseCount = 0;
+
+    m_shinyCount = 0;
     m_keepCount = 0;
 }
 
@@ -44,13 +49,15 @@ void SmartEggOperation::runNextState()
         initStat(m_statError, "Errors");
         initStat(m_statEggCollected, "Eggs Collected");
         initStat(m_statEggHatched, "Eggs Hatched");
+        initStat(m_statShinyHatched, "Shinies");
+        initStat(m_statPokemonKept, "Kept");
 
         switch (m_programSettings.m_operation)
         {
         case EOT_Collector:
         {
             m_substage = SS_CollectCycle;
-            setState_runCommand("Nothing,2");
+            setState_runCommand("Nothing,1");
             break;
         }
         case EOT_Hatcher:
@@ -63,6 +70,12 @@ void SmartEggOperation::runNextState()
 
             m_substage = SS_ToHatch;
             setState_runCommand(C_ToHatch);
+            break;
+        }
+        case EOT_Release:
+        {
+            m_substage = SS_ReleaseConfirm;
+            setState_runCommand("Nothing,1");
             break;
         }
         default:
@@ -198,7 +211,7 @@ void SmartEggOperation::runNextState()
                 }
                 else
                 {
-                    m_keepCount = 0;
+                    m_keepColumnCount = 0;
 
                     // go to the bottom of the hatched eggs
                     m_substage = SS_CheckStats;
@@ -347,13 +360,18 @@ void SmartEggOperation::runNextState()
             if (m_eggsToHatchCount > 0)
             {
                 QString log = "Column " + QString::number(m_eggColumnsHatched) + " row " + QString::number(m_eggsToHatchCount);
-                log += " (Egg no." + QString::number(m_statEggHatched.first - m_eggsToHatchColumn + m_eggsToHatchCount) + ")";
+                //log += " (Egg no." + QString::number(m_statEggHatched.first - m_eggsToHatchColumn + m_eggsToHatchCount) + ")";
 
                 QString command;
                 if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
                 {
-                    m_keepCount++;
+                    m_keepColumnCount++;
                     emit printLog(log + " is SHINY!!! Moving it to keep box!", LOG_SUCCESS);
+
+                    m_keepCount++;
+                    incrementStat(m_statPokemonKept);
+                    m_shinyCount++;
+                    incrementStat(m_statShinyHatched);
 
                     command = "A,3,Loop,1"; // pick up
                     int scrollCount = 1 + (m_eggColumnsHatched - 1) / 6;
@@ -392,7 +410,7 @@ void SmartEggOperation::runNextState()
             // we are here if m_eggsToHatchCount == 0
             m_substage = SS_NextColumn;
             QString command;
-            if (m_keepCount == m_eggsToHatchColumn)
+            if (m_keepColumnCount == m_eggsToHatchColumn)
             {
                 emit printLog("There are no more Pokemon in the party");
                 setState_runCommand("Y,1,DUp,1,Loop,1,DRight,1,Nothing,1,Loop," + QString::number((m_eggColumnsHatched - 1) % 6 + 1));
@@ -407,10 +425,28 @@ void SmartEggOperation::runNextState()
     }
     case SS_NextColumn:
     {
-        if (state == S_CommandFinished)
+        if (state == S_CaptureReady)
         {
             if (m_eggColumnsHatched >= m_programSettings.m_columnsToHatch)
             {
+                if (m_shinyCount > 0)
+                {
+                    emit printLog(QString::number(m_shinyCount) + " SHINY Pokemon has been found", LOG_SUCCESS);
+                }
+                else
+                {
+                    emit printLog("No Shiny Pokemon is found...");
+                }
+
+                if (m_keepCount - m_shinyCount > 0)
+                {
+                    emit printLog(QString::number(m_keepCount - m_shinyCount) + " Non-Shiny Pokemon has been stored in keep box", LOG_SUCCESS);
+                }
+                else
+                {
+                    emit printLog("No Non-Shiny Pokemon is kept...");
+                }
+
                 // we are done
                 m_substage = SS_Finished;
                 setState_runCommand("Home,2");
@@ -434,6 +470,127 @@ void SmartEggOperation::runNextState()
         }
         break;
     }
+    case SS_ReleaseHasPokemon:
+    {
+        if (state == S_CommandFinished)
+        {
+            // no pokemon, next
+            m_releaseCount++;
+            emit printLog(GetCurrentBoxPosString(m_releaseCount) + " has no Pokemon");
+
+            m_substage = SS_ReleaseConfirm;
+            setState_runCommand("Nothing,1");
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (checkBrightnessMeanTarget(A_DialogBox.m_rect, C_Color_Dialog, 240))
+            {
+                m_substage = SS_ReleaseYesNo;
+                setState_runCommand("DUp,1,LUp,1,A,20");
+                m_videoManager->setAreas({A_No,A_DialogBox,A_Shiny});
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
+            }
+        }
+        break;
+    }
+    case SS_ReleaseYesNo:
+    {
+        if (state == S_CommandFinished)
+        {
+            m_timer.restart();
+            setState_frameAnalyzeRequest();
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (m_timer.elapsed() > 1000)
+            {
+                if (checkBrightnessMeanTarget(A_DialogBox.m_rect, C_Color_Dialog, 240))
+                {
+                    m_releaseCount++;
+                    emit printLog(GetCurrentBoxPosString(m_releaseCount) + " cannot be released, was it an egg?", LOG_WARNING);
+
+                    m_substage = SS_ReleaseConfirm;
+                    setState_runCommand("A,25");
+                }
+                else
+                {
+                    incrementStat(m_statError);
+                    setState_error("Unable to detect Yes/No box when releasing Pokemon");
+                }
+            }
+            else if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
+            {
+                // shiny, don't release
+                m_releaseCount++;
+                emit printLog(GetCurrentBoxPosString(m_releaseCount) + " is a SHINY, not releasing", LOG_WARNING);
+
+                m_substage = SS_ReleaseConfirm;
+                setState_runCommand("B,30");
+            }
+            else if (checkBrightnessMeanTarget(A_No.m_rect, C_Color_Black, 200))
+            {
+                m_releaseCount++;
+                emit printLog(GetCurrentBoxPosString(m_releaseCount) + " is released");
+
+                m_substage = SS_ReleaseConfirm;
+                setState_runCommand("DUp,1,ASpam,50");
+                m_videoManager->clearCaptures();
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
+            }
+        }
+        break;
+    }
+    case SS_ReleaseConfirm:
+    {
+        if (state == S_CommandFinished)
+        {
+            if (m_releaseCount / 30 == m_programSettings.m_targetReleaseBoxCount)
+            {
+                m_substage = SS_Finished;
+                setState_runCommand("Home,2");
+            }
+            else
+            {
+                m_substage = SS_ReleaseHasPokemon;
+                m_videoManager->setAreas({A_DialogBox});
+
+                if (m_releaseCount == 0)
+                {
+                    setState_runCommand("A,25", true);
+                }
+                else
+                {
+                    if (m_releaseCount % 30 == 0)
+                    {
+                        // next box
+                        setState_runCommand("DRight,1,LRight,1,DDown,1,LDown,1,DDown,1,R,1,Nothing,5,A,25", true);
+                    }
+                    else if (m_releaseCount % 6 == 0)
+                    {
+                        // next row
+                        setState_runCommand("DDown,1,A,25", true);
+                    }
+                    else if (((m_releaseCount % 30) / 6) % 2 == 0)
+                    {
+                        // odd row
+                        setState_runCommand("DRight,1,A,25", true);
+                    }
+                    else
+                    {
+                        // even row
+                        setState_runCommand("DLeft,1,A,25", true);
+                    }
+                }
+            }
+        }
+        break;
+    }
     case SS_Finished:
     {
         if (state == S_CommandFinished)
@@ -445,6 +602,28 @@ void SmartEggOperation::runNextState()
     }
 
     SmartProgramBase::runNextState();
+}
+
+QPoint SmartEggOperation::GetCurrentBoxPosFromReleaseCount(int count)
+{
+    if (count < 1)
+    {
+        // wtf
+        return QPoint(0,0);
+    }
+
+    // [0-29]
+    count = (count - 1) % 30;
+
+    int row = (count / 6) + 1;
+    int column = (row % 2 == 0) ? column = 6 - (count % 6) : column = (count % 6) + 1;
+    return QPoint(column, row);
+}
+
+QString SmartEggOperation::GetCurrentBoxPosString(int count)
+{
+    QPoint pos = GetCurrentBoxPosFromReleaseCount(count);
+    return "Column " + QString::number(pos.x()) + " row " + QString::number(pos.y()) + " in Box " + QString::number(((count - 1) / 30) + 1);
 }
 
 const CaptureArea SmartEggOperation::GetPartyCaptureAreaOfPos(int y)
