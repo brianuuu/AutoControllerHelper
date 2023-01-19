@@ -4883,7 +4883,7 @@ Enter the Trade Partner:</string>
                           </item>
                           <item>
                            <property name="text">
-                            <string/>
+                            <string>Shiny Mode</string>
                            </property>
                           </item>
                          </widget>
@@ -4914,12 +4914,6 @@ Enter the Trade Partner:</string>
                         </item>
                         <item>
                          <widget class="QSpinBox" name="SP20_SB_Collect">
-                          <property name="minimumSize">
-                           <size>
-                            <width>86</width>
-                            <height>0</height>
-                           </size>
-                          </property>
                           <property name="minimum">
                            <number>1</number>
                           </property>
@@ -4943,12 +4937,6 @@ Enter the Trade Partner:</string>
                          <widget class="QSpinBox" name="SP20_SB_Column">
                           <property name="enabled">
                            <bool>false</bool>
-                          </property>
-                          <property name="minimumSize">
-                           <size>
-                            <width>86</width>
-                            <height>0</height>
-                           </size>
                           </property>
                           <property name="minimum">
                            <number>1</number>
@@ -4984,17 +4972,11 @@ Enter the Trade Partner:</string>
                           <property name="enabled">
                            <bool>false</bool>
                           </property>
-                          <property name="minimumSize">
-                           <size>
-                            <width>86</width>
-                            <height>0</height>
-                           </size>
-                          </property>
-                          <property name="minimum">
-                           <number>0</number>
-                          </property>
                           <property name="maximum">
                            <number>300</number>
+                          </property>
+                          <property name="value">
+                           <number>1</number>
                           </property>
                          </widget>
                         </item>

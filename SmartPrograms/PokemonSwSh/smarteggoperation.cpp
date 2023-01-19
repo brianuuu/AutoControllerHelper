@@ -23,17 +23,26 @@ void SmartEggOperation::reset()
 
     m_substage = SS_Init;
 
+    resetCollectorModeMembers();
+    resetHatcherModeMembers();
+
+    m_shinyCount = 0;
+    m_keepCount = 0;
+}
+
+void SmartEggOperation::resetCollectorModeMembers()
+{
     m_eggsCollected = 0;
     m_talkDialogAttempts = 0;
     m_eggCollectAttempts = 0;
+}
 
+void SmartEggOperation::resetHatcherModeMembers()
+{
     m_eggColumnsHatched = 0;
     m_eggsToHatchCount = 0;
     m_eggsToHatchColumn = 0;
     m_blackScreenDetected = false;
-
-    m_shinyCount = 0;
-    m_keepCount = 0;
 }
 
 void SmartEggOperation::runNextState()
@@ -67,6 +76,19 @@ void SmartEggOperation::runNextState()
 
             m_substage = SS_ToHatch;
             setState_runCommand(C_ToHatch);
+            break;
+        }
+        case EOT_Shiny:
+        {
+            if (m_programSettings.m_targetShinyCount == 0)
+            {
+                setState_error("0 Shiny Pokemon target is set");
+                break;
+            }
+
+            m_programSettings.m_targetEggCount = 30;
+            m_substage = SS_CollectCycle;
+            setState_runCommand("Nothing,1");
             break;
         }
         default:
@@ -152,13 +174,25 @@ void SmartEggOperation::runNextState()
         {
             if (m_eggsCollected >= m_programSettings.m_targetEggCount)
             {
-                m_substage = SS_Finished;
-                setState_runCommand("Home,2");
-                break;
-            }
+                if (m_programSettings.m_operation == EOT_Shiny)
+                {
+                    m_programSettings.m_columnsToHatch = 6;
+                    resetHatcherModeMembers();
 
-            m_substage = SS_CollectCycle;
-            setState_runCommand(C_CollectCycle);
+                    m_substage = SS_ToHatch;
+                    setState_runCommand(C_ToHatch);
+                }
+                else
+                {
+                    m_substage = SS_Finished;
+                    setState_runCommand("Home,2");
+                }
+            }
+            else
+            {
+                m_substage = SS_CollectCycle;
+                setState_runCommand(C_CollectCycle);
+            }
         }
         break;
     }
@@ -166,11 +200,12 @@ void SmartEggOperation::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            m_substage = SS_ToBox;
+            m_substage = (m_programSettings.m_operation == EOT_Shiny) ? SS_BoxFiller : SS_ToBox;
             setState_runCommand(C_ToBox);
         }
         break;
     }
+    case SS_BoxFiller:
     case SS_ToBox:
     {
         if (state == S_CommandFinished)
@@ -190,15 +225,25 @@ void SmartEggOperation::runNextState()
             {
                 if (m_eggColumnsHatched == 0)
                 {
-                    m_substage = SS_CheckEggCount;
-                    setState_runCommand(C_FirstColumn);
-                    m_videoManager->setAreas({
-                                                 GetPartyCaptureAreaOfPos(2),
-                                                 GetPartyCaptureAreaOfPos(3),
-                                                 GetPartyCaptureAreaOfPos(4),
-                                                 GetPartyCaptureAreaOfPos(5),
-                                                 GetPartyCaptureAreaOfPos(6)
-                                             });
+                    if (m_substage == SS_BoxFiller)
+                    {
+                        // put 5 pokemon in team to keep box
+                        emit printLog("Putting 5 filler Pokemon to keep box");
+                        m_substage = SS_ToBox;
+                        setState_runCommand(C_BoxFiller);
+                    }
+                    else
+                    {
+                        m_substage = SS_CheckEggCount;
+                        setState_runCommand(C_FirstColumn);
+                        m_videoManager->setAreas({
+                                                     GetPartyCaptureAreaOfPos(2),
+                                                     GetPartyCaptureAreaOfPos(3),
+                                                     GetPartyCaptureAreaOfPos(4),
+                                                     GetPartyCaptureAreaOfPos(5),
+                                                     GetPartyCaptureAreaOfPos(6)
+                                                 });
+                    }
                 }
                 else
                 {
@@ -416,6 +461,21 @@ void SmartEggOperation::runNextState()
                     emit printLog("No Non-Shiny Pokemon is kept...");
                 }
 
+                if (m_programSettings.m_operation == EOT_Shiny)
+                {
+                    if (m_shinyCount < m_programSettings.m_targetShinyCount)
+                    {
+                        emit printLog(QString::number(m_programSettings.m_targetShinyCount - m_shinyCount) + " shiny Pokemon remaining to find");
+
+                        emit printLog("Taking 5 filler Pokemon from keep box to party");
+                        m_substage = SS_TakeFiller;
+                        setState_runCommand(C_TakeFiller);
+                        break;
+                    }
+
+                    // TODO: other keep pokemon
+                }
+
                 // we are done
                 m_substage = SS_Finished;
                 setState_runCommand("Home,2");
@@ -499,6 +559,19 @@ void SmartEggOperation::runNextState()
             {
                 setState_frameAnalyzeRequest();
             }
+        }
+        break;
+    }
+    case SS_TakeFiller:
+    {
+        if (state == S_CommandFinished)
+        {
+            emit printLog("Returning to collect more eggs");
+            resetCollectorModeMembers();
+
+            // go back to collecting eggs
+            m_substage = SS_CollectCycle;
+            setState_runCommand("BSpam,80," + m_commands[C_ToCollect]);
         }
         break;
     }

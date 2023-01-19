@@ -12,6 +12,7 @@ public:
     {
         EOT_Collector = 0,
         EOT_Hatcher,
+        EOT_Shiny,
         EOT_COUNT,
     };
 
@@ -20,6 +21,8 @@ public:
         EggOperationType m_operation;
         int m_targetEggCount;
         int m_columnsToHatch;
+        bool m_isShinySound;
+        int m_targetShinyCount;
     };
 
 public:
@@ -38,6 +41,8 @@ private:
     virtual void init();
     virtual void reset();
     virtual void runNextState();
+    void resetCollectorModeMembers();
+    void resetHatcherModeMembers();
     void runKeepPokemonCommand(int yPos);
 
     // Command indices
@@ -49,7 +54,9 @@ private:
     Command const C_HatchCycle      = 5;
     Command const C_HatchReturn     = 6;
     Command const C_FirstColumn     = 7;
-    Command const C_COUNT           = 8;
+    Command const C_BoxFiller       = 8;
+    Command const C_TakeFiller      = 9;
+    Command const C_COUNT           = 10;
 
     // List of test color
     HSVRange const C_Color_Black = HSVRange(0,0,0,359,30,100); // >200
@@ -91,6 +98,10 @@ private:
         SS_ReleaseHasPokemon,
         SS_ReleaseYesNo,
         SS_ReleaseConfirm,
+
+        // shiny
+        SS_BoxFiller,
+        SS_TakeFiller,
 
         SS_Finished,
     };
