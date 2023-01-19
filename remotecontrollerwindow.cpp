@@ -1780,7 +1780,6 @@ void RemoteControllerWindow::on_SP20_CB_Mode_currentIndexChanged(int index)
     SmartEggOperation::EggOperationType type = SmartEggOperation::EggOperationType(index);
     ui->SP20_SB_Collect->setEnabled(type == SmartEggOperation::EOT_Collector);
     ui->SP20_SB_Column->setEnabled(type == SmartEggOperation::EOT_Hatcher);
-    ui->SP20_SB_Release->setEnabled(type == SmartEggOperation::EOT_Release);
 }
 
 void RemoteControllerWindow::on_SoundDetection_required(int min, int max)
@@ -2325,7 +2324,6 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         settings.m_operation = SmartEggOperation::EggOperationType(ui->SP20_CB_Mode->currentIndex());
         settings.m_targetEggCount = ui->SP20_SB_Collect->value();
         settings.m_columnsToHatch = ui->SP20_SB_Column->value();
-        settings.m_targetReleaseBoxCount = ui->SP20_SB_Release->value();
         m_smartProgram = new SmartEggOperation(settings, parameter);
         break;
     }

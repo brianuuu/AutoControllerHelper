@@ -12,7 +12,6 @@ public:
     {
         EOT_Collector = 0,
         EOT_Hatcher,
-        EOT_Release,
         EOT_COUNT,
     };
 
@@ -21,7 +20,6 @@ public:
         EggOperationType m_operation;
         int m_targetEggCount;
         int m_columnsToHatch;
-        int m_targetReleaseBoxCount;
     };
 
 public:
@@ -40,8 +38,7 @@ private:
     virtual void init();
     virtual void reset();
     virtual void runNextState();
-    static QPoint GetCurrentBoxPosFromReleaseCount(int count);
-    static QString GetCurrentBoxPosString(int count);
+    void runKeepPokemonCommand(int yPos);
 
     // Command indices
     Command const C_CollectCycle    = 0;
@@ -87,6 +84,7 @@ private:
         SS_HatchCycle,
         SS_Hatching,
         SS_CheckStats,
+        SS_KeepPokemon,
         SS_NextColumn,
 
         // release
@@ -112,10 +110,6 @@ private:
     int m_eggsToHatchCount; // how many eggs we have hatched for the current column?
     int m_eggsToHatchColumn; // hatching for this loop? should always be 5 but can be fewer
     bool m_blackScreenDetected; // for detecting finishing hatch
-    int m_keepColumnCount; // how many pokemon of the current column is moved to the keep box?
-
-    // release
-    int m_releaseCount; // how many pokemon have released
 
     // final
     int m_shinyCount; // how many shiny pokemon found this session
