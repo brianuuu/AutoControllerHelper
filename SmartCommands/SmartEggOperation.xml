@@ -3,7 +3,7 @@
 	<C_CollectCycle>LRight,5,B,1,LRight,55,LDown,1,LLeft,110,LUpRight,40</C_CollectCycle>
 	<C_CollectEgg>A,1,BSpam,130</C_CollectEgg>
 	<C_ToHatch>LRight,100,LDownLeft,30</C_ToHatch>
-	<C_ToCollect>LUp,1,Nothing,10,LLeft,100,LUpRight,30</C_ToCollect>
+	<C_ToCollect>LUp,1,Nothing,10,LLeft,100,LUpRight,40</C_ToCollect>
 	<C_ToBox>X,1,ASpam,20,Nothing,18,Loop,1,R,1,Nothing,1,Loop,5</C_ToBox>
 	<C_HatchCycle>LDown,1,LRight,10,B,1,LRight,55,LUp,10,LDownLeft,50,LLeft,50,LDownLeft,20</C_HatchCycle>
 	<C_HatchReturn>LDownLeft,50,LLeft,50,LDownLeft,50</C_HatchReturn>

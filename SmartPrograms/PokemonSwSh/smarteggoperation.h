@@ -34,13 +34,18 @@ public:
     virtual SmartProgram getProgramEnum() { return SP_EggOperation; }
 
     // static public functions
+    static QVector<CaptureArea> const GetPartyCaptureAreas();
     static CaptureArea const GetPartyCaptureAreaOfPos(int y);
     static CapturePoint const GetPartyCapturePointOfPos(int y);
+    static CaptureArea const GetBoxStatNumArea(StatType type);
+    static CaptureArea const GetBoxStatNameArea(StatType type);
 
 private:
     virtual void init();
     virtual void reset();
     virtual void runNextState();
+    typedef QPair<int,int> EggPokeCountPair;
+    EggPokeCountPair checkPokemonCountInParty();
     void resetCollectorModeMembers();
     void resetHatcherModeMembers();
     void runKeepPokemonCommand(int yPos);
@@ -60,10 +65,12 @@ private:
 
     // List of test color
     HSVRange const C_Color_Black = HSVRange(0,0,0,359,30,100); // >200
+    HSVRange const C_Color_Grey = HSVRange(0,0,200,359,20,240); // >190
     HSVRange const C_Color_White = HSVRange(0,0,220,359,30,255); // >240
     HSVRange const C_Color_Box = HSVRange(50,170,220,110,255,255); // >240
     HSVRange const C_Color_Dialog = HSVRange(0,0,20,359,40,80); // >240
     HSVRange const C_Color_Shiny = HSVRange(0,0,70,359,40,180); // >25
+    HSVRange const C_Color_Text = HSVRange(0,0,0,359,200,200);
 
     // List of test point/area
     CaptureArea const A_Yes = CaptureArea(943,470,84,34);
@@ -73,11 +80,14 @@ private:
     CaptureArea const A_Dialog = CaptureArea(534,650,400,40);
     CaptureArea const A_Shiny = CaptureArea(1242,104,28,30);
     CaptureArea const A_DialogBox = CaptureArea(670,632,200,40);
+    CaptureArea const A_Level = CaptureArea(1178,22,100,40);
 
     // Substages
     enum Substage
     {
         SS_Init,
+        SS_InitCheckCount,
+        SS_InitBoxView,
 
         // collect
         SS_CollectCycle,
@@ -110,6 +120,7 @@ private:
     // Members
     QElapsedTimer m_timer;
     Settings m_programSettings;
+    bool m_boxViewChecked = false;
 
     // collect
     int m_eggsCollected;
@@ -123,7 +134,8 @@ private:
     bool m_blackScreenDetected; // for detecting finishing hatch
 
     // final
-    int m_shinyCount; // how many shiny pokemon found this session
+    int m_shinySingleCount; // how many shiny pokemon found in 30 eggs (shiny mode only)
+    int m_shinyCount; // how many shiny pokemon found overall
     int m_keepCount; // how many pokemon we have kept (including shiny)
 
     // Stats

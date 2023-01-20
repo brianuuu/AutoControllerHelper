@@ -36,6 +36,16 @@ enum PLAAreaType : uint8_t
     PLAAT_AlabasterIcelands,
 };
 
+enum StatType : uint8_t
+{
+    ST_HP = 0,
+    ST_Attack,
+    ST_Defense,
+    ST_SpAtk,
+    ST_SpDef,
+    ST_Speed,
+};
+
 class PokemonDatabase
 {
 private:
