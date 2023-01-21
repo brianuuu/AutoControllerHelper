@@ -16,12 +16,19 @@ public:
         EOT_COUNT,
     };
 
+    enum ShinyDetectionType : uint8_t
+    {
+        SDT_Disable = 0,
+        SDT_Sound,
+        SDT_Delay,
+    };
+
     struct Settings
     {
         EggOperationType m_operation;
         int m_targetEggCount;
         int m_columnsToHatch;
-        bool m_isShinySound;
+        ShinyDetectionType m_shinyDetection;
         int m_targetShinyCount;
     };
 
@@ -39,6 +46,9 @@ public:
     static CapturePoint const GetPartyCapturePointOfPos(int y);
     static CaptureArea const GetBoxStatNumArea(StatType type);
     static CaptureArea const GetBoxStatNameArea(StatType type);
+
+private slots:
+    void soundDetected(int id);
 
 private:
     virtual void init();
@@ -129,8 +139,12 @@ private:
     int m_eggsToHatchCount; // how many eggs we have hatched for the current column?
     int m_eggsToHatchColumn; // hatching for this loop? should always be 5 but can be fewer
     bool m_blackScreenDetected; // for detecting finishing hatch
+    qint64 m_fadeOutDelayTime; // how long does it take for hatch screen to fade to black
 
     // final
+    int m_shinySoundID;
+    bool m_shinyDetected; // the current hatched egg is a shiny
+    int m_shinyWasDetected; // how many shiny there was for the current column of eggs
     int m_shinySingleCount; // how many shiny pokemon found in 30 eggs (shiny mode only)
     int m_shinyCount; // how many shiny pokemon found overall
     int m_keepCount; // how many pokemon we have kept (including shiny)

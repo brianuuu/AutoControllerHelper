@@ -474,7 +474,7 @@ void AudioManager::stopDetection(int id)
                 return;
             }
         }
-        emit printLog("Invalid sound detection ID", LOG_ERROR);
+        //emit printLog("Invalid sound detection ID", LOG_ERROR);
         return;
     }
 

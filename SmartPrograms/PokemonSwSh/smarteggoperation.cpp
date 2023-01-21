@@ -26,7 +26,11 @@ void SmartEggOperation::reset()
 
     resetCollectorModeMembers();
     resetHatcherModeMembers();
+    m_fadeOutDelayTime = 0; // should not reset
 
+    m_shinySoundID = 0;
+    m_shinyDetected = false;
+    m_shinyWasDetected = 0;
     m_shinyCount = 0;
     m_keepCount = 0;
 }
@@ -76,6 +80,18 @@ void SmartEggOperation::runNextState()
             {
                 setState_error("0 Shiny Pokemon target is set");
                 break;
+            }
+
+            if (m_programSettings.m_operation == EOT_Collector)
+            {
+                // force disable shiny detection
+                m_programSettings.m_shinyDetection = SDT_Disable;
+            }
+            else if (m_programSettings.m_shinyDetection == SDT_Sound)
+            {
+                // Setup sound detection
+                m_shinySoundID = m_audioManager->addDetection("PokemonSwSh/ShinySFXHatch", 0.2f, 5000);
+                connect(m_audioManager, &AudioManager::soundDetected, this, &SmartEggOperation::soundDetected);
             }
 
             m_substage = SS_InitCheckCount;
@@ -451,6 +467,15 @@ void SmartEggOperation::runNextState()
     {
         if (state == S_CommandFinished)
         {
+            // restart timer to check for fade out delay
+            m_timer.restart();
+
+            // sound detection
+            if (m_shinySoundID > 0)
+            {
+                m_audioManager->startDetection(m_shinySoundID);
+            }
+
             setState_runCommand("BSpam,2,Loop,0", true);
             m_videoManager->setAreas({A_Dialog});
         }
@@ -464,11 +489,55 @@ void SmartEggOperation::runNextState()
             else if (m_blackScreenDetected && !blackScreenDetected)
             {
                 m_blackScreenDetected = false;
-                m_timer.restart();
+                qint64 elapsed = m_timer.restart();
+
+                // shiny detection
+                switch (m_programSettings.m_shinyDetection)
+                {
+                case SDT_Delay:
+                {
+                    if (m_fadeOutDelayTime == 0)
+                    {
+                        m_fadeOutDelayTime = elapsed;
+                        emit printLog("Fade Out Delay time calibrated = " + QString::number(m_fadeOutDelayTime) + "ms");
+                    }
+                    else if (elapsed > m_fadeOutDelayTime + 1000)
+                    {
+                        emit printLog("Fade Out Delay: " + QString::number(elapsed) + "ms > " + QString::number(m_fadeOutDelayTime + 1000) + "ms", LOG_SUCCESS);
+                        m_shinyDetected = true;
+                    }
+                    else
+                    {
+                        if (elapsed <= m_fadeOutDelayTime - 1000)
+                        {
+                            emit printLog("Fade Out Delay is much lower than before, the previous Pokemon might have been shiny? Delay is now updated to " + QString::number(elapsed) + "ms", LOG_WARNING);
+                        }
+                        m_fadeOutDelayTime = qMin(m_fadeOutDelayTime, elapsed);
+                    }
+                    break;
+                }
+                case SDT_Sound:
+                {
+                    m_audioManager->stopDetection(m_shinySoundID);
+                    break;
+                }
+                default: break;
+                }
 
                 // move back to position while still looking for eggs to hatch
                 m_substage = SS_HatchCycle;
-                setState_runCommand(C_HatchReturn, m_eggsToHatchCount < m_eggsToHatchColumn);
+                if (m_shinyDetected)
+                {
+                    m_shinyWasDetected++;
+                    m_shinyDetected = false;
+
+                    emit printLog("SHINY Pokemon detected! Capturing video!", LOG_SUCCESS);
+                    setState_runCommand("Capture,22," + m_commands[C_HatchReturn], m_eggsToHatchCount < m_eggsToHatchColumn);
+                }
+                else
+                {
+                    setState_runCommand(C_HatchReturn, m_eggsToHatchCount < m_eggsToHatchColumn);
+                }
 
                 if (m_eggsToHatchCount >= m_eggsToHatchColumn)
                 {
@@ -502,6 +571,12 @@ void SmartEggOperation::runNextState()
                 m_shinySingleCount++;
                 incrementStat(m_statShinyHatched);
 
+                // to check if we correctly detected shiny icon in box
+                if (m_shinyWasDetected > 0)
+                {
+                    m_shinyWasDetected--;
+                }
+
                 emit printLog(log + " is SHINY!!! Moving it to keep box!", LOG_SUCCESS);
                 runKeepPokemonCommand();
             }
@@ -530,6 +605,12 @@ void SmartEggOperation::runNextState()
             }
             else
             {
+                if (m_shinyWasDetected > 0)
+                {
+                    setState_error("There were " + QString::number(m_shinyWasDetected) + " SHINY Pokemon detected with sound/delay but are released due to unable to detect shiny icon in Box view...");
+                    break;
+                }
+
                 m_substage = SS_NextColumn;
                 setState_runCommand("Y,1,DUp,1,Y,1,DRight,1");
             }
@@ -546,7 +627,12 @@ void SmartEggOperation::runNextState()
                 {
                     if (m_shinySingleCount > 0)
                     {
-                        emit printLog(QString::number(m_shinyCount) + " SHINY Pokemon has been found, " + QString::number(m_programSettings.m_targetShinyCount - m_shinyCount) + " remaining", LOG_SUCCESS);
+                        QString log = QString::number(m_shinyCount) + " SHINY Pokemon has been found";
+                        if (m_programSettings.m_operation == EOT_Shiny)
+                        {
+                            log += ", " + QString::number(m_programSettings.m_targetShinyCount - m_shinyCount) + " remaining";
+                        }
+                        emit printLog(log, LOG_SUCCESS);
                         m_shinySingleCount = 0;
                     }
                     else
@@ -779,4 +865,12 @@ const CaptureArea SmartEggOperation::GetBoxStatNumArea(StatType type)
 const CaptureArea SmartEggOperation::GetBoxStatNameArea(StatType type)
 {
     return CaptureArea(882, 146 + int(type) * 38, 106, 30);
+}
+
+void SmartEggOperation::soundDetected(int id)
+{
+    if (id == m_shinySoundID && m_substage == SS_Hatching)
+    {
+        m_shinyDetected = true;
+    }
 }
