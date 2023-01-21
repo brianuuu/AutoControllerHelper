@@ -827,8 +827,14 @@ void SmartEggOperation::runKeepPokemonCommand(int yPos)
     m_keepCount++;
     incrementStat(m_statPokemonKept);
 
-    QString command = "Y,1,A,3,Loop,1"; // pick up
     int scrollCount = 1 + (m_eggColumnsHatched - 1) / 6;
+    if (m_keepCount > 25)
+    {
+        // 1st keep box can only store 25 then 30 and so on
+        scrollCount += (m_keepCount + 4) / 30;
+    }
+
+    QString command = "Y,1,A,3,Loop,1"; // pick up
     if (yPos < 6)
     {
         command += ",DDown,1,Nothing,1,Loop," + QString::number(6 - yPos); // move down to bottom
