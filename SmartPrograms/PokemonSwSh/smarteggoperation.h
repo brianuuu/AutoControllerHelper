@@ -142,6 +142,7 @@ private:
     qint64 m_fadeOutDelayTime; // how long does it take for hatch screen to fade to black
 
     // final
+    bool m_videoCaptured; // have we taken a capture for this shiny yet?
     int m_shinySoundID;
     bool m_shinyDetected; // the current hatched egg is a shiny
     int m_shinyWasDetected; // how many shiny there was for the current column of eggs

@@ -28,6 +28,7 @@ void SmartEggOperation::reset()
     resetHatcherModeMembers();
     m_fadeOutDelayTime = 0; // should not reset
 
+    m_videoCaptured = false;
     m_shinySoundID = 0;
     m_shinyDetected = false;
     m_shinyWasDetected = 0;
@@ -526,12 +527,27 @@ void SmartEggOperation::runNextState()
 
                 // move back to position while still looking for eggs to hatch
                 m_substage = SS_HatchCycle;
+                bool videoCapture = false;
                 if (m_shinyDetected)
                 {
                     m_shinyWasDetected++;
                     m_shinyDetected = false;
 
-                    emit printLog("SHINY Pokemon detected! Capturing video!", LOG_SUCCESS);
+                    if (!m_videoCaptured)
+                    {
+                        videoCapture = true;
+                        m_videoCaptured = true;
+                        emit printLog("SHINY Pokemon detected! Capturing video!", LOG_SUCCESS);
+                    }
+                    else
+                    {
+                        // TODO: square/star shiny one video each
+                        emit printLog("SHINY Pokemon detected! But we have already captured the same video, skipping capture");
+                    }
+                }
+
+                if (videoCapture)
+                {
                     setState_runCommand("Capture,22," + m_commands[C_HatchReturn], m_eggsToHatchCount < m_eggsToHatchColumn);
                 }
                 else
@@ -667,9 +683,14 @@ void SmartEggOperation::runNextState()
                     // TODO: other keep pokemon
                 }
 
-                // we are done
+                // we are done, move back to first box
                 m_substage = SS_Finished;
-                setState_runCommand("Home,2");
+                QString command;
+                if (m_eggColumnsHatched > 6)
+                {
+                    command = "L,1,Nothing,5,Loop," + QString::number((m_eggColumnsHatched - 1) / 6) + ",";
+                }
+                setState_runCommand(command + "Home,2");
             }
             else
             {
