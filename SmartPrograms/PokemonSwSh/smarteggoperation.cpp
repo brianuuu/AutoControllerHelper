@@ -170,7 +170,7 @@ void SmartEggOperation::runNextState()
             else
             {
                 // viewing model
-                emit printLog("Box view is not at Judge View, fixing it for you...", LOG_WARNING);
+                emit printLog("Box is not at Judge View, fixing it for you...", LOG_WARNING);
                 setState_runCommand("Plus,1,Nothing,1,Loop,2,Nothing,20");
             }
         }
@@ -178,18 +178,18 @@ void SmartEggOperation::runNextState()
         {
             QString text = getOCRStringRaw();
             bool ok = false;
-            int number = text.toInt(&ok);
+            text.toInt(&ok);
 
             if (ok)
             {
                 // viewing number stats
-                emit printLog("Box view is not at Judge View, fixing it for you...", LOG_WARNING);
+                emit printLog("Box is not at Judge View, fixing it for you...", LOG_WARNING);
                 setState_runCommand("Plus,1,Nothing,20");
             }
             else
             {
                 // viewing judge function (TODO: check match with text?)
-                emit printLog("Box view is now at Judge View");
+                emit printLog("Box at Judge View confirmed");
                 m_boxViewChecked = true;
                 m_videoManager->clearCaptures();
 
@@ -197,8 +197,8 @@ void SmartEggOperation::runNextState()
                 {
                 case EOT_Hatcher:
                 {
-                    m_substage = SS_ToHatch;
-                    setState_runCommand("BSpam,80," + m_commands[C_ToHatch]);
+                    m_substage = SS_ToBox;
+                    setState_runCommand("DRight,1");
                     break;
                 }
                 case EOT_Shiny:
@@ -297,8 +297,8 @@ void SmartEggOperation::runNextState()
                     m_programSettings.m_columnsToHatch = 6;
                     resetHatcherModeMembers();
 
-                    m_substage = SS_ToHatch;
-                    setState_runCommand(C_ToHatch);
+                    m_substage = (m_programSettings.m_operation == EOT_Shiny) ? SS_BoxFiller : SS_ToBox;
+                    setState_runCommand(C_ToBox);
                 }
                 else
                 {
@@ -311,15 +311,6 @@ void SmartEggOperation::runNextState()
                 m_substage = SS_CollectCycle;
                 setState_runCommand(C_CollectCycle);
             }
-        }
-        break;
-    }
-    case SS_ToHatch:
-    {
-        if (state == S_CommandFinished)
-        {
-            m_substage = (m_programSettings.m_operation == EOT_Shiny) ? SS_BoxFiller : SS_ToBox;
-            setState_runCommand(C_ToBox);
         }
         break;
     }
@@ -367,7 +358,7 @@ void SmartEggOperation::runNextState()
                 {
                     // go to the bottom of the hatched eggs
                     m_substage = SS_CheckStats;
-                    setState_runCommand("DLeft,1,Loop,1,DDown,1,Nothing,1,Loop," + QString::number(m_eggsToHatchColumn) + ",Nothing,20");
+                    setState_runCommand("DLeft,1,DDown,1,Nothing,20");
                     m_videoManager->setAreas({A_Shiny});
                 }
             }
@@ -406,6 +397,7 @@ void SmartEggOperation::runNextState()
                     m_timer.restart();
                     m_eggsToHatchCount = 0;
                     m_blackScreenDetected = false;
+
                     m_substage = SS_HatchCycle;
                     setState_runCommand("BSpam,40");
                     m_videoManager->setAreas({A_Dialog});
@@ -427,6 +419,7 @@ void SmartEggOperation::runNextState()
             }
             else
             {
+                // this command never returns finished (loop 0)
                 setState_runCommand(C_HatchCycle, true);
             }
         }
@@ -502,7 +495,7 @@ void SmartEggOperation::runNextState()
                 break;
             }
 
-            QString log = "Column " + QString::number(m_eggColumnsHatched) + " row " + QString::number(m_eggsToHatchCount);
+            QString log = "Column " + QString::number(m_eggColumnsHatched) + " row " + QString::number(6 - m_eggsToHatchCount);
             if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
             {
                 m_shinyCount++;
@@ -510,7 +503,7 @@ void SmartEggOperation::runNextState()
                 incrementStat(m_statShinyHatched);
 
                 emit printLog(log + " is SHINY!!! Moving it to keep box!", LOG_SUCCESS);
-                runKeepPokemonCommand(m_eggsToHatchCount + 1);
+                runKeepPokemonCommand();
             }
             else
             {
@@ -532,7 +525,7 @@ void SmartEggOperation::runNextState()
             if (m_eggsToHatchCount > 0)
             {
                 m_substage = SS_CheckStats;
-                setState_runCommand("DUp,1,Nothing,20");
+                setState_runCommand("Nothing,20");
                 m_videoManager->setAreas({A_Shiny});
             }
             else
@@ -554,6 +547,7 @@ void SmartEggOperation::runNextState()
                     if (m_shinySingleCount > 0)
                     {
                         emit printLog(QString::number(m_shinyCount) + " SHINY Pokemon has been found, " + QString::number(m_programSettings.m_targetShinyCount - m_shinyCount) + " remaining", LOG_SUCCESS);
+                        m_shinySingleCount = 0;
                     }
                     else
                     {
@@ -567,7 +561,7 @@ void SmartEggOperation::runNextState()
 
                 if (m_keepCount - m_shinyCount > 0)
                 {
-                    emit printLog(QString::number(m_keepCount - m_shinyCount) + " Non-Shiny Pokemon has been stored in keep box", LOG_SUCCESS);
+                    emit printLog(QString::number(m_keepCount - m_shinyCount) + " non-Shiny Pokemon has been stored in keep box", LOG_SUCCESS);
                 }
                 else
                 {
@@ -657,7 +651,7 @@ void SmartEggOperation::runNextState()
             else if (checkBrightnessMeanTarget(A_No.m_rect, C_Color_Black, 200))
             {
                 m_substage = SS_ReleaseConfirm;
-                setState_runCommand("DUp,1,ASpam,30");
+                setState_runCommand("DUp,1,A,25,Nothing,1,A,4");
                 m_videoManager->clearCaptures();
             }
             else
@@ -671,12 +665,12 @@ void SmartEggOperation::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            emit printLog("Returning to collect more eggs");
+            emit printLog("Collecting more eggs...");
             resetCollectorModeMembers();
 
             // go back to collecting eggs
             m_substage = SS_CollectCycle;
-            setState_runCommand("BSpam,80," + m_commands[C_ToCollect]);
+            setState_runCommand("BSpam,80");
         }
         break;
     }

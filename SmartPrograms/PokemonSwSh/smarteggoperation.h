@@ -48,20 +48,18 @@ private:
     EggPokeCountPair checkPokemonCountInParty();
     void resetCollectorModeMembers();
     void resetHatcherModeMembers();
-    void runKeepPokemonCommand(int yPos);
+    void runKeepPokemonCommand(int yPos = 2);
 
     // Command indices
     Command const C_CollectCycle    = 0;
     Command const C_CollectEgg      = 1;
-    Command const C_ToHatch         = 2;
-    Command const C_ToCollect       = 3;
-    Command const C_ToBox           = 4;
-    Command const C_HatchCycle      = 5;
-    Command const C_HatchReturn     = 6;
-    Command const C_FirstColumn     = 7;
-    Command const C_BoxFiller       = 8;
-    Command const C_TakeFiller      = 9;
-    Command const C_COUNT           = 10;
+    Command const C_ToBox           = 2;
+    Command const C_HatchCycle      = 3;
+    Command const C_HatchReturn     = 4;
+    Command const C_FirstColumn     = 5;
+    Command const C_BoxFiller       = 6;
+    Command const C_TakeFiller      = 7;
+    Command const C_COUNT           = 8;
 
     // List of test color
     HSVRange const C_Color_Black = HSVRange(0,0,0,359,30,100); // >200
@@ -95,7 +93,6 @@ private:
         SS_CollectEgg,
 
         // hatch
-        SS_ToHatch,
         SS_ToBox,
         SS_CheckEggCount,
         SS_HatchCycle,
