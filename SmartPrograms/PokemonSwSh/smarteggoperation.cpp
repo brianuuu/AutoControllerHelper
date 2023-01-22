@@ -87,6 +87,7 @@ void SmartEggOperation::runNextState()
         {
             if (m_programSettings.m_operation == EOT_Shiny && m_programSettings.m_targetShinyCount == 0)
             {
+                incrementStat(m_statError);
                 setState_error("0 Shiny Pokemon target is set");
                 break;
             }
@@ -120,6 +121,7 @@ void SmartEggOperation::runNextState()
             EggPokeCountPair countPair = checkPokemonCountInParty();
             if (countPair.first > 0)
             {
+                incrementStat(m_statError);
                 setState_error("There should not be any eggs in the party");
                 break;
             }
@@ -138,6 +140,7 @@ void SmartEggOperation::runNextState()
                 }
                 else
                 {
+                    incrementStat(m_statError);
                     setState_error("There should be a full party while using Collector Mode");
                 }
                 break;
@@ -152,6 +155,7 @@ void SmartEggOperation::runNextState()
                 }
                 else
                 {
+                    incrementStat(m_statError);
                     setState_error("There should only 1 Pokemon with Flame Body in the team in Hatcher Mode");
                 }
                 break;
@@ -167,12 +171,14 @@ void SmartEggOperation::runNextState()
                 }
                 else
                 {
+                    incrementStat(m_statError);
                     setState_error("There should be a full party while using Shiny Mode");
                 }
                 break;
             }
             default:
             {
+                incrementStat(m_statError);
                 setState_error("Invalid operation type");
                 break;
             }
@@ -234,6 +240,7 @@ void SmartEggOperation::runNextState()
                 }
                 default:
                 {
+                    incrementStat(m_statError);
                     setState_error("Unhandled operation type");
                     break;
                 }
@@ -313,6 +320,7 @@ void SmartEggOperation::runNextState()
                 {
                     if (!checkBrightnessMeanTarget(A_Nursery2nd.m_rect, C_Color_Black, 180))
                     {
+                        incrementStat(m_statError);
                         setState_error("Excepting cursor at \"I'd like to take my Pokemon back\"");
                         break;
                     }
@@ -463,6 +471,7 @@ void SmartEggOperation::runNextState()
 
                     m_substage = SS_HatchCycle;
                     setState_runCommand("BSpam,40");
+                    m_videoManager->clearCaptures();
                 }
             }
         }
@@ -592,7 +601,7 @@ void SmartEggOperation::runNextState()
                     if (!m_videoCaptured)
                     {
                         videoCapture = true;
-                        m_videoCaptured = true;
+                        // m_videoCaptured = true;
                         emit printLog("SHINY Pokemon detected! Capturing video!", LOG_SUCCESS);
                     }
                     else
@@ -604,7 +613,8 @@ void SmartEggOperation::runNextState()
 
                 if (videoCapture)
                 {
-                    setState_runCommand("Capture,22," + m_commands[C_HatchReturn], m_eggsToHatchCount < m_eggsToHatchColumn);
+                    // add delay after capture as it can freeze the game
+                    setState_runCommand("Capture,22,Nothing,200," + m_commands[C_HatchReturn], m_eggsToHatchCount < m_eggsToHatchColumn);
                 }
                 else
                 {
@@ -632,6 +642,7 @@ void SmartEggOperation::runNextState()
         {
             if (m_eggsToHatchCount < 1 && m_eggsToHatchCount > 5)
             {
+                incrementStat(m_statError);
                 setState_error("m_eggsToHatchCount is invalid, we should not end up here");
                 break;
             }
@@ -687,6 +698,7 @@ void SmartEggOperation::runNextState()
             {
                 if (m_shinyWasDetected > 0)
                 {
+                    incrementStat(m_statError);
                     setState_error("There were " + QString::number(m_shinyWasDetected) + " SHINY Pokemon detected with sound/delay but are released due to unable to detect shiny icon in Box view...");
                     break;
                 }
@@ -907,6 +919,7 @@ void SmartEggOperation::runKeepPokemonCommand(int yPos)
 {
     if (yPos < 2 || yPos > 6)
     {
+        incrementStat(m_statError);
         setState_error("Invalid position when trying to keep Pokemon in party");
         return;
     }
