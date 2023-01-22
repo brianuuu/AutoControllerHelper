@@ -602,7 +602,7 @@ void SmartSVEggOperation::runNextState()
                     emit printLog("Hatching column " + QString::number(m_eggColumnsHatched + 1) + " with " + QString::number(m_eggsToHatch) + " eggs");
                     m_eggsToHatchColumn = m_eggsToHatch;
                     m_substage = SS_ExitBox;
-                    setState_runCommand("B,5,Nothing,5");
+                    setState_runCommand("BSpam,6");
                 }
                 else if (m_eggsToHatch <= 1)
                 {
@@ -904,7 +904,6 @@ void SmartSVEggOperation::runNextState()
             // when failed putting back hatched mon into 6th column in box we need to go back to the previous box
             bool backToPreviousBox = m_eggColumnsHatched % 6 == 0 && m_missedInputRetryCount > 0;
 
-            m_missedInputRetryCount = 0;
             QString log = "Column " + QString::number(m_eggColumnsHatched) + " row " + QString::number(m_checkShinyCount);
             bool hasPokemon = true;
             if (!checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Yellow, 200))
