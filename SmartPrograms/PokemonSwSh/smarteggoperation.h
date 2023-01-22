@@ -28,6 +28,7 @@ public:
         EggOperationType m_operation;
         int m_targetEggCount;
         int m_columnsToHatch;
+        bool m_isHatchExtra;
         ShinyDetectionType m_shinyDetection;
         int m_targetShinyCount;
     };
@@ -69,10 +70,11 @@ private:
     Command const C_FirstColumn     = 5;
     Command const C_BoxFiller       = 6;
     Command const C_TakeFiller      = 7;
-    Command const C_COUNT           = 8;
+    Command const C_TakeParent      = 8;
+    Command const C_COUNT           = 9;
 
     // List of test color
-    HSVRange const C_Color_Black = HSVRange(0,0,0,359,30,100); // >200
+    HSVRange const C_Color_Black = HSVRange(0,0,0,359,30,100); // >180
     HSVRange const C_Color_Grey = HSVRange(0,0,200,359,20,240); // >190
     HSVRange const C_Color_White = HSVRange(0,0,220,359,30,255); // >240
     HSVRange const C_Color_Box = HSVRange(50,170,220,110,255,255); // >240
@@ -81,6 +83,8 @@ private:
     HSVRange const C_Color_Text = HSVRange(0,0,0,359,200,200);
 
     // List of test point/area
+    CaptureArea const A_Nursery1st = CaptureArea(943,390,84,34);
+    CaptureArea const A_Nursery2nd = CaptureArea(943,430,84,34);
     CaptureArea const A_Yes = CaptureArea(943,470,84,34);
     CaptureArea const A_No = CaptureArea(943,510,84,34);
     CaptureArea const A_YesNo = CaptureArea(886,549,148,12);
@@ -110,6 +114,7 @@ private:
         SS_CheckStats,
         SS_KeepPokemon,
         SS_NextColumn,
+        SS_HatchComplete,
 
         // release
         SS_ReleaseHasPokemon,
@@ -140,6 +145,7 @@ private:
     int m_eggsToHatchColumn; // hatching for this loop? should always be 5 but can be fewer
     bool m_blackScreenDetected; // for detecting finishing hatch
     qint64 m_fadeOutDelayTime; // how long does it take for hatch screen to fade to black
+    bool m_hatchExtraEgg; // is it time to take remaining egg from nursery and hatch it?
 
     // final
     bool m_videoCaptured; // have we taken a capture for this shiny yet?

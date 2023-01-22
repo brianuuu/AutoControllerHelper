@@ -27,6 +27,7 @@ void SmartEggOperation::reset()
     resetCollectorModeMembers();
     resetHatcherModeMembers();
     m_fadeOutDelayTime = 0; // should not reset
+    m_hatchExtraEgg = false;
 
     m_videoCaptured = false;
     m_shinySoundID = 0;
@@ -67,6 +68,7 @@ void SmartEggOperation::runNextState()
         initStat(m_statPokemonKept, "Kept");
 
         bool testAfterHatched = false;
+        bool testHatchExtra = false;
         if (testAfterHatched)
         {
             m_eggColumnsHatched = 1;
@@ -74,6 +76,12 @@ void SmartEggOperation::runNextState()
             m_eggsToHatchColumn = 5;
             m_substage = SS_ToBox;
             setState_runCommand(C_ToBox);
+        }
+        else if (testHatchExtra)
+        {
+            m_hatchExtraEgg = true;
+            m_substage = SS_CollectCycle;
+            setState_runCommand("Nothing,1");
         }
         else
         {
@@ -248,7 +256,7 @@ void SmartEggOperation::runNextState()
             m_talkDialogAttempts++;
             m_timer.restart();
             setState_runCommand("A,20,Nothing,20", true);
-            m_videoManager->setAreas({A_Yes,A_YesNo});
+            m_videoManager->setAreas({A_Nursery1st,A_Nursery2nd,A_Yes,A_YesNo});
         }
         else if (state == S_CaptureReady)
         {
@@ -276,17 +284,55 @@ void SmartEggOperation::runNextState()
         {
             m_substage = SS_CollectEgg;
             m_videoManager->clearCaptures();
-            if (checkBrightnessMeanTarget(A_Yes.m_rect, C_Color_Black, 200))
+            if (checkBrightnessMeanTarget(A_Yes.m_rect, C_Color_Black, 180))
             {
                 // Collect egg
                 m_eggsCollected++;
                 m_eggCollectAttempts = 0;
                 incrementStat(m_statEggCollected);
-                emit printLog("Egg collected! (" + QString::number(m_programSettings.m_targetEggCount - m_eggsCollected) + " remaining)");
+
+                if (m_hatchExtraEgg)
+                {
+                    // immediately talk to nursey again to take one parent away
+                    m_substage = SS_CollectCycle;
+                    emit printLog("Remaining Egg collected!");
+
+                    m_programSettings.m_columnsToHatch = 1;
+                    resetHatcherModeMembers();
+                    m_eggsToHatchColumn = 1;
+                }
+                else
+                {
+                    emit printLog("Egg collected! (" + QString::number(m_programSettings.m_targetEggCount - m_eggsCollected) + " remaining)");
+                }
                 setState_runCommand(C_CollectEgg);
             }
             else
             {
+                if (m_hatchExtraEgg)
+                {
+                    if (!checkBrightnessMeanTarget(A_Nursery2nd.m_rect, C_Color_Black, 180))
+                    {
+                        setState_error("Excepting cursor at \"I'd like to take my Pokemon back\"");
+                        break;
+                    }
+
+                    emit printLog("Taking one parent back from Nursery");
+                    if (m_eggsToHatchColumn > 0)
+                    {
+                        // hatch the remaining egg
+                        m_substage = SS_HatchCycle;
+                        setState_runCommand(C_TakeParent);
+                    }
+                    else
+                    {
+                        // no remaining egg to hatch
+                        m_substage = SS_HatchComplete;
+                        setState_runCommand(m_commands[C_TakeParent] + "," + m_commands[C_ToBox] + ",Nothing,30,Loop,1,Y,1,Nothing,1,Loop,2");
+                    }
+                    break;
+                }
+
                 // No egg
                 m_eggCollectAttempts++;
                 if (m_eggCollectAttempts >= 10)
@@ -417,7 +463,6 @@ void SmartEggOperation::runNextState()
 
                     m_substage = SS_HatchCycle;
                     setState_runCommand("BSpam,40");
-                    m_videoManager->setAreas({A_Dialog});
                 }
             }
         }
@@ -436,8 +481,14 @@ void SmartEggOperation::runNextState()
             }
             else
             {
+                if (m_hatchExtraEgg)
+                {
+                    emit printLog("Hatching remaining egg");
+                }
+
                 // this command never returns finished (loop 0)
                 setState_runCommand(C_HatchCycle, true);
+                m_videoManager->setAreas({A_Dialog});
             }
         }
         else if (state == S_CaptureReady)
@@ -451,7 +502,12 @@ void SmartEggOperation::runNextState()
             {
                 m_eggsToHatchCount++;
                 incrementStat(m_statEggHatched);
-                emit printLog("Oh? Egg no." + QString::number(m_statEggHatched.first) + " is hatching! (" + QString::number(m_eggsToHatchColumn - m_eggsToHatchCount) + " remaining)");
+                QString log = "Oh? Egg no." + QString::number(m_statEggHatched.first) + " is hatching!";
+                if (!m_hatchExtraEgg)
+                {
+                    log += " (" + QString::number(m_eggsToHatchColumn - m_eggsToHatchCount) + " remaining)";
+                }
+                emit printLog(log);
 
                 m_substage = SS_Hatching;
                 setState_runCommand("BSpam,250");
@@ -580,7 +636,15 @@ void SmartEggOperation::runNextState()
                 break;
             }
 
-            QString log = "Column " + QString::number(m_eggColumnsHatched) + " row " + QString::number(6 - m_eggsToHatchCount);
+            QString log;
+            if (m_hatchExtraEgg)
+            {
+                log = "Remaining egg";
+            }
+            else
+            {
+                log = "Column " + QString::number(m_eggColumnsHatched) + " row " + QString::number(6 - m_eggsToHatchCount);
+            }
             if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
             {
                 m_shinyCount++;
@@ -628,7 +692,7 @@ void SmartEggOperation::runNextState()
                 }
 
                 m_substage = SS_NextColumn;
-                setState_runCommand("Y,1,DUp,1,Y,1,DRight,1");
+                setState_runCommand("Nothing,20,Y,1,DUp,1,Y,1,DRight,1");
             }
         }
         break;
@@ -683,14 +747,16 @@ void SmartEggOperation::runNextState()
                     // TODO: other keep pokemon
                 }
 
-                // we are done, move back to first box
-                m_substage = SS_Finished;
-                QString command;
+                m_substage = SS_HatchComplete;
                 if (m_eggColumnsHatched > 6)
                 {
-                    command = "L,1,Nothing,5,Loop," + QString::number((m_eggColumnsHatched - 1) / 6) + ",";
+                    // we are done, move back to first box
+                    setState_runCommand("L,1,Nothing,5,Loop," + QString::number((m_eggColumnsHatched - 1) / 6));
                 }
-                setState_runCommand(command + "Home,2");
+                else
+                {
+                    setState_runCommand("Nothing,1");
+                }
             }
             else
             {
@@ -701,6 +767,27 @@ void SmartEggOperation::runNextState()
                 m_substage = SS_CheckEggCount;
                 setState_runCommand(command);
                 m_videoManager->setAreas(GetPartyCaptureAreas());
+            }
+        }
+        break;
+    }
+    case SS_HatchComplete:
+    {
+        if (state == S_CommandFinished)
+        {
+            if (m_programSettings.m_isHatchExtra && !m_hatchExtraEgg)
+            {
+                m_substage = SS_CollectCycle;
+                resetCollectorModeMembers();
+
+                m_hatchExtraEgg = true;
+                setState_runCommand("BSpam,80");
+            }
+            else
+            {
+                m_hatchExtraEgg = false;
+                m_substage = SS_Finished;
+                setState_runCommand("Home,2");
             }
         }
         break;
@@ -755,7 +842,7 @@ void SmartEggOperation::runNextState()
                 incrementStat(m_statError);
                 setState_error("Current Pokemon is a SHINY, not releasing, we should've detected it eariler");
             }
-            else if (checkBrightnessMeanTarget(A_No.m_rect, C_Color_Black, 200))
+            else if (checkBrightnessMeanTarget(A_No.m_rect, C_Color_Black, 180))
             {
                 m_substage = SS_ReleaseConfirm;
                 setState_runCommand("DUp,1,A,25,Nothing,1,A,4");
@@ -820,7 +907,7 @@ void SmartEggOperation::runKeepPokemonCommand(int yPos)
 {
     if (yPos < 2 || yPos > 6)
     {
-        setState_error("Invalid position when releasing Pokemon in party");
+        setState_error("Invalid position when trying to keep Pokemon in party");
         return;
     }
 
