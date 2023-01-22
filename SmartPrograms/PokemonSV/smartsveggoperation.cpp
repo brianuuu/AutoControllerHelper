@@ -557,6 +557,7 @@ void SmartSVEggOperation::runNextState()
                                 {
                                     A_Pokemon,
                                     A_Shiny,
+                                    A_Paldea,
                                     GetPartyCaptureAreaOfPos(2),
                                     GetPartyCaptureAreaOfPos(3),
                                     GetPartyCaptureAreaOfPos(4),
@@ -914,6 +915,14 @@ void SmartSVEggOperation::runNextState()
             }
             else
             {
+                if (!checkBrightnessMeanTarget(A_Paldea.m_rect, C_Color_Shiny, 60))
+                {
+                    m_checkShinyCount--;
+                    emit printLog("Unable to detect Paldea icon, Box is not at Stats View or Judge View, fixing it for you...", LOG_WARNING);
+                    setState_runCommand("Plus,1,Nothing,20");
+                    break;
+                }
+
                 m_hasPokemonCount++;
                 log += " (Egg no." + QString::number(m_statEggHatched.first - m_eggsToHatchColumn + m_hasPokemonCount) + ")";
                 if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))

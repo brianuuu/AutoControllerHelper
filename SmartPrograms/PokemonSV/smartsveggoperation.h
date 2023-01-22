@@ -73,7 +73,7 @@ private:
     HSVRange const C_Color_Dialog = HSVRange(170,130,20,230,255,60); // >200
     HSVRange const C_Color_Yellow = HSVRange(30,200,200,70,255,255); // >200 (box: >130) (battle: >180)
     HSVRange const C_Color_Green = HSVRange(100,170,200,140,255,255); // >200
-    HSVRange const C_Color_Shiny = HSVRange(0,0,200,359,255,255); // >25
+    HSVRange const C_Color_Shiny = HSVRange(0,0,200,359,255,255); // >25 (Paldea: > 60)
 
     // List of test point/area
     CaptureArea const A_Title = CaptureArea(480,110,320,100);
@@ -89,6 +89,8 @@ private:
     CaptureArea const A_Battle = CaptureArea(1148,466,100,48);
     CaptureArea const A_Health = CaptureArea(69,634,80,20);
     CaptureArea const A_Shiny = CaptureArea(1126,60,30,30);
+    CaptureArea const A_Paldea = CaptureArea(1228,58,26,34);
+    CaptureArea const A_StatAttack = CaptureArea(1143,224,51,25);
 
     // Substages
     enum Substage
