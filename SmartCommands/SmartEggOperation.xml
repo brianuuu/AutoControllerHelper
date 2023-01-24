@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <SmartEggOperation>
+	<C_CollectFirst>LDownLeft,1,Nothing,6,LDownLeft,25,Loop,1,LUpLeft,10,LUpRight,10,LDownRight,10,LDownLeft,10,Loop,2,LUp,10,LUpRight,60</C_CollectFirst>
 	<C_CollectCycle>LRight,5,B,1,LRight,55,LDown,1,LLeft,110,LUpRight,40</C_CollectCycle>
 	<C_CollectEgg>A,1,BSpam,130</C_CollectEgg>
 	<C_ToBox>X,1,ASpam,20,Nothing,18,Loop,1,R,1,Nothing,1,Loop,5</C_ToBox>

@@ -62,16 +62,17 @@ private:
     void runKeepPokemonCommand(int yPos = 2);
 
     // Command indices
-    Command const C_CollectCycle    = 0;
-    Command const C_CollectEgg      = 1;
-    Command const C_ToBox           = 2;
-    Command const C_HatchCycle      = 3;
-    Command const C_HatchReturn     = 4;
-    Command const C_FirstColumn     = 5;
-    Command const C_BoxFiller       = 6;
-    Command const C_TakeFiller      = 7;
-    Command const C_TakeParent      = 8;
-    Command const C_COUNT           = 9;
+    Command const C_CollectFirst    = 0;
+    Command const C_CollectCycle    = 1;
+    Command const C_CollectEgg      = 2;
+    Command const C_ToBox           = 3;
+    Command const C_HatchCycle      = 4;
+    Command const C_HatchReturn     = 5;
+    Command const C_FirstColumn     = 6;
+    Command const C_BoxFiller       = 7;
+    Command const C_TakeFiller      = 8;
+    Command const C_TakeParent      = 9;
+    Command const C_COUNT           = 10;
 
     // List of test color
     HSVRange const C_Color_Black = HSVRange(0,0,0,359,30,100); // >180
@@ -135,6 +136,7 @@ private:
     bool m_boxViewChecked = false;
 
     // collect
+    bool m_firstCollectCycle;
     int m_eggsCollected;
     int m_talkDialogAttempts;
     int m_eggCollectAttempts;

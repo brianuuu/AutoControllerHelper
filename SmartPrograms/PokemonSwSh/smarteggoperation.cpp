@@ -24,6 +24,7 @@ void SmartEggOperation::reset()
     m_substage = SS_Init;
     m_boxViewChecked = false;
 
+    m_firstCollectCycle = true;
     resetCollectorModeMembers();
     resetHatcherModeMembers();
     m_fadeOutDelayTime = 0; // should not reset
@@ -135,7 +136,7 @@ void SmartEggOperation::runNextState()
                     // we don't care about box view, go to collect eggs now
                     m_boxViewChecked = true;
                     m_substage = SS_CollectCycle;
-                    setState_runCommand("BSpam,40," + m_commands[C_CollectCycle]);
+                    setState_runCommand("BSpam,40," + m_commands[m_firstCollectCycle ? C_CollectFirst : C_CollectCycle]);
                     m_videoManager->clearCaptures();
                 }
                 else
@@ -235,7 +236,7 @@ void SmartEggOperation::runNextState()
                 case EOT_Shiny:
                 {
                     m_substage = SS_CollectCycle;
-                    setState_runCommand("BSpam,80," + m_commands[C_CollectCycle]);
+                    setState_runCommand("BSpam,80," + m_commands[m_firstCollectCycle ? C_CollectFirst : C_CollectCycle]);
                     break;
                 }
                 default:
@@ -260,6 +261,7 @@ void SmartEggOperation::runNextState()
                 break;
             }
 
+            m_firstCollectCycle = false;
             m_talkDialogAttempts++;
             m_timer.restart();
             setState_runCommand("A,20,Nothing,20", true);
