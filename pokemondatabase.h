@@ -44,6 +44,67 @@ enum StatType : uint8_t
     ST_SpAtk,
     ST_SpDef,
     ST_Speed,
+
+    ST_COUNT
+};
+
+enum IVType : uint8_t
+{
+    IVT_Any,
+    IVT_NoGood,
+    IVT_Decent,
+    IVT_PrettyGood,
+    IVT_VeryGood,
+    IVT_Fantastic,
+    IVT_Best,
+
+    IVT_COUNT
+};
+
+enum NatureType : uint8_t
+{
+    NT_Any,
+    NT_Neutral,
+    NT_Lonely,
+    NT_Adamant,
+    NT_Naughty,
+    NT_Brave,
+    NT_Bold,
+    NT_Impish,
+    NT_Lax,
+    NT_Relaxed,
+    NT_Modest,
+    NT_Mild,
+    NT_Rash,
+    NT_Quiet,
+    NT_Calm,
+    NT_Gentle,
+    NT_Careful,
+    NT_Sassy,
+    NT_Timid,
+    NT_Hasty,
+    NT_Jolly,
+    NT_Naive,
+
+    NT_COUNT
+};
+
+enum GenderType : uint8_t
+{
+    GT_Any,
+    GT_Male,
+    GT_Female,
+
+    GT_COUNT
+};
+
+enum ShinyType : uint8_t
+{
+    SPT_Any,
+    SPT_Star,
+    SPT_Square,
+
+    SPT_COUNT
 };
 
 class PokemonDatabase
@@ -56,6 +117,10 @@ public:
     // Game Enums
     static QString getGameLanguagePrefix(GameLanguage sp);
     static QString getGameLanguageName(GameLanguage sp);
+    static QString getIVTypeName(IVType type);
+    static QString getNatureTypeName(NatureType type);
+    static QString getGenderTypeName(GenderType type);
+    static QString getShinyTypeName(ShinyType type);
 
     // PLA Enums
     static QString PLAAreaTypeToString(PLAAreaType type);

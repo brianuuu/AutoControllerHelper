@@ -24,9 +24,8 @@ QString PokemonDatabase::getGameLanguagePrefix(GameLanguage sp)
     case GL_Japanese:           return "jpn";
     case GL_Korean:             return "kor";
     case GL_Spanish:            return "spa";
-    case GL_COUNT:              return "invalid";
+    default:                    return "invalid";
     }
-    return "invalid";
 }
 
 QString PokemonDatabase::getGameLanguageName(GameLanguage sp)
@@ -42,9 +41,75 @@ QString PokemonDatabase::getGameLanguageName(GameLanguage sp)
     case GL_Japanese:           return "Japanese";
     case GL_Korean:             return "Korean";
     case GL_Spanish:            return "Spanish";
-    case GL_COUNT:              return "Unknown";
+    default:                    return "Unknown";
     }
-    return "Unknown";
+}
+
+QString PokemonDatabase::getIVTypeName(IVType type)
+{
+    switch (type)
+    {
+    case IVT_Any:           return "Any"; // for UI only, not used for OCR
+    case IVT_NoGood:        return "No Good";
+    case IVT_Decent:        return "Decent";
+    case IVT_PrettyGood:    return "Pretty Good";
+    case IVT_VeryGood:      return "Very Good";
+    case IVT_Fantastic:     return "Fantastic";
+    case IVT_Best:          return "Best";
+    default:                return "INVALID";
+    }
+}
+
+QString PokemonDatabase::getNatureTypeName(NatureType type)
+{
+    switch (type)
+    {
+    case NT_Any:        return "Any";
+    case NT_Neutral:    return "Neutral";
+    case NT_Lonely:     return "Lonely (+Atk,-Def)";
+    case NT_Adamant:    return "Adamant (+Atk,-SpA)";
+    case NT_Naughty:    return "Naughty (+Atk,-SpD)";
+    case NT_Brave:      return "Brave (+Atk,-Spe)";
+    case NT_Bold:       return "Bold (+Def,-Atk)";
+    case NT_Impish:     return "Impish (+Def,-SpA)";
+    case NT_Lax:        return "Lax (+Def,-SpD)";
+    case NT_Relaxed:    return "Relaxed (+Def,-Spe)";
+    case NT_Modest:     return "Modest (+SpA,-Atk)";
+    case NT_Mild:       return "Mild (+SpA,-Def)";
+    case NT_Rash:       return "Rash (+SpA,-SpD)";
+    case NT_Quiet:      return "Quiet (+SpA,-Spe)";
+    case NT_Calm:       return "Calm (+SpD,-Atk)";
+    case NT_Gentle:     return "Gentle (+SpD,-Def)";
+    case NT_Careful:    return "Careful (+SpD,-SpA)";
+    case NT_Sassy:      return "Sassy (+SpD,-Spe)";
+    case NT_Timid:      return "Timid (+Spe,-Atk)";
+    case NT_Hasty:      return "Hasty (+Spe,-Def)";
+    case NT_Jolly:      return "Jolly (+Spe,-SpA)";
+    case NT_Naive:      return "Naive (+Spe,-SpD)";
+    default:            return "INVALID";
+    }
+}
+
+QString PokemonDatabase::getGenderTypeName(GenderType type)
+{
+    switch (type)
+    {
+    case GT_Any:    return "Any";
+    case GT_Male:   return "Male";
+    case GT_Female: return "Female";
+    default:        return "INVALID";
+    }
+}
+
+QString PokemonDatabase::getShinyTypeName(ShinyType type)
+{
+    switch (type)
+    {
+    case SPT_Any:       return "Any";
+    case SPT_Star:      return "Star";
+    case SPT_Square:    return "Square";
+    default:            return "INVALID";
+    }
 }
 
 QString PokemonDatabase::PLAAreaTypeToString(PLAAreaType type)
