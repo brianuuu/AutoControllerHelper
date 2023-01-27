@@ -5,11 +5,11 @@ PokemonStatTable::PokemonStatTable()
     m_target = 0;
     for (int i = 0; i < StatType::ST_COUNT; i++)
     {
-        m_ivs[i] = IVType::IVT_Any;
+        m_ivs[i] = IVType::IVT_COUNT;
     }
-    m_nature = NatureType::NT_Any;
-    m_gender = GenderType::GT_Any;
-    m_shiny = ShinyType::SPT_Any;
+    m_nature = NatureType::NT_COUNT;
+    m_gender = GenderType::GT_COUNT;
+    m_shiny = ShinyType::SPT_COUNT;
 }
 
 bool PokemonStatTable::Match(const PokemonStatTable &other)

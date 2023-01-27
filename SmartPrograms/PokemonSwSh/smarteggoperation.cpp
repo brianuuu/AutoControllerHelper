@@ -36,6 +36,11 @@ void SmartEggOperation::reset()
     m_shinyWasDetected = 0;
     m_shinyCount = 0;
     m_keepCount = 0;
+
+    // extra pokemon we want to keep
+    m_hatchedStat = PokemonStatTable();
+    m_keepList = m_programSettings.m_statTable->GetTableList();
+    updateKeepDummy();
 }
 
 void SmartEggOperation::resetCollectorModeMembers()
@@ -53,6 +58,38 @@ void SmartEggOperation::resetHatcherModeMembers()
     m_blackScreenDetected = false;
 
     m_shinySingleCount = 0;
+}
+
+void SmartEggOperation::updateKeepDummy()
+{
+    m_keepDummy = PokemonStatTable();
+    for (PokemonStatTable const& table : m_keepList)
+    {
+        if (table.m_target <= 0)
+        {
+            continue;
+        }
+
+        for (int i = 0; i < StatType::ST_COUNT; i++)
+        {
+            if (table.m_ivs[i] != IVType::IVT_Any)
+            {
+                m_keepDummy.m_ivs[i] = table.m_ivs[i];
+            }
+        }
+        if (table.m_nature != NatureType::NT_Any)
+        {
+            m_keepDummy.m_nature = table.m_nature;
+        }
+        if (table.m_gender != GenderType::GT_Any)
+        {
+            m_keepDummy.m_gender = table.m_gender;
+        }
+        if (table.m_shiny != ShinyType::SPT_Any)
+        {
+            m_keepDummy.m_shiny = table.m_shiny;
+        }
+    }
 }
 
 void SmartEggOperation::runNextState()
@@ -75,8 +112,19 @@ void SmartEggOperation::runNextState()
             m_eggColumnsHatched = 1;
             m_eggsToHatchCount = 5;
             m_eggsToHatchColumn = 5;
-            m_substage = SS_ToBox;
-            setState_runCommand(C_ToBox);
+
+            if (m_keepDummy.m_gender == GenderType::GT_COUNT)
+            {
+                m_substage = SS_ToBox;
+                setState_runCommand(C_ToBox);
+            }
+            else
+            {
+                // need to check gender
+                m_substage = SS_CheckGender;
+                setState_runCommand(C_ToParty);
+                m_videoManager->setAreas(GetPartyGenderCaptureAreas(m_eggsToHatchColumn));
+            }
         }
         else if (testHatchExtra)
         {
@@ -106,7 +154,7 @@ void SmartEggOperation::runNextState()
             }
 
             m_substage = SS_InitCheckCount;
-            setState_runCommand("X,1,ASpam,20,Nothing,40");
+            setState_runCommand(C_ToParty);
             m_videoManager->setAreas(GetPartyCaptureAreas());
         }
         break;
@@ -152,7 +200,7 @@ void SmartEggOperation::runNextState()
                 {
                     m_boxViewChecked = false;
                     m_substage = SS_ToBox;
-                    setState_runCommand("R,1,Nothing,1,Loop,5");
+                    setState_runCommand(C_PartyToBox);
                 }
                 else
                 {
@@ -168,7 +216,7 @@ void SmartEggOperation::runNextState()
                 {
                     m_boxViewChecked = false;
                     m_substage = SS_ToBox;
-                    setState_runCommand("R,1,Nothing,1,Loop,5");
+                    setState_runCommand(C_PartyToBox);
                 }
                 else
                 {
@@ -429,10 +477,10 @@ void SmartEggOperation::runNextState()
                 }
                 else
                 {
-                    // go to the bottom of the hatched eggs
+                    // go to 2nd slot of the party
                     m_substage = SS_CheckStats;
                     setState_runCommand("DLeft,1,DDown,1,Nothing,20");
-                    m_videoManager->setAreas({A_Shiny});
+                    m_videoManager->setAreas(GetCheckStatCaptureAreas());
                 }
             }
             else
@@ -487,8 +535,21 @@ void SmartEggOperation::runNextState()
             {
                 // finished hatching the current column
                 m_eggColumnsHatched++;
-                m_substage = SS_ToBox;
-                setState_runCommand(C_ToBox);
+                m_hatchedGenders.clear();
+                m_hatchedStat = PokemonStatTable();
+
+                if (m_keepDummy.m_gender == GenderType::GT_COUNT)
+                {
+                    m_substage = SS_ToBox;
+                    setState_runCommand(C_ToBox);
+                }
+                else
+                {
+                    // need to check gender
+                    m_substage = SS_CheckGender;
+                    setState_runCommand(C_ToParty);
+                    m_videoManager->setAreas(GetPartyGenderCaptureAreas(m_eggsToHatchColumn));
+                }
             }
             else
             {
@@ -634,11 +695,76 @@ void SmartEggOperation::runNextState()
         }
         break;
     }
-    case SS_CheckStats:
+    case SS_CheckGender:
     {
         if (state == S_CommandFinished)
         {
             setState_frameAnalyzeRequest();
+        }
+        else if (state == S_CaptureReady)
+        {
+            m_hatchedGenders = checkGenderInParty(m_eggsToHatchColumn);
+            m_videoManager->clearCaptures();
+
+            // continue to box
+            m_substage = SS_ToBox;
+            setState_runCommand(C_PartyToBox);
+        }
+        break;
+    }
+    case SS_CheckHP:
+    case SS_CheckAttack:
+    case SS_CheckDefense:
+    case SS_CheckSpAtk:
+    case SS_CheckSpDef:
+    case SS_CheckSpeed:
+    {
+        if (state == S_OCRReady)
+        {
+            // TODO:
+            //emit printLog(getOCRStringRaw());
+            goToNextCheckStatState(Substage(m_substage + 1));
+        }
+        break;
+    }
+    case SS_CheckNature:
+    {
+        if (state == S_CaptureReady)
+        {
+            // TODO:
+            goToNextCheckStatState(SS_CheckShiny);
+        }
+        break;
+    }
+    case SS_CheckShiny:
+    {
+        if (state == S_CaptureReady)
+        {
+            if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
+            {
+                // TODO: square shiny?
+                m_hatchedStat.m_shiny = ShinyType::SPT_Star;
+            }
+
+            m_substage = SS_CheckStats;
+            runNextStateContinue();
+        }
+        break;
+    }
+    case SS_CheckStats:
+    {
+        if (state == S_CommandFinished)
+        {
+            // add gender to current stat
+            m_hatchedStat = PokemonStatTable();
+            if (!m_hatchedGenders.isEmpty())
+            {
+                m_hatchedStat.m_gender = m_hatchedGenders.front();
+                m_hatchedGenders.pop_front();
+            }
+
+            // jump to other states to check actual stats
+            goToNextCheckStatState(SS_CheckHP);
         }
         else if (state == S_CaptureReady)
         {
@@ -658,7 +784,26 @@ void SmartEggOperation::runNextState()
             {
                 log = "Column " + QString::number(m_eggColumnsHatched) + " row " + QString::number(6 - m_eggsToHatchCount);
             }
-            if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
+
+            // check if any pokemon matched with the target list
+            int matchedTarget = -1;
+            for (int i = 0; i < m_keepList.size(); i++)
+            {
+                PokemonStatTable& table = m_keepList[i];
+                if (table.m_target > 0 && m_hatchedStat.Match(table))
+                {
+                    if (--table.m_target == 0)
+                    {
+                        // this target is done, maybe we can skip some stat check?
+                        updateKeepDummy();
+                    }
+                    matchedTarget = i;
+                    break;
+                }
+            }
+
+            // this is shiny!
+            if (m_hatchedStat.m_shiny != ShinyType::SPT_COUNT)
             {
                 m_shinyCount++;
                 m_shinySingleCount++;
@@ -669,7 +814,19 @@ void SmartEggOperation::runNextState()
                 {
                     m_shinyWasDetected--;
                 }
+            }
 
+            if (matchedTarget >= 0)
+            {
+                if (m_hatchedStat.m_shiny != ShinyType::SPT_COUNT)
+                {
+                    emit printLog(log + " is SHINY!!!", LOG_SUCCESS);
+                }
+                emit printLog(log + " matched target Pokemon at slot " + QString::number(matchedTarget + 1) + "! Moving it to keep box! " + QString::number(m_keepList[matchedTarget].m_target) + " remaining", LOG_SUCCESS);
+                runKeepPokemonCommand();
+            }
+            else if (m_hatchedStat.m_shiny != ShinyType::SPT_COUNT)
+            {
                 emit printLog(log + " is SHINY!!! Moving it to keep box!", LOG_SUCCESS);
                 runKeepPokemonCommand();
             }
@@ -694,7 +851,7 @@ void SmartEggOperation::runNextState()
             {
                 m_substage = SS_CheckStats;
                 setState_runCommand("Nothing,20");
-                m_videoManager->setAreas({A_Shiny});
+                m_videoManager->setAreas(GetCheckStatCaptureAreas());
             }
             else
             {
@@ -912,9 +1069,44 @@ SmartEggOperation::EggPokeCountPair SmartEggOperation::checkPokemonCountInParty(
                 pokemonCount++;
             }
         }
+        else
+        {
+            // no more pokemon below
+            break;
+        }
     }
 
     return EggPokeCountPair(eggCount, pokemonCount);
+}
+
+QVector<GenderType> SmartEggOperation::checkGenderInParty(int count)
+{
+    QVector<GenderType> types;
+    for (int i = 2; i <= 1 + count; i++)
+    {
+        if (checkPixelColorMatch(GetPartyCapturePointOfPos(i).m_point, QColor(253,253,253)))
+        {
+            if (checkBrightnessMeanTarget(GetPartyGenderCaptureAreaOfPos(i).m_rect, C_Color_Male, 130))
+            {
+                types.push_back(GenderType::GT_Male);
+            }
+            else if (checkBrightnessMeanTarget(GetPartyGenderCaptureAreaOfPos(i).m_rect, C_Color_Female, 130))
+            {
+                types.push_back(GenderType::GT_Female);
+            }
+            else
+            {
+                types.push_back(GenderType::GT_Any);
+            }
+        }
+        else
+        {
+            // no more pokemon below
+            break;
+        }
+    }
+
+    return types;
 }
 
 void SmartEggOperation::runKeepPokemonCommand(int yPos)
@@ -952,6 +1144,49 @@ void SmartEggOperation::runKeepPokemonCommand(int yPos)
     setState_runCommand(command);
 }
 
+void SmartEggOperation::goToNextCheckStatState(Substage target)
+{
+    for (int i = 0; i < ST_COUNT; i++)
+    {
+        if (target == SS_CheckHP + i)
+        {
+            if (m_keepDummy.m_ivs[i] == IVType::IVT_COUNT)
+            {
+                target = Substage(target + 1);
+            }
+            else
+            {
+                m_substage = target;
+                setState_ocrRequest(GetBoxStatNumArea(StatType(i)).m_rect, C_Color_Text);
+                return;
+            }
+        }
+    }
+
+    if (target == SS_CheckNature)
+    {
+        if (m_keepDummy.m_nature == NatureType::NT_COUNT)
+        {
+            target = SS_CheckShiny;
+        }
+        else
+        {
+            m_substage = target;
+            setState_frameAnalyzeRequest();
+            return;
+        }
+    }
+
+    if (target == SS_CheckShiny)
+    {
+        m_substage = target;
+        setState_frameAnalyzeRequest();
+        return;
+    }
+
+    setState_error("Invalid state when checking stats");
+}
+
 const QVector<CaptureArea> SmartEggOperation::GetPartyCaptureAreas()
 {
     return
@@ -962,6 +1197,41 @@ const QVector<CaptureArea> SmartEggOperation::GetPartyCaptureAreas()
         GetPartyCaptureAreaOfPos(5),
         GetPartyCaptureAreaOfPos(6)
     };
+}
+
+const QVector<CaptureArea> SmartEggOperation::GetPartyGenderCaptureAreas(int count)
+{
+    QVector<CaptureArea> areas;
+    for (int i = 0; i < count; i++)
+    {
+        areas.push_back(GetPartyGenderCaptureAreaOfPos(i + 2));
+    }
+
+    return areas;
+}
+
+const QVector<CaptureArea> SmartEggOperation::GetCheckStatCaptureAreas()
+{
+    QVector<CaptureArea> areas;
+    for (int i = 0; i < ST_COUNT; i++)
+    {
+        if (m_keepDummy.m_ivs[i] != IVType::IVT_COUNT)
+        {
+            areas.push_back(GetBoxStatNumArea(StatType(i)));
+        }
+    }
+
+    if (m_keepDummy.m_nature != NatureType::NT_COUNT)
+    {
+        for (int i = 0; i < ST_COUNT; i++)
+        {
+            areas.push_back(GetBoxStatNameArea(StatType(i)));
+        }
+    }
+
+    // always check shiny
+    areas.push_back(A_Shiny);
+    return areas;
 }
 
 const CaptureArea SmartEggOperation::GetPartyCaptureAreaOfPos(int y)
@@ -984,6 +1254,17 @@ const CapturePoint SmartEggOperation::GetPartyCapturePointOfPos(int y)
 
     y--;
     return CapturePoint(402, 134 + y * 96);
+}
+
+const CaptureArea SmartEggOperation::GetPartyGenderCaptureAreaOfPos(int y)
+{
+    if (y < 1 || y > 6)
+    {
+        y = 1;
+    }
+
+    y--;
+    return CaptureArea(340, 124 + y * 96, 24, 24);
 }
 
 const CaptureArea SmartEggOperation::GetBoxStatNumArea(StatType type)

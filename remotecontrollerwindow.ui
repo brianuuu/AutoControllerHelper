@@ -4849,8 +4849,8 @@ Enter the Trade Partner:</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>448</width>
-                       <height>210</height>
+                       <width>438</width>
+                       <height>242</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_51">
@@ -5040,6 +5040,20 @@ Enter the Trade Partner:</string>
                        </layout>
                       </item>
                       <item>
+                       <widget class="QLabel" name="label_88">
+                        <property name="text">
+                         <string>Extra List of Pokemon to Keep:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="PokemonStatTableWidget" name="SP20_TW_Keep">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
                        <spacer name="verticalSpacer_19">
                         <property name="orientation">
                          <enum>Qt::Vertical</enum>
@@ -5135,6 +5149,11 @@ Enter the Trade Partner:</string>
    <class>PokemonAutofillLineEdit</class>
    <extends>QLineEdit</extends>
    <header>SmartPrograms/Widgets/pokemonautofilllineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PokemonStatTableWidget</class>
+   <extends>QTableWidget</extends>
+   <header>SmartPrograms/Widgets/pokemonstattablewidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

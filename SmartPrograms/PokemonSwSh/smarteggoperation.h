@@ -4,6 +4,7 @@
 #include <QElapsedTimer>
 #include <QWidget>
 #include "../smartprogrambase.h"
+#include "../Widgets/pokemonstattablewidget.h"
 
 class SmartEggOperation : public SmartProgramBase
 {
@@ -31,6 +32,7 @@ public:
         bool m_isHatchExtra;
         ShinyDetectionType m_shinyDetection;
         int m_targetShinyCount;
+        PokemonStatTableWidget const* m_statTable;
     };
 
 public:
@@ -43,8 +45,10 @@ public:
 
     // static public functions
     static QVector<CaptureArea> const GetPartyCaptureAreas();
+    static QVector<CaptureArea> const GetPartyGenderCaptureAreas(int count = 5);
     static CaptureArea const GetPartyCaptureAreaOfPos(int y);
     static CapturePoint const GetPartyCapturePointOfPos(int y);
+    static CaptureArea const GetPartyGenderCaptureAreaOfPos(int y);
     static CaptureArea const GetBoxStatNumArea(StatType type);
     static CaptureArea const GetBoxStatNameArea(StatType type);
 
@@ -57,22 +61,27 @@ private:
     virtual void runNextState();
     typedef QPair<int,int> EggPokeCountPair;
     EggPokeCountPair checkPokemonCountInParty();
+    QVector<GenderType> checkGenderInParty(int count = 5);
+    QVector<CaptureArea> const GetCheckStatCaptureAreas();
     void resetCollectorModeMembers();
     void resetHatcherModeMembers();
+    void updateKeepDummy();
     void runKeepPokemonCommand(int yPos = 2);
 
     // Command indices
     Command const C_CollectFirst    = 0;
     Command const C_CollectCycle    = 1;
     Command const C_CollectEgg      = 2;
-    Command const C_ToBox           = 3;
-    Command const C_HatchCycle      = 4;
-    Command const C_HatchReturn     = 5;
-    Command const C_FirstColumn     = 6;
-    Command const C_BoxFiller       = 7;
-    Command const C_TakeFiller      = 8;
-    Command const C_TakeParent      = 9;
-    Command const C_COUNT           = 10;
+    Command const C_ToParty         = 3;
+    Command const C_ToBox           = 4;
+    Command const C_PartyToBox      = 5;
+    Command const C_HatchCycle      = 6;
+    Command const C_HatchReturn     = 7;
+    Command const C_FirstColumn     = 8;
+    Command const C_BoxFiller       = 9;
+    Command const C_TakeFiller      = 10;
+    Command const C_TakeParent      = 11;
+    Command const C_COUNT           = 12;
 
     // List of test color
     HSVRange const C_Color_Black = HSVRange(0,0,0,359,30,100); // >180
@@ -82,6 +91,10 @@ private:
     HSVRange const C_Color_Dialog = HSVRange(0,0,20,359,40,80); // >240
     HSVRange const C_Color_Shiny = HSVRange(0,0,70,359,40,180); // >25
     HSVRange const C_Color_Text = HSVRange(0,0,0,359,200,200);
+    HSVRange const C_Color_Male = HSVRange(200,80,0,260,255,255); // >130
+    HSVRange const C_Color_Female = HSVRange(330,80,0,30,255,255); // >130
+    HSVRange const C_Color_NatureGood = HSVRange(200,80,0,260,255,255); // >10
+    HSVRange const C_Color_NatureBad = HSVRange(300,80,0,255,255,255); // >10
 
     // List of test point/area
     CaptureArea const A_Nursery1st = CaptureArea(943,390,84,34);
@@ -117,6 +130,17 @@ private:
         SS_NextColumn,
         SS_HatchComplete,
 
+        // check stats
+        SS_CheckGender,
+        SS_CheckHP,
+        SS_CheckAttack,
+        SS_CheckDefense,
+        SS_CheckSpAtk,
+        SS_CheckSpDef,
+        SS_CheckSpeed,
+        SS_CheckNature,
+        SS_CheckShiny,
+
         // release
         SS_ReleaseHasPokemon,
         SS_ReleaseYesNo,
@@ -129,6 +153,7 @@ private:
         SS_Finished,
     };
     Substage m_substage;
+    void goToNextCheckStatState(Substage target);
 
     // Members
     QElapsedTimer m_timer;
@@ -148,6 +173,10 @@ private:
     bool m_blackScreenDetected; // for detecting finishing hatch
     qint64 m_fadeOutDelayTime; // how long does it take for hatch screen to fade to black
     bool m_hatchExtraEgg; // is it time to take remaining egg from nursery and hatch it?
+    QVector<GenderType> m_hatchedGenders; // genders of current hatched column
+    PokemonStatTable m_hatchedStat; // stats of current pokemon
+    PokemonStatTable m_keepDummy; // dummy table to look up which stat we need to check
+    PokemonStatTableList m_keepList; // list of extra pokemon we want to keep
 
     // final
     bool m_videoCaptured; // have we taken a capture for this shiny yet?

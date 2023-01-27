@@ -1785,6 +1785,7 @@ void RemoteControllerWindow::on_SP20_CB_Mode_currentIndexChanged(int index)
     ui->SP20_RB_ShinySound->setEnabled(type != SmartEggOperation::EOT_Collector);
     ui->SP20_RB_ShinyDelay->setEnabled(type != SmartEggOperation::EOT_Collector);
     ui->SP20_SB_ShinyCount->setEnabled(type == SmartEggOperation::EOT_Shiny);
+    ui->SP20_TW_Keep->setEnabled(type != SmartEggOperation::EOT_Collector);
 }
 
 void RemoteControllerWindow::on_SoundDetection_required(int min, int max)
@@ -2330,6 +2331,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         settings.m_targetEggCount = ui->SP20_SB_Collect->value();
         settings.m_columnsToHatch = ui->SP20_SB_Column->value();
         settings.m_isHatchExtra = ui->SP20_CB_HatchExtra->isChecked();
+        settings.m_statTable = ui->SP20_TW_Keep;
         if (ui->SP20_RB_ShinySound->isChecked())
         {
             settings.m_shinyDetection = SmartEggOperation::ShinyDetectionType::SDT_Sound;
