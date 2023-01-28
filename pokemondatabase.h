@@ -101,8 +101,10 @@ enum GenderType : uint8_t
 enum ShinyType : uint8_t
 {
     SPT_Any,
+    SPT_Yes,
     SPT_Star,
     SPT_Square,
+    SPT_No,
 
     SPT_COUNT
 };

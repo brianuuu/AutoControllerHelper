@@ -4,6 +4,7 @@
 #include "../../pokemondatabase.h"
 #include <QComboBox>
 #include <QDebug>
+#include <QHeaderView>
 #include <QSpinBox>
 #include <QTableWidget>
 #include <QToolButton>
@@ -26,16 +27,32 @@ typedef QVector<PokemonStatTable> PokemonStatTableList;
 class PokemonStatTableWidget : public QTableWidget
 {
 public:
+    enum Mode : int
+    {
+        // no restrictions, can be empty
+        Default,
+
+        // auto create first slot default to be shiny
+        Shiny,
+
+        // only one slot allowed, disable shiny
+        Parent,
+    };
+
+public:
     explicit PokemonStatTableWidget(QWidget *parent = nullptr);
 
     // public methods
+    void SetMode(Mode mode);
     PokemonStatTableList GetTableList() const;
+
 
 private:
     enum ColumnType : int
     {
         CT_Add = 0,
         CT_Target,
+        CT_Shiny,
         CT_HP,
         CT_Attack,
         CT_Defense,
@@ -44,7 +61,6 @@ private:
         CT_Speed,
         CT_Nature,
         CT_Gender,
-        CT_Shiny,
     };
 
 private slots:
@@ -54,6 +70,8 @@ private:
     void AddPokemon();
     void AddDummyRow();
     void Clear();
+
+    Mode m_mode;
 };
 
 #endif // POKEMONSTATTABLEWIDGET_H

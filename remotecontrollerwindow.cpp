@@ -1784,8 +1784,17 @@ void RemoteControllerWindow::on_SP20_CB_Mode_currentIndexChanged(int index)
     ui->SP20_RB_ShinyDisable->setEnabled(type != SmartEggOperation::EOT_Collector);
     ui->SP20_RB_ShinySound->setEnabled(type != SmartEggOperation::EOT_Collector);
     ui->SP20_RB_ShinyDelay->setEnabled(type != SmartEggOperation::EOT_Collector);
-    ui->SP20_SB_ShinyCount->setEnabled(type == SmartEggOperation::EOT_Shiny);
     ui->SP20_TW_Keep->setEnabled(type != SmartEggOperation::EOT_Collector);
+
+    switch (type)
+    {
+    case SmartEggOperation::EOT_Shiny:
+        ui->SP20_TW_Keep->SetMode(PokemonStatTableWidget::Mode::Shiny);
+        break;
+    default:
+        ui->SP20_TW_Keep->SetMode(PokemonStatTableWidget::Mode::Default);
+        break;
+    }
 }
 
 void RemoteControllerWindow::on_SoundDetection_required(int min, int max)
@@ -2344,7 +2353,6 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         {
             settings.m_shinyDetection = SmartEggOperation::ShinyDetectionType::SDT_Disable;
         }
-        settings.m_targetShinyCount = ui->SP20_SB_ShinyCount->value();
         m_smartProgram = new SmartEggOperation(settings, parameter);
         break;
     }

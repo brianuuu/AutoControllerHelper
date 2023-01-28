@@ -120,8 +120,10 @@ QString PokemonDatabase::getShinyTypeName(ShinyType type)
     switch (type)
     {
     case SPT_Any:       return "Any";
+    case SPT_Yes:       return "Yes";
     case SPT_Star:      return "Star";
     case SPT_Square:    return "Square";
+    case SPT_No:        return "No";
     default:            return "INVALID";
     }
 }

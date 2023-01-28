@@ -4850,7 +4850,7 @@ Enter the Trade Partner:</string>
                        <x>0</x>
                        <y>0</y>
                        <width>438</width>
-                       <height>261</height>
+                       <height>234</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_51">
@@ -5016,33 +5016,9 @@ Enter the Trade Partner:</string>
                        </layout>
                       </item>
                       <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_55">
-                        <item>
-                         <widget class="QLabel" name="label_86">
-                          <property name="text">
-                           <string>Target No. of Shinies (Shiny Mode):</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QSpinBox" name="SP20_SB_ShinyCount">
-                          <property name="enabled">
-                           <bool>false</bool>
-                          </property>
-                          <property name="maximum">
-                           <number>300</number>
-                          </property>
-                          <property name="value">
-                           <number>1</number>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
-                      <item>
                        <widget class="QLabel" name="label_88">
                         <property name="text">
-                         <string>Extra List of Pokemon to Keep:</string>
+                         <string>List of Pokemon to Keep:</string>
                         </property>
                        </widget>
                       </item>

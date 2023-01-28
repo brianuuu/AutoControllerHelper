@@ -39,8 +39,11 @@ void SmartEggOperation::reset()
 
     // extra pokemon we want to keep
     m_hatchedStat = PokemonStatTable();
-    m_keepList = m_programSettings.m_statTable->GetTableList();
-    updateKeepDummy();
+    if (m_programSettings.m_operation != EOT_Collector)
+    {
+        m_keepList = m_programSettings.m_statTable->GetTableList();
+        updateKeepDummy();
+    }
 }
 
 void SmartEggOperation::resetCollectorModeMembers()
@@ -112,6 +115,15 @@ void SmartEggOperation::runNextState()
             {
                 printPokemonStat(table);
             }
+
+            for (int i = 0; i < m_keepList.size(); i++)
+            {
+                PokemonStatTable const& table = m_keepList[i];
+                if (table.m_target > 0)
+                {
+                    emit printLog("Slot " + QString::number(i+1) + ": " + QString::number(table.m_target) + " remaining");
+                }
+            }
         }
 
         bool testAfterHatched = false;
@@ -143,10 +155,10 @@ void SmartEggOperation::runNextState()
         }
         else
         {
-            if (m_programSettings.m_operation == EOT_Shiny && m_programSettings.m_targetShinyCount == 0 && m_keepList.isEmpty())
+            if (m_programSettings.m_operation == EOT_Shiny && m_keepList.isEmpty())
             {
                 incrementStat(m_statError);
-                setState_error("No Shiny Pokemon nor any Extra Pokemon to keep is set");
+                setState_error("No Pokemon to keep is set");
                 break;
             }
 
@@ -686,7 +698,7 @@ void SmartEggOperation::runNextState()
                 if (videoCapture)
                 {
                     // add delay after capture as it can freeze the game
-                    setState_runCommand("Capture,22,Nothing,200," + m_commands[C_HatchReturn], m_eggsToHatchCount < m_eggsToHatchColumn);
+                    setState_runCommand("Capture,22,Nothing,300," + m_commands[C_HatchReturn], m_eggsToHatchCount < m_eggsToHatchColumn);
                 }
                 else
                 {
@@ -805,7 +817,11 @@ void SmartEggOperation::runNextState()
             if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 25))
             {
                 // TODO: square shiny?
-                m_hatchedStat.m_shiny = ShinyType::SPT_Star;
+                m_hatchedStat.m_shiny = ShinyType::SPT_Yes;
+            }
+            else
+            {
+                m_hatchedStat.m_shiny = ShinyType::SPT_No;
             }
 
             m_substage = SS_CheckStats;
@@ -876,7 +892,8 @@ void SmartEggOperation::runNextState()
             }
 
             // this is shiny!
-            if (m_hatchedStat.m_shiny != ShinyType::SPT_COUNT)
+            bool isShiny = m_hatchedStat.m_shiny == ShinyType::SPT_Yes || m_hatchedStat.m_shiny == ShinyType::SPT_Star || m_hatchedStat.m_shiny == ShinyType::SPT_Square;
+            if (isShiny)
             {
                 m_shinyCount++;
                 m_shinySingleCount++;
@@ -891,14 +908,14 @@ void SmartEggOperation::runNextState()
 
             if (matchedTarget >= 0)
             {
-                if (m_hatchedStat.m_shiny != ShinyType::SPT_COUNT)
+                if (isShiny)
                 {
                     emit printLog(log + " is SHINY!!!", LOG_SUCCESS);
                 }
                 emit printLog(log + " matched target Pokemon at slot " + QString::number(matchedTarget + 1) + "! Moving it to keep box! " + QString::number(m_keepList[matchedTarget].m_target) + " remaining", LOG_SUCCESS);
                 runKeepPokemonCommand();
             }
-            else if (m_hatchedStat.m_shiny != ShinyType::SPT_COUNT)
+            else if (isShiny)
             {
                 emit printLog(log + " is SHINY!!! Moving it to keep box!", LOG_SUCCESS);
                 runKeepPokemonCommand();
@@ -951,12 +968,7 @@ void SmartEggOperation::runNextState()
                 {
                     if (m_shinySingleCount > 0)
                     {
-                        QString log = QString::number(m_shinyCount) + " SHINY Pokemon has been found";
-                        if (m_programSettings.m_operation == EOT_Shiny)
-                        {
-                            log += ", " + QString::number(m_programSettings.m_targetShinyCount - m_shinyCount) + " remaining";
-                        }
-                        emit printLog(log, LOG_SUCCESS);
+                        emit printLog(QString::number(m_shinyCount) + " SHINY Pokemon has been found", LOG_SUCCESS);
                         m_shinySingleCount = 0;
                     }
                     else
@@ -978,27 +990,24 @@ void SmartEggOperation::runNextState()
                     emit printLog("No Non-Shiny Pokemon is kept...");
                 }
 
-                if (m_programSettings.m_operation == EOT_Shiny)
+                // any target pokemon we haven't got?
+                bool missingTarget = false;
+                for (int i = 0; i < m_keepList.size(); i++)
                 {
-                    // any target pokemon we haven't got?
-                    bool missingTarget = false;
-                    for (PokemonStatTable const& table : m_keepList)
+                    PokemonStatTable const& table = m_keepList[i];
+                    emit printLog("Slot " + QString::number(i+1) + ": " + QString::number(table.m_target) + " remaining");
+                    if (table.m_target > 0)
                     {
-                        if (table.m_target > 0)
-                        {
-                            missingTarget = true;
-                            break;
-                        }
+                        missingTarget = true;
                     }
+                }
 
-                    // have we found enough shiny?
-                    if (m_shinyCount < m_programSettings.m_targetShinyCount || missingTarget)
-                    {
-                        emit printLog("Taking 5 filler Pokemon from keep box to party");
-                        m_substage = SS_TakeFiller;
-                        setState_runCommand(C_TakeFiller);
-                        break;
-                    }
+                if (m_programSettings.m_operation == EOT_Shiny && missingTarget)
+                {
+                    emit printLog("Taking 5 filler Pokemon from keep box to party");
+                    m_substage = SS_TakeFiller;
+                    setState_runCommand(C_TakeFiller);
+                    break;
                 }
 
                 m_substage = SS_HatchComplete;
@@ -1354,7 +1363,7 @@ void SmartEggOperation::printPokemonStat(const PokemonStatTable &table)
         stats += PokemonDatabase::getStatTypeName(StatType(i), false) + ": ";
         if (type == IVType::IVT_COUNT)
         {
-            stats += "\?\?\?";
+            stats += "???";
         }
         else if (type == IVType::IVT_Any)
         {
@@ -1371,7 +1380,7 @@ void SmartEggOperation::printPokemonStat(const PokemonStatTable &table)
     NatureType const& nature = table.m_nature;
     if (nature == NatureType::NT_COUNT)
     {
-        stats += "\?\?\?";
+        stats += "???";
     }
     else if (nature == NatureType::NT_Any)
     {
@@ -1387,7 +1396,7 @@ void SmartEggOperation::printPokemonStat(const PokemonStatTable &table)
     GenderType const& gender = table.m_gender;
     if (gender == GenderType::GT_COUNT)
     {
-        stats += "\?\?\?";
+        stats += "???";
     }
     else if (gender == GenderType::GT_Any)
     {
@@ -1403,11 +1412,21 @@ void SmartEggOperation::printPokemonStat(const PokemonStatTable &table)
     ShinyType const& shiny = table.m_shiny;
     if (shiny == ShinyType::SPT_COUNT)
     {
-        stats += "No";
+        incrementStat(m_statError);
+        emit printLog("Shiny status unknown", LOG_ERROR);
+        stats += "???";
     }
     else if (shiny == ShinyType::SPT_Any)
     {
         stats += "Any";
+    }
+    else if (shiny == ShinyType::SPT_No)
+    {
+        stats += "No";
+    }
+    else if (shiny == ShinyType::SPT_Yes)
+    {
+        stats += "Yes";
     }
     else
     {

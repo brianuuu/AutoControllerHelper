@@ -31,7 +31,6 @@ public:
         int m_columnsToHatch;
         bool m_isHatchExtra;
         ShinyDetectionType m_shinyDetection;
-        int m_targetShinyCount;
         PokemonStatTableWidget const* m_statTable;
     };
 

@@ -14,6 +14,7 @@ PokemonStatTable::PokemonStatTable()
 
 bool PokemonStatTable::Match(const PokemonStatTable &other)
 {
+    // IV
     for (int i = 0; i < StatType::ST_COUNT; i++)
     {
         if (m_ivs[i] != IVType::IVT_Any && other.m_ivs[i] != IVType::IVT_Any && m_ivs[i] != other.m_ivs[i])
@@ -22,19 +23,60 @@ bool PokemonStatTable::Match(const PokemonStatTable &other)
         }
     }
 
+    // Nature
     if (m_nature != NatureType::NT_Any && other.m_nature != NatureType::NT_Any && m_nature != other.m_nature)
     {
         return false;
     }
 
+    // Gender
     if (m_gender != GenderType::GT_Any && other.m_gender != GenderType::GT_Any && m_gender != other.m_gender)
     {
         return false;
     }
 
-    if (m_shiny != ShinyType::SPT_Any && other.m_shiny != ShinyType::SPT_Any && m_shiny != other.m_shiny)
+    // Shiny
+    switch (m_shiny)
     {
-        return false;
+    case ShinyType::SPT_Any:
+        break;
+    case ShinyType::SPT_Yes:
+        switch (other.m_shiny)
+        {
+        case ShinyType::SPT_No:
+            return false;
+        default: break;
+        }
+        break;
+    case ShinyType::SPT_Star:
+        switch (other.m_shiny)
+        {
+        case ShinyType::SPT_Square:
+        case ShinyType::SPT_No:
+            return false;
+        default: break;
+        }
+        break;
+    case ShinyType::SPT_Square:
+        switch (other.m_shiny)
+        {
+        case ShinyType::SPT_Star:
+        case ShinyType::SPT_No:
+            return false;
+        default: break;
+        }
+        break;
+    case ShinyType::SPT_No:
+        switch (other.m_shiny)
+        {
+        case ShinyType::SPT_Yes:
+        case ShinyType::SPT_Star:
+        case ShinyType::SPT_Square:
+            return false;
+        default: break;
+        }
+        break;
+    default: return false;
     }
 
     return true;
@@ -44,12 +86,31 @@ PokemonStatTableWidget::PokemonStatTableWidget(QWidget *parent) : QTableWidget(p
 {
     setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    QStringList headers = {"", "Target", "HP", "Attack", "Defense", "Sp. Atk", "Sp. Def", "Speed", "Nature", "Gender", "Shiny"};
+    QStringList headers = {"", "Target", "Shiny", "HP", "Attack", "Defense", "Sp. Atk", "Sp. Def", "Speed", "Nature", "Gender"};
     setColumnCount(headers.size());
-    setColumnWidth(CT_Add, 20);
+    //setColumnWidth(CT_Add, 20);
+    //setColumnWidth(CT_Target, 40);
+    //setColumnWidth(CT_Shiny, 60);
     setHorizontalHeaderLabels(headers);
 
+    // initial setup
     AddDummyRow();
+    horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+    // set initial mode
+    SetMode(Mode::Default);
+}
+
+void PokemonStatTableWidget::SetMode(PokemonStatTableWidget::Mode mode)
+{
+    m_mode = mode;
+    Clear();
+
+    // Add at least one pokemon for shiny/parent mode
+    if (mode != Mode::Default)
+    {
+        AddPokemon();
+    }
 }
 
 PokemonStatTableList PokemonStatTableWidget::GetTableList() const
@@ -127,7 +188,8 @@ void PokemonStatTableWidget::AddPokemon()
     {
         QSpinBox* spinBox = new QSpinBox();
         spinBox->setRange(1, 100);
-        spinBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
+        spinBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        spinBox->setFixedWidth(40);
         setCellWidget(row, CT_Target, spinBox);
     }
 
@@ -171,14 +233,23 @@ void PokemonStatTableWidget::AddPokemon()
         {
             comboBox->addItem(PokemonDatabase::getShinyTypeName(ShinyType(i)));
         }
+        if (row == 0 && m_mode == Mode::Shiny)
+        {
+            comboBox->setCurrentIndex(ShinyType::SPT_Yes);
+        }
         setCellWidget(row, CT_Shiny, comboBox);
     }
 
     // change + to - button
     QToolButton* toolButton = qobject_cast<QToolButton*>(cellWidget(row, CT_Add));
     toolButton->setText("-");
+    if (row == 0 && m_mode == Mode::Parent)
+    {
+        toolButton->setEnabled(false);
+    }
 
     AddDummyRow();
+    horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 void PokemonStatTableWidget::AddDummyRow()
@@ -186,6 +257,10 @@ void PokemonStatTableWidget::AddDummyRow()
     // dummy row that addes a plus button at the first column
     QToolButton* pushButton = new QToolButton();
     pushButton->setText("+");
+    if (m_mode == Mode::Parent)
+    {
+        pushButton->setEnabled(false);
+    }
     connect(pushButton, &QToolButton::pressed, this, &PokemonStatTableWidget::OnAddButtonPressed);
 
     int row = rowCount();
