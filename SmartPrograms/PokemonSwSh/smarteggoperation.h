@@ -14,6 +14,7 @@ public:
         EOT_Collector = 0,
         EOT_Hatcher,
         EOT_Shiny,
+        EOT_Remainder,
         EOT_COUNT,
     };
 

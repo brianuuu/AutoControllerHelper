@@ -4886,6 +4886,11 @@ Enter the Trade Partner:</string>
                             <string>Shiny Mode</string>
                            </property>
                           </item>
+                          <item>
+                           <property name="text">
+                            <string>Remainer Mode</string>
+                           </property>
+                          </item>
                          </widget>
                         </item>
                         <item>

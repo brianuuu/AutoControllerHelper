@@ -163,6 +163,13 @@ void SmartEggOperation::runNextState()
                 break;
             }
 
+            if (m_programSettings.m_operation == EOT_Remainder && m_programSettings.m_shinyDetection == SDT_Delay)
+            {
+                incrementStat(m_statError);
+                setState_error("Fade Out Delay is not able in Remainder Mode");
+                break;
+            }
+
             if (m_programSettings.m_operation == EOT_Collector)
             {
                 // force disable shiny detection
@@ -218,18 +225,33 @@ void SmartEggOperation::runNextState()
                 break;
             }
             case EOT_Hatcher:
+            case EOT_Remainder:
             {
                 if (countPair.second == 0)
                 {
                     emit printLog("Only 1 Pokemon in party confirmed");
-                    m_boxViewChecked = false;
-                    m_substage = SS_ToBox;
-                    setState_runCommand(C_PartyToBox);
+                    if (m_programSettings.m_operation == EOT_Hatcher)
+                    {
+                        m_boxViewChecked = false;
+                        m_substage = SS_ToBox;
+                        setState_runCommand(C_PartyToBox);
+                    }
+                    else
+                    {
+                        // we don't care about box view in remainder mode
+                        m_boxViewChecked = true;
+                        m_hatchExtraEgg = true;
+                        m_programSettings.m_isHatchExtra = true;
+
+                        m_substage = SS_CollectCycle;
+                        setState_runCommand("BSpam,40");
+                        m_videoManager->clearCaptures();
+                    }
                 }
                 else
                 {
                     incrementStat(m_statError);
-                    setState_error("There should only 1 Pokemon with Flame Body in the team in Hatcher Mode");
+                    setState_error("There should only 1 Pokemon with Flame Body in the team in Hatcher/Remainder Mode");
                 }
                 break;
             }
@@ -1147,10 +1169,10 @@ void SmartEggOperation::runNextState()
         {
             if (m_programSettings.m_isHatchExtra && !m_hatchExtraEgg)
             {
-                m_substage = SS_CollectCycle;
+                m_hatchExtraEgg = true;
                 resetCollectorModeMembers();
 
-                m_hatchExtraEgg = true;
+                m_substage = SS_CollectCycle;
                 setState_runCommand("BSpam,80");
             }
             else

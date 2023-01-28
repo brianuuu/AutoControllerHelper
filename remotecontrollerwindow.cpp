@@ -1780,10 +1780,14 @@ void RemoteControllerWindow::on_SP20_CB_Mode_currentIndexChanged(int index)
     SmartEggOperation::EggOperationType type = SmartEggOperation::EggOperationType(index);
     ui->SP20_SB_Collect->setEnabled(type == SmartEggOperation::EOT_Collector);
     ui->SP20_SB_Column->setEnabled(type == SmartEggOperation::EOT_Hatcher);
-    ui->SP20_CB_HatchExtra->setEnabled(type != SmartEggOperation::EOT_Collector);
+    ui->SP20_CB_HatchExtra->setEnabled(type != SmartEggOperation::EOT_Collector && type != SmartEggOperation::EOT_Remainder);
     ui->SP20_RB_ShinyDisable->setEnabled(type != SmartEggOperation::EOT_Collector);
     ui->SP20_RB_ShinySound->setEnabled(type != SmartEggOperation::EOT_Collector);
-    ui->SP20_RB_ShinyDelay->setEnabled(type != SmartEggOperation::EOT_Collector);
+    ui->SP20_RB_ShinyDelay->setEnabled(type != SmartEggOperation::EOT_Collector && type != SmartEggOperation::EOT_Remainder);
+    if (type == SmartEggOperation::EOT_Remainder && ui->SP20_RB_ShinyDelay->isChecked())
+    {
+        ui->SP20_RB_ShinyDisable->setChecked(true);
+    }
     ui->SP20_TW_Keep->setEnabled(type != SmartEggOperation::EOT_Collector);
 
     switch (type)
