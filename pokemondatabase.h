@@ -117,8 +117,9 @@ public:
     // Game Enums
     static QString getGameLanguagePrefix(GameLanguage sp);
     static QString getGameLanguageName(GameLanguage sp);
+    static QString getStatTypeName(StatType type, bool fullName);
     static QString getIVTypeName(IVType type);
-    static QString getNatureTypeName(NatureType type);
+    static QString getNatureTypeName(NatureType type, bool fullName);
     static QString getGenderTypeName(GenderType type);
     static QString getShinyTypeName(ShinyType type);
 
@@ -133,6 +134,10 @@ public:
     // String manipulation
     static QString stringRemoveNonAlphaNumeric(QString const& str);
     static QString normalizeString(QString const& str);
+
+    // Pokemon
+    static NatureType getNatureFromStats(StatType inc, StatType dec);
+    static OCREntries const& getEntries_PokemonIV(GameLanguage gameLanguage);
 
     // Pokedex
     static OCREntries const& getEntries_PokedexNational(GameLanguage gameLanguage);
@@ -154,6 +159,9 @@ private:
     static bool getDatabase(QString const& name, GameLanguage gameLanguage, Database& database);
 
 private:
+    // Pokemon
+    Database m_database_PokedexIV;
+
     // Pokedex
     Database m_database_PokedexNational;
 

@@ -4850,7 +4850,7 @@ Enter the Trade Partner:</string>
                        <x>0</x>
                        <y>0</y>
                        <width>438</width>
-                       <height>242</height>
+                       <height>261</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_51">
@@ -5050,6 +5050,12 @@ Enter the Trade Partner:</string>
                        <widget class="PokemonStatTableWidget" name="SP20_TW_Keep">
                         <property name="enabled">
                          <bool>false</bool>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>70</height>
+                         </size>
                         </property>
                        </widget>
                       </item>

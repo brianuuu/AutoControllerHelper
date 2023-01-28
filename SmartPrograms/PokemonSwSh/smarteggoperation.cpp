@@ -105,6 +105,15 @@ void SmartEggOperation::runNextState()
         initStat(m_statShinyHatched, "Shinies");
         initStat(m_statPokemonKept, "Kept");
 
+        if (!m_keepList.isEmpty())
+        {
+            emit printLog("Keep Pokemon List:");
+            for (PokemonStatTable const& table : m_keepList)
+            {
+                printPokemonStat(table);
+            }
+        }
+
         bool testAfterHatched = false;
         bool testHatchExtra = false;
         if (testAfterHatched)
@@ -134,10 +143,10 @@ void SmartEggOperation::runNextState()
         }
         else
         {
-            if (m_programSettings.m_operation == EOT_Shiny && m_programSettings.m_targetShinyCount == 0)
+            if (m_programSettings.m_operation == EOT_Shiny && m_programSettings.m_targetShinyCount == 0 && m_keepList.isEmpty())
             {
                 incrementStat(m_statError);
-                setState_error("0 Shiny Pokemon target is set");
+                setState_error("No Shiny Pokemon nor any Extra Pokemon to keep is set");
                 break;
             }
 
@@ -721,8 +730,55 @@ void SmartEggOperation::runNextState()
     {
         if (state == S_OCRReady)
         {
-            // TODO:
-            //emit printLog(getOCRStringRaw());
+            GameLanguage const gameLanguage = m_settings->getGameLanguage();
+            PokemonDatabase::OCREntries const& entries = PokemonDatabase::getEntries_PokemonIV(gameLanguage);
+            if (entries.isEmpty())
+            {
+                incrementStat(m_statError);
+                setState_error("Unable to create OCR database from PokemonIV");
+                break;
+            }
+
+            QString result = matchStringDatabase(entries);
+            if (result.isEmpty())
+            {
+                incrementStat(m_statError);
+                emit printLog("OCR unable the match any IV entries, the returned text need to be added to database, please report to brianuuuSonic", LOG_ERROR);
+            }
+            else
+            {
+                IVType& type = m_hatchedStat.m_ivs[int(m_substage - SS_CheckHP + ST_HP)];
+                if (result == "No Good")
+                {
+                    type = IVType::IVT_NoGood;
+                }
+                else if (result == "Decent")
+                {
+                    type = IVType::IVT_Decent;
+                }
+                else if (result == "Pretty Good")
+                {
+                    type = IVType::IVT_PrettyGood;
+                }
+                else if (result == "Very Good")
+                {
+                    type = IVType::IVT_VeryGood;
+                }
+                else if (result == "Fantastic")
+                {
+                    type = IVType::IVT_Fantastic;
+                }
+                else if (result == "Best")
+                {
+                    type = IVType::IVT_Best;
+                }
+                else
+                {
+                    incrementStat(m_statError);
+                    emit printLog("Hyper trained Pokemon is unexpected", LOG_ERROR);
+                }
+            }
+
             goToNextCheckStatState(Substage(m_substage + 1));
         }
         break;
@@ -731,7 +787,13 @@ void SmartEggOperation::runNextState()
     {
         if (state == S_CaptureReady)
         {
-            // TODO:
+            auto natureStat = checkPokemonNatureInParty();
+            m_hatchedStat.m_nature = PokemonDatabase::getNatureFromStats(natureStat.first, natureStat.second);
+            if (m_hatchedStat.m_nature == NatureType::NT_COUNT)
+            {
+                incrementStat(m_statError);
+                emit printLog("Error occured when detecting Pokemon's nature (" + PokemonDatabase::getStatTypeName(natureStat.first, false) + ","+ PokemonDatabase::getStatTypeName(natureStat.second, false) + ")", LOG_ERROR);
+            }
             goToNextCheckStatState(SS_CheckShiny);
         }
         break;
@@ -787,19 +849,30 @@ void SmartEggOperation::runNextState()
 
             // check if any pokemon matched with the target list
             int matchedTarget = -1;
+            bool checkedStats = false;
             for (int i = 0; i < m_keepList.size(); i++)
             {
                 PokemonStatTable& table = m_keepList[i];
-                if (table.m_target > 0 && m_hatchedStat.Match(table))
+                if (table.m_target > 0)
                 {
-                    if (--table.m_target == 0)
+                    checkedStats = true;
+                    if (m_hatchedStat.Match(table))
                     {
-                        // this target is done, maybe we can skip some stat check?
-                        updateKeepDummy();
+                        if (--table.m_target == 0)
+                        {
+                            // this target is done, maybe we can skip some stat check?
+                            updateKeepDummy();
+                        }
+                        matchedTarget = i;
+                        break;
                     }
-                    matchedTarget = i;
-                    break;
                 }
+            }
+
+            // print current stats
+            if (checkedStats)
+            {
+                printPokemonStat(m_hatchedStat);
             }
 
             // this is shiny!
@@ -907,15 +980,25 @@ void SmartEggOperation::runNextState()
 
                 if (m_programSettings.m_operation == EOT_Shiny)
                 {
-                    if (m_shinyCount < m_programSettings.m_targetShinyCount)
+                    // any target pokemon we haven't got?
+                    bool missingTarget = false;
+                    for (PokemonStatTable const& table : m_keepList)
+                    {
+                        if (table.m_target > 0)
+                        {
+                            missingTarget = true;
+                            break;
+                        }
+                    }
+
+                    // have we found enough shiny?
+                    if (m_shinyCount < m_programSettings.m_targetShinyCount || missingTarget)
                     {
                         emit printLog("Taking 5 filler Pokemon from keep box to party");
                         m_substage = SS_TakeFiller;
                         setState_runCommand(C_TakeFiller);
                         break;
                     }
-
-                    // TODO: other keep pokemon
                 }
 
                 m_substage = SS_HatchComplete;
@@ -1184,6 +1267,7 @@ void SmartEggOperation::goToNextCheckStatState(Substage target)
         return;
     }
 
+    incrementStat(m_statError);
     setState_error("Invalid state when checking stats");
 }
 
@@ -1223,7 +1307,7 @@ const QVector<CaptureArea> SmartEggOperation::GetCheckStatCaptureAreas()
 
     if (m_keepDummy.m_nature != NatureType::NT_COUNT)
     {
-        for (int i = 0; i < ST_COUNT; i++)
+        for (int i = ST_Attack; i < ST_COUNT; i++)
         {
             areas.push_back(GetBoxStatNameArea(StatType(i)));
         }
@@ -1232,6 +1316,105 @@ const QVector<CaptureArea> SmartEggOperation::GetCheckStatCaptureAreas()
     // always check shiny
     areas.push_back(A_Shiny);
     return areas;
+}
+
+QPair<StatType, StatType> SmartEggOperation::checkPokemonNatureInParty()
+{
+    StatType inc = ST_COUNT;
+    StatType dec = ST_COUNT;
+
+    for (int i = ST_Attack; i < ST_COUNT; i++)
+    {
+        StatType stat = StatType(i);
+        if (inc == ST_COUNT && checkBrightnessMeanTarget(GetBoxStatNameArea(stat).m_rect, C_Color_NatureGood, 10))
+        {
+            inc = stat;
+        }
+        else if (dec == ST_COUNT && checkBrightnessMeanTarget(GetBoxStatNameArea(stat).m_rect, C_Color_NatureBad, 10))
+        {
+            dec = stat;
+        }
+    }
+
+    return {inc,dec};
+}
+
+void SmartEggOperation::printPokemonStat(const PokemonStatTable &table)
+{
+    QString stats = "Stats:<br>";
+
+    // IV
+    for (int i = 0; i < StatType::ST_COUNT; i++)
+    {
+        IVType const& type = table.m_ivs[i];
+        if (i > 0)
+        {
+            stats += " | ";
+        }
+        stats += PokemonDatabase::getStatTypeName(StatType(i), false) + ": ";
+        if (type == IVType::IVT_COUNT)
+        {
+            stats += "\?\?\?";
+        }
+        else if (type == IVType::IVT_Any)
+        {
+            stats += "Any";
+        }
+        else
+        {
+            stats += PokemonDatabase::getIVTypeName(type);
+        }
+    }
+
+    // Nature
+    stats += "<br>Nature: ";
+    NatureType const& nature = table.m_nature;
+    if (nature == NatureType::NT_COUNT)
+    {
+        stats += "\?\?\?";
+    }
+    else if (nature == NatureType::NT_Any)
+    {
+        stats += "Any";
+    }
+    else
+    {
+        stats += PokemonDatabase::getNatureTypeName(nature, false);
+    }
+
+    // Gender
+    stats += " | Gender: ";
+    GenderType const& gender = table.m_gender;
+    if (gender == GenderType::GT_COUNT)
+    {
+        stats += "\?\?\?";
+    }
+    else if (gender == GenderType::GT_Any)
+    {
+        stats += "Any";
+    }
+    else
+    {
+        stats += PokemonDatabase::getGenderTypeName(gender);
+    }
+
+    // Shiny
+    stats += " | Shiny: ";
+    ShinyType const& shiny = table.m_shiny;
+    if (shiny == ShinyType::SPT_COUNT)
+    {
+        stats += "No";
+    }
+    else if (shiny == ShinyType::SPT_Any)
+    {
+        stats += "Any";
+    }
+    else
+    {
+        stats += PokemonDatabase::getShinyTypeName(shiny);
+    }
+
+    emit printLog(stats);
 }
 
 const CaptureArea SmartEggOperation::GetPartyCaptureAreaOfPos(int y)

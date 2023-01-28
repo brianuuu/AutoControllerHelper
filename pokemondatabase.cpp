@@ -45,6 +45,20 @@ QString PokemonDatabase::getGameLanguageName(GameLanguage sp)
     }
 }
 
+QString PokemonDatabase::getStatTypeName(StatType type, bool fullName)
+{
+    switch (type)
+    {
+    case ST_HP:         return "HP";
+    case ST_Attack:     return fullName ? "Attack" : "Atk";
+    case ST_Defense:    return fullName ? "Defense" : "Def";
+    case ST_SpAtk:      return fullName ? "Special Attack" : "SpA";
+    case ST_SpDef:      return fullName ? "Special Defense" : "SpD";
+    case ST_Speed:      return fullName ? "Speed" : "Spe";
+    default:            return "INVALID";
+    }
+}
+
 QString PokemonDatabase::getIVTypeName(IVType type)
 {
     switch (type)
@@ -60,32 +74,32 @@ QString PokemonDatabase::getIVTypeName(IVType type)
     }
 }
 
-QString PokemonDatabase::getNatureTypeName(NatureType type)
+QString PokemonDatabase::getNatureTypeName(NatureType type, bool fullName)
 {
     switch (type)
     {
     case NT_Any:        return "Any";
     case NT_Neutral:    return "Neutral";
-    case NT_Lonely:     return "Lonely (+Atk,-Def)";
-    case NT_Adamant:    return "Adamant (+Atk,-SpA)";
-    case NT_Naughty:    return "Naughty (+Atk,-SpD)";
-    case NT_Brave:      return "Brave (+Atk,-Spe)";
-    case NT_Bold:       return "Bold (+Def,-Atk)";
-    case NT_Impish:     return "Impish (+Def,-SpA)";
-    case NT_Lax:        return "Lax (+Def,-SpD)";
-    case NT_Relaxed:    return "Relaxed (+Def,-Spe)";
-    case NT_Modest:     return "Modest (+SpA,-Atk)";
-    case NT_Mild:       return "Mild (+SpA,-Def)";
-    case NT_Rash:       return "Rash (+SpA,-SpD)";
-    case NT_Quiet:      return "Quiet (+SpA,-Spe)";
-    case NT_Calm:       return "Calm (+SpD,-Atk)";
-    case NT_Gentle:     return "Gentle (+SpD,-Def)";
-    case NT_Careful:    return "Careful (+SpD,-SpA)";
-    case NT_Sassy:      return "Sassy (+SpD,-Spe)";
-    case NT_Timid:      return "Timid (+Spe,-Atk)";
-    case NT_Hasty:      return "Hasty (+Spe,-Def)";
-    case NT_Jolly:      return "Jolly (+Spe,-SpA)";
-    case NT_Naive:      return "Naive (+Spe,-SpD)";
+    case NT_Lonely:     return !fullName ? "Lonely" : "Lonely (+Atk,-Def)";
+    case NT_Adamant:    return !fullName ? "Adamant" : "Adamant (+Atk,-SpA)";
+    case NT_Naughty:    return !fullName ? "Naughty" : "Naughty (+Atk,-SpD)";
+    case NT_Brave:      return !fullName ? "Brave" : "Brave (+Atk,-Spe)";
+    case NT_Bold:       return !fullName ? "Bold" : "Bold (+Def,-Atk)";
+    case NT_Impish:     return !fullName ? "Impish" : "Impish (+Def,-SpA)";
+    case NT_Lax:        return !fullName ? "Lax" : "Lax (+Def,-SpD)";
+    case NT_Relaxed:    return !fullName ? "Relaxed" : "Relaxed (+Def,-Spe)";
+    case NT_Modest:     return !fullName ? "Modest" : "Modest (+SpA,-Atk)";
+    case NT_Mild:       return !fullName ? "Mild" : "Mild (+SpA,-Def)";
+    case NT_Rash:       return !fullName ? "Rash" : "Rash (+SpA,-SpD)";
+    case NT_Quiet:      return !fullName ? "Quiet" : "Quiet (+SpA,-Spe)";
+    case NT_Calm:       return !fullName ? "Calm" : "Calm (+SpD,-Atk)";
+    case NT_Gentle:     return !fullName ? "Gentle" : "Gentle (+SpD,-Def)";
+    case NT_Careful:    return !fullName ? "Careful" : "Careful (+SpD,-SpA)";
+    case NT_Sassy:      return !fullName ? "Sassy" : "Sassy (+SpD,-Spe)";
+    case NT_Timid:      return !fullName ? "Timid" : "Timid (+Spe,-Atk)";
+    case NT_Hasty:      return !fullName ? "Hasty" : "Hasty (+Spe,-Def)";
+    case NT_Jolly:      return !fullName ? "Jolly" : "Jolly (+Spe,-SpA)";
+    case NT_Naive:      return !fullName ? "Naive" : "Naive (+Spe,-SpD)";
     default:            return "INVALID";
     }
 }
@@ -238,6 +252,82 @@ QString PokemonDatabase::normalizeString(const QString &str)
     QString temp = str.normalized(QString::NormalizationForm_KD);
     temp = stringRemoveNonAlphaNumeric(temp);
     return temp.toLower();
+}
+
+// -----------------------------------------------
+// Pokemon
+// -----------------------------------------------
+NatureType PokemonDatabase::getNatureFromStats(StatType inc, StatType dec)
+{
+    if (inc == StatType::ST_COUNT && dec == StatType::ST_COUNT)
+    {
+        // inc and dec unknown, assume neutral
+        return NatureType::NT_Neutral;
+    }
+
+    switch (inc)
+    {
+    case ST_Attack:
+        switch (dec)
+        {
+        case ST_Defense:    return NatureType::NT_Lonely;
+        case ST_SpAtk:      return NatureType::NT_Adamant;
+        case ST_SpDef:      return NatureType::NT_Naughty;
+        case ST_Speed:      return NatureType::NT_Brave;
+        default: break;
+        }
+        break;
+    case ST_Defense:
+        switch (dec)
+        {
+        case ST_Attack:     return NatureType::NT_Bold;
+        case ST_SpAtk:      return NatureType::NT_Impish;
+        case ST_SpDef:      return NatureType::NT_Lax;
+        case ST_Speed:      return NatureType::NT_Relaxed;
+        default: break;
+        }
+        break;
+    case ST_SpAtk:
+        switch (dec)
+        {
+        case ST_Attack:     return NatureType::NT_Modest;
+        case ST_Defense:    return NatureType::NT_Mild;
+        case ST_SpDef:      return NatureType::NT_Rash;
+        case ST_Speed:      return NatureType::NT_Quiet;
+        default: break;
+        }
+        break;
+    case ST_SpDef:
+        switch (dec)
+        {
+        case ST_Attack:     return NatureType::NT_Calm;
+        case ST_Defense:    return NatureType::NT_Gentle;
+        case ST_SpAtk:      return NatureType::NT_Careful;
+        case ST_Speed:      return NatureType::NT_Sassy;
+        default: break;
+        }
+        break;
+    case ST_Speed:
+        switch (dec)
+        {
+        case ST_Attack:     return NatureType::NT_Timid;
+        case ST_Defense:    return NatureType::NT_Hasty;
+        case ST_SpAtk:      return NatureType::NT_Jolly;
+        case ST_SpDef:      return NatureType::NT_Naive;
+        default: break;
+        }
+        break;
+    default: break;
+    }
+
+    // error
+    return NatureType::NT_COUNT;
+}
+
+const PokemonDatabase::OCREntries &PokemonDatabase::getEntries_PokemonIV(GameLanguage gameLanguage)
+{
+    instance().getDatabase("PokemonCommon/PokemonIV", gameLanguage, instance().m_database_PokedexIV);
+    return instance().m_database_PokedexIV[gameLanguage];
 }
 
 // -----------------------------------------------

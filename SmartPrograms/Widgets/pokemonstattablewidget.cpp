@@ -149,7 +149,7 @@ void PokemonStatTableWidget::AddPokemon()
         QComboBox* comboBox = new QComboBox();
         for (int i = 0; i < NatureType::NT_COUNT; i++)
         {
-            comboBox->addItem(PokemonDatabase::getNatureTypeName(NatureType(i)));
+            comboBox->addItem(PokemonDatabase::getNatureTypeName(NatureType(i), true));
         }
         setCellWidget(row, CT_Nature, comboBox);
     }

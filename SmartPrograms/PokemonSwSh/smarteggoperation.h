@@ -63,6 +63,8 @@ private:
     EggPokeCountPair checkPokemonCountInParty();
     QVector<GenderType> checkGenderInParty(int count = 5);
     QVector<CaptureArea> const GetCheckStatCaptureAreas();
+    QPair<StatType,StatType> checkPokemonNatureInParty();
+    void printPokemonStat(PokemonStatTable const& table);
     void resetCollectorModeMembers();
     void resetHatcherModeMembers();
     void updateKeepDummy();
@@ -93,8 +95,8 @@ private:
     HSVRange const C_Color_Text = HSVRange(0,0,0,359,200,200);
     HSVRange const C_Color_Male = HSVRange(200,80,0,260,255,255); // >130
     HSVRange const C_Color_Female = HSVRange(330,80,0,30,255,255); // >130
-    HSVRange const C_Color_NatureGood = HSVRange(200,80,0,260,255,255); // >10
-    HSVRange const C_Color_NatureBad = HSVRange(300,80,0,255,255,255); // >10
+    HSVRange const C_Color_NatureBad = HSVRange(200,80,0,260,255,255); // >10
+    HSVRange const C_Color_NatureGood = HSVRange(300,80,0,0,255,255); // >10
 
     // List of test point/area
     CaptureArea const A_Nursery1st = CaptureArea(943,390,84,34);
