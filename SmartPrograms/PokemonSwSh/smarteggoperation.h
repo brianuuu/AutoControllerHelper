@@ -115,6 +115,10 @@ private:
         SS_Init,
         SS_InitCheckCount,
         SS_InitBoxView,
+        SS_InitEmptyColumnStart,
+        SS_InitEmptyColumn,
+        SS_InitOtherColumnsStart,
+        SS_InitOtherColumns,
 
         // collect
         SS_CollectCycle,
@@ -184,8 +188,9 @@ private:
     int m_shinySoundID;
     bool m_shinyDetected; // the current hatched egg is a shiny
     int m_shinyWasDetected; // how many shiny there was for the current column of eggs
-    int m_shinySingleCount; // how many shiny pokemon found in 30 eggs (shiny mode only)
+    int m_shinySingleCount; // how many shiny pokemon found in 5 eggs (shiny mode only)
     int m_shinyCount; // how many shiny pokemon found overall
+    int m_keepSingleCount;
     int m_keepCount; // how many pokemon we have kept (including shiny)
 
     // Stats

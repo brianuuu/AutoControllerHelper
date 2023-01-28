@@ -61,6 +61,7 @@ void SmartEggOperation::resetHatcherModeMembers()
     m_blackScreenDetected = false;
 
     m_shinySingleCount = 0;
+    m_keepSingleCount = 0;
 }
 
 void SmartEggOperation::updateKeepDummy()
@@ -121,7 +122,7 @@ void SmartEggOperation::runNextState()
                 PokemonStatTable const& table = m_keepList[i];
                 if (table.m_target > 0)
                 {
-                    emit printLog("Slot " + QString::number(i+1) + ": " + QString::number(table.m_target) + " remaining");
+                    emit printLog("----------Keep Slot " + QString::number(i+1) + ": " + QString::number(table.m_target) + " remaining----------");
                 }
             }
         }
@@ -203,6 +204,7 @@ void SmartEggOperation::runNextState()
                 if (countPair.second == 5)
                 {
                     // we don't care about box view, go to collect eggs now
+                    emit printLog("Full party confirmed");
                     m_boxViewChecked = true;
                     m_substage = SS_CollectCycle;
                     setState_runCommand("BSpam,40," + m_commands[m_firstCollectCycle ? C_CollectFirst : C_CollectCycle]);
@@ -219,6 +221,7 @@ void SmartEggOperation::runNextState()
             {
                 if (countPair.second == 0)
                 {
+                    emit printLog("Only 1 Pokemon in party confirmed");
                     m_boxViewChecked = false;
                     m_substage = SS_ToBox;
                     setState_runCommand(C_PartyToBox);
@@ -232,9 +235,9 @@ void SmartEggOperation::runNextState()
             }
             case EOT_Shiny:
             {
-                m_programSettings.m_targetEggCount = 30;
                 if (countPair.second == 5)
                 {
+                    emit printLog("Full party confirmed");
                     m_boxViewChecked = false;
                     m_substage = SS_ToBox;
                     setState_runCommand(C_PartyToBox);
@@ -289,10 +292,9 @@ void SmartEggOperation::runNextState()
             }
             else
             {
-                // viewing judge function (TODO: check match with text?)
+                // viewing judge function
                 emit printLog("Box at Judge View confirmed");
                 m_boxViewChecked = true;
-                m_videoManager->clearCaptures();
 
                 switch (m_programSettings.m_operation)
                 {
@@ -300,12 +302,15 @@ void SmartEggOperation::runNextState()
                 {
                     m_substage = SS_ToBox;
                     setState_runCommand("DRight,1");
+                    m_videoManager->clearCaptures();
                     break;
                 }
                 case EOT_Shiny:
                 {
-                    m_substage = SS_CollectCycle;
-                    setState_runCommand("BSpam,80," + m_commands[m_firstCollectCycle ? C_CollectFirst : C_CollectCycle]);
+                    // now check if box has 25 pokmon
+                    m_substage = SS_InitEmptyColumnStart;
+                    setState_runCommand("DRight,1,Nothing,20");
+                    m_videoManager->setAreas({A_Level});
                     break;
                 }
                 default:
@@ -315,6 +320,86 @@ void SmartEggOperation::runNextState()
                     break;
                 }
                 }
+            }
+        }
+        break;
+    }
+    case SS_InitEmptyColumnStart:
+    {
+        if (state == S_CommandFinished)
+        {
+            // check keep box first column of egg box is empty
+            m_substage = SS_InitEmptyColumn;
+            setState_runCommand("DDown,1,LDown,1,Loop,2,L,1,Nothing,5,Loop,1,"
+                                "DRight,1,LRight,1,DRight,1,LRight,1,DRight,1,LUp,1,"
+                                "DLeft,1,LLeft,1,DLeft,1,LLeft,1,DLeft,1,LUp,1,Loop,2,"
+                                "DRight,1,LRight,1,DRight,1,LRight,1,DRight,1,Nothing,20",true);
+        }
+        break;
+    }
+    case SS_InitEmptyColumn:
+    {
+        if (state == S_CommandFinished)
+        {
+            // go back to egg box, cursor should now be on top right
+            m_substage = SS_InitOtherColumnsStart;
+            setState_runCommand("R,1,Nothing,20");
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (checkBrightnessMeanTarget(A_Level.m_rect, C_Color_Grey, 190))
+            {
+                // first column should be empty
+                incrementStat(m_statError);
+                emit printLog("First column of Egg Box and all columns of Keep Box should be empty in Shiny Mode", LOG_ERROR);
+
+                m_substage = SS_Finished;
+                setState_runCommand("Nothing,10");
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
+            }
+        }
+        break;
+    }
+    case SS_InitOtherColumnsStart:
+    {
+        if (state == S_CommandFinished)
+        {
+            m_substage = SS_InitOtherColumns;
+            setState_runCommand("DLeft,1,LLeft,1,DLeft,1,LLeft,1,DDown,1,"
+                                "LRight,1,DRight,1,LRight,1,DRight,1,LDown,1,Loop,2,"
+                                "DLeft,1,LLeft,1,DLeft,1,LLeft,1,Nothing,20",true);
+        }
+        break;
+    }
+    case SS_InitOtherColumns:
+    {
+        if (state == S_CommandFinished)
+        {
+            // we can finally start
+            m_programSettings.m_targetEggCount = 5;
+            emit printLog("Keep Box and Egg Box setup correctly confirmed");
+
+            m_substage = SS_CollectCycle;
+            setState_runCommand("BSpam,80," + m_commands[m_firstCollectCycle ? C_CollectFirst : C_CollectCycle]);
+            m_videoManager->clearCaptures();
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (checkBrightnessMeanTarget(A_Level.m_rect, C_Color_Grey, 190))
+            {
+                setState_frameAnalyzeRequest();
+            }
+            else
+            {
+                // other column should NOT be empty
+                incrementStat(m_statError);
+                emit printLog("2nd to 6th column of Box should NOT be empty in Shiny Mode", LOG_ERROR);
+
+                m_substage = SS_Finished;
+                setState_runCommand("Nothing,10");
             }
         }
         break;
@@ -436,7 +521,7 @@ void SmartEggOperation::runNextState()
             {
                 if (m_programSettings.m_operation == EOT_Shiny)
                 {
-                    m_programSettings.m_columnsToHatch = 6;
+                    m_programSettings.m_columnsToHatch = 1;
                     resetHatcherModeMembers();
 
                     m_substage = (m_programSettings.m_operation == EOT_Shiny) ? SS_BoxFiller : SS_ToBox;
@@ -532,6 +617,11 @@ void SmartEggOperation::runNextState()
                 {
                     incrementStat(m_statError);
                     setState_error("There are no eggs in party, something went really wrong");
+                }
+                else if (m_programSettings.m_operation == EOT_Shiny && m_eggsToHatchColumn < 5)
+                {
+                    incrementStat(m_statError);
+                    setState_error("Shiny Mode always expect to have 5 eggs, something went really wrong");
                 }
                 else
                 {
@@ -863,32 +953,43 @@ void SmartEggOperation::runNextState()
                 log = "Column " + QString::number(m_eggColumnsHatched) + " row " + QString::number(6 - m_eggsToHatchCount);
             }
 
-            // check if any pokemon matched with the target list
-            int matchedTarget = -1;
+            // did we checked any stats? if yes print stats
             bool checkedStats = false;
-            for (int i = 0; i < m_keepList.size(); i++)
+            for (int i = 0; i < StatType::ST_COUNT; i++)
             {
-                PokemonStatTable& table = m_keepList[i];
-                if (table.m_target > 0)
+                if (m_keepDummy.m_ivs[i] != IVType::IVT_COUNT)
                 {
                     checkedStats = true;
-                    if (m_hatchedStat.Match(table))
-                    {
-                        if (--table.m_target == 0)
-                        {
-                            // this target is done, maybe we can skip some stat check?
-                            updateKeepDummy();
-                        }
-                        matchedTarget = i;
-                        break;
-                    }
                 }
             }
-
-            // print current stats
+            if (m_keepDummy.m_nature != NatureType::NT_COUNT)
+            {
+                checkedStats = true;
+            }
+            if (m_keepDummy.m_gender != GenderType::GT_COUNT)
+            {
+                checkedStats = true;
+            }
             if (checkedStats)
             {
                 printPokemonStat(m_hatchedStat);
+            }
+
+            // check if any pokemon matched with the target list
+            int matchedTarget = -1;
+            for (int i = 0; i < m_keepList.size(); i++)
+            {
+                PokemonStatTable& table = m_keepList[i];
+                if (table.m_target > 0 && m_hatchedStat.Match(table))
+                {
+                    if (--table.m_target == 0)
+                    {
+                        // this target is done, maybe we can skip some stat check?
+                        updateKeepDummy();
+                    }
+                    matchedTarget = i;
+                    break;
+                }
             }
 
             // this is shiny!
@@ -969,7 +1070,6 @@ void SmartEggOperation::runNextState()
                     if (m_shinySingleCount > 0)
                     {
                         emit printLog(QString::number(m_shinyCount) + " SHINY Pokemon has been found", LOG_SUCCESS);
-                        m_shinySingleCount = 0;
                     }
                     else
                     {
@@ -983,7 +1083,14 @@ void SmartEggOperation::runNextState()
 
                 if (m_keepCount - m_shinyCount > 0)
                 {
-                    emit printLog(QString::number(m_keepCount - m_shinyCount) + " non-Shiny Pokemon has been stored in keep box", LOG_SUCCESS);
+                    if (m_keepSingleCount - m_shinySingleCount > 0)
+                    {
+                        emit printLog(QString::number(m_keepCount - m_shinyCount) + " non-Shiny Pokemon has been stored in keep box", LOG_SUCCESS);
+                    }
+                    else
+                    {
+                        emit printLog("No additional non-Shiny Pokemon is found");
+                    }
                 }
                 else
                 {
@@ -995,7 +1102,7 @@ void SmartEggOperation::runNextState()
                 for (int i = 0; i < m_keepList.size(); i++)
                 {
                     PokemonStatTable const& table = m_keepList[i];
-                    emit printLog("Slot " + QString::number(i+1) + ": " + QString::number(table.m_target) + " remaining");
+                    emit printLog("----------Keep Slot " + QString::number(i+1) + ": " + QString::number(table.m_target) + " remaining----------");
                     if (table.m_target > 0)
                     {
                         missingTarget = true;
@@ -1211,6 +1318,7 @@ void SmartEggOperation::runKeepPokemonCommand(int yPos)
     }
 
     m_keepCount++;
+    m_keepSingleCount++;
     incrementStat(m_statPokemonKept);
 
     int scrollCount = 1 + (m_eggColumnsHatched - 1) / 6;
