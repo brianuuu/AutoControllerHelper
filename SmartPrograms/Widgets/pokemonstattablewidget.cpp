@@ -111,6 +111,10 @@ void PokemonStatTableWidget::SetMode(PokemonStatTableWidget::Mode mode)
     {
         AddPokemon();
     }
+
+    // for parent mode, disable the + button
+    QToolButton* toolButton = qobject_cast<QToolButton*>(cellWidget(rowCount() - 1, CT_Add));
+    toolButton->setEnabled(mode != Mode::Parent);
 }
 
 PokemonStatTableList PokemonStatTableWidget::GetTableList() const
@@ -191,6 +195,11 @@ void PokemonStatTableWidget::AddPokemon()
         spinBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         spinBox->setFixedWidth(40);
         setCellWidget(row, CT_Target, spinBox);
+
+        if (m_mode == Mode::Parent)
+        {
+            spinBox->setEnabled(false);
+        }
     }
 
     // IV
@@ -237,6 +246,10 @@ void PokemonStatTableWidget::AddPokemon()
         {
             comboBox->setCurrentIndex(ShinyType::SPT_Yes);
         }
+        if (m_mode == Mode::Parent)
+        {
+            comboBox->setEnabled(false);
+        }
         setCellWidget(row, CT_Shiny, comboBox);
     }
 
@@ -257,10 +270,6 @@ void PokemonStatTableWidget::AddDummyRow()
     // dummy row that addes a plus button at the first column
     QToolButton* pushButton = new QToolButton();
     pushButton->setText("+");
-    if (m_mode == Mode::Parent)
-    {
-        pushButton->setEnabled(false);
-    }
     connect(pushButton, &QToolButton::pressed, this, &PokemonStatTableWidget::OnAddButtonPressed);
 
     int row = rowCount();

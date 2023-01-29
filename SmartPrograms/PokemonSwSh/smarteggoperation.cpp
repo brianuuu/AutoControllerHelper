@@ -22,13 +22,17 @@ void SmartEggOperation::reset()
     SmartProgramBase::reset();
 
     m_substage = SS_Init;
-    m_boxViewChecked = false;
+    m_initVerified = false;
 
     m_firstCollectCycle = true;
     resetCollectorModeMembers();
     resetHatcherModeMembers();
     m_fadeOutDelayTime = 0; // should not reset
     m_hatchExtraEgg = false;
+
+    m_parentStat = PokemonStatTable();
+    m_leaveParent = false;
+    m_natureMatched = false;
 
     m_videoCaptured = false;
     m_shinySoundID = 0;
@@ -122,7 +126,7 @@ void SmartEggOperation::runNextState()
                 PokemonStatTable const& table = m_keepList[i];
                 if (table.m_target > 0)
                 {
-                    emit printLog("----------Keep Slot " + QString::number(i+1) + ": " + QString::number(table.m_target) + " remaining----------");
+                    emit printLog(">>>>> Keep Slot " + QString::number(i+1) + ": " + QString::number(table.m_target) + " remaining");
                 }
             }
         }
@@ -170,6 +174,13 @@ void SmartEggOperation::runNextState()
                 break;
             }
 
+            if (m_programSettings.m_operation == EOT_Parent && m_keepList.size() != 1)
+            {
+                incrementStat(m_statError);
+                setState_error("Parent Mode expected only 1 Pokemon in keep list");
+                break;
+            }
+
             if (m_programSettings.m_operation == EOT_Collector)
             {
                 // force disable shiny detection
@@ -212,7 +223,7 @@ void SmartEggOperation::runNextState()
                 {
                     // we don't care about box view, go to collect eggs now
                     emit printLog("Full party confirmed");
-                    m_boxViewChecked = true;
+                    m_initVerified = true;
                     m_substage = SS_CollectCycle;
                     setState_runCommand("BSpam,40," + m_commands[m_firstCollectCycle ? C_CollectFirst : C_CollectCycle]);
                     m_videoManager->clearCaptures();
@@ -232,14 +243,14 @@ void SmartEggOperation::runNextState()
                     emit printLog("Only 1 Pokemon in party confirmed");
                     if (m_programSettings.m_operation == EOT_Hatcher)
                     {
-                        m_boxViewChecked = false;
+                        m_initVerified = false;
                         m_substage = SS_ToBox;
                         setState_runCommand(C_PartyToBox);
                     }
                     else
                     {
                         // we don't care about box view in remainder mode
-                        m_boxViewChecked = true;
+                        m_initVerified = true;
                         m_hatchExtraEgg = true;
                         m_programSettings.m_isHatchExtra = true;
 
@@ -256,13 +267,24 @@ void SmartEggOperation::runNextState()
                 break;
             }
             case EOT_Shiny:
+            case EOT_Parent:
             {
                 if (countPair.second == 5)
                 {
                     emit printLog("Full party confirmed");
-                    m_boxViewChecked = false;
-                    m_substage = SS_ToBox;
-                    setState_runCommand(C_PartyToBox);
+                    m_initVerified = false;
+
+                    if (m_programSettings.m_operation == EOT_Parent)
+                    {
+                        m_substage = SS_InitCheckItem;
+                        setState_runCommand("X,1,Nothing,20");
+                        m_videoManager->setAreas({GetPartyItemCaptureAreaOfPos(1)});
+                    }
+                    else
+                    {
+                        m_substage = SS_ToBox;
+                        setState_runCommand(C_PartyToBox);
+                    }
                 }
                 else
                 {
@@ -277,6 +299,30 @@ void SmartEggOperation::runNextState()
                 setState_error("Invalid operation type");
                 break;
             }
+            }
+        }
+        break;
+    }
+    case SS_InitCheckItem:
+    {
+        if (state == S_CommandFinished)
+        {
+            setState_frameAnalyzeRequest();
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (checkBrightnessMeanTarget(GetPartyItemCaptureAreaOfPos(1).m_rect, C_Color_Item, 190))
+            {
+                emit printLog("First Pokemon in party holding an item (Everstone) confirmed");
+                m_initVerified = false;
+                m_substage = SS_ToBox;
+                setState_runCommand("B,2,Loop,1," + m_commands[C_PartyToBox]);
+                m_videoManager->clearCaptures();
+            }
+            else
+            {
+                incrementStat(m_statError);
+                setState_error("Parent Mode expected first Pokemon in party holding an Everstone");
             }
         }
         break;
@@ -316,12 +362,11 @@ void SmartEggOperation::runNextState()
             {
                 // viewing judge function
                 emit printLog("Box at Judge View confirmed");
-                m_boxViewChecked = true;
-
                 switch (m_programSettings.m_operation)
                 {
                 case EOT_Hatcher:
                 {
+                    m_initVerified = true;
                     m_substage = SS_ToBox;
                     setState_runCommand("DRight,1");
                     m_videoManager->clearCaptures();
@@ -332,6 +377,14 @@ void SmartEggOperation::runNextState()
                     // now check if box has 25 pokmon
                     m_substage = SS_InitEmptyColumnStart;
                     setState_runCommand("DRight,1,Nothing,20");
+                    m_videoManager->setAreas({A_Level});
+                    break;
+                }
+                case EOT_Parent:
+                {
+                    // now check if box has 25 pokmon (not include parent)
+                    m_substage = SS_InitEmptyColumnStart;
+                    setState_runCommand("DRight,1,LDown,1,Nothing,20");
                     m_videoManager->setAreas({A_Level});
                     break;
                 }
@@ -352,7 +405,8 @@ void SmartEggOperation::runNextState()
         {
             // check keep box first column of egg box is empty
             m_substage = SS_InitEmptyColumn;
-            setState_runCommand("DDown,1,LDown,1,Loop,2,L,1,Nothing,5,Loop,1,"
+            QString command = m_programSettings.m_operation == EOT_Shiny ? "DDown,1,LDown,1,Loop,2" : "DDown,1,LDown,1,DDown,1";
+            setState_runCommand(command + ",L,1,Nothing,5,Loop,1,"
                                 "DRight,1,LRight,1,DRight,1,LRight,1,DRight,1,LUp,1,"
                                 "DLeft,1,LLeft,1,DLeft,1,LLeft,1,DLeft,1,LUp,1,Loop,2,"
                                 "DRight,1,LRight,1,DRight,1,LRight,1,DRight,1,Nothing,20",true);
@@ -400,13 +454,24 @@ void SmartEggOperation::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            // we can finally start
-            m_programSettings.m_targetEggCount = 5;
-            emit printLog("Keep Box and Egg Box setup correctly confirmed");
+            if (m_programSettings.m_operation == EOT_Parent)
+            {
+                // check parent's current stats
+                m_substage = SS_CheckStats;
+                setState_runCommand("DLeft,1,LUp,1,DUp,1,LUp,1,DUp,1,Nothing,20");
+                m_videoManager->setAreas(GetCheckStatCaptureAreas());
+            }
+            else
+            {
+                // we can finally start
+                m_initVerified = true;
+                m_programSettings.m_targetEggCount = 5;
+                emit printLog("Keep Box and Egg Box setup correctly confirmed");
 
-            m_substage = SS_CollectCycle;
-            setState_runCommand("BSpam,80," + m_commands[m_firstCollectCycle ? C_CollectFirst : C_CollectCycle]);
-            m_videoManager->clearCaptures();
+                m_substage = SS_CollectCycle;
+                setState_runCommand("BSpam,80," + m_commands[m_firstCollectCycle ? C_CollectFirst : C_CollectCycle]);
+                m_videoManager->clearCaptures();
+            }
         }
         else if (state == S_CaptureReady)
         {
@@ -423,6 +488,46 @@ void SmartEggOperation::runNextState()
                 m_substage = SS_Finished;
                 setState_runCommand("Nothing,10");
             }
+        }
+        break;
+    }
+    case SS_InitCheckParent:
+    {
+        if (state == S_CaptureReady)
+        {
+            if (!checkBrightnessMeanTarget(A_Level.m_rect, C_Color_Grey, 190))
+            {
+                incrementStat(m_statError);
+                setState_error("Parent not found at the top left of Box");
+                break;
+            }
+
+            m_parentStat = m_hatchedStat;
+            printPokemonStat(m_parentStat);
+
+            if (m_parentStat.Match(m_keepList[0]))
+            {
+                emit printLog("Parent already matched target Pokemon", LOG_WARNING);
+                setState_completed();
+                break;
+            }
+
+            // we can finally start
+            m_initVerified = true;
+            m_leaveParent = true;
+
+            QString command = "BSpam,80";
+            if (m_keepList[0].m_nature != NatureType::NT_Any && m_keepList[0].m_nature == m_parentStat.m_nature)
+            {
+                // transfer Everstone to parent
+                m_natureMatched = true;
+                emit printLog("Nature matched, moving Everstone to parent", LOG_SUCCESS);
+                command = m_commands[C_MoveItem] + "," + command;
+            }
+
+            m_substage = SS_CollectCycle;
+            setState_runCommand(command);
+            m_videoManager->clearCaptures();
         }
         break;
     }
@@ -471,6 +576,13 @@ void SmartEggOperation::runNextState()
             m_videoManager->clearCaptures();
             if (checkBrightnessMeanTarget(A_Yes.m_rect, C_Color_Black, 180))
             {
+                if (m_leaveParent)
+                {
+                    incrementStat(m_statError);
+                    setState_error("Attempting to leave parent to Nursery but there is an egg");
+                    break;
+                }
+
                 // Collect egg
                 m_eggsCollected++;
                 m_eggCollectAttempts = 0;
@@ -494,6 +606,7 @@ void SmartEggOperation::runNextState()
             }
             else
             {
+                // take parent back so it doesn't make anymore eggs
                 if (m_hatchExtraEgg)
                 {
                     if (!checkBrightnessMeanTarget(A_Nursery2nd.m_rect, C_Color_Black, 180))
@@ -516,6 +629,26 @@ void SmartEggOperation::runNextState()
                         m_substage = SS_HatchComplete;
                         setState_runCommand(m_commands[C_TakeParent] + "," + m_commands[C_ToBox] + ",Nothing,30,Loop,1,Y,1,Nothing,1,Loop,2");
                     }
+                    break;
+                }
+
+                // leave parent
+                if (m_leaveParent)
+                {
+                    m_leaveParent = false;
+                    if (!checkBrightnessMeanTarget(A_Nursery1st.m_rect, C_Color_Black, 180))
+                    {
+                        incrementStat(m_statError);
+                        setState_error("Excepting cursor at \"I'd like to leave Pokemon\"");
+                        break;
+                    }
+
+                    m_programSettings.m_targetEggCount = 5;
+                    emit printLog("Leaving new parent in Nursery");
+
+                    m_substage = SS_CollectCycle;
+                    setState_runCommand(m_commands[C_LeaveParent] + "," + m_commands[C_CollectFirst]);
+                    m_videoManager->clearCaptures();
                     break;
                 }
 
@@ -590,7 +723,7 @@ void SmartEggOperation::runNextState()
                         m_substage = SS_ToBox;
                         setState_runCommand(C_BoxFiller);
                     }
-                    else if (!m_boxViewChecked)
+                    else if (!m_initVerified)
                     {
                         m_substage = SS_InitBoxView;
                         setState_runCommand("DLeft,1,Nothing,20");
@@ -807,15 +940,13 @@ void SmartEggOperation::runNextState()
                     }
                 }
 
+                QString command = m_commands[C_HatchReturn];
                 if (videoCapture)
                 {
                     // add delay after capture as it can freeze the game
-                    setState_runCommand("Capture,22,Nothing,300," + m_commands[C_HatchReturn], m_eggsToHatchCount < m_eggsToHatchColumn);
+                    command = "Capture,22,Nothing,300," + command;
                 }
-                else
-                {
-                    setState_runCommand(C_HatchReturn, m_eggsToHatchCount < m_eggsToHatchColumn);
-                }
+                setState_runCommand(command, m_eggsToHatchCount < m_eggsToHatchColumn);
 
                 if (m_eggsToHatchCount >= m_eggsToHatchColumn)
                 {
@@ -867,7 +998,12 @@ void SmartEggOperation::runNextState()
             if (result.isEmpty())
             {
                 incrementStat(m_statError);
-                emit printLog("OCR unable the match any IV entries, the returned text need to be added to database, please report to brianuuuSonic", LOG_ERROR);
+                QString log = "OCR unable the match any IV entries";
+                if (!PokemonDatabase::normalizeString(getOCRStringRaw()).isEmpty())
+                {
+                    log += ", the returned text \"" + getOCRStringRaw() + "\" needs to be added to database, please report to brianuuuSonic";
+                }
+                emit printLog(log, LOG_ERROR);
             }
             else
             {
@@ -936,7 +1072,15 @@ void SmartEggOperation::runNextState()
                 m_hatchedStat.m_shiny = ShinyType::SPT_No;
             }
 
-            m_substage = SS_CheckStats;
+            if (m_programSettings.m_operation == EOT_Parent && !m_initVerified)
+            {
+                m_substage = SS_InitCheckParent;
+            }
+            else
+            {
+                m_substage = SS_CheckStats;
+            }
+
             runNextStateContinue();
         }
         break;
@@ -1124,7 +1268,7 @@ void SmartEggOperation::runNextState()
                 for (int i = 0; i < m_keepList.size(); i++)
                 {
                     PokemonStatTable const& table = m_keepList[i];
-                    emit printLog("----------Keep Slot " + QString::number(i+1) + ": " + QString::number(table.m_target) + " remaining----------");
+                    emit printLog(">>>>> Keep Slot " + QString::number(i+1) + ": " + QString::number(table.m_target) + " remaining");
                     if (table.m_target > 0)
                     {
                         missingTarget = true;
@@ -1597,6 +1741,17 @@ const CaptureArea SmartEggOperation::GetPartyGenderCaptureAreaOfPos(int y)
 
     y--;
     return CaptureArea(340, 124 + y * 96, 24, 24);
+}
+
+const CaptureArea SmartEggOperation::GetPartyItemCaptureAreaOfPos(int y)
+{
+    if (y < 1 || y > 6)
+    {
+        y = 1;
+    }
+
+    y--;
+    return CaptureArea(146, 156 + y * 96, 300, 40);
 }
 
 const CaptureArea SmartEggOperation::GetBoxStatNumArea(StatType type)

@@ -15,6 +15,7 @@ public:
         EOT_Hatcher,
         EOT_Shiny,
         EOT_Remainder,
+        EOT_Parent,
         EOT_COUNT,
     };
 
@@ -49,6 +50,7 @@ public:
     static CaptureArea const GetPartyCaptureAreaOfPos(int y);
     static CapturePoint const GetPartyCapturePointOfPos(int y);
     static CaptureArea const GetPartyGenderCaptureAreaOfPos(int y);
+    static CaptureArea const GetPartyItemCaptureAreaOfPos(int y);
     static CaptureArea const GetBoxStatNumArea(StatType type);
     static CaptureArea const GetBoxStatNameArea(StatType type);
 
@@ -83,7 +85,9 @@ private:
     Command const C_BoxFiller       = 9;
     Command const C_TakeFiller      = 10;
     Command const C_TakeParent      = 11;
-    Command const C_COUNT           = 12;
+    Command const C_LeaveParent     = 12;
+    Command const C_MoveItem        = 13;
+    Command const C_COUNT           = 14;
 
     // List of test color
     HSVRange const C_Color_Black = HSVRange(0,0,0,359,30,100); // >180
@@ -97,6 +101,7 @@ private:
     HSVRange const C_Color_Female = HSVRange(330,80,0,30,255,255); // >130
     HSVRange const C_Color_NatureBad = HSVRange(200,80,0,260,255,255); // >10
     HSVRange const C_Color_NatureGood = HSVRange(300,80,0,0,255,255); // >10
+    HSVRange const C_Color_Item = HSVRange(15,200,0,75,255,255); // >190
 
     // List of test point/area
     CaptureArea const A_Nursery1st = CaptureArea(943,390,84,34);
@@ -115,11 +120,15 @@ private:
     {
         SS_Init,
         SS_InitCheckCount,
+        SS_InitCheckItem,
         SS_InitBoxView,
         SS_InitEmptyColumnStart,
         SS_InitEmptyColumn,
         SS_InitOtherColumnsStart,
         SS_InitOtherColumns,
+        SS_InitCheckParent,
+
+        // parent
 
         // collect
         SS_CollectCycle,
@@ -164,7 +173,7 @@ private:
     // Members
     QElapsedTimer m_timer;
     Settings m_programSettings;
-    bool m_boxViewChecked = false;
+    bool m_initVerified = false;
 
     // collect
     bool m_firstCollectCycle;
@@ -183,6 +192,11 @@ private:
     PokemonStatTable m_hatchedStat; // stats of current pokemon
     PokemonStatTable m_keepDummy; // dummy table to look up which stat we need to check
     PokemonStatTableList m_keepList; // list of extra pokemon we want to keep
+
+    // parent
+    PokemonStatTable m_parentStat; // stats of current parent
+    bool m_leaveParent;
+    bool m_natureMatched;
 
     // final
     bool m_videoCaptured; // have we taken a capture for this shiny yet?

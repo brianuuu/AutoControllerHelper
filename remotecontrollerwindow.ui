@@ -4888,7 +4888,12 @@ Enter the Trade Partner:</string>
                           </item>
                           <item>
                            <property name="text">
-                            <string>Remainer Mode</string>
+                            <string>Remainder Mode</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>Parent Mode</string>
                            </property>
                           </item>
                          </widget>
