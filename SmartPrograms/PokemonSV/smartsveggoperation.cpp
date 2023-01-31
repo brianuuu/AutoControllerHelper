@@ -867,37 +867,27 @@ void SmartSVEggOperation::runNextState()
             // m_checkShinyCount = [1,5]
             if (!checkBrightnessMeanTarget(GetPartyCaptureAreaOfPos(m_checkShinyCount + 1).m_rect, C_Color_Yellow, 200))
             {
-                if (m_missedInputRetryCount < 3)
+                m_checkShinyCount--;
+                if (m_checkShinyCount == 0)
                 {
-                    m_checkShinyCount--;
-                    m_missedInputRetryCount++;
+                    // 2nd slot in the party, "LLeft,3,DDown,3,Minus,3,Nothing,20"
+                    // if we miss LLeft or DDown it will not end up correct spot, exit box and try again
+                    // if Minus is missed...? it won't be handled here
+                    emit printLog("Unable to detect cursor on current party (SS_CheckShiny: check = 0), input might be missed, exiting Box and retrying...", LOG_WARNING);
 
-                    if (m_checkShinyCount == 0)
-                    {
-                        // 2nd slot in the party, "LLeft,3,DDown,3,Minus,3,Nothing,20"
-                        // if we miss LLeft or DDown it will not end up correct spot, exit box and try again
-                        // if Minus is missed...? it won't be handled here
-                        // right after puting eggs to party
-                        emit printLog("Unable to detect cursor on current party (SS_CheckShiny: check = 0), input might be missed, exiting Box and retrying...", LOG_WARNING);
+                    // don't call runToBoxCommand() so it doesn't reset m_missedInputRetryCount
+                    m_substage = SS_MainMenu;
+                    setState_runCommand("B,10,Nothing,10,Loop,2");
+                    m_videoManager->clearCaptures();
 
-                        // don't call runToBoxCommand() so it doesn't reset m_missedInputRetryCount
-                        m_substage = SS_MainMenu;
-                        setState_runCommand("B,10,Nothing,10,Loop,2");
-                        m_videoManager->clearCaptures();
-
-                        m_substageAfterMainMenu = SS_ToBox;
-                        m_commandAfterMainMenu = "ASpam,10,Nothing,20";
-                        m_isToBoxAfterMainMenu = true;
-                    }
-                    else
-                    {
-                        emit printLog("Unable to detect cursor on current party (SS_CheckShiny: check > 0), input might be missed, retrying...", LOG_WARNING);
-                        setState_runCommand("DDown,3,Nothing,20");
-                    }
+                    m_substageAfterMainMenu = SS_ToBox;
+                    m_commandAfterMainMenu = "ASpam,10,Nothing,20";
+                    m_isToBoxAfterMainMenu = true;
                 }
                 else
                 {
-                    runRestartCommand("Unable to detect cursor on current party (SS_CheckShiny: miss input > 3), forcing restart", m_programSettings.m_isErrorCapture);
+                    emit printLog("Unable to detect cursor on current party (SS_CheckShiny: check > 0), input might be missed, retrying...", LOG_WARNING);
+                    setState_runCommand("DDown,3,Nothing,20");
                 }
                 break;
             }
