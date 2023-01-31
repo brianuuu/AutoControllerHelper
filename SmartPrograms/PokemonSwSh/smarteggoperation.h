@@ -66,7 +66,7 @@ private:
     QVector<GenderType> checkGenderInParty(int count = 5);
     QVector<CaptureArea> const GetCheckStatCaptureAreas();
     QPair<StatType,StatType> checkPokemonNatureInParty();
-    void printPokemonStat(PokemonStatTable const& table);
+    void printPokemonStat(PokemonStatTable const& table, int matchID = -1);
     void resetCollectorModeMembers();
     void resetHatcherModeMembers();
     void updateKeepDummy();
@@ -86,8 +86,10 @@ private:
     Command const C_TakeFiller      = 10;
     Command const C_TakeParent      = 11;
     Command const C_LeaveParent     = 12;
-    Command const C_MoveItem        = 13;
-    Command const C_COUNT           = 14;
+    Command const C_SetParent       = 13;
+    Command const C_MoveItem        = 14;
+    Command const C_MoveItemParent  = 15;
+    Command const C_COUNT           = 16;
 
     // List of test color
     HSVRange const C_Color_Black = HSVRange(0,0,0,359,30,100); // >180
@@ -114,6 +116,7 @@ private:
     CaptureArea const A_Shiny = CaptureArea(1242,104,28,30);
     CaptureArea const A_DialogBox = CaptureArea(670,632,200,40);
     CaptureArea const A_Level = CaptureArea(1178,22,100,40);
+    CaptureArea const A_Bag = CaptureArea(1228,110,40,100);
 
     // Substages
     enum Substage
@@ -129,6 +132,7 @@ private:
         SS_InitCheckParent,
 
         // parent
+        SS_KeepOldParent,
 
         // collect
         SS_CollectCycle,
@@ -195,8 +199,8 @@ private:
 
     // parent
     PokemonStatTable m_parentStat; // stats of current parent
-    bool m_leaveParent;
-    bool m_natureMatched;
+    bool m_leaveParent; // are we going to leave a new parent next loop?
+    bool m_natureMatched; // children should now have the same nature as parent
 
     // final
     bool m_videoCaptured; // have we taken a capture for this shiny yet?

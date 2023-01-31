@@ -14,6 +14,8 @@ PokemonStatTable::PokemonStatTable()
 
 bool PokemonStatTable::Match(const PokemonStatTable &other)
 {
+    // check if other table completely match this
+
     // IV
     for (int i = 0; i < StatType::ST_COUNT; i++)
     {
@@ -80,6 +82,96 @@ bool PokemonStatTable::Match(const PokemonStatTable &other)
     }
 
     return true;
+}
+
+int PokemonStatTable::Count(const PokemonStatTable &other, bool ignoreGender)
+{
+    // check how many stats other table matches this
+    int matchCount = 0;
+
+    // IV
+    for (int i = 0; i < StatType::ST_COUNT; i++)
+    {
+        if (m_ivs[i] == IVType::IVT_Any || other.m_ivs[i] == IVType::IVT_Any || m_ivs[i] == other.m_ivs[i])
+        {
+            matchCount++;
+        }
+    }
+
+    // Nature
+    if (m_nature == NatureType::NT_Any || other.m_nature == NatureType::NT_Any || m_nature == other.m_nature)
+    {
+        matchCount++;
+    }
+
+    // Gender
+    if (!ignoreGender)
+    {
+        if (m_gender == GenderType::GT_Any || other.m_gender == GenderType::GT_Any || m_gender == other.m_gender)
+        {
+            matchCount++;
+        }
+    }
+
+    // Shiny
+    switch (m_shiny)
+    {
+    case ShinyType::SPT_Any:
+        matchCount++;
+        break;
+    case ShinyType::SPT_Yes:
+        switch (other.m_shiny)
+        {
+        case ShinyType::SPT_No:
+            break;
+        default:
+            matchCount++;
+            break;
+        }
+        break;
+    case ShinyType::SPT_Star:
+        switch (other.m_shiny)
+        {
+        case ShinyType::SPT_Square:
+        case ShinyType::SPT_No:
+            break;
+        default:
+            matchCount++;
+            break;
+        }
+        break;
+    case ShinyType::SPT_Square:
+        switch (other.m_shiny)
+        {
+        case ShinyType::SPT_Star:
+        case ShinyType::SPT_No:
+            break;
+        default:
+            matchCount++;
+            break;
+        }
+        break;
+    case ShinyType::SPT_No:
+        switch (other.m_shiny)
+        {
+        case ShinyType::SPT_Yes:
+        case ShinyType::SPT_Star:
+        case ShinyType::SPT_Square:
+            break;
+        default:
+            matchCount++;
+            break;
+        }
+        break;
+    default: break;
+    }
+
+    return matchCount;
+}
+
+bool PokemonStatTable::Compare(const PokemonStatTable &oldTable, const PokemonStatTable &newTable, bool ignoreGender)
+{
+    return Count(oldTable, ignoreGender) < Count(newTable, ignoreGender);
 }
 
 PokemonStatTableWidget::PokemonStatTableWidget(QWidget *parent) : QTableWidget(parent)

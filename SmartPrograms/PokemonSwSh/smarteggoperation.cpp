@@ -255,7 +255,7 @@ void SmartEggOperation::runNextState()
                         m_programSettings.m_isHatchExtra = true;
 
                         m_substage = SS_CollectCycle;
-                        setState_runCommand("BSpam,40");
+                        setState_runCommand("BSpam,60");
                         m_videoManager->clearCaptures();
                     }
                 }
@@ -274,7 +274,7 @@ void SmartEggOperation::runNextState()
                     emit printLog("Full party confirmed");
                     m_initVerified = false;
 
-                    if (m_programSettings.m_operation == EOT_Parent)
+                    if (m_programSettings.m_operation == EOT_Parent && m_keepList[0].m_nature != NatureType::NT_Any)
                     {
                         m_substage = SS_InitCheckItem;
                         setState_runCommand("X,1,Nothing,20");
@@ -289,7 +289,7 @@ void SmartEggOperation::runNextState()
                 else
                 {
                     incrementStat(m_statError);
-                    setState_error("There should be a full party while using Shiny Mode");
+                    setState_error("There should be a full party while using Shiny/Parent Mode");
                 }
                 break;
             }
@@ -313,7 +313,7 @@ void SmartEggOperation::runNextState()
         {
             if (checkBrightnessMeanTarget(GetPartyItemCaptureAreaOfPos(1).m_rect, C_Color_Item, 190))
             {
-                emit printLog("First Pokemon in party holding an item (Everstone) confirmed");
+                emit printLog("First Pokemon in party holding an item (should be Everstone) confirmed");
                 m_initVerified = false;
                 m_substage = SS_ToBox;
                 setState_runCommand("B,2,Loop,1," + m_commands[C_PartyToBox]);
@@ -503,7 +503,8 @@ void SmartEggOperation::runNextState()
             }
 
             m_parentStat = m_hatchedStat;
-            printPokemonStat(m_parentStat);
+            printPokemonStat(m_parentStat, 0);
+            emit printLog("Parent stats saved");
 
             if (m_parentStat.Match(m_keepList[0]))
             {
@@ -516,11 +517,10 @@ void SmartEggOperation::runNextState()
             m_initVerified = true;
             m_leaveParent = true;
 
-            QString command = "BSpam,80";
-            if (m_keepList[0].m_nature != NatureType::NT_Any && m_keepList[0].m_nature == m_parentStat.m_nature)
+            QString command = "BSpam,100";
+            if (m_keepList[0].m_nature == m_parentStat.m_nature)
             {
                 // transfer Everstone to parent
-                m_natureMatched = true;
                 emit printLog("Nature matched, moving Everstone to parent", LOG_SUCCESS);
                 command = m_commands[C_MoveItem] + "," + command;
             }
@@ -576,7 +576,8 @@ void SmartEggOperation::runNextState()
             m_videoManager->clearCaptures();
             if (checkBrightnessMeanTarget(A_Yes.m_rect, C_Color_Black, 180))
             {
-                if (m_leaveParent)
+                // when swapping parent (m_hatchExtraEgg = true) we need to not trigger this error
+                if (m_leaveParent && !m_hatchExtraEgg)
                 {
                     incrementStat(m_statError);
                     setState_error("Attempting to leave parent to Nursery but there is an egg");
@@ -597,12 +598,15 @@ void SmartEggOperation::runNextState()
                     m_programSettings.m_columnsToHatch = 1;
                     resetHatcherModeMembers();
                     m_eggsToHatchColumn = 1;
+
+                    // add delay to prevent false dialog detection
+                    setState_runCommand(m_commands[C_CollectEgg] + ",Nothing,20");
                 }
                 else
                 {
                     emit printLog("Egg collected! (" + QString::number(m_programSettings.m_targetEggCount - m_eggsCollected) + " remaining)");
+                    setState_runCommand(C_CollectEgg);
                 }
-                setState_runCommand(C_CollectEgg);
             }
             else
             {
@@ -625,7 +629,7 @@ void SmartEggOperation::runNextState()
                     }
                     else
                     {
-                        // no remaining egg to hatch
+                        // no remaining egg to hatch, go to box with multiselect cursor
                         m_substage = SS_HatchComplete;
                         setState_runCommand(m_commands[C_TakeParent] + "," + m_commands[C_ToBox] + ",Nothing,30,Loop,1,Y,1,Nothing,1,Loop,2");
                     }
@@ -643,8 +647,14 @@ void SmartEggOperation::runNextState()
                         break;
                     }
 
+                    // we can now confirm the nature is matched
+                    if (m_keepList[0].m_nature == NatureType::NT_Any || m_keepList[0].m_nature == m_parentStat.m_nature)
+                    {
+                        m_natureMatched = true;
+                    }
+
                     m_programSettings.m_targetEggCount = 5;
-                    emit printLog("Leaving new parent in Nursery");
+                    emit printLog("Leaving new parent in Nursery and collecting more eggs");
 
                     m_substage = SS_CollectCycle;
                     setState_runCommand(m_commands[C_LeaveParent] + "," + m_commands[C_CollectFirst]);
@@ -674,12 +684,12 @@ void SmartEggOperation::runNextState()
         {
             if (m_eggsCollected >= m_programSettings.m_targetEggCount)
             {
-                if (m_programSettings.m_operation == EOT_Shiny)
+                if (m_programSettings.m_operation == EOT_Shiny || m_programSettings.m_operation == EOT_Parent)
                 {
                     m_programSettings.m_columnsToHatch = 1;
                     resetHatcherModeMembers();
 
-                    m_substage = (m_programSettings.m_operation == EOT_Shiny) ? SS_BoxFiller : SS_ToBox;
+                    m_substage = SS_BoxFiller;
                     setState_runCommand(C_ToBox);
                 }
                 else
@@ -719,7 +729,7 @@ void SmartEggOperation::runNextState()
                     if (m_substage == SS_BoxFiller)
                     {
                         // put 5 pokemon in team to keep box
-                        emit printLog("Putting 5 filler Pokemon to keep box");
+                        emit printLog("Putting 5 filler Pokemon to Keep Box");
                         m_substage = SS_ToBox;
                         setState_runCommand(C_BoxFiller);
                     }
@@ -773,10 +783,10 @@ void SmartEggOperation::runNextState()
                     incrementStat(m_statError);
                     setState_error("There are no eggs in party, something went really wrong");
                 }
-                else if (m_programSettings.m_operation == EOT_Shiny && m_eggsToHatchColumn < 5)
+                else if ((m_programSettings.m_operation == EOT_Shiny || m_programSettings.m_operation == EOT_Parent) && m_eggsToHatchColumn < 5)
                 {
                     incrementStat(m_statError);
-                    setState_error("Shiny Mode always expect to have 5 eggs, something went really wrong");
+                    setState_error("Shiny/Parent Mode always expect to have 5 eggs, something went really wrong");
                 }
                 else
                 {
@@ -786,7 +796,7 @@ void SmartEggOperation::runNextState()
                     m_blackScreenDetected = false;
 
                     m_substage = SS_HatchCycle;
-                    setState_runCommand("BSpam,40");
+                    setState_runCommand("BSpam,60");
                     m_videoManager->clearCaptures();
                 }
             }
@@ -1136,10 +1146,6 @@ void SmartEggOperation::runNextState()
             {
                 checkedStats = true;
             }
-            if (checkedStats)
-            {
-                printPokemonStat(m_hatchedStat);
-            }
 
             // check if any pokemon matched with the target list
             int matchedTarget = -1;
@@ -1158,6 +1164,20 @@ void SmartEggOperation::runNextState()
                 }
             }
 
+            // print current stats
+            if (checkedStats)
+            {
+                if (m_keepList.size() == 1)
+                {
+                    // if there's only one target, always compare with it
+                    printPokemonStat(m_hatchedStat, 0);
+                }
+                else
+                {
+                    printPokemonStat(m_hatchedStat, matchedTarget);
+                }
+            }
+
             // this is shiny!
             bool isShiny = m_hatchedStat.m_shiny == ShinyType::SPT_Yes || m_hatchedStat.m_shiny == ShinyType::SPT_Star || m_hatchedStat.m_shiny == ShinyType::SPT_Square;
             if (isShiny)
@@ -1173,29 +1193,112 @@ void SmartEggOperation::runNextState()
                 }
             }
 
+            m_eggsToHatchCount--;
             if (matchedTarget >= 0)
             {
                 if (isShiny)
                 {
                     emit printLog(log + " is SHINY!!!", LOG_SUCCESS);
                 }
-                emit printLog(log + " matched target Pokemon at slot " + QString::number(matchedTarget + 1) + "! Moving it to keep box! " + QString::number(m_keepList[matchedTarget].m_target) + " remaining", LOG_SUCCESS);
+
+                if (m_programSettings.m_operation == EOT_Parent)
+                {
+                    // this is the target parent we want, just move it to top right position
+                    m_substage = SS_KeepPokemon;
+                    setState_runCommand(C_SetParent);
+                    break;
+                }
+
+                emit printLog(log + " matched target Pokemon at slot " + QString::number(matchedTarget + 1) + "! Moving it to Keep Box! " + QString::number(m_keepList[matchedTarget].m_target) + " remaining", LOG_SUCCESS);
                 runKeepPokemonCommand();
+                break;
             }
             else if (isShiny)
             {
-                emit printLog(log + " is SHINY!!! Moving it to keep box!", LOG_SUCCESS);
+                emit printLog(log + " is SHINY!!! Moving it to Keep Box!", LOG_SUCCESS);
                 runKeepPokemonCommand();
+                break;
             }
-            else
+            else if (m_programSettings.m_operation == EOT_Parent && m_keepList[0].m_target > 0)
             {
-                emit printLog(log + " is not shiny, releasing");
-                m_substage = SS_ReleaseHasPokemon;
-                m_videoManager->setAreas({A_DialogBox});
-                setState_runCommand("A,25", true);
+                if (!m_natureMatched)
+                {
+                    // nature not matched yet, this takes priority over IVs, will swap even if it has fewer matching IVs
+                    if (m_keepList[0].m_nature == m_hatchedStat.m_nature)
+                    {
+                        // this pokemon has matching nature
+                        if (m_keepList[0].m_nature != m_parentStat.m_nature)
+                        {
+                            // this is a new parent, move it to top left position!
+                            m_leaveParent = true;
+                            m_parentStat = m_hatchedStat;
+                            emit printLog("Nature matched, moving parent to top left position for standby", LOG_SUCCESS);
+
+                            m_substage = SS_KeepPokemon;
+                            setState_runCommand(C_SetParent);
+                            break;
+                        }
+                        else if (m_keepList[0].Compare(m_parentStat, m_hatchedStat))
+                        {
+                            // we just found a parent with correct nature in the same column of eggs
+                            // but this one has better stats, replace and release old parent
+                            m_leaveParent = true;
+                            m_parentStat = m_hatchedStat;
+                            emit printLog("Nature matched and has more matching stats, swapping with parent at top left position and releasing old one", LOG_SUCCESS);
+
+                            m_substage = SS_ReleaseHasPokemon;
+                            setState_runCommand(m_commands[C_SetParent] + ",A,25", true);
+                            m_videoManager->setAreas({A_DialogBox});
+                            break;
+                        }
+                    }
+
+                    if (m_keepList[0].m_nature == m_parentStat.m_nature)
+                    {
+                        // we need to prevent any Pokemon with better stats but not with correct nature to replace the one we just found!
+                        emit printLog("Found parent with correct nature, preventing other Pokemon with better IV stats to override it");
+                        emit printLog(log + " is not shiny, releasing");
+                        m_substage = SS_ReleaseHasPokemon;
+                        setState_runCommand("A,25", true);
+                        m_videoManager->setAreas({A_DialogBox});
+                        break;
+                    }
+                }
+                else if (m_keepList[0].m_nature != NatureType::NT_Any && m_keepList[0].m_nature != m_hatchedStat.m_nature)
+                {
+                    // verify nature stay the same
+                    incrementStat(m_statError);
+                    setState_error("Parent in Nursery is presumably holding an Everstone but child does not have matching nature?");
+                    break;
+                }
+
+                // compare other stats
+                if (m_keepList[0].Compare(m_parentStat, m_hatchedStat))
+                {
+                    m_parentStat = m_hatchedStat;
+                    if (m_leaveParent)
+                    {
+                        emit printLog("Found parent with even more matching stats, swapping with parent at top left position and releasing old one", LOG_SUCCESS);
+                        m_substage = SS_ReleaseHasPokemon;
+                        setState_runCommand(m_commands[C_SetParent] + ",A,25", true);
+                        m_videoManager->setAreas({A_DialogBox});
+                    }
+                    else
+                    {
+                        m_leaveParent = true;
+                        emit printLog("Found parent with more matching stats, moving to top left position for standby", LOG_SUCCESS);
+
+                        m_substage = SS_KeepPokemon;
+                        setState_runCommand(C_SetParent);
+                    }
+                    break;
+                }
             }
 
-            m_eggsToHatchCount--;
+            emit printLog(log + " is not shiny, releasing");
+            m_substage = SS_ReleaseHasPokemon;
+            setState_runCommand("A,25", true);
+            m_videoManager->setAreas({A_DialogBox});
         }
         break;
     }
@@ -1219,6 +1322,7 @@ void SmartEggOperation::runNextState()
                     break;
                 }
 
+                // now in multiselect mode
                 m_substage = SS_NextColumn;
                 setState_runCommand("Nothing,20,Y,1,DUp,1,Y,1,DRight,1");
             }
@@ -1251,7 +1355,7 @@ void SmartEggOperation::runNextState()
                 {
                     if (m_keepSingleCount - m_shinySingleCount > 0)
                     {
-                        emit printLog(QString::number(m_keepCount - m_shinyCount) + " non-Shiny Pokemon has been stored in keep box", LOG_SUCCESS);
+                        emit printLog(QString::number(m_keepCount - m_shinyCount) + " non-Shiny Pokemon has been stored in Keep Box", LOG_SUCCESS);
                     }
                     else
                     {
@@ -1275,9 +1379,68 @@ void SmartEggOperation::runNextState()
                     }
                 }
 
-                if (m_programSettings.m_operation == EOT_Shiny && missingTarget)
+                // we need to leave a new parent
+                if (m_programSettings.m_operation == EOT_Parent && m_leaveParent)
                 {
-                    emit printLog("Taking 5 filler Pokemon from keep box to party");
+                    if (m_keepList[0].m_nature == m_parentStat.m_nature)
+                    {
+                        // new parent with correct nature waiting at top left position
+                        if (!m_natureMatched)
+                        {
+                            if (m_hatchExtraEgg)
+                            {
+                                // ----------------PARENT SWAP STEP 2----------------
+                                // finished hatching remining egg and old parent is in party slot 2, put old parent to keep box, then leave new parent to nursery
+                                m_substage = SS_KeepOldParent;
+                                setState_runCommand("Y,1,DLeft,1,LDown,1");
+                                break;
+                            }
+
+                            // ----------------PARENT SWAP STEP 1----------------
+                            // transfer Everstone from first slot in party to parent
+                            emit printLog("Transfering Everstone from 1st slot party Pokemon to new parent");
+                            m_programSettings.m_isHatchExtra = true;
+
+                            // take old parent from nursery and hatch remaining egg
+                            m_substage = SS_HatchComplete;
+                            setState_runCommand(C_MoveItem);
+                            break;
+                        }
+
+                        // this parent has more matching stats
+                        if (m_hatchExtraEgg)
+                        {
+                            // ----------------PARENT SWAP STEP 6----------------
+                            // transfer Everstone from previous parent (slot 2) to new one, put old parent to keep box, then leave new parent to nursery
+                            emit printLog("Transfering Everstone from old parent (2nd slot in party) to new parent");
+                            m_substage = SS_KeepOldParent;
+                            setState_runCommand(C_MoveItemParent);
+                            //m_videoManager->setAreas({A_Bag});
+                            break;
+                        }
+                    }
+
+                    if (m_hatchExtraEgg)
+                    {
+                        // ----------------PARENT SWAP STEP 4----------------
+                        // put old parent at slot 2 to keep box, then leave new parent to nursery
+                        m_substage = SS_KeepOldParent;
+                        setState_runCommand("Y,1,DLeft,1,LDown,1");
+                        break;
+                    }
+
+                    // ----------------PARENT SWAP STEP 3/5----------------
+                    // parent should already be on top right position, start taking old parent from nursery
+                    m_programSettings.m_isHatchExtra = true;
+                    m_substage = SS_HatchComplete;
+                    setState_runCommand("Nothing,1");
+                    break;
+                }
+
+                // continue collecting more eggs
+                if ((m_programSettings.m_operation == EOT_Shiny || m_programSettings.m_operation == EOT_Parent) && missingTarget)
+                {
+                    emit printLog("Taking 5 filler Pokemon from Keep Box to party");
                     m_substage = SS_TakeFiller;
                     setState_runCommand(C_TakeFiller);
                     break;
@@ -1307,6 +1470,31 @@ void SmartEggOperation::runNextState()
         }
         break;
     }
+    case SS_KeepOldParent:
+    {
+        if (state == S_CommandFinished)
+        {
+            setState_frameAnalyzeRequest();
+        }
+        else if (state == S_CaptureReady)
+        {
+            /*
+            if (checkBrightnessMeanTarget(A_Bag.m_rect, C_Color_Item, 210))
+            {
+                incrementStat(m_statError);
+                setState_error("Entered Bag menu, the current Pokemon is expected to be holding an item but it is not");
+                break;
+            }
+            */
+
+            emit printLog("Putting old parent to Keep Box");
+            runKeepPokemonCommand();
+
+            // set stage after since runKeepPokemonCommand() sets it too
+            m_substage = SS_HatchComplete;
+        }
+        break;
+    }
     case SS_HatchComplete:
     {
         if (state == S_CommandFinished)
@@ -1317,11 +1505,28 @@ void SmartEggOperation::runNextState()
                 resetCollectorModeMembers();
 
                 m_substage = SS_CollectCycle;
-                setState_runCommand("BSpam,80");
+                setState_runCommand("BSpam,100");
             }
             else
             {
+                // force param to reset (mainly for parent mode)
+                m_programSettings.m_isHatchExtra = false;
                 m_hatchExtraEgg = false;
+
+                if (m_leaveParent)
+                {
+                    // about to leave new parent, fill party with 6 pokemon to prepare collecting eggs
+                    emit printLog("Taking 5 filler Pokemon from Keep Box to party");
+                    m_substage = SS_TakeFiller;
+                    setState_runCommand("Y,1,DUp,1,Y,1,DRight,1," + m_commands[C_TakeFiller]);
+                    break;
+                }
+
+                if (m_programSettings.m_operation == EOT_Parent)
+                {
+                    emit printLog("Target Parent is found located at cursor's position!", LOG_SUCCESS);
+                }
+
                 m_substage = SS_Finished;
                 setState_runCommand("Home,2");
             }
@@ -1395,12 +1600,15 @@ void SmartEggOperation::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            emit printLog("Collecting more eggs...");
+            if (!m_leaveParent)
+            {
+                emit printLog("Collecting more eggs...");
+            }
             resetCollectorModeMembers();
 
             // go back to collecting eggs
             m_substage = SS_CollectCycle;
-            setState_runCommand("BSpam,80");
+            setState_runCommand("BSpam,100");
         }
         break;
     }
@@ -1622,9 +1830,10 @@ QPair<StatType, StatType> SmartEggOperation::checkPokemonNatureInParty()
     return {inc,dec};
 }
 
-void SmartEggOperation::printPokemonStat(const PokemonStatTable &table)
+void SmartEggOperation::printPokemonStat(const PokemonStatTable &table, int matchID)
 {
     QString stats = "Stats:<br>";
+    PokemonStatTable const* matchTable = (matchID >= 0 && matchID < m_keepList.size()) ? &m_keepList[matchID] : nullptr;
 
     // IV
     for (int i = 0; i < StatType::ST_COUNT; i++)
@@ -1645,7 +1854,10 @@ void SmartEggOperation::printPokemonStat(const PokemonStatTable &table)
         }
         else
         {
+            bool matched = matchTable && matchTable->m_ivs[i] == type;
+            if (matched) stats += "<font color=\"#FF00AA00\">";
             stats += PokemonDatabase::getIVTypeName(type);
+            if (matched) stats += "</font>";
         }
     }
 
@@ -1662,7 +1874,10 @@ void SmartEggOperation::printPokemonStat(const PokemonStatTable &table)
     }
     else
     {
+        bool matched = matchTable && matchTable->m_nature == nature;
+        if (matched) stats += "<font color=\"#FF00AA00\">";
         stats += PokemonDatabase::getNatureTypeName(nature, false);
+        if (matched) stats += "</font>";
     }
 
     // Gender
@@ -1678,7 +1893,10 @@ void SmartEggOperation::printPokemonStat(const PokemonStatTable &table)
     }
     else
     {
+        bool matched = matchTable && matchTable->m_gender == gender;
+        if (matched) stats += "<font color=\"#FF00AA00\">";
         stats += PokemonDatabase::getGenderTypeName(gender);
+        if (matched) stats += "</font>";
     }
 
     // Shiny
@@ -1694,17 +1912,23 @@ void SmartEggOperation::printPokemonStat(const PokemonStatTable &table)
     {
         stats += "Any";
     }
-    else if (shiny == ShinyType::SPT_No)
-    {
-        stats += "No";
-    }
-    else if (shiny == ShinyType::SPT_Yes)
-    {
-        stats += "Yes";
-    }
     else
     {
-        stats += PokemonDatabase::getShinyTypeName(shiny);
+        bool matched = matchTable && (matchTable->m_shiny == shiny || (matchTable->m_shiny == ShinyType::SPT_Yes && (shiny == ShinyType::SPT_Star || shiny == ShinyType::SPT_Square)));
+        if (matched) stats += "<font color=\"#FF00AA00\">";
+        if (shiny == ShinyType::SPT_No)
+        {
+            stats += "No";
+        }
+        else if (shiny == ShinyType::SPT_Yes)
+        {
+            stats += "Yes";
+        }
+        else
+        {
+            stats += PokemonDatabase::getShinyTypeName(shiny);
+        }
+        if (matched) stats += "</font>";
     }
 
     emit printLog(stats);

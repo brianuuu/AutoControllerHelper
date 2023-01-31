@@ -14,6 +14,8 @@ class PokemonStatTable
 public:
     PokemonStatTable();
     bool Match(PokemonStatTable const& other);
+    int Count(PokemonStatTable const& other, bool ignoreGender = true);
+    bool Compare(PokemonStatTable const& oldTable, PokemonStatTable const& newTable, bool ignoreGender = true);
 
 public:
     int m_target;
