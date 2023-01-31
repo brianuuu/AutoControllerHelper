@@ -1789,6 +1789,7 @@ void RemoteControllerWindow::on_SP20_CB_Mode_currentIndexChanged(int index)
         ui->SP20_RB_ShinyDisable->setChecked(true);
     }
     ui->SP20_TW_Keep->setEnabled(type != SmartEggOperation::EOT_Collector);
+    ui->SP20_CB_ParentGender->setEnabled(type == SmartEggOperation::EOT_Parent);
 
     switch (type)
     {
@@ -2348,6 +2349,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         settings.m_columnsToHatch = ui->SP20_SB_Column->value();
         settings.m_isHatchExtra = ui->SP20_CB_HatchExtra->isChecked();
         settings.m_statTable = ui->SP20_TW_Keep;
+        settings.m_parentGender = GenderType(ui->SP20_CB_ParentGender->currentIndex());
         if (ui->SP20_RB_ShinySound->isChecked())
         {
             settings.m_shinyDetection = SmartEggOperation::ShinyDetectionType::SDT_Sound;

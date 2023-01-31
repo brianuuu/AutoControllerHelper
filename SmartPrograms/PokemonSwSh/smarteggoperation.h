@@ -34,6 +34,7 @@ public:
         bool m_isHatchExtra;
         ShinyDetectionType m_shinyDetection;
         PokemonStatTableWidget const* m_statTable;
+        GenderType m_parentGender;
     };
 
 public:

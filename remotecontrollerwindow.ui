@@ -4850,7 +4850,7 @@ Enter the Trade Partner:</string>
                        <x>0</x>
                        <y>0</y>
                        <width>438</width>
-                       <height>234</height>
+                       <height>245</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_51">
@@ -5026,11 +5026,57 @@ Enter the Trade Partner:</string>
                        </layout>
                       </item>
                       <item>
-                       <widget class="QLabel" name="label_88">
-                        <property name="text">
-                         <string>List of Pokemon to Keep:</string>
-                        </property>
-                       </widget>
+                       <layout class="QHBoxLayout" name="horizontalLayout_55">
+                        <item>
+                         <widget class="QLabel" name="label_88">
+                          <property name="text">
+                           <string>List of Pokemon to Keep:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <spacer name="horizontalSpacer_26">
+                          <property name="orientation">
+                           <enum>Qt::Horizontal</enum>
+                          </property>
+                          <property name="sizeHint" stdset="0">
+                           <size>
+                            <width>40</width>
+                            <height>20</height>
+                           </size>
+                          </property>
+                         </spacer>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_86">
+                          <property name="text">
+                           <string>Parent Gender in Nursery:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QComboBox" name="SP20_CB_ParentGender">
+                          <property name="enabled">
+                           <bool>false</bool>
+                          </property>
+                          <item>
+                           <property name="text">
+                            <string>Ditto</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>Male</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>Female</string>
+                           </property>
+                          </item>
+                         </widget>
+                        </item>
+                       </layout>
                       </item>
                       <item>
                        <widget class="PokemonStatTableWidget" name="SP20_TW_Keep">

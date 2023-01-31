@@ -97,6 +97,12 @@ void SmartEggOperation::updateKeepDummy()
         {
             m_keepDummy.m_shiny = table.m_shiny;
         }
+
+        // need to check gender in parent mode if parent in nursery isn't ditto
+        if (m_programSettings.m_operation == EOT_Parent && m_programSettings.m_parentGender != GenderType::GT_Any)
+        {
+            m_keepDummy.m_gender = GenderType::GT_Male;
+        }
     }
 }
 
@@ -1221,6 +1227,16 @@ void SmartEggOperation::runNextState()
             }
             else if (m_programSettings.m_operation == EOT_Parent && m_keepList[0].m_target > 0)
             {
+                if (m_programSettings.m_parentGender != GenderType::GT_Any && m_programSettings.m_parentGender == m_hatchedStat.m_gender)
+                {
+                    // reject wrong gender, otherwise we might not be able to get any eggs
+                    emit printLog(log + " is not with correct gender and not shiny, releasing");
+                    m_substage = SS_ReleaseHasPokemon;
+                    setState_runCommand("A,25", true);
+                    m_videoManager->setAreas({A_DialogBox});
+                    break;
+                }
+
                 if (!m_natureMatched)
                 {
                     // nature not matched yet, this takes priority over IVs, will swap even if it has fewer matching IVs
@@ -1444,6 +1460,12 @@ void SmartEggOperation::runNextState()
                     m_substage = SS_TakeFiller;
                     setState_runCommand(C_TakeFiller);
                     break;
+                }
+
+                // For parent mode after finishing, always take parent out
+                if (m_programSettings.m_operation == EOT_Parent)
+                {
+                    m_programSettings.m_isHatchExtra = true;
                 }
 
                 m_substage = SS_HatchComplete;
