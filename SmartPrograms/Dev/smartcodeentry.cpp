@@ -278,6 +278,7 @@ void SmartCodeEntry::runNextState()
     {
         if (state == S_CommandFinished)
         {
+            m_programSettings.m_lineEdit->setText("");
             setState_completed();
         }
         break;

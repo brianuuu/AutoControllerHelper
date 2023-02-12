@@ -473,6 +473,7 @@ void autocontrollerwindow::on_NetworkManager_Finished(QNetworkReply *reply)
 //---------------------------------------------------------------------------
 void autocontrollerwindow::on_CompileErrorOccurred(QProcess::ProcessError error)
 {
+    // TODO: this also happens if you terminate program while compiling, fix it
     QMessageBox::critical(this, "Error", "Compilation failed to start, please ensure you have installed WinAVR before using this program.", QMessageBox::Ok);
 
     ui->PB_Generate->setText("Save && Generate HEX file");
