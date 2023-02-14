@@ -109,8 +109,10 @@ public:
             case SP_BrightnessMeanFinder:   return "Dev: Brightness Mean Finder";
             case SP_ColorCalibrator:        return "Dev: Color Calibrator";
             case SP_SoundDetection:         return "Dev: Sound Detection";
-            case SP_Test:                   return "Test Program";
             case SP_CodeEntry:              return "Code Entry";
+#if DEBUG_ENABLED
+            case SP_Test:                   return "Test Program";
+#endif
 
             case SP_PurpleBeamFinder:       return "Purple Beam Finder";
             case SP_YCommGlitch:            return "Y-Comm Glitch";
@@ -149,9 +151,8 @@ public:
             case SP_SV_GimmighoulFarmer:    return "Gimmighoul Farmer";
             case SP_SV_TradePartnerFinder:  return "Trade Partner Finder";
 
-            case SP_COUNT:                  return "Invalid";
+            default:                        return "Invalid";
         }
-        return "Invalid";
     }
 
     static SmartProgram getProgramEnumFromName(QString const& str)

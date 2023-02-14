@@ -206,7 +206,11 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
         SmartProgram sp = (SmartProgram)i;
         if (SmartProgramBase::getProgramTabID(sp) >= 0)
         {
-            ui->LW_SmartProgram->addItem(SmartProgramBase::getProgramNameFromEnum(sp));
+            QString const name = SmartProgramBase::getProgramNameFromEnum(sp);
+            if (name != "Invalid")
+            {
+                ui->LW_SmartProgram->addItem(name);
+            }
         }
     }
 

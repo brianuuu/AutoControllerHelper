@@ -1210,6 +1210,7 @@ void SmartEggOperation::runNextState()
                 if (m_programSettings.m_operation == EOT_Parent)
                 {
                     // this is the target parent we want, just move it to top right position
+                    emit printLog("Target Parent is found! Moving it to top left of Box!");
                     m_substage = SS_KeepPokemon;
                     setState_runCommand(C_SetParent);
                     break;
@@ -1542,11 +1543,6 @@ void SmartEggOperation::runNextState()
                     m_substage = SS_TakeFiller;
                     setState_runCommand("Y,1,DUp,1,Y,1,DRight,1," + m_commands[C_TakeFiller]);
                     break;
-                }
-
-                if (m_programSettings.m_operation == EOT_Parent)
-                {
-                    emit printLog("Target Parent is found located at cursor's position!", LOG_SUCCESS);
                 }
 
                 m_substage = SS_Finished;
