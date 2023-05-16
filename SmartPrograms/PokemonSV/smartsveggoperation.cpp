@@ -113,7 +113,7 @@ void SmartSVEggOperation::runNextState()
     {
         if (state == S_CaptureReady)
         {
-            if (m_timer.elapsed() > 30000)
+            if (m_timer.elapsed() > 60000)
             {
                 runRestartCommand("Unable to detect title screen, attempting restart again...");
             }
@@ -149,7 +149,7 @@ void SmartSVEggOperation::runNextState()
         }
         else if (state == S_CaptureReady)
         {
-            if (m_timer.elapsed() > 30000)
+            if (m_timer.elapsed() > 60000)
             {
                 runRestartCommand("Unable to detect game start, attempting restart again...");
             }
