@@ -97,6 +97,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     m_flagToCharMap.insert(m_PBToFlagMap[ui->PB_LLeft] | m_PBToFlagMap[ui->PB_B], '#');
     m_flagToCharMap.insert(m_PBToFlagMap[ui->PB_LRight] | m_PBToFlagMap[ui->PB_B], '$');
     m_flagToCharMap.insert(m_PBToFlagMap[ui->PB_B] | m_PBToFlagMap[ui->PB_X] | m_PBToFlagMap[ui->PB_DUp], '%');
+    m_flagToCharMap.insert(m_PBToFlagMap[ui->PB_ZR] | m_PBToFlagMap[ui->PB_DUp], '^');
 
     m_commandToFlagMap.insert("Nothing", 0);
     m_commandToFlagMap.insert("A", m_PBToFlagMap[ui->PB_A]);
@@ -138,6 +139,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     m_commandToFlagMap.insert("LLeftB", m_PBToFlagMap[ui->PB_LLeft] | m_PBToFlagMap[ui->PB_B]);
     m_commandToFlagMap.insert("LRightB", m_PBToFlagMap[ui->PB_LRight] | m_PBToFlagMap[ui->PB_B]);
     m_commandToFlagMap.insert("BXDUp", m_PBToFlagMap[ui->PB_B] | m_PBToFlagMap[ui->PB_X] | m_PBToFlagMap[ui->PB_DUp]);
+    m_commandToFlagMap.insert("ZRDUp", m_PBToFlagMap[ui->PB_ZR] | m_PBToFlagMap[ui->PB_DUp]);
 
     // Special case
     m_commandToFlagMap.insert("ASpam", m_PBToFlagMap[ui->PB_A] | m_turboFlag);
