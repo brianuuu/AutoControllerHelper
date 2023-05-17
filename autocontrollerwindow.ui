@@ -78,6 +78,11 @@
         </item>
         <item>
          <property name="text">
+          <string>Tears of the Kingdom</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
           <string>Others</string>
          </property>
         </item>

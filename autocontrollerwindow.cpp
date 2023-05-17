@@ -59,6 +59,8 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_programEnumMap["SV_BoxRelease"]       = P_SV_BoxRelease;
     m_programEnumMap["SV_GimmighoulFarmer"] = P_SV_GimmighoulFarmer;
 
+    m_programEnumMap["TOTK_ItemDuplication"]    = P_TOTK_ItemDuplication;
+
     m_tabID[P_DaySkipper]           = 1;
     m_tabID[P_DaySkipper_Unlimited] = 2;
     m_tabID[P_WattFarmer]           = 17; // 3 now use for error
@@ -103,6 +105,8 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_tabID[P_SV_EggHatcher]        = 12;
     m_tabID[P_SV_BoxRelease]        = 7;
     m_tabID[P_SV_GimmighoulFarmer]  = 9;
+
+    m_tabID[P_TOTK_ItemDuplication]   = 7;
 
     if (!QDir(HEX_PATH).exists())
     {
@@ -585,6 +589,10 @@ void autocontrollerwindow::on_CB_Bots_currentIndexChanged(int index)
         else if (item->text().startsWith("SV"))
         {
             item->setHidden(ui->CB_Bots->currentText() != "Pokemon Scarlet/Violet");
+        }
+        else if (item->text().startsWith("TOTK"))
+        {
+            item->setHidden(ui->CB_Bots->currentText() != "Tears of the Kingdom");
         }
         else
         {
@@ -1072,6 +1080,7 @@ void autocontrollerwindow::LoadConfig()
             && program != P_BDSP_BoxDuplication
             && program != P_SV_ItemDuplication
             && program != P_SV_BoxRelease
+            && program != P_TOTK_ItemDuplication
     );
     ui->GB_AutoFossil->setHidden(program != P_AutoFossil && program != P_AutoFossil_GR);
     ui->GB_Auto3DaySkipper->setHidden(program != P_Auto3DaySkipper && program != P_SV_GimmighoulFarmer);
@@ -1639,9 +1648,10 @@ void autocontrollerwindow::LoadConfig()
 
     //--------------------------------------------------------
     case P_SV_ItemDuplication:
+    case P_TOTK_ItemDuplication:
     {
-    ui->Generic1_Label->setText("Item Count:");
-    ui->Generic1_Count->setRange(1,998);
+        ui->Generic1_Label->setText("Duplicate Count:");
+        ui->Generic1_Count->setRange(1,998);
 
         QTextStream in(&configFile);
         while (!in.atEnd())
@@ -1984,6 +1994,7 @@ void autocontrollerwindow::SaveConfig()
 
     //--------------------------------------------------------
     case P_SV_ItemDuplication:
+    case P_TOTK_ItemDuplication:
     {
         out << "int m_maxCycle = " << QString::number(ui->Generic1_Count->value()) << ";\n";
         break;
@@ -2532,6 +2543,14 @@ void autocontrollerwindow::UpdateInfo()
     {
         info = "Time per soft-reset: " + GetTimeString(name, 0);
         info += "\nEach reset does not guarantee encountering Gimmighoul!";
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_TOTK_ItemDuplication:
+    {
+        info = "Program Duration: " + GetTimeString(name, ui->Generic1_Count->value());
+        info += "\nInconsistent and does not duplicate exact amount, may get patched after v1.1.0";
         break;
     }
 

@@ -197,6 +197,9 @@ private:
         P_SV_BoxRelease,
         P_SV_GimmighoulFarmer,
 
+        // TOTK Programs
+        P_TOTK_ItemDuplication,
+
         P_INVALID
     };
     QMap<QString, Program> m_programEnumMap;
