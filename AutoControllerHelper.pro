@@ -63,6 +63,7 @@ SOURCES += \
     SmartPrograms/Widgets/pokemonautofilllineedit.cpp \
     SmartPrograms/Widgets/pokemonstattablewidget.cpp \
     SmartPrograms/Widgets/selectorwidget.cpp \
+    SmartPrograms/ZeldaTOTK/smarttotkitemduplication.cpp \
     SmartPrograms/smartprogrambase.cpp \
     SmartPrograms/smartsimpleprogram.cpp \
     Video/videomanager.cpp \
@@ -119,6 +120,7 @@ HEADERS += \
     SmartPrograms/Widgets/pokemonautofilllineedit.h \
     SmartPrograms/Widgets/pokemonstattablewidget.h \
     SmartPrograms/Widgets/selectorwidget.h \
+    SmartPrograms/ZeldaTOTK/smarttotkitemduplication.h \
     SmartPrograms/smartprogrambase.h \
     SmartPrograms/smartsimpleprogram.h \
     Video/videomanager.h \

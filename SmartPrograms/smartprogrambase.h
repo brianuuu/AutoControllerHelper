@@ -65,6 +65,8 @@ enum SmartProgram : uint32_t
     SP_SV_GimmighoulFarmer,
     SP_SV_TradePartnerFinder,
 
+    SP_TOTK_ItemDuplication,
+
     SP_COUNT
 };
 
@@ -151,6 +153,8 @@ public:
             case SP_SV_GimmighoulFarmer:    return "Gimmighoul Farmer";
             case SP_SV_TradePartnerFinder:  return "Trade Partner Finder";
 
+            case SP_TOTK_ItemDuplication:   return "Item Duplication (TOTK)";
+
             default:                        return "Invalid";
         }
     }
@@ -217,6 +221,8 @@ public:
             case SP_SV_GimmighoulFarmer:    return "SmartSVGimmighoulFarmer";
             case SP_SV_TradePartnerFinder:  return "SmartSVTradePartnerFinder";
 
+            case SP_TOTK_ItemDuplication:   return "SmartTOTKItemDuplication";
+
             case SP_COUNT:                  return "Invalid";
         }
         return "Invalid";
@@ -271,6 +277,8 @@ public:
             case SP_SV_GimmighoulFarmer:    return 0;
             case SP_SV_TradePartnerFinder:  return 18;
 
+            case SP_TOTK_ItemDuplication:   return 4;
+
             case SP_COUNT:                  return -1;
         }
         return 0;
@@ -322,6 +330,7 @@ public:
         case SP_SV_BoxReleaseSafe:
         case SP_SV_GimmighoulFarmer:
         case SP_SV_TradePartnerFinder:
+        case SP_TOTK_ItemDuplication:
             return false;
         default:
             return true;
@@ -330,26 +339,32 @@ public:
 
     static QString getProgramGamePrefix(SmartProgram sp)
     {
+        if (sp >= SP_TOTK_ItemDuplication)
+        {
+            return "Tears of the Kingdom";
+        }
+
         if (sp >= SP_SV_ItemDuplication)
         {
             return "Pokemon Scarlet/Violet";
         }
-        else if (sp >= SP_PLA_NuggetFarmer)
+
+        if (sp >= SP_PLA_NuggetFarmer)
         {
             return "Pokemon Legends: Arceus";
         }
-        else if (sp >= SP_BDSP_Starter)
+
+        if (sp >= SP_BDSP_Starter)
         {
             return "Pokemon BDSP";
         }
-        else if (sp >= SP_PurpleBeamFinder)
+
+        if (sp >= SP_PurpleBeamFinder)
         {
             return "Pokemon Sword/Shield";
         }
-        else
-        {
-            return "Others";
-        }
+
+        return "Others";
     }
 
     typedef QPair<int, QString> Stat;
