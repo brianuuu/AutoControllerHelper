@@ -1,6 +1,7 @@
 #ifndef SMARTTOTKITEMDUPLICATION_H
 #define SMARTTOTKITEMDUPLICATION_H
 
+#include <QElapsedTimer>
 #include <QWidget>
 #include "../smartprogrambase.h"
 
@@ -36,19 +37,21 @@ private:
     {
         SS_Init,
         SS_CheckColor,
+        SS_Start,
 
         SS_Attach,
         SS_DropFirst,
         SS_QuickMenu,
-        SS_DropSecond,
 
         SS_Finished,
     };
     Substage m_substage;
 
     // Members
+    QElapsedTimer m_timer;
+
     int m_loopLeft;
-    bool m_menuDetectFailed;
+    bool m_menuDetected;
 };
 
 #endif // SMARTTOTKITEMDUPLICATION_H
