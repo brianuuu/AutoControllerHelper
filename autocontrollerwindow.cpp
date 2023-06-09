@@ -59,7 +59,10 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_programEnumMap["SV_BoxRelease"]       = P_SV_BoxRelease;
     m_programEnumMap["SV_GimmighoulFarmer"] = P_SV_GimmighoulFarmer;
 
-    m_programEnumMap["TOTK_ItemDuplication"]    = P_TOTK_ItemDuplication;
+    m_programEnumMap["TOTK_BowFuseDuplication"]     = P_TOTK_BowFuseDuplication;
+    m_programEnumMap["TOTK_MineruDuplication"]      = P_TOTK_MineruDuplication;
+    m_programEnumMap["TOTK_ShieldSurfDuplication"]  = P_TOTK_ShieldSurfDuplication;
+    m_programEnumMap["TOTK_ZonaiDeviceDuplication"] = P_TOTK_ZonaiDeviceDuplication;
 
     m_tabID[P_DaySkipper]           = 1;
     m_tabID[P_DaySkipper_Unlimited] = 2;
@@ -106,7 +109,10 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_tabID[P_SV_BoxRelease]        = 7;
     m_tabID[P_SV_GimmighoulFarmer]  = 9;
 
-    m_tabID[P_TOTK_ItemDuplication]   = 7;
+    m_tabID[P_TOTK_BowFuseDuplication]      = 7;
+    m_tabID[P_TOTK_MineruDuplication]       = 7;
+    m_tabID[P_TOTK_ShieldSurfDuplication]   = 7;
+    m_tabID[P_TOTK_ZonaiDeviceDuplication]  = 7;
 
     if (!QDir(HEX_PATH).exists())
     {
@@ -1080,7 +1086,10 @@ void autocontrollerwindow::LoadConfig()
             && program != P_BDSP_BoxDuplication
             && program != P_SV_ItemDuplication
             && program != P_SV_BoxRelease
-            && program != P_TOTK_ItemDuplication
+            && program != P_TOTK_BowFuseDuplication
+            && program != P_TOTK_MineruDuplication
+            && program != P_TOTK_ShieldSurfDuplication
+            && program != P_TOTK_ZonaiDeviceDuplication
     );
     ui->GB_AutoFossil->setHidden(program != P_AutoFossil && program != P_AutoFossil_GR);
     ui->GB_Auto3DaySkipper->setHidden(program != P_Auto3DaySkipper && program != P_SV_GimmighoulFarmer);
@@ -1648,7 +1657,10 @@ void autocontrollerwindow::LoadConfig()
 
     //--------------------------------------------------------
     case P_SV_ItemDuplication:
-    case P_TOTK_ItemDuplication:
+    case P_TOTK_BowFuseDuplication:
+    case P_TOTK_MineruDuplication:
+    case P_TOTK_ShieldSurfDuplication:
+    case P_TOTK_ZonaiDeviceDuplication:
     {
         ui->Generic1_Label->setText("Duplicate Count:");
         ui->Generic1_Count->setRange(1,998);
@@ -1994,7 +2006,10 @@ void autocontrollerwindow::SaveConfig()
 
     //--------------------------------------------------------
     case P_SV_ItemDuplication:
-    case P_TOTK_ItemDuplication:
+    case P_TOTK_BowFuseDuplication:
+    case P_TOTK_MineruDuplication:
+    case P_TOTK_ShieldSurfDuplication:
+    case P_TOTK_ZonaiDeviceDuplication:
     {
         out << "int m_maxCycle = " << QString::number(ui->Generic1_Count->value()) << ";\n";
         break;
@@ -2547,10 +2562,22 @@ void autocontrollerwindow::UpdateInfo()
     }
 
     //--------------------------------------------------------
-    case P_TOTK_ItemDuplication:
+    case P_TOTK_BowFuseDuplication:
     {
         info = "Program Duration: " + GetTimeString(name, ui->Generic1_Count->value());
-        info += "\nInconsistent and does not duplicate exact amount, may get patched after v1.1.0";
+        info += "\nInconsistent and does not duplicate exact amount, this is patched after v1.1.0.";
+        break;
+    }
+
+    //--------------------------------------------------------
+    case P_TOTK_MineruDuplication:
+    case P_TOTK_ShieldSurfDuplication:
+    case P_TOTK_ZonaiDeviceDuplication:
+    {
+        info = "Program Duration: " + GetTimeString(name, ui->Generic1_Count->value());
+        info += "\nDuplication amount is ";
+        info += (program == P_TOTK_ZonaiDeviceDuplication) ? "10" : "5";
+        info += " times the set value. This is patched after v1.1.0.";
         break;
     }
 

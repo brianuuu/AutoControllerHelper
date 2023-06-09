@@ -198,7 +198,10 @@ private:
         P_SV_GimmighoulFarmer,
 
         // TOTK Programs
-        P_TOTK_ItemDuplication,
+        P_TOTK_BowFuseDuplication,
+        P_TOTK_MineruDuplication,
+        P_TOTK_ShieldSurfDuplication,
+        P_TOTK_ZonaiDeviceDuplication,
 
         P_INVALID
     };
