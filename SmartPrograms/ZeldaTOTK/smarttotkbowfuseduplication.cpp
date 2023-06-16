@@ -1,6 +1,6 @@
-#include "smarttotkitemduplication.h"
+#include "smarttotkbowfuseduplication.h"
 
-SmartTOTKItemDuplication::SmartTOTKItemDuplication
+SmartTOTKBowFuseDuplication::SmartTOTKBowFuseDuplication
 (
     int loopCount,
     SmartProgramParameter parameter
@@ -11,13 +11,13 @@ SmartTOTKItemDuplication::SmartTOTKItemDuplication
     init();
 }
 
-void SmartTOTKItemDuplication::init()
+void SmartTOTKBowFuseDuplication::init()
 {
     SmartProgramBase::init();
     inializeCommands(C_COUNT);
 }
 
-void SmartTOTKItemDuplication::reset()
+void SmartTOTKBowFuseDuplication::reset()
 {
     SmartProgramBase::reset();
 
@@ -26,7 +26,7 @@ void SmartTOTKItemDuplication::reset()
     m_menuDetected = false;
 }
 
-void SmartTOTKItemDuplication::runNextState()
+void SmartTOTKBowFuseDuplication::runNextState()
 {
     State const state = getState();
     switch (m_substage)

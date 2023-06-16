@@ -1,19 +1,19 @@
-#ifndef SMARTTOTKITEMDUPLICATION_H
-#define SMARTTOTKITEMDUPLICATION_H
+#ifndef SMARTTOTKBOWFUSEDUPLICATION_H
+#define SMARTTOTKBOWFUSEDUPLICATION_H
 
 #include <QElapsedTimer>
 #include <QWidget>
 #include "../smartprogrambase.h"
 
-class SmartTOTKItemDuplication : public SmartProgramBase
+class SmartTOTKBowFuseDuplication : public SmartProgramBase
 {
 public:
-    explicit SmartTOTKItemDuplication(
+    explicit SmartTOTKBowFuseDuplication(
             int loopCount,
             SmartProgramParameter parameter
             );
 
-    virtual SmartProgram getProgramEnum() { return SP_TOTK_ItemDuplication; }
+    virtual SmartProgram getProgramEnum() { return SP_TOTK_BowFuseDuplication; }
 
 private:
     virtual void init();
@@ -54,4 +54,4 @@ private:
     bool m_menuDetected;
 };
 
-#endif // SMARTTOTKITEMDUPLICATION_H
+#endif // SMARTTOTKBOWFUSEDUPLICATION_H

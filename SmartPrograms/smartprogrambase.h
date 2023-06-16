@@ -65,7 +65,7 @@ enum SmartProgram : uint32_t
     SP_SV_GimmighoulFarmer,
     SP_SV_TradePartnerFinder,
 
-    SP_TOTK_ItemDuplication,
+    SP_TOTK_BowFuseDuplication,
 
     SP_COUNT
 };
@@ -153,7 +153,7 @@ public:
             case SP_SV_GimmighoulFarmer:    return "Gimmighoul Farmer";
             case SP_SV_TradePartnerFinder:  return "Trade Partner Finder";
 
-            case SP_TOTK_ItemDuplication:   return "Item Duplication (TOTK)";
+            case SP_TOTK_BowFuseDuplication:    return "Bow Fuse Duplication";
 
             default:                        return "Invalid";
         }
@@ -221,7 +221,7 @@ public:
             case SP_SV_GimmighoulFarmer:    return "SmartSVGimmighoulFarmer";
             case SP_SV_TradePartnerFinder:  return "SmartSVTradePartnerFinder";
 
-            case SP_TOTK_ItemDuplication:   return "SmartTOTKItemDuplication";
+            case SP_TOTK_BowFuseDuplication:    return "SmartTOTKBowFuseDuplication";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -277,7 +277,7 @@ public:
             case SP_SV_GimmighoulFarmer:    return 0;
             case SP_SV_TradePartnerFinder:  return 18;
 
-            case SP_TOTK_ItemDuplication:   return 4;
+            case SP_TOTK_BowFuseDuplication:return 4;
 
             case SP_COUNT:                  return -1;
         }
@@ -330,7 +330,7 @@ public:
         case SP_SV_BoxReleaseSafe:
         case SP_SV_GimmighoulFarmer:
         case SP_SV_TradePartnerFinder:
-        case SP_TOTK_ItemDuplication:
+        case SP_TOTK_BowFuseDuplication:
             return false;
         default:
             return true;
@@ -339,7 +339,7 @@ public:
 
     static QString getProgramGamePrefix(SmartProgram sp)
     {
-        if (sp >= SP_TOTK_ItemDuplication)
+        if (sp >= SP_TOTK_BowFuseDuplication)
         {
             return "Tears of the Kingdom";
         }

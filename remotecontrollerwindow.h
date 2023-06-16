@@ -75,7 +75,7 @@
 #include "SmartPrograms/PokemonSV/smartsvgimmighoulfarmer.h"
 #include "SmartPrograms/PokemonSV/smartsvtradepartnerfinder.h"
 
-#include "SmartPrograms/ZeldaTOTK/smarttotkitemduplication.h"
+#include "SmartPrograms/ZeldaTOTK/smarttotkbowfuseduplication.h"
 
 #include "SmartPrograms/Widgets/pokemonautofilllineedit.h"
 #include "SmartPrograms/Widgets/selectorwidget.h"

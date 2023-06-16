@@ -2068,7 +2068,7 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
         ui->SPGeneric1_Count->setRange(1,32);
         break;
     }
-    case SP_TOTK_ItemDuplication:
+    case SP_TOTK_BowFuseDuplication:
     {
         ui->SPGeneric1_Note->setText("Inconsistent, will not duplicate exact target amount. This may get patched after v1.1.0");
         ui->SPGeneric1_Label->setText("Target No. of Duplication:");
@@ -2505,9 +2505,9 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartSVTradePartnerFinder(ui->SP18_LE_Name->text(), ui->SP18_CB_Spam->isChecked(), parameter);
         break;
     }
-    case SP_TOTK_ItemDuplication:
+    case SP_TOTK_BowFuseDuplication:
     {
-        m_smartProgram = new SmartTOTKItemDuplication(ui->SPGeneric1_Count->value(), parameter);
+        m_smartProgram = new SmartTOTKBowFuseDuplication(ui->SPGeneric1_Count->value(), parameter);
         break;
     }
     default:
