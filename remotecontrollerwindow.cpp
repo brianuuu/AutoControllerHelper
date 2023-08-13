@@ -98,6 +98,9 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     m_flagToCharMap.insert(m_PBToFlagMap[ui->PB_LRight] | m_PBToFlagMap[ui->PB_B], '$');
     m_flagToCharMap.insert(m_PBToFlagMap[ui->PB_B] | m_PBToFlagMap[ui->PB_X] | m_PBToFlagMap[ui->PB_DUp], '%');
     m_flagToCharMap.insert(m_PBToFlagMap[ui->PB_ZR] | m_PBToFlagMap[ui->PB_DUp], '^');
+    m_flagToCharMap.insert(m_PBToFlagMap[ui->PB_B] | m_PBToFlagMap[ui->PB_Y], '&');
+    m_flagToCharMap.insert(m_PBToFlagMap[ui->PB_ZL] | m_PBToFlagMap[ui->PB_B] | m_PBToFlagMap[ui->PB_X], '*');
+    m_flagToCharMap.insert(m_PBToFlagMap[ui->PB_ZL] | m_PBToFlagMap[ui->PB_A], '(');
 
     m_commandToFlagMap.insert("Nothing", 0);
     m_commandToFlagMap.insert("A", m_PBToFlagMap[ui->PB_A]);
@@ -140,6 +143,9 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     m_commandToFlagMap.insert("LRightB", m_PBToFlagMap[ui->PB_LRight] | m_PBToFlagMap[ui->PB_B]);
     m_commandToFlagMap.insert("BXDUp", m_PBToFlagMap[ui->PB_B] | m_PBToFlagMap[ui->PB_X] | m_PBToFlagMap[ui->PB_DUp]);
     m_commandToFlagMap.insert("ZRDUp", m_PBToFlagMap[ui->PB_ZR] | m_PBToFlagMap[ui->PB_DUp]);
+    m_commandToFlagMap.insert("BY", m_PBToFlagMap[ui->PB_B] | m_PBToFlagMap[ui->PB_Y]);
+    m_commandToFlagMap.insert("ZLBX", m_PBToFlagMap[ui->PB_ZL] | m_PBToFlagMap[ui->PB_B] | m_PBToFlagMap[ui->PB_X]);
+    m_commandToFlagMap.insert("ZLA", m_PBToFlagMap[ui->PB_ZL] | m_PBToFlagMap[ui->PB_A]);
 
     // Special case
     m_commandToFlagMap.insert("ASpam", m_PBToFlagMap[ui->PB_A] | m_turboFlag);
@@ -2070,9 +2076,18 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
     }
     case SP_TOTK_BowFuseDuplication:
     {
-        ui->SPGeneric1_Note->setText("Inconsistent, will not duplicate exact target amount. This may get patched after v1.1.0");
+        ui->SPGeneric1_Note->setText("Inconsistent, will not duplicate exact target amount. This is patched after v1.1.0");
         ui->SPGeneric1_Label->setText("Target No. of Duplication:");
         ui->SPGeneric1_Count->setRange(1,999);
+        break;
+    }
+    case SP_TOTK_MineruDuplication:
+    case SP_TOTK_ShieldSurfDuplication:
+    case SP_TOTK_ZonaiDeviceDuplication:
+    {
+        ui->SPGeneric1_Note->setText("Duplicate amount is " + QString(sp == SP_TOTK_ZonaiDeviceDuplication ? "10" : "5") + "x the target. This is patched after v1.1.0");
+        ui->SPGeneric1_Label->setText("Target No. of Duplication:");
+        ui->SPGeneric1_Count->setRange(1,2000);
         break;
     }
     default: break;
@@ -2508,6 +2523,13 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     case SP_TOTK_BowFuseDuplication:
     {
         m_smartProgram = new SmartTOTKBowFuseDuplication(ui->SPGeneric1_Count->value(), parameter);
+        break;
+    }
+    case SP_TOTK_MineruDuplication:
+    case SP_TOTK_ShieldSurfDuplication:
+    case SP_TOTK_ZonaiDeviceDuplication:
+    {
+        m_smartProgram = new SmartSimpleProgram(sp, ui->SPGeneric1_Count->value(), parameter);
         break;
     }
     default:

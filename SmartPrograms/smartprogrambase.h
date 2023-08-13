@@ -66,6 +66,9 @@ enum SmartProgram : uint32_t
     SP_SV_TradePartnerFinder,
 
     SP_TOTK_BowFuseDuplication,
+    SP_TOTK_MineruDuplication,
+    SP_TOTK_ShieldSurfDuplication,
+    SP_TOTK_ZonaiDeviceDuplication,
 
     SP_COUNT
 };
@@ -154,6 +157,9 @@ public:
             case SP_SV_TradePartnerFinder:  return "Trade Partner Finder";
 
             case SP_TOTK_BowFuseDuplication:    return "Bow Fuse Duplication";
+            case SP_TOTK_MineruDuplication:     return "Mineru Duplication";
+            case SP_TOTK_ShieldSurfDuplication: return "Shield Surf Duplication";
+            case SP_TOTK_ZonaiDeviceDuplication:return "Zonai Device Duplication";
 
             default:                        return "Invalid";
         }
@@ -222,6 +228,9 @@ public:
             case SP_SV_TradePartnerFinder:  return "SmartSVTradePartnerFinder";
 
             case SP_TOTK_BowFuseDuplication:    return "SmartTOTKBowFuseDuplication";
+            case SP_TOTK_MineruDuplication:     return "SmartTOTKMineruDuplication";
+            case SP_TOTK_ShieldSurfDuplication: return "SmartTOTKShieldSurfDuplication";
+            case SP_TOTK_ZonaiDeviceDuplication:return "SmartTOTKZonaiDeviceDuplication";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -277,7 +286,10 @@ public:
             case SP_SV_GimmighoulFarmer:    return 0;
             case SP_SV_TradePartnerFinder:  return 18;
 
-            case SP_TOTK_BowFuseDuplication:return 4;
+            case SP_TOTK_BowFuseDuplication:    return 4;
+            case SP_TOTK_MineruDuplication:     return 4;
+            case SP_TOTK_ShieldSurfDuplication: return 4;
+            case SP_TOTK_ZonaiDeviceDuplication:return 4;
 
             case SP_COUNT:                  return -1;
         }
@@ -331,6 +343,9 @@ public:
         case SP_SV_GimmighoulFarmer:
         case SP_SV_TradePartnerFinder:
         case SP_TOTK_BowFuseDuplication:
+        case SP_TOTK_MineruDuplication:
+        case SP_TOTK_ShieldSurfDuplication:
+        case SP_TOTK_ZonaiDeviceDuplication:
             return false;
         default:
             return true;

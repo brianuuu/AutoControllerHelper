@@ -484,6 +484,9 @@ bool SmartProgramBase::validateCommand(const QString &commands, QString &errorMs
         "lrightb",
         "bxdup",
         "zrdup",
+        "by",
+        "zlbx",
+        "zla",
 
         "aspam",
         "bspam",
