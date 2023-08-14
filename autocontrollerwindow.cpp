@@ -65,6 +65,8 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_programEnumMap["TOTK_ShieldSurfDuplication"]  = P_TOTK_ShieldSurfDuplication;
     m_programEnumMap["TOTK_ZonaiDeviceDuplication"] = P_TOTK_ZonaiDeviceDuplication;
 
+    m_programEnumMap["S3_TableturfSkip"]    = P_S3_TableturfSkip;
+
     m_tabID[P_DaySkipper]           = 1;
     m_tabID[P_DaySkipper_Unlimited] = 2;
     m_tabID[P_WattFarmer]           = 17; // 3 now use for error
@@ -115,6 +117,8 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_tabID[P_TOTK_MineruDuplication]       = 7;
     m_tabID[P_TOTK_ShieldSurfDuplication]   = 7;
     m_tabID[P_TOTK_ZonaiDeviceDuplication]  = 7;
+
+    m_tabID[P_S3_TableturfSkip]     = 0;
 
     if (!QDir(HEX_PATH).exists())
     {
@@ -601,6 +605,10 @@ void autocontrollerwindow::on_CB_Bots_currentIndexChanged(int index)
         else if (item->text().startsWith("TOTK"))
         {
             item->setHidden(ui->CB_Bots->currentText() != "Tears of the Kingdom");
+        }
+        else if (item->text().startsWith("S3"))
+        {
+            item->setHidden(ui->CB_Bots->currentText() != "Splatoon 3");
         }
         else
         {
@@ -2587,7 +2595,19 @@ void autocontrollerwindow::UpdateInfo()
         break;
     }
 
-    case P_INVALID: break;
+    //--------------------------------------------------------
+    case P_S3_TableturfSkip:
+    {
+        info = "It takes about 2 minutes per battle (40 EXP).";
+        break;
+    }
+
+    //--------------------------------------------------------
+    default:
+    {
+        info = "N/A";
+        break;
+    }
     }
 
     QPalette pal = ui->L_Info->palette();

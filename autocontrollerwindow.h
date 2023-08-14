@@ -204,6 +204,9 @@ private:
         P_TOTK_ShieldSurfDuplication,
         P_TOTK_ZonaiDeviceDuplication,
 
+        // Splatoon 3 Programs
+        P_S3_TableturfSkip,
+
         P_INVALID
     };
     QMap<QString, Program> m_programEnumMap;
