@@ -2345,8 +2345,9 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         break;
     }
     case SP_BattleTower:
+    case SP_S3_TableturfSkip:
     {
-        m_smartProgram = new SmartSimpleProgram(SP_BattleTower, -1, parameter);
+        m_smartProgram = new SmartSimpleProgram(sp, -1, parameter);
         break;
     }
     case SP_Loto:

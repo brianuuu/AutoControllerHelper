@@ -70,6 +70,8 @@ enum SmartProgram : uint32_t
     SP_TOTK_ShieldSurfDuplication,
     SP_TOTK_ZonaiDeviceDuplication,
 
+    SP_S3_TableturfSkip,
+
     SP_COUNT
 };
 
@@ -161,6 +163,8 @@ public:
             case SP_TOTK_ShieldSurfDuplication: return "Shield Surf Duplication";
             case SP_TOTK_ZonaiDeviceDuplication:return "Zonai Device Duplication";
 
+            case SP_S3_TableturfSkip:       return "Tableturf Skipper";
+
             default:                        return "Invalid";
         }
     }
@@ -232,6 +236,8 @@ public:
             case SP_TOTK_ShieldSurfDuplication: return "SmartTOTKShieldSurfDuplication";
             case SP_TOTK_ZonaiDeviceDuplication:return "SmartTOTKZonaiDeviceDuplication";
 
+            case SP_S3_TableturfSkip:       return "SmartS3TableturfSkip";
+
             case SP_COUNT:                  return "Invalid";
         }
         return "Invalid";
@@ -291,6 +297,8 @@ public:
             case SP_TOTK_ShieldSurfDuplication: return 4;
             case SP_TOTK_ZonaiDeviceDuplication:return 4;
 
+            case SP_S3_TableturfSkip:       return 0;
+
             case SP_COUNT:                  return -1;
         }
         return 0;
@@ -346,6 +354,7 @@ public:
         case SP_TOTK_MineruDuplication:
         case SP_TOTK_ShieldSurfDuplication:
         case SP_TOTK_ZonaiDeviceDuplication:
+        case SP_S3_TableturfSkip:
             return false;
         default:
             return true;
@@ -354,6 +363,11 @@ public:
 
     static QString getProgramGamePrefix(SmartProgram sp)
     {
+        if (sp >= SP_S3_TableturfSkip)
+        {
+            return "Splatoon 3";
+        }
+
         if (sp >= SP_TOTK_BowFuseDuplication)
         {
             return "Tears of the Kingdom";
