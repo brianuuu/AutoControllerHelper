@@ -31,6 +31,7 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_programEnumMap["EggCollector_IT"]         = P_EggCollector_IT;
     m_programEnumMap["EggHatcher"]              = P_EggHatcher;
     m_programEnumMap["GodEggDuplication"]       = P_GodEggDuplication;
+    m_programEnumMap["GodEggDuplication_JP"]    = P_GodEggDuplication_JP;
     m_programEnumMap["ShinyFiveRegi"]           = P_ShinyFiveRegi;
     m_programEnumMap["ShinySwordTrio"]          = P_ShinySwordTrio;
     m_programEnumMap["DailyHighlightFarmer"]    = P_DailyHighlightFarmer;
@@ -80,6 +81,7 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_tabID[P_EggCollector_IT]      = 7;
     m_tabID[P_EggHatcher]           = 13;
     m_tabID[P_GodEggDuplication]    = 7; // 14 deprecated
+    m_tabID[P_GodEggDuplication_JP] = 7; // 14 deprecated
     m_tabID[P_ShinyFiveRegi]        = 15;
     m_tabID[P_ShinySwordTrio]       = 16;
     m_tabID[P_DailyHighlightFarmer] = 17;
@@ -1083,6 +1085,7 @@ void autocontrollerwindow::LoadConfig()
             && program != P_EggCollector
             && program != P_EggCollector_IT
             && program != P_GodEggDuplication
+            && program != P_GodEggDuplication_JP
             && program != P_BDSP_BoxDuplication
             && program != P_SV_ItemDuplication
             && program != P_SV_BoxRelease
@@ -1438,6 +1441,7 @@ void autocontrollerwindow::LoadConfig()
 
     //--------------------------------------------------------
     case P_GodEggDuplication:
+    case P_GodEggDuplication_JP:
     {
         ui->Generic1_Label->setText("Target No. of Duplication (0 = Infinite):");
         ui->Generic1_Count->setRange(0,960);
@@ -1938,6 +1942,7 @@ void autocontrollerwindow::SaveConfig()
 
     //--------------------------------------------------------
     case P_GodEggDuplication:
+    case P_GodEggDuplication_JP:
     {
         out << "int m_maxCycle = " << QString::number(ui->Generic1_Count->value()) << ";\n";
         break;
@@ -2317,6 +2322,7 @@ void autocontrollerwindow::UpdateInfo()
 
     //--------------------------------------------------------
     case P_GodEggDuplication:
+    case P_GodEggDuplication_JP:
     {
         int count = ui->Generic1_Count->value();
         if (count > 0)

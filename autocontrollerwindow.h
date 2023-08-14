@@ -165,6 +165,7 @@ private:
         P_EggCollector_IT,
         P_EggHatcher,
         P_GodEggDuplication,
+        P_GodEggDuplication_JP,
         P_ShinyFiveRegi,
         P_ShinySwordTrio,
         P_DailyHighlightFarmer,
