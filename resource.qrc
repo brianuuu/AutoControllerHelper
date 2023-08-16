@@ -7,5 +7,13 @@
         <file>ImageMatch/PLA_RoyalWyrdeer.bmp</file>
         <file>ImageMatch/PLA_RoyalBraviary.bmp</file>
         <file>ImageMatch/PLA_Shiny.bmp</file>
+        <file>ImageMatch/S3_CountBL1.bmp</file>
+        <file>ImageMatch/S3_CountBL2.bmp</file>
+        <file>ImageMatch/S3_CountBR1.bmp</file>
+        <file>ImageMatch/S3_CountBR2.bmp</file>
+        <file>ImageMatch/S3_CountTL1.bmp</file>
+        <file>ImageMatch/S3_CountTL2.bmp</file>
+        <file>ImageMatch/S3_CountTR2.bmp</file>
+        <file>ImageMatch/S3_CountTR1.bmp</file>
     </qresource>
 </RCC>

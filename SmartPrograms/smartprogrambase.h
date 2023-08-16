@@ -71,6 +71,7 @@ enum SmartProgram : uint32_t
     SP_TOTK_ZonaiDeviceDuplication,
 
     SP_S3_TableturfSkip,
+    SP_S3_TableturfCloneJelly,
 
     SP_COUNT
 };
@@ -164,6 +165,7 @@ public:
             case SP_TOTK_ZonaiDeviceDuplication:return "Zonai Device Duplication";
 
             case SP_S3_TableturfSkip:       return "Tableturf Skipper";
+            case SP_S3_TableturfCloneJelly: return "Tableturf Clone Jelly";
 
             default:                        return "Invalid";
         }
@@ -237,6 +239,7 @@ public:
             case SP_TOTK_ZonaiDeviceDuplication:return "SmartTOTKZonaiDeviceDuplication";
 
             case SP_S3_TableturfSkip:       return "SmartS3TableturfSkip";
+            case SP_S3_TableturfCloneJelly: return "SmartS3TableturfCloneJelly";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -298,6 +301,7 @@ public:
             case SP_TOTK_ZonaiDeviceDuplication:return 4;
 
             case SP_S3_TableturfSkip:       return 0;
+            case SP_S3_TableturfCloneJelly: return 0;
 
             case SP_COUNT:                  return -1;
         }

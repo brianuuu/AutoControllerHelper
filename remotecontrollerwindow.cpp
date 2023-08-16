@@ -2533,6 +2533,12 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartSimpleProgram(sp, ui->SPGeneric1_Count->value(), parameter);
         break;
     }
+    case SP_S3_TableturfCloneJelly:
+    {
+        SmartS3TableturfCloneJelly::Settings settings;
+        m_smartProgram = new SmartS3TableturfCloneJelly(settings, parameter);
+        break;
+    }
     default:
     {
         QMessageBox::critical(this, "Error", "No code exist for this Smart Program!");
