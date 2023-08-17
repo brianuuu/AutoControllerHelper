@@ -261,9 +261,11 @@ void SmartS3TableturfCloneJelly::runNextState()
         break;
     }
     case SS_PlaceCard:
+    case SS_PlaceCardEnd:
     {
         if (state == S_CommandFinished)
         {
+            m_substage = SS_PlaceCardEnd;
             setState_frameAnalyzeRequest();
         }
         else if (state == S_CaptureReady)
@@ -275,6 +277,13 @@ void SmartS3TableturfCloneJelly::runNextState()
             }
             else if (!checkTurnEnd())
             {
+                if (m_substage == SS_PlaceCard)
+                {
+                    // still during place card command
+                    setState_frameAnalyzeRequest();
+                    break;
+                }
+
                 if (m_turn > 8)
                 {
                     emit printLog("Unabled to count up, something went wrong, capture has been taken", LOG_ERROR);

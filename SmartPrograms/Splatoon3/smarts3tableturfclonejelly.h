@@ -59,11 +59,12 @@ private:
         SS_PickCard,
 
         SS_PlaceCard,
+        SS_PlaceCardEnd,
+
         SS_CountUp,
         SS_TurnSkip,
 
         SS_CheckWin,
-
         SS_Finished,
     };
     Substage m_substage;
