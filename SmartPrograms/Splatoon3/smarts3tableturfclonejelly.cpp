@@ -94,7 +94,7 @@ void SmartS3TableturfCloneJelly::runNextState()
                 if (m_substage != SS_TurnWait)
                 {
                     incrementStat(m_statBattles);
-                    emit printLog("Battle " + QString::number(m_statBattles.first) + " started!");
+                    emit printLog("-----------Battle " + QString::number(m_statBattles.first) + " started!-----------");
                 }
 
                 emit printLog("Turn Left: " + QString::number(m_turn));
@@ -104,11 +104,11 @@ void SmartS3TableturfCloneJelly::runNextState()
                 {
                     if (m_tileCount[i] == 0)
                     {
-                        if (checkImageMatchTarget(A_TileCount[i].m_rect, C_Color_TileCount, m_imageMatchCount[i*2], 0.9))
+                        if (checkImageMatchTarget(A_TileCount[i].m_rect, C_Color_TileCount, m_imageMatchCount[i*2], 0.85))
                         {
                             m_tileCount[i] = 1;
                         }
-                        else if (checkImageMatchTarget(A_TileCount[i].m_rect, C_Color_TileCount, m_imageMatchCount[i*2+1], 0.9))
+                        else if (checkImageMatchTarget(A_TileCount[i].m_rect, C_Color_TileCount, m_imageMatchCount[i*2+1], 0.85))
                         {
                             m_tileCount[i] = 2;
                         }
@@ -133,6 +133,11 @@ void SmartS3TableturfCloneJelly::runNextState()
                     }
                 }
 
+                if (m_tileCount[m_cardToUse] <= 2)
+                {
+                    emit printLog("Unable to find card more than 2 tiles", LOG_ERROR);
+                }
+
                 emit printLog("Picking card " + QString::number(m_cardToUse + 1));
                 m_substage = SS_PickCard;
                 switch (m_cardToUse)
@@ -149,6 +154,24 @@ void SmartS3TableturfCloneJelly::runNextState()
                 case 3:
                     setState_runCommand("DDown,1,LRight,1,A,1");
                     break;
+                }
+
+                if (m_turn == 1)
+                {
+                    // insanity check for last turn, should always have 3 1/2 tile cards
+                    int count = 0;
+                    for (int i = 0; i < 4; i++)
+                    {
+                        if (m_tileCount[i] <= 2)
+                        {
+                            count++;
+                        }
+                    }
+
+                    if (count != 3)
+                    {
+                        emit printLog("Remaining cards does not contain 3 1/2 tile cards", LOG_ERROR);
+                    }
                 }
 
                 m_tileCount[m_cardToUse] = 0;
@@ -171,7 +194,7 @@ void SmartS3TableturfCloneJelly::runNextState()
             case 12:
             case 11:
             {
-                setState_runCommand("A,1,DUp,1,Loop,10", true);
+                setState_runCommand("A,1,DUp,1,Loop,10,Nothing,20", true);
                 break;
             }
             case 10:
@@ -195,7 +218,7 @@ void SmartS3TableturfCloneJelly::runNextState()
 
                 // move left/right
                 command += (m_turn == 9) ? "DLeft,1," : "DRight,1,";
-                command += "A,1,Loop,5";
+                command += "A,1,Loop,5,Nothing,20";
                 setState_runCommand(command, true);
                 break;
             }
@@ -205,7 +228,7 @@ void SmartS3TableturfCloneJelly::runNextState()
                 command += ",A,1,Loop,5,DUp,1,A,1,Loop," + QString::number(m_upCount + 3);
                 command += ",DDown,1,A,1,Loop," + QString::number(m_upCount + 8);
                 command += (m_turn > 4) ? ",DRight,1" : ",DLeft,1";
-                command += ",A,1,Loop,8";
+                command += ",A,1,Loop,8,Nothing,20";
                 setState_runCommand(command, true);
                 break;
             }
