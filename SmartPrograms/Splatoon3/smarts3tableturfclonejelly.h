@@ -24,11 +24,12 @@ private:
     virtual void reset();
     virtual void runNextState();
 
+    void printTileCounts();
+    bool checkTurnEnd();
+
     // Command indices
     Command const C_GameStart       = 0;
-    Command const C_PlaceCard1      = 1;
-    Command const C_PlaceCard2      = 2;
-    Command const C_COUNT           = 3;
+    Command const C_COUNT           = 1;
 
     // List of test color
     HSVRange const C_Color_CardName = HSVRange(0,0,170,359,60,210); // >180
@@ -58,7 +59,7 @@ private:
         SS_PickCard,
 
         SS_PlaceCard,
-        SS_PlaceCardCheck,
+        SS_CountUp,
         SS_TurnSkip,
 
         SS_CheckWin,
@@ -74,7 +75,7 @@ private:
     QImage m_imageMatchCount[8];
     int m_turn; // turns left
     int m_tileCount[4]; // tile count for each cards
-    int m_placeCardTries;
+    int m_upCount;
     int m_cardToUse;
 
     // Stats

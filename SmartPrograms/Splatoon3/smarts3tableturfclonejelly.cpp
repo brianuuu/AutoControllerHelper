@@ -37,7 +37,7 @@ void SmartS3TableturfCloneJelly::reset()
     m_tileCount[1] = 0;
     m_tileCount[2] = 0;
     m_tileCount[3] = 0;
-    m_placeCardTries = 0;
+    m_upCount = 0;
     m_cardToUse = 0;
 }
 
@@ -66,7 +66,9 @@ void SmartS3TableturfCloneJelly::runNextState()
         {
             if (m_timer.elapsed() >= 60000)
             {
-                setState_error("Unable to detect turn start for too long");
+                emit printLog("Unable to detect turn start for too long", LOG_ERROR);
+                m_substage = SS_Finished;
+                setState_runCommand("Home,1,Nothing,20");
             }
             else
             {
@@ -104,22 +106,20 @@ void SmartS3TableturfCloneJelly::runNextState()
                     {
                         if (checkImageMatchTarget(A_TileCount[i].m_rect, C_Color_TileCount, m_imageMatchCount[i*2], 0.9))
                         {
-                            emit printLog("Card " + QString::number(i) + ": 1 tile");
                             m_tileCount[i] = 1;
                         }
                         else if (checkImageMatchTarget(A_TileCount[i].m_rect, C_Color_TileCount, m_imageMatchCount[i*2+1], 0.9))
                         {
-                            emit printLog("Card " + QString::number(i) + ": 2 tiles");
                             m_tileCount[i] = 2;
                         }
                         else
                         {
                             // assume the card has at least 3 tiles, always usable
-                            emit printLog("Card " + QString::number(i) + ": >2 tiles");
                             m_tileCount[i] = 3;
                         }
                     }
                 }
+                printTileCounts();
 
                 // pick card to use (highest tile count)
                 m_cardToUse = 0;
@@ -133,31 +133,30 @@ void SmartS3TableturfCloneJelly::runNextState()
                     }
                 }
 
-                emit printLog("Picking card " + QString::number(m_cardToUse));
+                emit printLog("Picking card " + QString::number(m_cardToUse + 1));
                 m_substage = SS_PickCard;
                 switch (m_cardToUse)
                 {
                 default:
-                    setState_runCommand("A,1,Nothing,20");
+                    setState_runCommand("A,1");
                     break;
                 case 1:
-                    setState_runCommand("DRight,1,A,1,Nothing,20");
+                    setState_runCommand("DRight,1,A,1");
                     break;
                 case 2:
-                    setState_runCommand("DDown,1,A,1,Nothing,20");
+                    setState_runCommand("DDown,1,A,1");
                     break;
                 case 3:
-                    setState_runCommand("DDown,1,LRight,1,A,1,Nothing,20");
+                    setState_runCommand("DDown,1,LRight,1,A,1");
                     break;
                 }
 
-                m_tileCount[cardToUse] = 0;
-                m_placeCardTries = 0;
+                m_tileCount[m_cardToUse] = 0;
                 m_videoManager->clearCaptures();
             }
             else
             {
-                setState_runCommand(m_substage == SS_TurnWait ? "Nothing,20" : "A,1,Nothing,20");
+                setState_runCommand(m_substage == SS_TurnWait ? "Nothing,10" : "A,1,Nothing,20");
             }
         }
         break;
@@ -166,85 +165,101 @@ void SmartS3TableturfCloneJelly::runNextState()
     {
         if (state == S_CommandFinished)
         {
+            m_substage = SS_PlaceCard;
+            switch (m_turn)
+            {
+            case 12:
+            case 11:
+            {
+                setState_runCommand("A,1,DUp,1,Loop,10", true);
+                break;
+            }
+            case 10:
+            {
+                m_upCount = 2;
+                m_substage = SS_CountUp;
+                setState_runCommand("DUp,1,LUp,1,A,1,Nothing,20");
+                break;
+            }
+            case 9:
+            case 8:
+            {
+                QString command;
+
+                // move up
+                for (int i = 0; i < m_upCount; i++)
+                {
+                    command += (i % 2 == 0) ? "DUp,1," : "LUp,1,";
+                }
+                command += "Loop,1,";
+
+                // move left/right
+                command += (m_turn == 9) ? "DLeft,1," : "DRight,1,";
+                command += "A,1,Loop,5";
+                setState_runCommand(command, true);
+                break;
+            }
+            default:
+            {
+                QString command = (m_turn > 4) ? "DLeft,1" : "DRight,1";
+                command += ",A,1,Loop,5,DUp,1,A,1,Loop," + QString::number(m_upCount + 3);
+                command += ",DDown,1,A,1,Loop," + QString::number(m_upCount + 8);
+                command += (m_turn > 4) ? ",DRight,1" : ",DLeft,1";
+                command += ",A,1,Loop,8";
+                setState_runCommand(command, true);
+                break;
+            }
+            }
+
+            m_timer.restart();
+            m_videoManager->setAreas({A_Button});
+        }
+
+        break;
+    }
+    case SS_CountUp:
+    {
+        if (state == S_CommandFinished)
+        {
             setState_frameAnalyzeRequest();
         }
         else if (state == S_CaptureReady)
         {
-            if (checkBrightnessMeanTarget(A_Button.m_rect, C_Color_Button, 130))
+            if (checkTurnEnd())
             {
-                m_substage = SS_PlaceCard;
-                setState_runCommand(C_PlaceCard1, true);
-
-                m_videoManager->setAreas({A_Button});
+                emit printLog("Up count: " + QString::number(m_upCount));
             }
             else
             {
-                setState_error("Unable to detect rotate buttons");
+                m_upCount++;
+                setState_runCommand("DUp,1,A,1,Nothing,20");
             }
         }
         break;
     }
     case SS_PlaceCard:
-    case SS_PlaceCardCheck:
     {
-        if (state == S_CaptureReady)
+        if (state == S_CommandFinished)
         {
-            if (!checkBrightnessMeanTarget(A_Button.m_rect, C_Color_Button, 130))
-            {
-                m_turn--;
-
-                if (m_turn > 0)
-                {
-                    m_substage = SS_TurnWait;
-                    setState_runCommand("Nothing,20");
-
-                    m_timer.restart();
-                    QVector<CaptureArea> areas = {A_CardName};
-                    for (int i = 0; i < 4; i++)
-                    {
-                        if (m_tileCount[i] == 0)
-                        {
-                            areas.push_back(A_TileCount[i]);
-                            break;
-                        }
-                    }
-                    m_videoManager->setAreas(areas);
-                }
-                else
-                {
-                    emit printLog("Battle finished!");
-
-                    m_turn = 12;
-                    m_tileCount[0] = 0;
-                    m_tileCount[1] = 0;
-                    m_tileCount[2] = 0;
-                    m_tileCount[3] = 0;
-
-                    m_substage = SS_CheckWin;
-                    setState_runCommand("Nothing,20");
-
-                    m_timer.restart();
-                    m_videoManager->setAreas({A_CardName, A_Win, A_TileCount[0], A_TileCount[1], A_TileCount[2], A_TileCount[3]});
-                }
-            }
-            else
-            {
-                if (m_substage == SS_PlaceCardCheck)
-                {
-                    m_substage = SS_PlaceCard;
-                    setState_runCommand(C_PlaceCard2);
-                }
-                else
-                {
-                    setState_frameAnalyzeRequest();
-                }
-            }
+            setState_frameAnalyzeRequest();
         }
-        else if (state == S_CommandFinished)
+        else if (state == S_CaptureReady)
         {
-            m_placeCardTries++;
-            if (m_placeCardTries >= 8)
+            if (m_timer.elapsed() < 3000)
             {
+                // too fast, wait longer
+                setState_frameAnalyzeRequest();
+            }
+            else if (!checkTurnEnd())
+            {
+                if (m_turn > 8)
+                {
+                    emit printLog("Unabled to count up, something went wrong, capture has been taken", LOG_ERROR);
+                    m_substage = SS_Finished;
+                    setState_runCommand("Capture,25,Home,1,Nothing,20");
+                    break;
+                }
+
                 emit printLog("Unable to place card, skipping turn...", LOG_WARNING);
                 m_substage = SS_TurnSkip;
                 switch (m_cardToUse)
@@ -263,11 +278,6 @@ void SmartS3TableturfCloneJelly::runNextState()
                     break;
                 }
             }
-            else
-            {
-                m_substage = SS_PlaceCardCheck;
-                setState_frameAnalyzeRequest();
-            }
         }
         break;
     }
@@ -275,8 +285,16 @@ void SmartS3TableturfCloneJelly::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            m_substage = SS_PlaceCard;
             setState_frameAnalyzeRequest();
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (!checkTurnEnd())
+            {
+                emit printLog("Unable to skip turn, something went wrong, capture has been taken", LOG_ERROR);
+                m_substage = SS_Finished;
+                setState_runCommand("Capture,25,Home,1,Nothing,20");
+            }
         }
         break;
     }
@@ -291,5 +309,74 @@ void SmartS3TableturfCloneJelly::runNextState()
     }
 
     SmartProgramBase::runNextState();
+}
+
+void SmartS3TableturfCloneJelly::printTileCounts()
+{
+    QString str = "Tile Counts: ";
+    for (int i = 0; i < 4; i++)
+    {
+        if (m_tileCount[i] > 2)
+        {
+            str += "2+";
+        }
+        else
+        {
+            str += QString::number(m_tileCount[i]);
+        }
+
+        if (i < 3)
+        {
+            str += ", ";
+        }
+    }
+
+    emit printLog(str);
+}
+
+bool SmartS3TableturfCloneJelly::checkTurnEnd()
+{
+    if (!checkBrightnessMeanTarget(A_Button.m_rect, C_Color_Button, 130))
+    {
+        m_turn--;
+
+        if (m_turn > 0)
+        {
+            m_substage = SS_TurnWait;
+            setState_runCommand("Nothing,20");
+
+            m_timer.restart();
+            QVector<CaptureArea> areas = {A_CardName};
+            for (int i = 0; i < 4; i++)
+            {
+                if (m_tileCount[i] == 0)
+                {
+                    areas.push_back(A_TileCount[i]);
+                    break;
+                }
+            }
+            m_videoManager->setAreas(areas);
+        }
+        else
+        {
+            emit printLog("Battle finished!");
+
+            m_turn = 12;
+            m_tileCount[0] = 0;
+            m_tileCount[1] = 0;
+            m_tileCount[2] = 0;
+            m_tileCount[3] = 0;
+
+            m_substage = SS_CheckWin;
+            setState_runCommand("Nothing,20");
+
+            m_timer.restart();
+            m_videoManager->setAreas({A_CardName, A_Win, A_TileCount[0], A_TileCount[1], A_TileCount[2], A_TileCount[3]});
+        }
+
+        return true;
+    }
+
+    return false;
 }
 
