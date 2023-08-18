@@ -79,6 +79,10 @@ private:
     int m_upCount;
     int m_cardToUse;
 
+    qint64 m_startTimeStamp;
+    int m_winCount;
+    int m_battleCount;
+
     // Stats
     Stat m_statWins;
     Stat m_statBattles;

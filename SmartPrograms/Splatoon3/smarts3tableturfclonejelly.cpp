@@ -39,6 +39,10 @@ void SmartS3TableturfCloneJelly::reset()
     m_tileCount[3] = 0;
     m_upCount = 0;
     m_cardToUse = 0;
+
+    m_startTimeStamp = QDateTime::currentSecsSinceEpoch();
+    m_winCount = 0;
+    m_battleCount = 0;
 }
 
 void SmartS3TableturfCloneJelly::runNextState()
@@ -81,9 +85,11 @@ void SmartS3TableturfCloneJelly::runNextState()
             {
                 if (checkBrightnessMeanTarget(A_Win.m_rect, C_Color_Win, 180))
                 {
+                    emit printLog("You won!", LOG_SUCCESS);
+
                     m_substage = SS_GameStart;
                     incrementStat(m_statWins);
-                    emit printLog("You won!", LOG_SUCCESS);
+                    m_winCount++;
 
                     m_videoManager->setAreas({A_CardName, A_TileCount[0], A_TileCount[1], A_TileCount[2], A_TileCount[3]});
                 }
@@ -93,7 +99,17 @@ void SmartS3TableturfCloneJelly::runNextState()
             {
                 if (m_substage != SS_TurnWait)
                 {
+                    if (m_battleCount > 0)
+                    {
+                        QString str = "Runtime: " + QString::number(QDateTime::currentSecsSinceEpoch() - m_startTimeStamp);
+                        str += "s, EXP gained: " + QString::number(m_winCount * 100 + (m_battleCount- m_winCount) * 40);
+                        str += " (" + QString::number(m_winCount) + "/" + QString::number(m_battleCount) + ")";
+                        emit printLog(str);
+                    }
+
                     incrementStat(m_statBattles);
+                    m_battleCount++;
+
                     emit printLog("-----------Battle " + QString::number(m_statBattles.first) + " started!-----------");
                 }
 
