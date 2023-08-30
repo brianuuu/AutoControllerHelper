@@ -520,7 +520,8 @@ void RemoteControllerWindow::PrintLog(const QString &log, QColor color)
     // Clear if there are too many logs
     if (m_logCount >= 5000)
     {
-        on_PB_ClearLog_clicked();
+        m_logCount = 0;
+        ui->TB_Log->clear();
     }
 }
 
