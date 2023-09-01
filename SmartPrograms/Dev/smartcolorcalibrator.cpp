@@ -67,7 +67,7 @@ void SmartColorCalibrator::runNextState()
     SmartProgramBase::runNextState();
 }
 
-void SmartColorCalibrator::testColor(const CapturePoint &cp, const SmartProgramBase::HSVRange &range, QLabel *label)
+void SmartColorCalibrator::testColor(const CapturePoint &cp, const HSVRange &range, QLabel *label)
 {
     QColor color = m_capture.pixelColor(cp.m_point);
     QColor hsv = color.toHsv();

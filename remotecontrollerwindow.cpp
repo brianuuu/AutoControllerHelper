@@ -1,5 +1,6 @@
 #include "remotecontrollerwindow.h"
 #include "ui_remotecontrollerwindow.h"
+#include "SmartPrograms/Splatoon3/tableturfai.h"
 
 RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     QWidget(parent),
@@ -308,6 +309,11 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     ui->SP19_SB_Width->setRange(1, screenSize.width());
     ui->SP19_SB_Height->setRange(1, screenSize.height());
     ui->SP19_LE_Code->setMaxLength(ui->SP19_SP_Count->value());
+
+    TableTurfAI ai;
+    QImage img;
+    img.load(QString(SCREENSHOT_PATH) + "2023-08-31_23-14-12_screenshot.png", "PNG");
+    ai.UpdateFrame(img);
 }
 
 RemoteControllerWindow::~RemoteControllerWindow()

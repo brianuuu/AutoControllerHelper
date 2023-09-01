@@ -61,6 +61,7 @@ SOURCES += \
     SmartPrograms/PokemonSwSh/smartwattfarmer.cpp \
     SmartPrograms/PokemonSwSh/smartycommglitch.cpp \
     SmartPrograms/Splatoon3/smarts3tableturfclonejelly.cpp \
+    SmartPrograms/Splatoon3/tableturfai.cpp \
     SmartPrograms/Widgets/pokemonautofilllineedit.cpp \
     SmartPrograms/Widgets/pokemonstattablewidget.cpp \
     SmartPrograms/Widgets/selectorwidget.cpp \
@@ -119,6 +120,7 @@ HEADERS += \
     SmartPrograms/PokemonSwSh/smartwattfarmer.h \
     SmartPrograms/PokemonSwSh/smartycommglitch.h \
     SmartPrograms/Splatoon3/smarts3tableturfclonejelly.h \
+    SmartPrograms/Splatoon3/tableturfai.h \
     SmartPrograms/Widgets/pokemonautofilllineedit.h \
     SmartPrograms/Widgets/pokemonstattablewidget.h \
     SmartPrograms/Widgets/selectorwidget.h \
