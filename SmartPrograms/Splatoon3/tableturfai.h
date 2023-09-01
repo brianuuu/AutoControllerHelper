@@ -35,10 +35,14 @@ private:
 
         void Reset();
         void Rotate(bool clockwise);
+        void UpdateRect();
 
         bool m_init;
         bool m_usable;
+
         QPoint m_center;
+        QRect m_rect; // top left and size
+
         int m_tileCount;
         GridType m_tile[CARD_SIZE][CARD_SIZE];
     };
@@ -49,6 +53,9 @@ private:
 
     void AnalysisHands();
     bool UpdateCardTile(QRect rect, GridType& tileType);
+
+    void TestPlacement(Card card, bool isSpecial);
+    bool TestPlacementOnPoint(Card const& card, QPoint cursorPoint, bool isSpecial);
 
     void ExportBoard();
     void ExportCards();
@@ -62,6 +69,8 @@ private:
     #define BOARD_SIZE_Y 26
     #define BOARD_TILE_SIZE 25
     GridType m_board[BOARD_SIZE_X][BOARD_SIZE_Y];
+    QRect m_boardRect;
+
     Card m_cards[4];
     int m_spCount;
 

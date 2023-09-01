@@ -14,6 +14,7 @@ void TableTurfAI::Restart()
             m_board[x][y] = GT_Empty;
         }
     }
+    m_boardRect = QRect();
 
     for (int i = 0; i < 4; i++)
     {
@@ -28,22 +29,36 @@ void TableTurfAI::UpdateFrame(const QImage &image)
     m_frame = image;
 
     AnalysisBoard();
-    ExportBoard();
+    //ExportBoard();
 
     AnalysisHands();
-    ExportCards();
+    //ExportCards();
+
+    TestPlacement(m_cards[2], false);
 }
 
 void TableTurfAI::AnalysisBoard()
 {
+    m_boardRect = QRect(4,22,1,1);
     for (int y = 0; y < BOARD_SIZE_Y; y++)
     {
         QPointF topLeft = c_boardTopLefts[y];
         for (int x = 0; x < BOARD_SIZE_X; x++)
         {
             QRect rect = QRect(topLeft.toPoint(), QSize(BOARD_TILE_SIZE, BOARD_TILE_SIZE));
-            if (!UpdateBoardTile(rect, m_board[x][y]))
+            if (UpdateBoardTile(rect, m_board[x][y]))
             {
+                if (m_board[x][y] == GT_InkOrange)
+                {
+                    m_boardRect.setTop(qMin(y, m_boardRect.top()));
+                    m_boardRect.setLeft(qMin(x, m_boardRect.left()));
+                    m_boardRect.setBottom(qMax(y, m_boardRect.bottom()));
+                    m_boardRect.setRight(qMax(x, m_boardRect.right()));
+                }
+            }
+            else
+            {
+                m_board[x][y] = GT_Neutral;
                 qDebug() << "ERROR DETECTING TILE(" << x << "," << y << ")";
             }
 
@@ -117,7 +132,7 @@ void TableTurfAI::AnalysisHands()
 
         if (!m_cards[i].m_usable)
         {
-            // unsable card won't become usable
+            // unusable card won't become usable
         }
 
         QPointF topLeft = c_handTopLefts[i];
@@ -160,6 +175,8 @@ void TableTurfAI::AnalysisHands()
             qDebug() << "ERROR DETECTING ANY TILE FOR CARD" << i;
             m_cards[i].m_usable = false;
         }
+
+        m_cards[i].UpdateRect();
     }
 }
 
@@ -179,6 +196,90 @@ bool TableTurfAI::UpdateCardTile(QRect rect, TableTurfAI::GridType &tileType)
 
     tileType = GT_Empty;
     return false;
+}
+
+void TableTurfAI::TestPlacement(TableTurfAI::Card card, bool isSpecial)
+{
+    int cardHalfLeft = card.m_center.x() - card.m_rect.left();
+    int cardHalfRight = card.m_rect.right() - card.m_center.x();
+    int cardHalfTop = card.m_center.y() - card.m_rect.top();
+    int cardHalfBottom = card.m_rect.bottom() - card.m_center.y();
+
+    int boardXMin = qMax(cardHalfLeft, m_boardRect.left() - cardHalfRight - 1);
+    int boardXMax = qMin(BOARD_SIZE_X - 1 - cardHalfRight, m_boardRect.right() + cardHalfLeft + 1);
+    int boardYMin = qMax(cardHalfTop, m_boardRect.top() - cardHalfBottom - 1);
+    int boardYMax = qMin(BOARD_SIZE_Y - 1 - cardHalfBottom, m_boardRect.bottom() + cardHalfTop + 1);
+
+    // start from bottom to top
+    for (int y = boardYMax; y >= boardYMin; y--)
+    {
+        for (int x = boardXMax; x >= boardXMin; x--)
+        {
+            QPoint cursorPoint(x,y);
+            if (TestPlacementOnPoint(card, cursorPoint, isSpecial))
+            {
+                qDebug() << cursorPoint;
+            }
+        }
+    }
+
+    // TODO: return some results?
+}
+
+bool TableTurfAI::TestPlacementOnPoint(const TableTurfAI::Card &card, QPoint cursorPoint, bool isSpecial)
+{
+    bool isNextToOrangeTile = false;
+    for (int cy = card.m_rect.top(); cy <= card.m_rect.bottom(); cy++)
+    {
+        for (int cx = card.m_rect.left(); cx <= card.m_rect.right(); cx++)
+        {
+            if (card.m_tile[cx][cy] == GT_Empty)
+            {
+                // empty tile on card
+                continue;
+            }
+
+            QPoint tilePoint(cursorPoint.x() - (card.m_center.x() - cx), cursorPoint.y() - (card.m_center.y() - cy));
+            GridType const& boardTileType = m_board[tilePoint.x()][tilePoint.y()];
+            if (boardTileType != GT_Empty)
+            {
+                // overlapping
+                if (!isSpecial)
+                {
+                    return false;
+                }
+
+                // special ignore normal tiles
+                if (isSpecial && boardTileType != GT_InkOrange && boardTileType != GT_InkBlue)
+                {
+                    return false;
+                }
+            }
+
+            // test if there is any orange tile around
+            auto nearbyTest = [this, &isSpecial] (int x, int y) -> bool
+            {
+                bool result = m_board[x][y] == GT_InkOrangeSp;
+                if (!isSpecial)
+                {
+                    result |= m_board[x][y] == GT_InkOrange;
+                }
+                return result;
+            };
+
+            isNextToOrangeTile |=
+                    nearbyTest(tilePoint.x() - 1,   tilePoint.y() - 1)  ||
+                    nearbyTest(tilePoint.x(),       tilePoint.y() - 1)  ||
+                    nearbyTest(tilePoint.x() + 1,   tilePoint.y() - 1)  ||
+                    nearbyTest(tilePoint.x() - 1,   tilePoint.y())      ||
+                    nearbyTest(tilePoint.x() + 1,   tilePoint.y())      ||
+                    nearbyTest(tilePoint.x() - 1,   tilePoint.y() + 1)  ||
+                    nearbyTest(tilePoint.x(),       tilePoint.y() + 1)  ||
+                    nearbyTest(tilePoint.x() + 1,   tilePoint.y() + 1);
+        }
+    }
+
+    return isNextToOrangeTile;
 }
 
 void TableTurfAI::ExportBoard()
@@ -276,6 +377,7 @@ void TableTurfAI::Card::Reset()
     m_init = false;
     m_usable = true;
     m_center = QPoint(3,3);
+    m_rect = QRect();
     m_tileCount = 0;
     for (int y = 0; y < CARD_SIZE; y++)
     {
@@ -330,4 +432,35 @@ void TableTurfAI::Card::Rotate(bool clockwise)
             }
         }
     }
+
+    UpdateRect();
+}
+
+void TableTurfAI::Card::UpdateRect()
+{
+    if (m_tileCount == 0)
+    {
+        return;
+    }
+
+    int cardXMin = CARD_SIZE;
+    int cardXMax = -1;
+    int cardYMin = CARD_SIZE;
+    int cardYMax = -1;
+
+    for (int y = 0; y < CARD_SIZE; y++)
+    {
+        for (int x = 0; x < CARD_SIZE; x++)
+        {
+            if (m_tile[x][y] != GT_Empty)
+            {
+                cardXMin = qMin(x, cardXMin);
+                cardXMax = qMax(x, cardXMax);
+                cardYMin = qMin(y, cardYMin);
+                cardYMax = qMax(y, cardYMax);
+            }
+        }
+    }
+
+    m_rect = QRect(QPoint(cardXMin,cardYMin), QPoint(cardXMax,cardYMax));
 }
