@@ -102,6 +102,30 @@ struct SmartProgramParameter
     {}
 };
 
+// Capture analysis
+struct HSVRange
+{
+    HSVRange(int minH, int minS, int minV, int maxH, int maxS, int maxV)
+    {
+        m_minHSV.setHsv(minH,minS,minV);
+        m_maxHSV.setHsv(maxH,maxS,maxV);
+    }
+    HSVRange(QColor minHSV, QColor maxHSV)
+    {
+        Q_ASSERT(minHSV.spec() == QColor::Hsv);
+        Q_ASSERT(maxHSV.spec() == QColor::Hsv);
+        m_minHSV = minHSV;
+        m_maxHSV = maxHSV;
+    }
+
+    QColor min() const {return m_minHSV;}
+    QColor max() const {return m_maxHSV;}
+
+private:
+    QColor m_minHSV;
+    QColor m_maxHSV;
+};
+
 class SmartProgramBase : public QWidget
 {
     Q_OBJECT
@@ -411,6 +435,9 @@ public:
 
     static bool validateCommand(QString const& commands, QString& errorMsg);
 
+    static bool checkColorMatch(QColor testColor, QColor targetColor, int threshold = 10);
+    static bool checkColorMatchHSV(QColor testColor, HSVRange hsvRange);
+
 signals:
     void printLog(QString const log, QColor color = QColor(0,0,0));
     void completed();
@@ -432,33 +459,7 @@ protected:
     void runNextStateContinue() { m_runNextState = true; }
     void runNextStateDelay(int milliseconds = 1000);
 
-    // Capture analysis
-    struct HSVRange
-    {
-        HSVRange(int minH, int minS, int minV, int maxH, int maxS, int maxV)
-        {
-            m_minHSV.setHsv(minH,minS,minV);
-            m_maxHSV.setHsv(maxH,maxS,maxV);
-        }
-        HSVRange(QColor minHSV, QColor maxHSV)
-        {
-            Q_ASSERT(minHSV.spec() == QColor::Hsv);
-            Q_ASSERT(maxHSV.spec() == QColor::Hsv);
-            m_minHSV = minHSV;
-            m_maxHSV = maxHSV;
-        }
-
-        QColor min() const {return m_minHSV;}
-        QColor max() const {return m_maxHSV;}
-
-    private:
-        QColor m_minHSV;
-        QColor m_maxHSV;
-    };
-
     // Single pixcel color
-    bool checkColorMatch(QColor testColor, QColor targetColor, int threshold = 10);
-    bool checkColorMatchHSV(QColor testColor, HSVRange hsvRange);
     bool checkPixelColorMatch(QPoint pixelPos, QColor targetColor, int threshold = 10);
 
     // Average color in area

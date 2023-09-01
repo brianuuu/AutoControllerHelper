@@ -254,7 +254,7 @@ double SmartProgramBase::getBrightnessMean(QRect rectPos, HSVRange hsvRange)
     return mean;
 }
 
-bool SmartProgramBase::checkBrightnessMeanTarget(QRect rectPos, SmartProgramBase::HSVRange hsvRange, double target)
+bool SmartProgramBase::checkBrightnessMeanTarget(QRect rectPos, HSVRange hsvRange, double target)
 {
     // m_frameAnalyze must be ready before calling this!
     Q_ASSERT(m_state == S_CaptureReady);
@@ -276,7 +276,7 @@ bool SmartProgramBase::checkBrightnessMeanTarget(QRect rectPos, SmartProgramBase
     return success;
 }
 
-QImage SmartProgramBase::getMonochromeImage(QRect rectPos, SmartProgramBase::HSVRange hsvRange, bool whiteIsOne)
+QImage SmartProgramBase::getMonochromeImage(QRect rectPos, HSVRange hsvRange, bool whiteIsOne)
 {
     QImage cropped = m_capture.copy(rectPos);
     QImage masked = QImage(cropped.size(), QImage::Format_MonoLSB);
@@ -353,7 +353,7 @@ double SmartProgramBase::getImageSimilarRatio(const QImage &query, const QImage 
     return (hitCount - missCount) / count;
 }
 
-double SmartProgramBase::getImageMatch(QRect rectPos, SmartProgramBase::HSVRange hsvRange, const QImage &testImage)
+double SmartProgramBase::getImageMatch(QRect rectPos, HSVRange hsvRange, const QImage &testImage)
 {
     // m_frameAnalyze must be ready before calling this!
     Q_ASSERT(m_state == S_CaptureReady);
@@ -379,7 +379,7 @@ double SmartProgramBase::getImageMatch(QRect rectPos, SmartProgramBase::HSVRange
     return (sqd + sdq) / 2;
 }
 
-bool SmartProgramBase::checkImageMatchTarget(QRect rectPos, SmartProgramBase::HSVRange hsvRange, const QImage &testImage, double target, QPoint* offset)
+bool SmartProgramBase::checkImageMatchTarget(QRect rectPos, HSVRange hsvRange, const QImage &testImage, double target, QPoint* offset)
 {
     // m_frameAnalyze must be ready before calling this!
     Q_ASSERT(m_state == S_CaptureReady);
@@ -678,7 +678,7 @@ void SmartProgramBase::runStateLoop()
     }
 }
 
-bool SmartProgramBase::startOCR(QRect rectPos, SmartProgramBase::HSVRange hsvRange, bool isNumber)
+bool SmartProgramBase::startOCR(QRect rectPos, HSVRange hsvRange, bool isNumber)
 {
     // Get filtered image, flip black/white since black text detects better
     if (m_ocrCustomImage)
