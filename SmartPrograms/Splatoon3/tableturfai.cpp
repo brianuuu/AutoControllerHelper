@@ -29,12 +29,141 @@ void TableTurfAI::UpdateFrame(const QImage &image)
     m_frame = image;
 
     AnalysisBoard();
-    //ExportBoard();
-
     AnalysisHands();
-    //ExportCards();
+    AnalysisSpecial();
 
-    TestPlacement(m_cards[2], false);
+    //ExportBoard();
+    //ExportCards();
+}
+
+int TableTurfAI::GetCardTileCount(int index)
+{
+    return m_cards[index].m_tileCount;
+}
+
+QVector<int> TableTurfAI::GetCardTileCounts()
+{
+    return { m_cards[0].m_tileCount, m_cards[1].m_tileCount, m_cards[2].m_tileCount, m_cards[3].m_tileCount };
+}
+
+QString TableTurfAI::GetNextMove(int& o_index, int turn, bool failedLast, int preferredCard)
+{
+    // TODO: send this to a thread
+    if (!failedLast)
+    {
+        m_placementResults.clear();
+        switch (m_mode)
+        {
+        case Mode::None:
+        case Mode::SkipTurns:
+        {
+            // nothing to do
+            break;
+        }
+        case Mode::LeastMoves:
+        case Mode::NoOneTwoTile:
+        {
+            DoPlacement_LeastMoves(preferredCard);
+            break;
+        }
+        }
+    }
+
+    if (m_placementResults.empty())
+    {
+        int index = 0;
+        if (m_mode != Mode::SkipTurns)
+        {
+            // don't want to place any card, skip card with least tiles
+            int lowestTileCount = INT_MAX;
+            for (int i = 0; i < 4; i++)
+            {
+                if (m_cards[i].m_tileCount < lowestTileCount)
+                {
+                    index = i;
+                    lowestTileCount = m_cards[i].m_tileCount;
+                }
+            }
+        }
+
+        switch (index)
+        {
+        default:
+            return "DUp,1,A,1,Nothing,2,A,1,Nothing,20";
+        case 1:
+            return "DUp,1,A,1,Nothing,2,DRight,1,A,1,Nothing,20";
+        case 2:
+            return "DUp,1,A,1,Nothing,2,DDown,1,A,1,Nothing,20";
+        case 3:
+            return "DUp,1,A,1,Nothing,2,DDown,1,LRight,1,A,1,Nothing,20";
+        }
+    }
+    else
+    {
+        // in case command fails, we can go back here to pick next best
+        std::sort(m_placementResults.begin(), m_placementResults.end(),
+            [](PlacementResult const& a, PlacementResult const& b)
+            {
+                return a.m_score > b.m_score;
+            }
+        );
+
+        // TODO: enable special
+        PlacementResult const& best = m_placementResults[0];
+        o_index = best.m_cardIndex;
+        qDebug() << "Target cursor:" << best.m_cursorPoint;
+        qDebug() << "Score:" << best.m_score;
+
+        QString command;
+        if (best.m_cardIndex % 2 == 1) // 1 or 3
+        {
+            command += "DRight,1,";
+        }
+        if (best.m_cardIndex >= 2) // 2 or 3
+        {
+            command += "LDown,1,";
+        }
+        command += "A,1,Nothing,1,Loop,1,";
+
+        // TODO: default cursor pos change if failed last time
+        int xCount = 4 - best.m_cursorPoint.x();
+        if (xCount != 0)
+        {
+            command += (xCount > 0 ? "DLeft" : "DRight");
+            command += ",1,Nothing,1,Loop," + QString::number(qAbs(xCount)) + ",";
+        }
+
+        int yCount = 22 - best.m_cursorPoint.y();
+        if (yCount != 0)
+        {
+            command += (yCount > 0 ? "DUp" : "DDown");
+            command += ",1,Nothing,1,Loop," + QString::number(qAbs(yCount)) + ",";
+        }
+
+        m_placementResults.pop_front();
+        command += "A,1,Nothing,20";
+        return command;
+    }
+}
+
+void TableTurfAI::DoPlacement_LeastMoves(int preferredCard)
+{
+    for (int i = 0; i < 4; i++)
+    {
+        if (preferredCard != -1 && i != preferredCard)
+        {
+            // not preferred card
+            continue;
+        }
+
+        if (m_mode == Mode::NoOneTwoTile && m_cards[i].m_tileCount <= 2)
+        {
+            // this strat won't use any 1/2 tile cards
+            continue;
+        }
+
+        TestPlacement(i, false);
+    }
 }
 
 void TableTurfAI::AnalysisBoard()
@@ -135,6 +264,7 @@ void TableTurfAI::AnalysisHands()
             // unusable card won't become usable
         }
 
+        m_cards[i].m_tileCount = 0;
         QPointF topLeft = c_handTopLefts[i];
         QPointF offset = QPointF(0,0);
         for (int y = 0; y < CARD_SIZE; y++)
@@ -176,7 +306,7 @@ void TableTurfAI::AnalysisHands()
             m_cards[i].m_usable = false;
         }
 
-        m_cards[i].UpdateRect();
+        m_cards[i].UpdateRectCenter();
     }
 }
 
@@ -198,8 +328,30 @@ bool TableTurfAI::UpdateCardTile(QRect rect, TableTurfAI::GridType &tileType)
     return false;
 }
 
-void TableTurfAI::TestPlacement(TableTurfAI::Card card, bool isSpecial)
+void TableTurfAI::AnalysisSpecial()
 {
+    m_spCount = 0;
+    QPointF topLeft = c_specialTopLeft;
+    for (int i = 0; i < SPECIAL_COUNT; i++)
+    {
+        QRect rect = QRect(topLeft.toPoint(), QSize(SPECIAL_TILE_SIZE, SPECIAL_TILE_SIZE));
+        if (GetColorPixelRadio(rect, c_hsvInkOrangeSp) > c_colorPixelRatio)
+        {
+            m_spCount++;
+        }
+
+        topLeft.rx() += c_specialStepX;
+    }
+}
+
+void TableTurfAI::TestPlacement(int cardIndex, bool isSpecial)
+{
+    // TODO: some flag can stop card from being used
+    // TODO: rotation flag
+
+    Card const& card = m_cards[cardIndex];
+    PlacementResult result;
+
     int cardHalfLeft = card.m_center.x() - card.m_rect.left();
     int cardHalfRight = card.m_rect.right() - card.m_center.x();
     int cardHalfTop = card.m_center.y() - card.m_rect.top();
@@ -218,12 +370,30 @@ void TableTurfAI::TestPlacement(TableTurfAI::Card card, bool isSpecial)
             QPoint cursorPoint(x,y);
             if (TestPlacementOnPoint(card, cursorPoint, isSpecial))
             {
-                qDebug() << cursorPoint;
+                result.m_cardIndex = cardIndex;
+                result.m_cursorPoint = cursorPoint;
+
+                switch (m_mode)
+                {
+                case Mode::LeastMoves:
+                case Mode::NoOneTwoTile:
+                {
+                    // rank base on number of moves
+                    result.m_score = 1000;
+                    result.m_score -= qAbs(cursorPoint.x() - 4);
+                    result.m_score -= qAbs(cursorPoint.y() - 22);
+                    break;
+                }
+                default:
+                {
+                    break;
+                }
+                }
+
+                m_placementResults.push_back(result);
             }
         }
     }
-
-    // TODO: return some results?
 }
 
 bool TableTurfAI::TestPlacementOnPoint(const TableTurfAI::Card &card, QPoint cursorPoint, bool isSpecial)
@@ -390,21 +560,17 @@ void TableTurfAI::Card::Reset()
 
 void TableTurfAI::Card::Rotate(bool clockwise)
 {
-    if (m_center == QPoint(3,3))
+    // rotation center
+    QPoint tempCenter = m_center;
+    if (clockwise)
     {
-        m_center = clockwise ? QPoint(4,3) : QPoint(3,4);
-    }
-    else if (m_center == QPoint(4,3))
-    {
-        m_center = clockwise ? QPoint(4,4) : QPoint(3,3);
-    }
-    else if (m_center == QPoint(4,4))
-    {
-        m_center = clockwise ? QPoint(3,4) : QPoint(4,3);
+        m_center.setX(CARD_SIZE - tempCenter.y() - 1);
+        m_center.setY(tempCenter.x());
     }
     else
     {
-        m_center = clockwise ? QPoint(3,3) : QPoint(4,4);
+        m_center.setX(tempCenter.y());
+        m_center.setY(CARD_SIZE - tempCenter.x() - 1);
     }
 
     // copy to temp
@@ -433,10 +599,10 @@ void TableTurfAI::Card::Rotate(bool clockwise)
         }
     }
 
-    UpdateRect();
+    UpdateRectCenter();
 }
 
-void TableTurfAI::Card::UpdateRect()
+void TableTurfAI::Card::UpdateRectCenter()
 {
     if (m_tileCount == 0)
     {
@@ -463,4 +629,5 @@ void TableTurfAI::Card::UpdateRect()
     }
 
     m_rect = QRect(QPoint(cardXMin,cardYMin), QPoint(cardXMax,cardYMax));
+    m_center = QPoint(cardXMin + ((m_rect.width() - 1)/2), cardYMin + (m_rect.height()/2));
 }

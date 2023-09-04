@@ -16,6 +16,22 @@ public:
     void Restart();
     void UpdateFrame(QImage const& image);
 
+    enum class Mode
+    {
+        None,
+        SkipTurns,
+        LeastMoves,
+        NoOneTwoTile,
+    };
+    void SetMode(Mode mode) { m_mode = mode; }
+
+    // TODO: flags, don't use <tile count, allow rotation
+
+    int GetCardTileCount(int index);
+    QVector<int> GetCardTileCounts();
+
+    QString GetNextMove(int &o_index, int turn, bool failedLast = false, int preferredCard = -1);
+
 private:
     enum GridType : uint8_t
     {
@@ -35,7 +51,7 @@ private:
 
         void Reset();
         void Rotate(bool clockwise);
-        void UpdateRect();
+        void UpdateRectCenter();
 
         bool m_init;
         bool m_usable;
@@ -54,7 +70,27 @@ private:
     void AnalysisHands();
     bool UpdateCardTile(QRect rect, GridType& tileType);
 
-    void TestPlacement(Card card, bool isSpecial);
+    void AnalysisSpecial();
+
+    struct PlacementResult
+    {
+        PlacementResult()
+            : m_cardIndex(-1)
+            , m_rotationCount(0)
+            , m_cursorPoint(4,22)
+            , m_score(0)
+        {}
+
+        int m_cardIndex;
+        int m_rotationCount;
+        QPoint m_cursorPoint;
+
+        int m_score;
+    };
+
+    void DoPlacement_LeastMoves(int preferredCard = -1);
+
+    void TestPlacement(int cardIndex, bool isSpecial);
     bool TestPlacementOnPoint(Card const& card, QPoint cursorPoint, bool isSpecial);
 
     void ExportBoard();
@@ -63,6 +99,7 @@ private:
     qreal GetColorPixelRadio(QRect rect, HSVRange hsvRange);
 
 private:
+    Mode m_mode;
     QImage m_frame;
 
     #define BOARD_SIZE_X 9
@@ -71,7 +108,13 @@ private:
     GridType m_board[BOARD_SIZE_X][BOARD_SIZE_Y];
     QRect m_boardRect;
 
+    QVector<PlacementResult> m_placementResults;
     Card m_cards[4];
+
+    #define SPECIAL_COUNT 5
+    #define SPECIAL_TILE_SIZE 20
+    qreal const c_specialStepX = 21.5;
+    QPointF const c_specialTopLeft = QPointF(37,654);
     int m_spCount;
 
     HSVRange const c_hsvEmpty = HSVRange(0,0,0,359,255,40);

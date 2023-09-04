@@ -2,14 +2,17 @@
 #define SMARTS3TABLETURFCLONEJELLY_H
 
 #include <QElapsedTimer>
+#include <QThread>
 #include <QWidget>
 #include "../smartprogrambase.h"
+#include "tableturfai.h"
 
 class SmartS3TableturfCloneJelly : public SmartProgramBase
 {
 public:
     struct Settings
     {
+        TableTurfAI::Mode m_mode;
     };
 
     explicit SmartS3TableturfCloneJelly(
@@ -83,9 +86,13 @@ private:
     int m_winCount;
     int m_battleCount;
 
+    QThread m_aiThread;
+    TableTurfAI m_ai;
+
     // Stats
     Stat m_statWins;
     Stat m_statBattles;
+    Stat m_statErrors;
 };
 
 #endif // SMARTS3TABLETURFCLONEJELLY_H
