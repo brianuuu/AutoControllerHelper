@@ -3,6 +3,7 @@
 
 #include <QElapsedTimer>
 #include <QThread>
+#include <QtConcurrent>
 #include <QWidget>
 #include "../smartprogrambase.h"
 #include "tableturfai.h"
@@ -21,6 +22,9 @@ public:
             );
 
     virtual SmartProgram getProgramEnum() { return SP_S3_TableturfCloneJelly; }
+
+private slots:
+    void CalculateNextMoveCompleted();
 
 private:
     virtual void init();
@@ -60,6 +64,7 @@ private:
         SS_GameStart,
         SS_TurnWait,
         SS_PickCard,
+        SS_GetNextMove,
 
         SS_PlaceCard,
         SS_PlaceCardEnd,
@@ -86,7 +91,6 @@ private:
     int m_winCount;
     int m_battleCount;
 
-    QThread m_aiThread;
     TableTurfAI m_ai;
 
     // Stats

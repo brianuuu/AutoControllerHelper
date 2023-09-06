@@ -11,6 +11,11 @@ SmartS3TableturfCloneJelly::SmartS3TableturfCloneJelly
     init();
 }
 
+void SmartS3TableturfCloneJelly::CalculateNextMoveCompleted()
+{
+    runNextStateContinue();
+}
+
 void SmartS3TableturfCloneJelly::init()
 {
     SmartProgramBase::init();
@@ -44,8 +49,8 @@ void SmartS3TableturfCloneJelly::reset()
     m_winCount = 0;
     m_battleCount = 0;
 
-    //m_ai.moveToThread(&m_aiThread);
     m_ai.SetMode(m_programSettings.m_mode);
+    connect(&m_ai, &TableTurfAI::CalculateNextMoveCompleted, this, &SmartS3TableturfCloneJelly::CalculateNextMoveCompleted);
 }
 
 void SmartS3TableturfCloneJelly::runNextState()
@@ -62,7 +67,6 @@ void SmartS3TableturfCloneJelly::runNextState()
         m_substage = SS_GameStart;
         setState_runCommand(C_GameStart);
 
-        m_aiThread.start();
         m_timer.restart();
         m_videoManager->setAreas({A_CardName, A_TileCount[0], A_TileCount[1], A_TileCount[2], A_TileCount[3]});
         break;
@@ -212,9 +216,9 @@ void SmartS3TableturfCloneJelly::runNextState()
                         m_tileCount[i] = m_ai.GetCardTileCount(i);
                     }
 
-                    // TODO: thread?
-                    m_substage = SS_PlaceCard;
-                    setState_runCommand(m_ai.GetNextMove(m_cardToUse, m_turn));
+                    // run calculation in a thread, wait for it to finish
+                    QtConcurrent::run(&m_ai, &TableTurfAI::CalculateNextMove, m_turn);
+                    m_substage = SS_GetNextMove;
                 }
 
                 m_videoManager->clearCaptures();
@@ -224,6 +228,13 @@ void SmartS3TableturfCloneJelly::runNextState()
                 setState_runCommand(m_substage == SS_TurnWait ? "Nothing,10" : "A,1,Nothing,20");
             }
         }
+        break;
+    }
+    case SS_GetNextMove:
+    {
+        setState_runCommand(m_ai.GetNextMove());
+        m_cardToUse = m_ai.GetNextCard();
+        m_substage = SS_PlaceCard;
         break;
     }
     case SS_PickCard:

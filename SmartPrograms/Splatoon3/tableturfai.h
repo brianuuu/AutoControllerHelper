@@ -30,7 +30,12 @@ public:
     int GetCardTileCount(int index);
     QVector<int> GetCardTileCounts();
 
-    QString GetNextMove(int &o_index, int turn, bool failedLast = false, int preferredCard = -1);
+    void CalculateNextMove(int turn);
+    QString GetNextMove(bool failedLast = false);
+    int GetNextCard();
+
+signals:
+    void CalculateNextMoveCompleted();
 
 private:
     enum GridType : uint8_t

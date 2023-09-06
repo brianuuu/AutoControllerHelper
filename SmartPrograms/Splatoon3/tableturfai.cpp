@@ -46,31 +46,49 @@ QVector<int> TableTurfAI::GetCardTileCounts()
     return { m_cards[0].m_tileCount, m_cards[1].m_tileCount, m_cards[2].m_tileCount, m_cards[3].m_tileCount };
 }
 
-QString TableTurfAI::GetNextMove(int& o_index, int turn, bool failedLast, int preferredCard)
+void TableTurfAI::CalculateNextMove(int turn)
 {
     // TODO: send this to a thread
-    if (!failedLast)
+    m_placementResults.clear();
+    switch (m_mode)
     {
-        m_placementResults.clear();
-        switch (m_mode)
+    case Mode::None:
+    case Mode::SkipTurns:
+    {
+        // nothing to do
+        break;
+    }
+    case Mode::LeastMoves:
+    case Mode::NoOneTwoTile:
+    {
+        DoPlacement_LeastMoves();
+        break;
+    }
+    }
+
+    // score results
+    std::sort(m_placementResults.begin(), m_placementResults.end(),
+        [](PlacementResult const& a, PlacementResult const& b)
         {
-        case Mode::None:
-        case Mode::SkipTurns:
-        {
-            // nothing to do
-            break;
+            return a.m_score > b.m_score;
         }
-        case Mode::LeastMoves:
-        case Mode::NoOneTwoTile:
-        {
-            DoPlacement_LeastMoves(preferredCard);
-            break;
-        }
-        }
+    );
+
+    emit CalculateNextMoveCompleted();
+}
+
+QString TableTurfAI::GetNextMove(bool failedLast)
+{
+    // next best move
+    if (failedLast && !m_placementResults.empty())
+    {
+        // TODO: cursor is not the origin
+        m_placementResults.pop_front();
     }
 
     if (m_placementResults.empty())
     {
+        // no card to use, skip turn
         int index = 0;
         if (m_mode != Mode::SkipTurns)
         {
@@ -100,17 +118,8 @@ QString TableTurfAI::GetNextMove(int& o_index, int turn, bool failedLast, int pr
     }
     else
     {
-        // in case command fails, we can go back here to pick next best
-        std::sort(m_placementResults.begin(), m_placementResults.end(),
-            [](PlacementResult const& a, PlacementResult const& b)
-            {
-                return a.m_score > b.m_score;
-            }
-        );
-
         // TODO: enable special
         PlacementResult const& best = m_placementResults[0];
-        o_index = best.m_cardIndex;
         qDebug() << "Target cursor:" << best.m_cursorPoint;
         qDebug() << "Score:" << best.m_score;
 
@@ -144,6 +153,16 @@ QString TableTurfAI::GetNextMove(int& o_index, int turn, bool failedLast, int pr
         command += "A,1,Nothing,20";
         return command;
     }
+}
+
+int TableTurfAI::GetNextCard()
+{
+    if (!m_placementResults.empty())
+    {
+        return m_placementResults[0].m_cardIndex;
+    }
+
+    return -1;
 }
 
 void TableTurfAI::DoPlacement_LeastMoves(int preferredCard)
