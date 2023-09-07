@@ -447,6 +447,7 @@ signals:
 public slots:
     void commandFinished();
     void runStateLoop();
+    void printLogExternal(QString const log, QColor color);
 
     // Tesseract OCR (text recognition)
     void on_OCRErrorOccurred(QProcess::ProcessError error);

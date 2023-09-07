@@ -678,6 +678,11 @@ void SmartProgramBase::runStateLoop()
     }
 }
 
+void SmartProgramBase::printLogExternal(const QString log, QColor color)
+{
+    emit printLog(log, color);
+}
+
 bool SmartProgramBase::startOCR(QRect rectPos, HSVRange hsvRange, bool isNumber)
 {
     // Get filtered image, flip black/white since black text detects better

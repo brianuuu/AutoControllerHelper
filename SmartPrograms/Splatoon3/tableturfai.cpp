@@ -21,7 +21,7 @@ void TableTurfAI::Restart()
         m_cards[i].Reset();
     }
 
-    m_spCount = 0;
+    m_boardStat.m_spCount = 0;
 }
 
 void TableTurfAI::UpdateFrame(const QImage &image)
@@ -31,6 +31,10 @@ void TableTurfAI::UpdateFrame(const QImage &image)
     AnalysisBoard();
     AnalysisHands();
     AnalysisSpecial();
+
+    int blueTurf = m_boardStat.m_gridTypeCount[GT_InkBlue] + m_boardStat.m_gridTypeCount[GT_InkBlueSp];
+    int orangeTurf = m_boardStat.m_gridTypeCount[GT_InkOrange] + m_boardStat.m_gridTypeCount[GT_InkOrangeSp];
+    emit printLog("Board Status: " + QString::number(orangeTurf) + "vs" + QString::number(blueTurf) + ", Specials: " + QString::number(m_boardStat.m_spCount));
 
     //ExportBoard();
     //ExportCards();
@@ -88,6 +92,7 @@ QString TableTurfAI::GetNextMove(bool failedLast)
 
     if (m_placementResults.empty())
     {
+        emit printLog("No card to use, skipping turn");
         // no card to use, skip turn
         int index = 0;
         if (m_mode != Mode::SkipTurns)
@@ -120,8 +125,7 @@ QString TableTurfAI::GetNextMove(bool failedLast)
     {
         // TODO: enable special
         PlacementResult const& best = m_placementResults[0];
-        qDebug() << "Target cursor:" << best.m_cursorPoint;
-        qDebug() << "Score:" << best.m_score;
+        emit printLog("Using card " + QString::number(best.m_cardIndex) + " with rotation " + QString::number(best.m_rotationCount) + " at (" + QString::number(best.m_cursorPoint.x()) + "," + QString::number(best.m_cursorPoint.y()) + "), Score = " + QString::number(best.m_score));
 
         QString command;
         if (best.m_cardIndex % 2 == 1) // 1 or 3
@@ -188,6 +192,11 @@ void TableTurfAI::DoPlacement_LeastMoves(int preferredCard)
 void TableTurfAI::AnalysisBoard()
 {
     m_boardRect = QRect(4,22,1,1);
+    for (int i = 0; i < GT_Count; i++)
+    {
+        m_boardStat.m_gridTypeCount[i] = 0;
+    }
+
     for (int y = 0; y < BOARD_SIZE_Y; y++)
     {
         QPointF topLeft = c_boardTopLefts[y];
@@ -196,6 +205,7 @@ void TableTurfAI::AnalysisBoard()
             QRect rect = QRect(topLeft.toPoint(), QSize(BOARD_TILE_SIZE, BOARD_TILE_SIZE));
             if (UpdateBoardTile(rect, m_board[x][y]))
             {
+                m_boardStat.m_gridTypeCount[ m_board[x][y] ]++;
                 if (m_board[x][y] == GT_InkOrange)
                 {
                     m_boardRect.setTop(qMin(y, m_boardRect.top()));
@@ -349,14 +359,14 @@ bool TableTurfAI::UpdateCardTile(QRect rect, TableTurfAI::GridType &tileType)
 
 void TableTurfAI::AnalysisSpecial()
 {
-    m_spCount = 0;
+    m_boardStat.m_spCount = 0;
     QPointF topLeft = c_specialTopLeft;
     for (int i = 0; i < SPECIAL_COUNT; i++)
     {
         QRect rect = QRect(topLeft.toPoint(), QSize(SPECIAL_TILE_SIZE, SPECIAL_TILE_SIZE));
         if (GetColorPixelRadio(rect, c_hsvInkOrangeSp) > c_colorPixelRatio)
         {
-            m_spCount++;
+            m_boardStat.m_spCount++;
         }
 
         topLeft.rx() += c_specialStepX;
@@ -398,7 +408,7 @@ void TableTurfAI::TestPlacement(int cardIndex, bool isSpecial)
                 case Mode::NoOneTwoTile:
                 {
                     // rank base on number of moves
-                    result.m_score = 1000;
+                    result.m_score = 10;
                     result.m_score -= qAbs(cursorPoint.x() - 4);
                     result.m_score -= qAbs(cursorPoint.y() - 22);
                     break;

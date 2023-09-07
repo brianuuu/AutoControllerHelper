@@ -51,6 +51,7 @@ void SmartS3TableturfCloneJelly::reset()
 
     m_ai.SetMode(m_programSettings.m_mode);
     connect(&m_ai, &TableTurfAI::CalculateNextMoveCompleted, this, &SmartS3TableturfCloneJelly::CalculateNextMoveCompleted);
+    connect(&m_ai, &TableTurfAI::printLog, this, &SmartS3TableturfCloneJelly::printLogExternal);
 }
 
 void SmartS3TableturfCloneJelly::runNextState()

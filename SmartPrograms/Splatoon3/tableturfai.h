@@ -36,6 +36,7 @@ public:
 
 signals:
     void CalculateNextMoveCompleted();
+    void printLog(QString const log, QColor color = QColor(0,0,0));
 
 private:
     enum GridType : uint8_t
@@ -45,7 +46,9 @@ private:
         GT_InkOrangeSp,
         GT_InkBlue,
         GT_InkBlueSp,
-        GT_Neutral
+        GT_Neutral,
+
+        GT_Count
     };
 
     #define CARD_SIZE 8
@@ -68,15 +71,6 @@ private:
         GridType m_tile[CARD_SIZE][CARD_SIZE];
     };
 
-private:
-    void AnalysisBoard();
-    bool UpdateBoardTile(QRect rect, GridType& tileType);
-
-    void AnalysisHands();
-    bool UpdateCardTile(QRect rect, GridType& tileType);
-
-    void AnalysisSpecial();
-
     struct PlacementResult
     {
         PlacementResult()
@@ -93,13 +87,27 @@ private:
         int m_score;
     };
 
+    struct BoardStat
+    {
+        int m_gridTypeCount[GT_Count];
+        int m_spCount;
+    };
+
+private:
+    void AnalysisBoard();
+    void AnalysisHands();
+    void AnalysisSpecial();
+
+    bool UpdateBoardTile(QRect rect, GridType& tileType);
+    bool UpdateCardTile(QRect rect, GridType& tileType);
+
+    void ExportBoard();
+    void ExportCards();
+
     void DoPlacement_LeastMoves(int preferredCard = -1);
 
     void TestPlacement(int cardIndex, bool isSpecial);
     bool TestPlacementOnPoint(Card const& card, QPoint cursorPoint, bool isSpecial);
-
-    void ExportBoard();
-    void ExportCards();
 
     qreal GetColorPixelRadio(QRect rect, HSVRange hsvRange);
 
@@ -112,6 +120,7 @@ private:
     #define BOARD_TILE_SIZE 25
     GridType m_board[BOARD_SIZE_X][BOARD_SIZE_Y];
     QRect m_boardRect;
+    BoardStat m_boardStat;
 
     QVector<PlacementResult> m_placementResults;
     Card m_cards[4];
@@ -120,7 +129,6 @@ private:
     #define SPECIAL_TILE_SIZE 20
     qreal const c_specialStepX = 21.5;
     QPointF const c_specialTopLeft = QPointF(37,654);
-    int m_spCount;
 
     HSVRange const c_hsvEmpty = HSVRange(0,0,0,359,255,40);
     HSVRange const c_hsvNeutral = HSVRange(0,0,160,359,50,200);
