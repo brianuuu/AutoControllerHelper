@@ -81,6 +81,8 @@ void SmartS3TableturfCloneJelly::runNextState()
             if (m_timer.elapsed() >= 60000)
             {
                 emit printLog("Unable to detect turn start for too long", LOG_ERROR);
+                incrementStat(m_statErrors);
+
                 m_substage = SS_Finished;
                 setState_runCommand("Home,1,Nothing,20");
             }
@@ -163,7 +165,7 @@ void SmartS3TableturfCloneJelly::runNextState()
 
                     if (m_tileCount[m_cardToUse] <= 2)
                     {
-                        emit printLog("Unable to find card more than 2 tiles", LOG_ERROR);
+                        emit printLog("Unable to find card more than 2 tiles", LOG_WARNING);
                     }
 
                     emit printLog("Picking card " + QString::number(m_cardToUse + 1));
@@ -198,7 +200,7 @@ void SmartS3TableturfCloneJelly::runNextState()
 
                         if (count != 3)
                         {
-                            emit printLog("Remaining cards does not contain 3 1/2 tile cards", LOG_ERROR);
+                            emit printLog("Remaining cards does not contain 3 1/2 tile cards", LOG_WARNING);
                         }
                     }
 
@@ -311,6 +313,8 @@ void SmartS3TableturfCloneJelly::runNextState()
                 if (m_upCount > 15)
                 {
                     emit printLog("Unabled to count up, something went wrong, capture has been taken", LOG_ERROR);
+                    incrementStat(m_statErrors);
+
                     m_substage = SS_Finished;
                     setState_runCommand("Capture,25,Home,1,Nothing,20");
                     break;
@@ -378,9 +382,20 @@ void SmartS3TableturfCloneJelly::runNextState()
         {
             if (!checkTurnEnd())
             {
-                emit printLog("Unable to skip turn, something went wrong, capture has been taken", LOG_ERROR);
-                m_substage = SS_Finished;
-                setState_runCommand("Capture,25,Home,1,Nothing,20");
+                emit printLog("Unable to skip turn, something went wrong, giving up battle", LOG_ERROR);
+                incrementStat(m_statErrors);
+
+                m_turn = 12;
+                m_tileCount[0] = 0;
+                m_tileCount[1] = 0;
+                m_tileCount[2] = 0;
+                m_tileCount[3] = 0;
+
+                m_substage = SS_CheckWin;
+                setState_runCommand("BSpam,20,Plus,20,LRight,1,Nothing,1,A,1,Nothing,20");
+
+                m_timer.restart();
+                m_videoManager->setAreas({A_CardName, A_Win, A_TileCount[0], A_TileCount[1], A_TileCount[2], A_TileCount[3]});
             }
         }
         break;
