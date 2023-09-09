@@ -94,9 +94,13 @@ void TableTurfAI::CalculateNextMove(int turn)
     m_boardStat.m_spScore = CalculateScore_BuildSpecial(m_board);
 
     // calculate the current max number of enemy turf we can replace
-    m_boardStat.m_predictScore = 0;
-    TestPlacement(-1, turn, true, true, false);
-    emit printLog("Max enemy tiles to be replaced: " + QString::number(m_boardStat.m_predictScore));
+    if (m_mode == Mode::ThreeTwelveSp)
+    {
+        m_boardStat.m_predictScore = 0;
+        TestPlacement(-1, turn, true, true, false);
+        emit printLog("Max enemy tiles to be replaced: " + QString::number(m_boardStat.m_predictScore));
+        //qDebug() << "Tile replace:" << m_boardStat.m_predictScore;
+    }
 
     // get next results
     m_placementResults.clear();
@@ -156,7 +160,7 @@ void TableTurfAI::CalculateNextMove(int turn)
                 emit printLog("Couldn't build enough special...", LOG_WARNING);
             }
         }
-        else if (m_boardStat.m_spCount >= 5)
+        else if (m_boardStat.m_spCount > 3)
         {
             // have enough special, use it
             for (int i = 0; i < 4; i++)
@@ -167,7 +171,11 @@ void TableTurfAI::CalculateNextMove(int turn)
                     continue;
                 }
 
-                TestPlacement(i, turn, true, true);
+                if (m_cards[i].m_tileCount <= 3 || (m_boardStat.m_spCount >= 5 && m_cards[i].m_tileCount == 4))
+                {
+                    // 2 & 3 tile card use 1 special, 4 tile card use 2 special
+                    TestPlacement(i, turn, true, true);
+                }
             }
 
             if (!m_placementResults.empty())
@@ -200,6 +208,12 @@ void TableTurfAI::CalculateNextMove(int turn)
 
             // test all cards with rotation
             TestPlacement(pair.second, turn, false, true);
+
+            // if there's two moves left and have enough special, just make turf
+            if (turn == 2 && m_boardStat.m_spCount >= 3 && m_boardStat.m_predictScore == 12 && !m_placementResults.empty())
+            {
+                break;
+            }
         }
         break;
     }
@@ -604,6 +618,11 @@ void TableTurfAI::TestPlacement(int cardIndex, int turn, bool isSpecial, bool te
                             {
                                 CalculateScore_ExpandTurf(result);
                             }
+                            else if (turn == 2 && m_boardStat.m_spCount >= 3)
+                            {
+                                // no need to build special if we're on 2nd last move, just turf as much as possible
+                                CalculateScore_LeastMoves(result);
+                            }
                             else
                             {
                                 // build special is increase in spScore
@@ -620,7 +639,7 @@ void TableTurfAI::TestPlacement(int cardIndex, int turn, bool isSpecial, bool te
 
                     if (cardIndex >= 0 && !isPrediction)
                     {
-                        if (turn > 1 && m_boardStat.m_spCount >= 3)
+                        if (m_mode == Mode::ThreeTwelveSp && turn > 1 && m_boardStat.m_spCount > 3)
                         {
                             m_predictScoreAdd = 0;
                             TestPlacement(cardIndex, turn, true, true, true);
