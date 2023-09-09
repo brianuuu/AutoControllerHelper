@@ -281,7 +281,7 @@ QString TableTurfAI::GetNextMove(bool failedLast)
 
         if (best.m_score > 1000)
         {
-            emit printLog("Max enemy tile overlap increase to " + QString::number(best.m_score - 1000), LOG_SUCCESS);
+            emit printLog("Max enemy tile overlap increased to " + QString::number(best.m_score - 1000), LOG_SUCCESS);
         }
 
         // hard record special points on board to avoid false detection
@@ -330,17 +330,51 @@ QString TableTurfAI::GetNextMove(bool failedLast)
 
         // TODO: default cursor pos change if failed last time
         int xCount = 4 - best.m_cursorPoint.x();
+        int xCountAbs = qAbs(xCount);
         if (xCount != 0)
         {
-            command += (xCount > 0 ? "DLeft" : "DRight");
-            command += ",1,Nothing,1,Loop," + QString::number(qAbs(xCount)) + ",";
+            if (xCountAbs % 2 == 0)
+            {
+                // even
+                command += (xCount > 0 ? "DLeft,1,LLeft" : "DRight,1,LRight");
+                command += ",1,Loop," + QString::number(xCountAbs/2) + ",";
+            }
+            else
+            {
+                // odd
+                command += (xCount > 0 ? "LLeft" : "LRight");
+                command += ",1,Loop,1,";
+
+                if (xCountAbs > 1)
+                {
+                    command += (xCount > 0 ? "DLeft,1,LLeft" : "DRight,1,LRight");
+                    command += ",1,Loop," + QString::number((xCountAbs-1)/2) + ",";
+                }
+            }
         }
 
         int yCount = 22 - best.m_cursorPoint.y();
+        int yCountAbs = qAbs(yCount);
         if (yCount != 0)
         {
-            command += (yCount > 0 ? "DUp" : "DDown");
-            command += ",1,Nothing,1,Loop," + QString::number(qAbs(yCount)) + ",";
+            if (yCountAbs % 2 == 0)
+            {
+                // even
+                command += (yCount > 0 ? "DUp,1,LUp" : "DDown,1,LDown");
+                command += ",1,Loop," + QString::number(yCountAbs/2) + ",";
+            }
+            else
+            {
+                // odd
+                command += (yCount > 0 ? "LUp" : "LDown");
+                command += ",1,Loop,1,";
+
+                if (yCountAbs > 1)
+                {
+                    command += (yCount > 0 ? "DUp,1,LUp" : "DDown,1,LDown");
+                    command += ",1,Loop," + QString::number((yCountAbs-1)/2) + ",";
+                }
+            }
         }
 
         command += "A,1,Nothing,20";
