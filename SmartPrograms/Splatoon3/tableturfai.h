@@ -138,6 +138,7 @@ private:
     GridType m_board[BOARD_SIZE_X][BOARD_SIZE_Y];
     GridType m_boardPreview[BOARD_SIZE_X][BOARD_SIZE_Y];
     BoardStat m_boardStat;
+    QLabel m_previewWidget;
 
     QVector<PlacementResult> m_placementResults;
     Card m_cards[4];

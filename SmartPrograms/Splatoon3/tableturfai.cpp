@@ -3,6 +3,9 @@
 TableTurfAI::TableTurfAI()
 {
     Restart();
+    m_previewWidget.resize(BOARD_SIZE_X * BOARD_TILE_SIZE + 1, BOARD_SIZE_Y * BOARD_TILE_SIZE + 1);
+    m_previewWidget.setWindowTitle("Board Preview");
+    m_previewWidget.show();
 }
 
 void TableTurfAI::Restart()
@@ -39,7 +42,7 @@ void TableTurfAI::UpdateFrame(const QImage &image)
     int orangeTurf = m_boardStat.m_gridTypeCount[GT_InkOrange] + m_boardStat.m_gridTypeCount[GT_InkOrangeSp];
     emit printLog("Board Status: " + QString::number(orangeTurf) + "vs" + QString::number(m_boardStat.m_enemyTurf) + ", Specials: " + QString::number(m_boardStat.m_spCount));
 
-    //ExportBoard();
+    ExportBoard();
     //ExportCards();
 }
 
@@ -198,12 +201,15 @@ QString TableTurfAI::GetNextMove(bool failedLast)
             m_boardStat.m_spPoints.push_back(best.m_spPointOnBoard);
         }
 
+        // force special tile to be special, if replaced by enemy it will be updated in AnalysisBoard()
+        m_board[best.m_spPointOnBoard.x()][best.m_spPointOnBoard.y()] = GT_InkOrangeSp;
+
         QString command;
 
         // enable special
         if (best.m_isSpecial)
         {
-            command += "DUp,1,LRight,1,A,5,";
+            command += "DUp,1,LRight,1,A,1,Nothing,4";
         }
 
         // move to card
@@ -354,6 +360,12 @@ bool TableTurfAI::UpdateBoardTile(QRect rect, QPoint boardPos)
         }
 
         tileType = GT_InkOrange;
+        return true;
+    }
+
+    // if it was blue ink tile, assume it is the same
+    if (tileType == GT_InkBlue)
+    {
         return true;
     }
 
@@ -728,7 +740,8 @@ void TableTurfAI::ExportBoard()
         topLeft.rx() = 0;
     }
 
-    img.save(QString(SCREENSHOT_PATH) + "Board.png", "PNG");
+    m_previewWidget.setPixmap(QPixmap::fromImage(img));
+    //img.save(QString(SCREENSHOT_PATH) + "Board.png", "PNG");
 }
 
 void TableTurfAI::ExportCards()
