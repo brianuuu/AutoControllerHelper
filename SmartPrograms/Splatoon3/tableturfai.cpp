@@ -149,7 +149,7 @@ void TableTurfAI::CalculateNextMove(int turn)
         std::sort(tileCountToIndices.begin(), tileCountToIndices.end(),
             [] (QPair<int, int> const& a, QPair<int, int> const& b)
             {
-                return a.first > b.second;
+                return a.first > b.first;
             }
         );
 
@@ -562,29 +562,19 @@ void TableTurfAI::TestPlacement(int cardIndex, int turn, bool isSpecial, bool te
                         }
                         case Mode::ThreeTwelveSp:
                         {
-                            switch (turn)
-                            {
-                            case 12:
-                            case 11:
-                            case 10:
-                            case 9:
+                            if (turn >= c_lastTurnExpandTurf)
                             {
                                 CalculateScore_ExpandTurf(result);
-                                break;
                             }
-                            default:
+                            else if (m_boardStat.m_spCount >= 3)
                             {
-                                if (m_boardStat.m_spCount >= 3)
-                                {
-                                    // have enough special, just do least moves
-                                    CalculateScore_LeastMoves(result);
-                                    break;
-                                }
-
+                                // have enough special, just do least moves
+                                CalculateScore_LeastMoves(result);
+                            }
+                            else
+                            {
                                 // build special is increase in spScore
                                 result.m_score = CalculateScore_BuildSpecial(m_boardPreview) - m_boardStat.m_spScore;
-                                break;
-                            }
                             }
                             break;
                         }

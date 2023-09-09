@@ -253,6 +253,8 @@ private:
     HSVRange const c_hsvCardInk = HSVRange(60,170,100,70,255,255);
     HSVRange const c_hsvCardInkSp = HSVRange(45,170,100,55,255,255);
     HSVRange const c_hsvCardDark = HSVRange(60,170,100,70,255,180);
+
+    int const c_lastTurnExpandTurf = 9;
 };
 
 #endif // TABLETURFAI_H
