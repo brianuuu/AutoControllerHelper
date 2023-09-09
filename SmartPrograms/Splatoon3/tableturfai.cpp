@@ -119,17 +119,64 @@ void TableTurfAI::CalculateNextMove(int turn)
                 emit printLog("Couldn't build enough special...", LOG_WARNING);
             }
         }
+        /* Disabled, this will waste turn covering enemy 3-12 tile card instead of expanding turf
+        else if (m_boardStat.m_spCount >= 5)
+        {
+            // have enough special, use it
+            for (int i = 0; i < 4; i++)
+            {
+                if (m_cards[i].m_tileCount == 12)
+                {
+                    // only use 3-12 tile card last turn
+                    continue;
+                }
 
+                TestPlacement(i, turn, true, true);
+            }
+
+            if (!m_placementResults.empty())
+            {
+                break;
+            }
+        }*/
+
+        // sort card by tile count
+        QVector<QPair<int, int>> tileCountToIndices;
         for (int i = 0; i < 4; i++)
         {
-            if (turn > 1 && m_cards[i].m_tileCount > 4)
+            tileCountToIndices.push_back( QPair<int, int>(m_cards[i].m_tileCount, i) );
+        }
+        std::sort(tileCountToIndices.begin(), tileCountToIndices.end(),
+            [] (QPair<int, int> const& a, QPair<int, int> const& b)
+            {
+                return a.first > b.second;
+            }
+        );
+
+        // use highest tile count card first
+        for (auto const& pair : tileCountToIndices)
+        {
+            if (turn > 1 && pair.first > 4)
             {
                 // don't use any cards above 4 tiles unless last turn
                 continue;
             }
 
-            // test all cards with rotation
-            TestPlacement(i, turn, false, true);
+            if (m_boardStat.m_spCount >= 3)
+            {
+                // enough special, just use least move
+                TestPlacement(pair.second, turn, false, false);
+                if (!m_placementResults.empty())
+                {
+                    // already have solution for higher tile card, quit
+                    break;
+                }
+            }
+            else
+            {
+                // test all cards with rotation
+                TestPlacement(pair.second, turn, false, true);
+            }
         }
         break;
     }
@@ -209,7 +256,7 @@ QString TableTurfAI::GetNextMove(bool failedLast)
         // enable special
         if (best.m_isSpecial)
         {
-            command += "DUp,1,LRight,1,A,1,Nothing,4";
+            command += "DUp,1,LRight,1,A,1,Nothing,4,";
         }
 
         // move to card
@@ -298,7 +345,7 @@ void TableTurfAI::AnalysisBoard()
             else
             {
                 m_board[x][y] = GT_Neutral;
-                qDebug() << "ERROR DETECTING TILE(" << x << "," << y << ")";
+                emit printLog("ERROR DETECTING TILE(" + QString::number(x) + "," + QString::number(y) + ")", LOG_WARNING);
             }
 
             topLeft.rx() += c_boardXSeparations[y];
@@ -363,8 +410,8 @@ bool TableTurfAI::UpdateBoardTile(QRect rect, QPoint boardPos)
         return true;
     }
 
-    // if it was blue ink tile, assume it is the same
-    if (tileType == GT_InkBlue)
+    // if it was blue ink tile or our special, assume it is the same
+    if (tileType == GT_InkBlue || tileType == GT_InkBlueSp || tileType == GT_InkOrangeSp)
     {
         return true;
     }
@@ -527,6 +574,13 @@ void TableTurfAI::TestPlacement(int cardIndex, int turn, bool isSpecial, bool te
                             }
                             default:
                             {
+                                if (m_boardStat.m_spCount >= 3)
+                                {
+                                    // have enough special, just do least moves
+                                    CalculateScore_LeastMoves(result);
+                                    break;
+                                }
+
                                 // build special is increase in spScore
                                 result.m_score = CalculateScore_BuildSpecial(m_boardPreview) - m_boardStat.m_spScore;
                                 break;
@@ -588,6 +642,11 @@ bool TableTurfAI::TestPlacementOnPoint(const TableTurfAI::Card &card, PlacementR
             if (cardTileType == GT_InkOrangeSp)
             {
                 result.m_spPointOnBoard = tilePoint;
+                if (boardTileType == GT_InkBlue)
+                {
+                    // special point should not cover enemy ink (to avoid covering enemy 12 tile card)
+                    return false;
+                }
             }
 
             // record the point closest to enemy turf

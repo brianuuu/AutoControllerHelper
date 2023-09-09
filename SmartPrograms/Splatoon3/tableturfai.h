@@ -49,6 +49,7 @@ private:
         GT_InkBlueSp,
         GT_Neutral,
 
+        GT_Unknown,
         GT_Count
     };
 
@@ -163,7 +164,8 @@ private:
         QColor(255,128,64),
         QColor(0,128,255),
         QColor(0,255,255),
-        QColor(128,128,128)
+        QColor(128,128,128),
+        QColor(255,0,255)
     };
 
     qreal const c_colorPixelRatio = 120;
