@@ -160,7 +160,7 @@ void TableTurfAI::CalculateNextMove(int turn)
                 emit printLog("Couldn't build enough special...", LOG_WARNING);
             }
         }
-        else if (m_boardStat.m_spCount > 3)
+        else if (m_boardStat.m_spCount > 3 && m_boardStat.m_predictScore < 12) // if we can cover entire enemy 12 card, we always win(?) don't use special
         {
             // have enough special, use it
             for (int i = 0; i < 4; i++)
@@ -652,9 +652,10 @@ void TableTurfAI::TestPlacement(int cardIndex, int turn, bool isSpecial, bool te
                             {
                                 CalculateScore_ExpandTurf(result);
                             }
-                            else if (turn == 2 && m_boardStat.m_spCount >= 3)
+                            else if ((turn == 2 && m_boardStat.m_spCount >= 3) || m_boardStat.m_predictScore == 12)
                             {
                                 // no need to build special if we're on 2nd last move, just turf as much as possible
+                                // same if we can already replace enemy's 12 tile card
                                 CalculateScore_LeastMoves(result);
                             }
                             else
@@ -673,7 +674,7 @@ void TableTurfAI::TestPlacement(int cardIndex, int turn, bool isSpecial, bool te
 
                     if (cardIndex >= 0 && !isPrediction)
                     {
-                        if (m_mode == Mode::ThreeTwelveSp && turn > 1 && m_boardStat.m_spCount > 3)
+                        if (m_mode == Mode::ThreeTwelveSp && turn > 1 && m_boardStat.m_spCount >= 3)
                         {
                             m_predictScoreAdd = 0;
                             TestPlacement(cardIndex, turn, true, true, true);
