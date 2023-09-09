@@ -63,10 +63,7 @@ private:
         void Rotate(bool clockwise = true);
         void UpdateRectCenter();
 
-        bool m_init;
-        bool m_usable;
         int m_rotation;
-
         QPoint m_center;
         QRect m_rect; // top left and size
 
@@ -106,6 +103,7 @@ private:
         int m_enemyTurf;
         int m_spCount;
         int m_spScore; // set in CalculateNextMove()
+        int m_predictScore; // current score if used 3-12 card
         QVector<QPoint> m_spPoints;
         QRect m_rect;
     };
@@ -121,14 +119,14 @@ private:
     void ExportBoard();
     void ExportCards();
 
-    void RefreshBoardPreview();
-    void TestPlacement(int cardIndex, int turn, bool isSpecial, bool testRotation);
-    bool TestPlacementOnPoint(Card const& card, PlacementResult& result, QPoint cursorPoint, bool isSpecial);
+    void RefreshBoardPreview(GridType const ppBoardRef[][BOARD_SIZE_Y], GridType ppBoard[][BOARD_SIZE_Y]);
+    void TestPlacement(int cardIndex, int turn, bool isSpecial, bool testRotation, bool isPrediction = false);
+    bool TestPlacementOnPoint(Card const& card, PlacementResult& result, QPoint cursorPoint, bool isSpecial, GridType const ppBoardBefore[][BOARD_SIZE_Y], GridType ppBoardAfter[][BOARD_SIZE_Y]);
 
     void CalculateScore_LeastMoves(PlacementResult& result);
     void CalculateScore_ExpandTurf(PlacementResult& result);
     int CalculateScore_BuildSpecial(GridType ppBoard[][BOARD_SIZE_Y]);
-    void CalculateScore_CoverEnemyTurf(PlacementResult& result);
+    void CalculateScore_CoverEnemyTurf(PlacementResult& result, GridType const ppBoardBefore[][BOARD_SIZE_Y], GridType const ppBoardAfter[][BOARD_SIZE_Y]);
 
     qreal GetColorPixelRadio(QRect rect, HSVRange hsvRange);
 
@@ -138,11 +136,15 @@ private:
 
     GridType m_board[BOARD_SIZE_X][BOARD_SIZE_Y];
     GridType m_boardPreview[BOARD_SIZE_X][BOARD_SIZE_Y];
+    GridType m_boardPredict[BOARD_SIZE_X][BOARD_SIZE_Y];
     BoardStat m_boardStat;
     QLabel m_previewWidget;
 
     QVector<PlacementResult> m_placementResults;
     Card m_cards[4];
+
+    Card m_cardPredict;
+    int m_predictScoreAdd;
 
     #define SPECIAL_COUNT 5
     #define SPECIAL_TILE_SIZE 20

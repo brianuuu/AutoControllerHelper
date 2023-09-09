@@ -3,9 +3,41 @@
 TableTurfAI::TableTurfAI()
 {
     Restart();
+
     m_previewWidget.resize(BOARD_SIZE_X * BOARD_TILE_SIZE + 1, BOARD_SIZE_Y * BOARD_TILE_SIZE + 1);
     m_previewWidget.setWindowTitle("Board Preview");
     m_previewWidget.show();
+
+    // Triple Inkstrike
+    //m_cardPredict.m_tile[3][2] = GT_InkOrange;
+    //m_cardPredict.m_tile[4][2] = GT_InkOrange;
+    //m_cardPredict.m_tile[3][3] = GT_InkOrange;
+    //m_cardPredict.m_tile[4][3] = GT_InkOrange;
+    //m_cardPredict.m_tile[1][4] = GT_InkOrange;
+    //m_cardPredict.m_tile[2][4] = GT_InkOrange;
+    //m_cardPredict.m_tile[1][5] = GT_InkOrange;
+    //m_cardPredict.m_tile[2][5] = GT_InkOrange;
+    //m_cardPredict.m_tile[5][4] = GT_InkOrange;
+    //m_cardPredict.m_tile[6][4] = GT_InkOrange;
+    //m_cardPredict.m_tile[5][5] = GT_InkOrange;
+    //m_cardPredict.m_tile[6][5] = GT_InkOrange;
+
+    // Tenta Missile
+    m_cardPredict.m_tile[1][2] = GT_InkOrange;
+    m_cardPredict.m_tile[2][2] = GT_InkOrange;
+    m_cardPredict.m_tile[5][2] = GT_InkOrange;
+    m_cardPredict.m_tile[6][2] = GT_InkOrange;
+    m_cardPredict.m_tile[1][3] = GT_InkOrange;
+    m_cardPredict.m_tile[2][3] = GT_InkOrange;
+    m_cardPredict.m_tile[3][3] = GT_InkOrange;
+    m_cardPredict.m_tile[4][3] = GT_InkOrange;
+    m_cardPredict.m_tile[5][3] = GT_InkOrange;
+    m_cardPredict.m_tile[6][3] = GT_InkOrange;
+    m_cardPredict.m_tile[2][4] = GT_InkOrange;
+    m_cardPredict.m_tile[5][4] = GT_InkOrange;
+
+    m_cardPredict.m_tileCount = 12;
+    m_cardPredict.UpdateRectCenter();
 }
 
 void TableTurfAI::Restart()
@@ -60,6 +92,11 @@ void TableTurfAI::CalculateNextMove(int turn)
 {
     // calculate current special score
     m_boardStat.m_spScore = CalculateScore_BuildSpecial(m_board);
+
+    // calculate the current max number of enemy turf we can replace
+    m_boardStat.m_predictScore = 0;
+    TestPlacement(-1, turn, true, true, false);
+    emit printLog("Max enemy tiles to be replaced: " + QString::number(m_boardStat.m_predictScore));
 
     // get next results
     m_placementResults.clear();
@@ -119,7 +156,6 @@ void TableTurfAI::CalculateNextMove(int turn)
                 emit printLog("Couldn't build enough special...", LOG_WARNING);
             }
         }
-        /* Disabled, this will waste turn covering enemy 3-12 tile card instead of expanding turf
         else if (m_boardStat.m_spCount >= 5)
         {
             // have enough special, use it
@@ -138,9 +174,9 @@ void TableTurfAI::CalculateNextMove(int turn)
             {
                 break;
             }
-        }*/
+        }
 
-        // sort card by tile count
+        // sort card by decending tile count
         QVector<QPair<int, int>> tileCountToIndices;
         for (int i = 0; i < 4; i++)
         {
@@ -162,21 +198,8 @@ void TableTurfAI::CalculateNextMove(int turn)
                 continue;
             }
 
-            if (m_boardStat.m_spCount >= 3)
-            {
-                // enough special, just use least move
-                TestPlacement(pair.second, turn, false, false);
-                if (!m_placementResults.empty())
-                {
-                    // already have solution for higher tile card, quit
-                    break;
-                }
-            }
-            else
-            {
-                // test all cards with rotation
-                TestPlacement(pair.second, turn, false, true);
-            }
+            // test all cards with rotation
+            TestPlacement(pair.second, turn, false, true);
         }
         break;
     }
@@ -241,6 +264,11 @@ QString TableTurfAI::GetNextMove(bool failedLast)
                       + " at (" + QString::number(best.m_cursorPoint.x()) + "," + QString::number(best.m_cursorPoint.y())
                       + "), Score = " + QString::number(best.m_score)
                       + ", Special: " + (best.m_isSpecial ? "Yes" : "No"));
+
+        if (best.m_score > 1000)
+        {
+            emit printLog("Max enemy tile overlap increase to " + QString::number(best.m_score - 1000), LOG_SUCCESS);
+        }
 
         // hard record special points on board to avoid false detection
         if (!m_boardStat.m_spPoints.contains(best.m_spPointOnBoard))
@@ -423,17 +451,6 @@ void TableTurfAI::AnalysisHands()
 {
     for (int i = 0; i < 4; i++)
     {
-        if (m_cards[i].m_init)
-        {
-            // already know what this card is
-            continue;
-        }
-
-        if (!m_cards[i].m_usable)
-        {
-            // unusable card won't become usable
-        }
-
         m_cards[i].m_tileCount = 0;
         QPointF topLeft = c_handTopLefts[i];
         QPointF offset = QPointF(0,0);
@@ -445,15 +462,6 @@ void TableTurfAI::AnalysisHands()
                 if (UpdateCardTile(rect, m_cards[i].m_tile[x][y]))
                 {
                     m_cards[i].m_tileCount++;
-                }
-
-                if (m_cards[i].m_usable && m_cards[i].m_tile[x][y] == GT_InkOrange)
-                {
-                    // check usability
-                    if (GetColorPixelRadio(rect, c_hsvCardDark) > c_colorPixelRatio)
-                    {
-                        m_cards[i].m_usable = false;
-                    }
                 }
 
                 // next column
@@ -473,7 +481,6 @@ void TableTurfAI::AnalysisHands()
         if (m_cards[i].m_tileCount == 0)
         {
             qDebug() << "ERROR DETECTING ANY TILE FOR CARD" << i;
-            m_cards[i].m_usable = false;
         }
 
         m_cards[i].UpdateRectCenter();
@@ -514,9 +521,12 @@ void TableTurfAI::AnalysisSpecial()
     }
 }
 
-void TableTurfAI::TestPlacement(int cardIndex, int turn, bool isSpecial, bool testRotation)
+void TableTurfAI::TestPlacement(int cardIndex, int turn, bool isSpecial, bool testRotation, bool isPrediction)
 {
-    Card card = m_cards[cardIndex];
+    // cardIndex == -1 -> testing how many enemy tile can be replaced on current board status
+    // isPrediction == true -> testing how many enemy tile can be replaced AFTER placing the current card
+
+    Card card = (cardIndex == -1 || isPrediction) ? m_cardPredict : m_cards[cardIndex];
 
     for (int r = 0; r < (testRotation ? 4 : 1); r++)
     {
@@ -535,11 +545,22 @@ void TableTurfAI::TestPlacement(int cardIndex, int turn, bool isSpecial, bool te
         {
             for (int x = boardXMax; x >= boardXMin; x--)
             {
-                RefreshBoardPreview();
-
                 PlacementResult result;
                 QPoint cursorPoint(x,y);
-                if (TestPlacementOnPoint(card, result, cursorPoint, isSpecial))
+
+                bool testSuccess = false;
+                if (isPrediction)
+                {
+                    RefreshBoardPreview(m_boardPreview, m_boardPredict);
+                    testSuccess = TestPlacementOnPoint(card, result, cursorPoint, isSpecial, m_boardPreview, m_boardPredict);
+                }
+                else
+                {
+                    RefreshBoardPreview(m_board, m_boardPreview);
+                    testSuccess = TestPlacementOnPoint(card, result, cursorPoint, isSpecial, m_board, m_boardPreview);
+                }
+
+                if (testSuccess)
                 {
                     result.m_cardIndex = cardIndex;
                     result.m_cursorPoint = cursorPoint;
@@ -548,7 +569,24 @@ void TableTurfAI::TestPlacement(int cardIndex, int turn, bool isSpecial, bool te
 
                     if (isSpecial)
                     {
-                        CalculateScore_CoverEnemyTurf(result);
+                        if (isPrediction)
+                        {
+                            CalculateScore_CoverEnemyTurf(result, m_boardPreview, m_boardPredict);
+                            if (result.m_score >= m_predictScoreAdd)
+                            {
+                                //qDebug() << result.m_score << m_boardStat.m_predictScore << cursorPoint << cardIndex << r;
+                                m_predictScoreAdd = result.m_score;
+                            }
+                        }
+                        else
+                        {
+                            CalculateScore_CoverEnemyTurf(result, m_board, m_boardPreview);
+                            if (cardIndex == -1 && result.m_score > m_boardStat.m_predictScore)
+                            {
+                                // current max enemy tile replacement
+                                m_boardStat.m_predictScore = result.m_score;
+                            }
+                        }
                     }
                     else
                     {
@@ -566,11 +604,6 @@ void TableTurfAI::TestPlacement(int cardIndex, int turn, bool isSpecial, bool te
                             {
                                 CalculateScore_ExpandTurf(result);
                             }
-                            else if (m_boardStat.m_spCount >= 3)
-                            {
-                                // have enough special, just do least moves
-                                CalculateScore_LeastMoves(result);
-                            }
                             else
                             {
                                 // build special is increase in spScore
@@ -585,7 +618,30 @@ void TableTurfAI::TestPlacement(int cardIndex, int turn, bool isSpecial, bool te
                         }
                     }
 
-                    m_placementResults.push_back(result);
+                    if (cardIndex >= 0 && !isPrediction)
+                    {
+                        if (turn > 1 && m_boardStat.m_spCount >= 3)
+                        {
+                            m_predictScoreAdd = 0;
+                            TestPlacement(cardIndex, turn, true, true, true);
+                            if (isSpecial)
+                            {
+                                if (m_predictScoreAdd < m_boardStat.m_predictScore)
+                                {
+                                    // using this special will make us replace fewer enemy tiles
+                                    continue;
+                                }
+                            }
+
+                            if (m_predictScoreAdd > m_boardStat.m_predictScore)
+                            {
+                                // placing this card will allow replacing MORE enemy tile
+                                result.m_score = m_predictScoreAdd + 1000;
+                            }
+                        }
+
+                        m_placementResults.push_back(result);
+                    }
                 }
             }
         }
@@ -598,9 +654,10 @@ void TableTurfAI::TestPlacement(int cardIndex, int turn, bool isSpecial, bool te
     }
 }
 
-bool TableTurfAI::TestPlacementOnPoint(const TableTurfAI::Card &card, PlacementResult &result, QPoint cursorPoint, bool isSpecial)
+bool TableTurfAI::TestPlacementOnPoint(const TableTurfAI::Card &card, PlacementResult &result, QPoint cursorPoint, bool isSpecial, GridType const ppBoardBefore[][BOARD_SIZE_Y], GridType ppBoardAfter[][BOARD_SIZE_Y])
 {
     bool isNextToOrangeTile = false;
+    bool isSpecialCoverEnemyTile = false;
     for (int cy = card.m_rect.top(); cy <= card.m_rect.bottom(); cy++)
     {
         for (int cx = card.m_rect.left(); cx <= card.m_rect.right(); cx++)
@@ -613,7 +670,7 @@ bool TableTurfAI::TestPlacementOnPoint(const TableTurfAI::Card &card, PlacementR
             }
 
             QPoint tilePoint(cursorPoint.x() - (card.m_center.x() - cx), cursorPoint.y() - (card.m_center.y() - cy));
-            GridType const& boardTileType = m_board[tilePoint.x()][tilePoint.y()];
+            GridType const& boardTileType = ppBoardBefore[tilePoint.x()][tilePoint.y()];
             if (boardTileType != GT_Empty)
             {
                 if (!isSpecial)
@@ -621,10 +678,18 @@ bool TableTurfAI::TestPlacementOnPoint(const TableTurfAI::Card &card, PlacementR
                     // overlapping
                     return false;
                 }
-                else if ((boardTileType != GT_InkOrange && boardTileType != GT_InkBlue) || m_boardStat.m_spPoints.contains(tilePoint))
+                else
                 {
-                    // special ignore normal tiles
-                    return false;
+                    if ((boardTileType != GT_InkOrange && boardTileType != GT_InkBlue) || m_boardStat.m_spPoints.contains(tilePoint))
+                    {
+                        // special ignore normal tiles
+                        return false;
+                    }
+
+                    if (boardTileType == GT_InkBlue)
+                    {
+                        isSpecialCoverEnemyTile = true;
+                    }
                 }
             }
 
@@ -632,11 +697,6 @@ bool TableTurfAI::TestPlacementOnPoint(const TableTurfAI::Card &card, PlacementR
             if (cardTileType == GT_InkOrangeSp)
             {
                 result.m_spPointOnBoard = tilePoint;
-                if (boardTileType == GT_InkBlue)
-                {
-                    // special point should not cover enemy ink (to avoid covering enemy 12 tile card)
-                    return false;
-                }
             }
 
             // record the point closest to enemy turf
@@ -646,20 +706,20 @@ bool TableTurfAI::TestPlacementOnPoint(const TableTurfAI::Card &card, PlacementR
             }
 
             // put card on preview
-            m_boardPreview[tilePoint.x()][tilePoint.y()] = cardTileType;
+            ppBoardAfter[tilePoint.x()][tilePoint.y()] = cardTileType;
 
             // test if there is any orange tile around
-            auto nearbyTest = [this, &isSpecial] (int x, int y) -> bool
+            auto nearbyTest = [&ppBoardBefore, &isSpecial] (int x, int y) -> bool
             {
                 if (x < 0 || y < 0 || x >= BOARD_SIZE_X || y >= BOARD_SIZE_Y)
                 {
                     return false;
                 }
 
-                bool result = m_board[x][y] == GT_InkOrangeSp;
+                bool result = ppBoardBefore[x][y] == GT_InkOrangeSp;
                 if (!isSpecial)
                 {
-                    result |= m_board[x][y] == GT_InkOrange;
+                    result |= ppBoardBefore[x][y] == GT_InkOrange;
                 }
                 return result;
             };
@@ -676,7 +736,14 @@ bool TableTurfAI::TestPlacementOnPoint(const TableTurfAI::Card &card, PlacementR
         }
     }
 
-    return isNextToOrangeTile;
+    if (isSpecial)
+    {
+        return isSpecialCoverEnemyTile && isNextToOrangeTile;
+    }
+    else
+    {
+        return isNextToOrangeTile;
+    }
 }
 
 void TableTurfAI::CalculateScore_LeastMoves(PlacementResult &result)
@@ -698,7 +765,7 @@ void TableTurfAI::CalculateScore_ExpandTurf(TableTurfAI::PlacementResult &result
     result.m_score -= qAbs(result.m_cursorPoint.x() - 4);
 }
 
-int TableTurfAI::CalculateScore_BuildSpecial(TableTurfAI::GridType ppBoard[][BOARD_SIZE_Y])
+int TableTurfAI::CalculateScore_BuildSpecial(GridType ppBoard[][BOARD_SIZE_Y])
 {
     QVector<QPoint> spPoints;
     for (int y = 0; y < BOARD_SIZE_Y; y++)
@@ -744,22 +811,34 @@ int TableTurfAI::CalculateScore_BuildSpecial(TableTurfAI::GridType ppBoard[][BOA
     return score;
 }
 
-void TableTurfAI::CalculateScore_CoverEnemyTurf(TableTurfAI::PlacementResult &result)
+void TableTurfAI::CalculateScore_CoverEnemyTurf(TableTurfAI::PlacementResult &result, GridType const ppBoardBefore[][BOARD_SIZE_Y], GridType const ppBoardAfter[][BOARD_SIZE_Y])
 {
-    int enemyTurf = 0;
+    int enemyTurfBefore = 0;
     for (int y = 0; y < BOARD_SIZE_Y; y++)
     {
         for (int x = 0; x < BOARD_SIZE_X; x++)
         {
-            if (m_boardPreview[x][y] == GT_InkBlue || m_boardPreview[x][y] == GT_InkBlueSp)
+            if (ppBoardBefore[x][y] == GT_InkBlue || ppBoardBefore[x][y] == GT_InkBlueSp)
             {
-                enemyTurf++;
+                enemyTurfBefore++;
+            }
+        }
+    }
+
+    int enemyTurfAfter = 0;
+    for (int y = 0; y < BOARD_SIZE_Y; y++)
+    {
+        for (int x = 0; x < BOARD_SIZE_X; x++)
+        {
+            if (ppBoardAfter[x][y] == GT_InkBlue || ppBoardAfter[x][y] == GT_InkBlueSp)
+            {
+                enemyTurfAfter++;
             }
         }
     }
 
     // score on replacing the most enemy turf
-    result.m_score += m_boardStat.m_enemyTurf - enemyTurf;
+    result.m_score += (enemyTurfBefore - enemyTurfAfter);
 }
 
 void TableTurfAI::ExportBoard()
@@ -831,13 +910,13 @@ void TableTurfAI::ExportCards()
     }
 }
 
-void TableTurfAI::RefreshBoardPreview()
+void TableTurfAI::RefreshBoardPreview(const GridType ppBoardRef[][BOARD_SIZE_Y], GridType ppBoard[][BOARD_SIZE_Y])
 {
     for (int y = 0; y < BOARD_SIZE_Y; y++)
     {
         for (int x = 0; x < BOARD_SIZE_X; x++)
         {
-            m_boardPreview[x][y] = m_board[x][y];
+            ppBoard[x][y] = ppBoardRef[x][y];
         }
     }
 }
@@ -871,8 +950,6 @@ qreal TableTurfAI::GetColorPixelRadio(QRect rect, HSVRange hsvRange)
 
 void TableTurfAI::Card::Reset()
 {
-    m_init = false;
-    m_usable = true;
     m_rotation = 0;
     m_center = QPoint(3,3);
     m_rect = QRect();
