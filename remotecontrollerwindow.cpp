@@ -2538,7 +2538,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     case SP_S3_TableturfCloneJelly:
     {
         SmartS3TableturfCloneJelly::Settings settings;
-        settings.m_mode = TableTurfAI::Mode::NoOneTwoTile;
+        settings.m_mode = TableTurfAI::Mode::ThreeTwelveSp;
         m_smartProgram = new SmartS3TableturfCloneJelly(settings, parameter);
         break;
     }

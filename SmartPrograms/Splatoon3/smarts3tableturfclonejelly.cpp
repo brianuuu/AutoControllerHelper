@@ -112,7 +112,7 @@ void SmartS3TableturfCloneJelly::runNextState()
                     if (m_battleCount > 0)
                     {
                         QString str = "Runtime: " + QString::number(QDateTime::currentSecsSinceEpoch() - m_startTimeStamp);
-                        str += "s, EXP gained: " + QString::number(m_winCount * 100 + (m_battleCount- m_winCount) * 40);
+                        str += "s, EXP gained: " + QString::number(m_winCount * 130 + (m_battleCount- m_winCount) * 40);
                         str += " (" + QString::number(m_winCount) + "/" + QString::number(m_battleCount) + ")";
                         emit printLog(str);
                     }
@@ -352,16 +352,16 @@ void SmartS3TableturfCloneJelly::runNextState()
                 switch (m_cardToUse)
                 {
                 default:
-                    setState_runCommand("B,1,DUp,1,A,1,Nothing,2,A,1,Nothing,20");
+                    setState_runCommand("B,1,DUp,1,A,1,Nothing,4,A,1,Nothing,20");
                     break;
                 case 1:
-                    setState_runCommand("B,1,DLeft,1,LUp,1,A,1,Nothing,2,DRight,1,A,1,Nothing,20");
+                    setState_runCommand("B,1,DLeft,1,LUp,1,A,1,Nothing,4,DRight,1,A,1,Nothing,20");
                     break;
                 case 2:
-                    setState_runCommand("B,1,DDown,1,A,1,Nothing,2,DDown,1,A,1,Nothing,20");
+                    setState_runCommand("B,1,DDown,1,A,1,Nothing,4,DDown,1,A,1,Nothing,20");
                     break;
                 case 3:
-                    setState_runCommand("B,1,DDown,1,LLeft,1,A,1,Nothing,2,DDown,1,LRight,1,A,1,Nothing,20");
+                    setState_runCommand("B,1,DDown,1,LLeft,1,A,1,Nothing,4,DDown,1,LRight,1,A,1,Nothing,20");
                     break;
                 }
             }

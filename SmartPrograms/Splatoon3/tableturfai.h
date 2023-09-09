@@ -22,6 +22,7 @@ public:
         SkipTurns,
         LeastMoves,
         NoOneTwoTile,
+        ThreeTwelveSp,
     };
     void SetMode(Mode mode) { m_mode = mode; }
 
@@ -58,11 +59,12 @@ private:
         Card() { Reset(); }
 
         void Reset();
-        void Rotate(bool clockwise);
+        void Rotate(bool clockwise = true);
         void UpdateRectCenter();
 
         bool m_init;
         bool m_usable;
+        int m_rotation;
 
         QPoint m_center;
         QRect m_rect; // top left and size
@@ -77,20 +79,34 @@ private:
             : m_cardIndex(-1)
             , m_rotationCount(0)
             , m_cursorPoint(4,22)
+            , m_spPointOnBoard(4,22)
+            , m_yMinOnBoard(26)
+            , m_isSpecial(false)
             , m_score(0)
         {}
 
         int m_cardIndex;
         int m_rotationCount;
         QPoint m_cursorPoint;
+        QPoint m_spPointOnBoard;
+        int m_yMinOnBoard;
+        bool m_isSpecial;
 
         int m_score;
     };
 
+    #define BOARD_SIZE_X 9
+    #define BOARD_SIZE_Y 26
+    #define BOARD_TILE_SIZE 25
     struct BoardStat
     {
         int m_gridTypeCount[GT_Count];
+        int m_enemyTurfPrev;
+        int m_enemyTurf;
         int m_spCount;
+        int m_spScore; // set in CalculateNextMove()
+        QVector<QPoint> m_spPoints;
+        QRect m_rect;
     };
 
 private:
@@ -98,16 +114,20 @@ private:
     void AnalysisHands();
     void AnalysisSpecial();
 
-    bool UpdateBoardTile(QRect rect, GridType& tileType);
+    bool UpdateBoardTile(QRect rect, QPoint boardPos);
     bool UpdateCardTile(QRect rect, GridType& tileType);
 
     void ExportBoard();
     void ExportCards();
 
-    void DoPlacement_LeastMoves(int preferredCard = -1);
+    void RefreshBoardPreview();
+    void TestPlacement(int cardIndex, int turn, bool isSpecial, bool testRotation);
+    bool TestPlacementOnPoint(Card const& card, PlacementResult& result, QPoint cursorPoint, bool isSpecial);
 
-    void TestPlacement(int cardIndex, bool isSpecial);
-    bool TestPlacementOnPoint(Card const& card, QPoint cursorPoint, bool isSpecial);
+    void CalculateScore_LeastMoves(PlacementResult& result);
+    void CalculateScore_ExpandTurf(PlacementResult& result);
+    int CalculateScore_BuildSpecial(GridType ppBoard[][BOARD_SIZE_Y]);
+    void CalculateScore_CoverEnemyTurf(PlacementResult& result);
 
     qreal GetColorPixelRadio(QRect rect, HSVRange hsvRange);
 
@@ -115,11 +135,8 @@ private:
     Mode m_mode;
     QImage m_frame;
 
-    #define BOARD_SIZE_X 9
-    #define BOARD_SIZE_Y 26
-    #define BOARD_TILE_SIZE 25
     GridType m_board[BOARD_SIZE_X][BOARD_SIZE_Y];
-    QRect m_boardRect;
+    GridType m_boardPreview[BOARD_SIZE_X][BOARD_SIZE_Y];
     BoardStat m_boardStat;
 
     QVector<PlacementResult> m_placementResults;
