@@ -228,7 +228,7 @@ void SmartS3TableturfCloneJelly::runNextState()
             }
             else
             {
-                setState_runCommand(m_substage == SS_TurnWait ? "Nothing,10" : "A,1,Nothing,20");
+                setState_runCommand(m_substage == SS_TurnWait ? "Nothing,1" : "A,1,Nothing,20");
             }
         }
         break;
