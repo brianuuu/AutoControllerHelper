@@ -59,6 +59,7 @@ SOURCES += \
     SmartPrograms/PokemonSwSh/smartmaxraidbattler.cpp \
     SmartPrograms/PokemonSwSh/smartpurplebeamfilder.cpp \
     SmartPrograms/PokemonSwSh/smartsurprisetrade.cpp \
+    SmartPrograms/PokemonSwSh/smarttradepartnerfinder.cpp \
     SmartPrograms/PokemonSwSh/smartwattfarmer.cpp \
     SmartPrograms/PokemonSwSh/smartycommglitch.cpp \
     SmartPrograms/Splatoon3/smarts3tableturfclonejelly.cpp \
@@ -118,6 +119,7 @@ HEADERS += \
     SmartPrograms/PokemonSwSh/smartmaxraidbattler.h \
     SmartPrograms/PokemonSwSh/smartpurplebeamfilder.h \
     SmartPrograms/PokemonSwSh/smartsurprisetrade.h \
+    SmartPrograms/PokemonSwSh/smarttradepartnerfinder.h \
     SmartPrograms/PokemonSwSh/smartwattfarmer.h \
     SmartPrograms/PokemonSwSh/smartycommglitch.h \
     SmartPrograms/Splatoon3/smarts3tableturfclonejelly.h \

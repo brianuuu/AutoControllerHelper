@@ -1942,7 +1942,7 @@
                  </sizepolicy>
                 </property>
                 <property name="currentIndex">
-                 <number>20</number>
+                 <number>18</number>
                 </property>
                 <widget class="QWidget" name="page">
                  <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1974,8 +1974,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>384</width>
-                       <height>64</height>
+                       <width>498</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -4521,8 +4521,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>357</width>
-                       <height>117</height>
+                       <width>498</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_47">
@@ -4546,6 +4546,20 @@ Enter the Trade Partner:</string>
                         </property>
                         <property name="checked">
                          <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="label_89">
+                        <property name="text">
+                         <string>Enter Link Code (SwSh only):</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="SP18_LE_LinkCode">
+                        <property name="maxLength">
+                         <number>8</number>
                         </property>
                        </widget>
                       </item>
@@ -4598,8 +4612,8 @@ Enter the Trade Partner:</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>380</width>
-                       <height>183</height>
+                       <width>498</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_49">

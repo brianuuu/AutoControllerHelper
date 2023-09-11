@@ -2401,6 +2401,11 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartBoxRelease(ui->SPGeneric1_Count->value(), parameter);
         break;
     }
+    case SP_TradePartnerFinder:
+    {
+        m_smartProgram = new SmartTradePartnerFinder(ui->SP18_LE_Name->text(), ui->SP18_LE_LinkCode->text(), ui->SP18_CB_Spam->isChecked(), parameter);
+        break;
+    }
     case SP_BDSP_Starter:
     {
         m_smartProgram = new SmartBDSPStarter(ui->SP7_CB_Starter->currentIndex(), parameter);
