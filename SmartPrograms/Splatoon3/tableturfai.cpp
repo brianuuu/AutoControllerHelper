@@ -98,7 +98,11 @@ void TableTurfAI::CalculateNextMove(int turn)
     {
         m_boardStat.m_predictScore = 0;
         TestPlacement(-1, turn, true, true, false);
-        emit printLog("Max enemy tiles to be replaced: " + QString::number(m_boardStat.m_predictScore > 0 ? m_boardStat.m_predictScore - 100 : 0));
+        int overlapScore = m_boardStat.m_predictScore > 0 ? m_boardStat.m_predictScore - 100 : 0;
+        int orangeTurf = m_boardStat.m_gridTypeCount[GT_InkOrange] + m_boardStat.m_gridTypeCount[GT_InkOrangeSp];
+        int projectedFinalScoreDiff = orangeTurf + overlapScore - m_boardStat.m_enemyTurf - 4;
+        emit printLog("Max special overlap score: " + QString::number(overlapScore)
+                      + ", Projected final score diff: " + QString::number(projectedFinalScoreDiff) + (projectedFinalScoreDiff > 0 ? " (WINNING)" : " (LOSING)"));
         //qDebug() << "Tile replace:" << m_boardStat.m_predictScore - 100;
     }
 
@@ -148,7 +152,7 @@ void TableTurfAI::CalculateNextMove(int turn)
 
                 if (m_placementResults.empty())
                 {
-                    emit printLog("Unable to place 3-12 tile card with special...", LOG_WARNING);
+                    emit printLog("Unable to place 3-12 tile card with special...", LOG_ERROR);
                 }
                 else
                 {
@@ -157,7 +161,7 @@ void TableTurfAI::CalculateNextMove(int turn)
             }
             else
             {
-                emit printLog("Couldn't build enough special...", LOG_WARNING);
+                emit printLog("Couldn't build enough special...", LOG_ERROR);
             }
         }
         else if (m_boardStat.m_spCount > 3 && m_boardStat.m_predictScore < LEAST_REPLACE_TO_WIN) // if we can cover entire enemy 12 card, we always win(?) don't use special
@@ -269,7 +273,7 @@ QString TableTurfAI::GetNextMove(bool failedLast)
     else
     {
         PlacementResult const& best = m_placementResults[0];
-        emit printLog("Using card " + QString::number(best.m_cardIndex)
+        emit printLog("Using card " + QString::number(best.m_cardIndex) + " (" + QString::number(m_cards[best.m_cardIndex].m_tileCount) + " tiles)"
                       + " with rotation " + QString::number(best.m_rotationCount)
                       + " at (" + QString::number(best.m_cursorPoint.x()) + "," + QString::number(best.m_cursorPoint.y())
                       + "), Score = " + QString::number(best.m_score)
@@ -277,7 +281,7 @@ QString TableTurfAI::GetNextMove(bool failedLast)
 
         if (best.m_score > 1000)
         {
-            emit printLog("Max enemy tile overlap increased to " + QString::number(best.m_score - 1100), LOG_SUCCESS);
+            emit printLog("Max special overlap score increased to " + QString::number(best.m_score - 1100), LOG_SUCCESS);
         }
 
         // hard record special points on board to avoid false detection
@@ -636,6 +640,12 @@ void TableTurfAI::TestPlacement(int cardIndex, int turn, bool isSpecial, bool te
                         if (isPrediction)
                         {
                             CalculateScore_CoverEnemyTurf(result, m_boardPreview, m_boardPredict);
+                            if (result.m_score <= card.m_tileCount)
+                            {
+                                // better to just place card normally
+                                continue;
+                            }
+
                             if (result.m_score >= m_predictScoreAdd)
                             {
                                 //qDebug() << result.m_score << m_boardStat.m_predictScore << cursorPoint << cardIndex << r;
@@ -646,6 +656,12 @@ void TableTurfAI::TestPlacement(int cardIndex, int turn, bool isSpecial, bool te
                         else
                         {
                             CalculateScore_CoverEnemyTurf(result, m_board, m_boardPreview);
+                            if (result.m_score <= card.m_tileCount)
+                            {
+                                // better to just place card normally
+                                continue;
+                            }
+
                             if (cardIndex == -1 && result.m_score > m_boardStat.m_predictScore)
                             {
                                 // current max enemy tile replacement
@@ -695,14 +711,11 @@ void TableTurfAI::TestPlacement(int cardIndex, int turn, bool isSpecial, bool te
                         {
                             m_predictScoreAdd = 0;
                             TestPlacement(cardIndex, turn, true, true, true);
-                            if (isSpecial)
+                            if (m_predictScoreAdd < m_boardStat.m_predictScore)
                             {
-                                if (m_predictScoreAdd < m_boardStat.m_predictScore)
-                                {
-                                    // using this special will make us replace fewer enemy tiles
-                                    //if (cardIndex == 2) qDebug() << "SKIPPED" << cursorPoint;
-                                    continue;
-                                }
+                                // using this will make us replace fewer enemy tiles
+                                //if (cardIndex == 2) qDebug() << "SKIPPED" << cursorPoint;
+                                continue;
                             }
 
                             if (m_predictScoreAdd > m_boardStat.m_predictScore)
@@ -887,6 +900,7 @@ int TableTurfAI::CalculateScore_BuildSpecial(GridType ppBoard[][BOARD_SIZE_Y])
 void TableTurfAI::CalculateScore_CoverEnemyTurf(TableTurfAI::PlacementResult &result, GridType const ppBoardBefore[][BOARD_SIZE_Y], GridType const ppBoardAfter[][BOARD_SIZE_Y])
 {
     int enemyTurfBefore = 0;
+    int myTurfBefore = 0;
     for (int y = 0; y < BOARD_SIZE_Y; y++)
     {
         for (int x = 0; x < BOARD_SIZE_X; x++)
@@ -895,10 +909,15 @@ void TableTurfAI::CalculateScore_CoverEnemyTurf(TableTurfAI::PlacementResult &re
             {
                 enemyTurfBefore++;
             }
+            else if (ppBoardBefore[x][y] == GT_InkOrange || ppBoardBefore[x][y] == GT_InkOrangeSp)
+            {
+                myTurfBefore++;
+            }
         }
     }
 
     int enemyTurfAfter = 0;
+    int myTurfAfter = 0;
     for (int y = 0; y < BOARD_SIZE_Y; y++)
     {
         for (int x = 0; x < BOARD_SIZE_X; x++)
@@ -907,12 +926,16 @@ void TableTurfAI::CalculateScore_CoverEnemyTurf(TableTurfAI::PlacementResult &re
             {
                 enemyTurfAfter++;
             }
+            else if (ppBoardAfter[x][y] == GT_InkOrange || ppBoardAfter[x][y] == GT_InkOrangeSp)
+            {
+                myTurfAfter++;
+            }
         }
     }
 
-    // score on replacing the most enemy turf
+    // score on replacing the most enemy turf and increasing most of our turf
     result.m_score += 100;
-    result.m_score += (enemyTurfBefore - enemyTurfAfter);
+    result.m_score += (enemyTurfBefore - enemyTurfAfter) + (myTurfAfter - myTurfBefore);
 }
 
 void TableTurfAI::ExportBoard()

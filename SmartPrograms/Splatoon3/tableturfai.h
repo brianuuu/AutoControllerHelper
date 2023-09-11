@@ -143,7 +143,7 @@ private:
     QVector<PlacementResult> m_placementResults;
     Card m_cards[4];
 
-    #define LEAST_REPLACE_TO_WIN (12+100)
+    #define LEAST_REPLACE_TO_WIN (20+100)
     Card m_cardPredict;
     int m_predictScoreAdd;
 
