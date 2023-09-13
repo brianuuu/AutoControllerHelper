@@ -892,6 +892,12 @@ int TableTurfAI::CalculateScore_BuildSpecial(GridType ppBoard[][BOARD_SIZE_Y])
         {
             score += i;
         }
+
+        if (surroundCount == 8)
+        {
+            // this speical block is completed, prioritize it
+            score += 40;
+        }
     }
 
     return score;
