@@ -4532,7 +4532,7 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                          <string>Note: If the name has non-English characters, you must change the
 Game Language in General Settings, otherwise it will not be properly detected
 
-Enter the Trade Partner:</string>
+Enter Trade Partner Name:</string>
                         </property>
                        </widget>
                       </item>

@@ -1,6 +1,5 @@
 #include "remotecontrollerwindow.h"
 #include "ui_remotecontrollerwindow.h"
-#include "SmartPrograms/Splatoon3/tableturfai.h"
 
 RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     QWidget(parent),
