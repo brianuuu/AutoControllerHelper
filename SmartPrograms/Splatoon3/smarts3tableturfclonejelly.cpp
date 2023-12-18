@@ -143,8 +143,8 @@ void SmartS3TableturfCloneJelly::runNextState()
     }
     case SS_GetNextMove:
     {
-        setState_runCommand(m_ai.GetNextMove());
         m_cardToUse = m_ai.GetNextCard();
+        setState_runCommand(m_ai.GetNextMove());
         m_substage = SS_PlaceCard;
         break;
     }
