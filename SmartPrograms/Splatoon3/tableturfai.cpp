@@ -261,13 +261,13 @@ QString TableTurfAI::GetNextMove(bool failedLast)
         switch (index)
         {
         default:
-            return "DUp,1,A,1,Nothing,2,A,1,Nothing,20";
+            return "DUp,1,A,1,Nothing,4,A,1,Nothing,20";
         case 1:
-            return "DUp,1,A,1,Nothing,2,DRight,1,A,1,Nothing,20";
+            return "DUp,1,A,1,Nothing,4,DRight,1,A,1,Nothing,20";
         case 2:
-            return "DUp,1,A,1,Nothing,2,DDown,1,A,1,Nothing,20";
+            return "DUp,1,A,1,Nothing,4,DDown,1,A,1,Nothing,20";
         case 3:
-            return "DUp,1,A,1,Nothing,2,DDown,1,LRight,1,A,1,Nothing,20";
+            return "DUp,1,A,1,Nothing,4,DDown,1,LRight,1,A,1,Nothing,20";
         }
     }
     else
@@ -529,6 +529,12 @@ void TableTurfAI::AnalysisHands()
         if (m_cards[i].m_tileCount == 0)
         {
             qDebug() << "ERROR DETECTING ANY TILE FOR CARD" << i;
+        }
+
+        if (m_cards[i].m_tileCount > 6 && m_cards[i].m_tileCount < 12)
+        {
+            emit printLog("Card with " + QString::number(m_cards[i].m_tileCount) + " tiles detected at slot " + QString::number(i) + ", assuming it is Tenta Missile", LOG_ERROR);
+            m_cards[i] = m_cardPredict;
         }
 
         m_cards[i].UpdateRectCenter();
