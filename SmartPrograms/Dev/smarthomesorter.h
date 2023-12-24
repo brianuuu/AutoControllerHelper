@@ -12,6 +12,7 @@ public:
     {
         int m_count;
         bool m_livingDex;
+        bool m_livingDexShiny;
     };
 
 public:
@@ -75,7 +76,7 @@ private:
     // List of test color
     HSVRange const C_Color_Empty = HSVRange(0,0,220,359,40,255); // >250
     HSVRange const C_Color_Summary = HSVRange(150,130,170,190,255,210); // >180
-    HSVRange const C_Color_Text = HSVRange(0,0,220,359,255,255);
+    HSVRange const C_Color_Text = HSVRange(0,0,210,359,255,255);
     HSVRange const C_Color_Shiny = HSVRange(0,0,50,359,70,220); // >50
 
     // List of test point/area

@@ -169,20 +169,28 @@ void SmartHomeSorter::runNextState()
                 // scan completed
                 if (m_currentID >= m_pokemonData.size())
                 {
+                    int livingDexOutsideCount = 0;
                     if (m_programSettings.m_livingDex)
                     {
                         m_pokemonDataSorted.resize(m_maxDexNum);
                         for (int i = 0; i < m_pokemonData.size(); i++)
                         {
                             int dexNum = m_pokemonData[i].m_dexNum;
-                            if (m_pokemonDataSorted[dexNum - 1].m_dexNum == 0)
+                            if (dexNum == 0)
+                            {
+                                continue;
+                            }
+
+                            bool isShiny = m_pokemonData[i].m_isShiny;
+                            if (isShiny == m_programSettings.m_livingDexShiny && m_pokemonDataSorted[dexNum - 1].m_dexNum == 0)
                             {
                                 // slot isn't occupied yet
-                                m_pokemonDataSorted[dexNum - 1].m_dexNum = dexNum;
+                                m_pokemonDataSorted[dexNum - 1] = m_pokemonData[i];
                             }
                             else
                             {
-                                // slot already occupied, put it to default sort
+                                // slot already occupied or not same shiny setting, put it to default sort
+                                livingDexOutsideCount++;
                                 m_pokemonDataSorted.push_back(m_pokemonData[i]);
                             }
                         }
@@ -194,9 +202,14 @@ void SmartHomeSorter::runNextState()
                         }
 
                         // expand data to maximum size required
-                        m_programSettings.m_count = (m_pokemonDataSorted.size() + 29) / 30;
-                        m_pokemonData.resize(m_programSettings.m_count * 30);
+                        int targetSize = (m_pokemonDataSorted.size() + 29) / 30;
+                        if (targetSize > m_programSettings.m_count)
+                        {
+                            m_pokemonData.resize(targetSize * 30);
+                            m_programSettings.m_count = targetSize;
+                        }
                         m_pokemonDataSorted.resize(m_programSettings.m_count * 30);
+
                         emit printLog("Total Boxes required = " + QString::number(m_programSettings.m_count));
                     }
                     else
@@ -206,12 +219,23 @@ void SmartHomeSorter::runNextState()
                     }
 
                     // Mark those that already have correct position
+                    int sortedCount = 0;
                     for (int i = 0; i < m_pokemonData.size(); i++)
                     {
                         if (m_pokemonData[i] == m_pokemonDataSorted[i])
                         {
                             m_pokemonData[i].m_isSorted = true;
+                            if (m_pokemonData[i].m_dexNum > 0)
+                            {
+                                sortedCount++;
+                            }
                         }
+                    }
+
+                    emit printLog("Pokemon Sorted: " + QString::number(sortedCount) + "/" + QString::number(m_pokemonCount));
+                    if (m_programSettings.m_livingDex)
+                    {
+                        emit printLog("No. of Pokemon Outside Living Dex: " + QString::number(livingDexOutsideCount));
                     }
 
                     // quit summary, start sorting
@@ -310,36 +334,38 @@ int SmartHomeSorter::findClosestUnsortedID()
 {
     // find any unsorted pokemon in the same box, then adjacent box, and so on
     int boxMove = 0;
-    int targetBox = m_position.m_box + boxMove;
-    while ((boxMove >= 0 && targetBox < m_programSettings.m_count) || (boxMove < 0 && targetBox >= 0))
+    while (m_position.m_box + boxMove < m_programSettings.m_count || m_position.m_box - boxMove >= 0)
     {
         // TODO: try find adjacent slots for optimization
-        for (int i = targetBox * 30; i < (targetBox + 1) * 30; i++)
+        if (m_position.m_box + boxMove < m_programSettings.m_count)
         {
-            if (!m_pokemonData[i].m_isSorted && m_pokemonData[i].m_dexNum > 0)
+            for (int i = m_position.m_box + boxMove * 30; i < (m_position.m_box + boxMove + 1) * 30; i++)
             {
-                return i;
+                if (!m_pokemonData[i].m_isSorted && m_pokemonData[i].m_dexNum > 0)
+                {
+                    return i;
+                }
             }
         }
 
         if (boxMove == 0)
         {
-            // 0 -> 1
             boxMove++;
-        }
-        else if (boxMove > 0)
-        {
-            // 1 -> -1
-            boxMove = -boxMove;
-        }
-        else
-        {
-            // -1 -> 2
-            boxMove = -boxMove;
-            boxMove++;
+            continue;
         }
 
-        targetBox = m_position.m_box + boxMove;
+        if (m_position.m_box - boxMove >= 0)
+        {
+            for (int i = (m_position.m_box - boxMove) * 30; i < (m_position.m_box - boxMove + 1) * 30; i++)
+            {
+                if (!m_pokemonData[i].m_isSorted && m_pokemonData[i].m_dexNum > 0)
+                {
+                    return i;
+                }
+            }
+        }
+
+        boxMove++;
     }
 
     return -1;
@@ -372,7 +398,7 @@ int SmartHomeSorter::findClosestTargetID()
         {
             for (int i = (m_position.m_box - boxMove) * 30; i < (m_position.m_box - boxMove + 1) * 30; i++)
             {
-                if (m_pokemonData[m_currentID] == m_pokemonDataSorted[i])
+                if (m_pokemonData[m_currentID] == m_pokemonDataSorted[i] && !m_pokemonData[i].m_isSorted)
                 {
                     return i;
                 }
