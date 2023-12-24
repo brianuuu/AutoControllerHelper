@@ -31,6 +31,7 @@ void SmartHomeSorter::runNextState()
     case SS_Init:
     {
         m_pokemonCount = 0;
+        m_currentID = 0;
         m_position = Position();
         m_pokemonData.resize(m_programSettings.m_count * 30);
 
@@ -65,43 +66,47 @@ void SmartHomeSorter::runNextState()
             }
 
             emit printLog("Box " + QString::number(m_position.m_box + 1) + " has " + QString::number(count) + " pokemon");
-            if (m_position.m_box == m_programSettings.m_count - 1)
+
+            if (count == 0)
             {
-                if (m_pokemonCount == 0)
+                if (m_position.m_box < m_programSettings.m_count - 1)
                 {
-                    setState_error("No Pokemon is found within the boxes");
+                    // next box
+                    m_position.m_box++;
+                    setState_runCommand("R,1,Nothing,30");
                 }
                 else
                 {
-                    // go to first available pokemon to check summary
-                    m_currentID = 0;
-                    for (PokemonData const& data : m_pokemonData)
-                    {
-                        if (data.m_dexNum == -1)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            m_currentID++;
-                        }
-                    }
+                    // no pokemon in last box, start sorting
+                    m_substage = SS_Sort;
+                    setState_runCommand("Nothing,5");
+                }
+                break;
+            }
 
-                    m_substage = SS_Summary;
-                    Position target = getPositionFromID(m_currentID);
-                    setState_runCommand(gotoPosition(m_position, target, false) + ",A,1,DDown,1,A,50");
-                    m_position = target;
-
-                    emit printLog("Scanning dex number and shiny for each Pokemon...");
-                    m_videoManager->setAreas({A_Summary});
+            // go to first available pokemon in this box to check summary
+            m_currentID = -1;
+            for (int i = m_position.m_box * 30; i < (m_position.m_box + 1) * 30; i++)
+            {
+                if (m_pokemonData[i].m_dexNum == -1)
+                {
+                    m_currentID = i;
+                    break;
                 }
             }
-            else
+
+            if (m_currentID == -1)
             {
-                // next box
-                m_position.m_box++;
-                setState_runCommand("R,1,Nothing,30");
+                setState_error("Unable to find Pokemon to check summary");
+                break;
             }
+
+            m_substage = SS_Summary;
+            Position target = getPositionFromID(m_currentID);
+            setState_runCommand(gotoPosition(m_position, target, false) + ",A,1,DDown,1,A,50");
+            m_position = target;
+
+            m_videoManager->setAreas({A_Summary});
         }
         break;
     }
@@ -157,7 +162,7 @@ void SmartHomeSorter::runNextState()
 
                 // find next pokemon to check
                 m_checkCount = 0;
-                while (m_currentID < m_pokemonData.size())
+                while (m_currentID < m_pokemonData.size() && m_currentID < (m_position.m_box + 1) * 30)
                 {
                     m_currentID++;
                     if (m_pokemonData[m_currentID].m_dexNum == -1)
@@ -169,98 +174,115 @@ void SmartHomeSorter::runNextState()
                 // scan completed
                 if (m_currentID >= m_pokemonData.size())
                 {
-                    int livingDexOutsideCount = 0;
-                    if (m_programSettings.m_livingDex)
+                    m_substage = SS_Sort;
+                    setState_runCommand("B,60");
+                    break;
+                }
+
+                // scan on current box is completed, go to next box
+                if (m_currentID >= (m_position.m_box + 1) * 30)
+                {
+                    m_substage = SS_ScanBox;
+                    Position target = Position();
+                    target.m_box = m_position.m_box + 1;
+                    setState_runCommand("B,60,Loop,1," + gotoPosition(m_position, target, true));
+                    m_position = target;
+
+                    m_videoManager->setAreas({A_All});
+                    break;
+                }
+
+                // scan next pokemon in the same box
+                setState_runCommand("DRight,1,Nothing,25", true);
+            }
+        }
+        break;
+    }
+    case SS_Sort:
+    {
+        if (state == S_CommandFinished)
+        {
+            if (m_pokemonCount == 0)
+            {
+                setState_error("No Pokemon is found within all boxes");
+                break;
+            }
+
+            int livingDexOutsideCount = 0;
+            if (m_programSettings.m_livingDex)
+            {
+                m_pokemonDataSorted.resize(m_maxDexNum);
+                for (int i = 0; i < m_pokemonData.size(); i++)
+                {
+                    int dexNum = m_pokemonData[i].m_dexNum;
+                    if (dexNum == 0)
                     {
-                        m_pokemonDataSorted.resize(m_maxDexNum);
-                        for (int i = 0; i < m_pokemonData.size(); i++)
-                        {
-                            int dexNum = m_pokemonData[i].m_dexNum;
-                            if (dexNum == 0)
-                            {
-                                continue;
-                            }
+                        continue;
+                    }
 
-                            bool isShiny = m_pokemonData[i].m_isShiny;
-                            if (isShiny == m_programSettings.m_livingDexShiny && m_pokemonDataSorted[dexNum - 1].m_dexNum == 0)
-                            {
-                                // slot isn't occupied yet
-                                m_pokemonDataSorted[dexNum - 1] = m_pokemonData[i];
-                            }
-                            else
-                            {
-                                // slot already occupied or not same shiny setting, put it to default sort
-                                livingDexOutsideCount++;
-                                m_pokemonDataSorted.push_back(m_pokemonData[i]);
-                            }
-                        }
-
-                        // sort remaining with default sort
-                        if (m_pokemonDataSorted.size() > m_maxDexNum)
-                        {
-                            std::sort(m_pokemonDataSorted.begin() + m_maxDexNum, m_pokemonDataSorted.end(), BoxSort());
-                        }
-
-                        // expand data to maximum size required
-                        int targetSize = (m_pokemonDataSorted.size() + 29) / 30;
-                        if (targetSize > m_programSettings.m_count)
-                        {
-                            m_pokemonData.resize(targetSize * 30);
-                            m_programSettings.m_count = targetSize;
-                        }
-                        m_pokemonDataSorted.resize(m_programSettings.m_count * 30);
-
-                        emit printLog("Total Boxes required = " + QString::number(m_programSettings.m_count));
+                    bool isShiny = m_pokemonData[i].m_isShiny;
+                    if (isShiny == m_programSettings.m_livingDexShiny && m_pokemonDataSorted[dexNum - 1].m_dexNum == 0)
+                    {
+                        // slot isn't occupied yet
+                        m_pokemonDataSorted[dexNum - 1] = m_pokemonData[i];
                     }
                     else
                     {
-                        m_pokemonDataSorted = m_pokemonData;
-                        std::sort(m_pokemonDataSorted.begin(), m_pokemonDataSorted.end(), BoxSort());
+                        // slot already occupied or not same shiny setting, put it to default sort
+                        livingDexOutsideCount++;
+                        m_pokemonDataSorted.push_back(m_pokemonData[i]);
                     }
-
-                    // Mark those that already have correct position
-                    int sortedCount = 0;
-                    for (int i = 0; i < m_pokemonData.size(); i++)
-                    {
-                        if (m_pokemonData[i] == m_pokemonDataSorted[i])
-                        {
-                            m_pokemonData[i].m_isSorted = true;
-                            if (m_pokemonData[i].m_dexNum > 0)
-                            {
-                                sortedCount++;
-                            }
-                        }
-                    }
-
-                    emit printLog("Pokemon Sorted: " + QString::number(sortedCount) + "/" + QString::number(m_pokemonCount));
-                    if (m_programSettings.m_livingDex)
-                    {
-                        emit printLog("No. of Pokemon Outside Living Dex: " + QString::number(livingDexOutsideCount));
-                    }
-
-                    // quit summary, start sorting
-                    m_substage = SS_Swap;
-                    setState_runCommand("B,60");
-
-                    emit printLog("Sorting started...");
-                    m_videoManager->clearCaptures();
-                    break;
                 }
 
-                // Is the next pokemon in the same current box?
-                Position target = getPositionFromID(m_currentID);
-                if (target.m_box == m_position.m_box)
+                // sort remaining with default sort
+                if (m_pokemonDataSorted.size() > m_maxDexNum)
                 {
-                    setState_runCommand("DRight,1,Nothing,25", true);
-                    break;
+                    std::sort(m_pokemonDataSorted.begin() + m_maxDexNum, m_pokemonDataSorted.end(), BoxSort());
                 }
 
-                // Need to goto the next box
-                m_substage = SS_Summary;
-                setState_runCommand("B,60,Loop,1," + gotoPosition(m_position, target, false) + ",A,1,DDown,1,A,50");
-                m_position = target;
-                m_videoManager->setAreas({A_Summary});
+                // expand data to maximum size required
+                int targetSize = (m_pokemonDataSorted.size() + 29) / 30;
+                if (targetSize > m_programSettings.m_count)
+                {
+                    m_pokemonData.resize(targetSize * 30);
+                    m_programSettings.m_count = targetSize;
+                }
+                m_pokemonDataSorted.resize(m_programSettings.m_count * 30);
+
+                emit printLog("Total Boxes required = " + QString::number(m_programSettings.m_count));
             }
+            else
+            {
+                m_pokemonDataSorted = m_pokemonData;
+                std::sort(m_pokemonDataSorted.begin(), m_pokemonDataSorted.end(), BoxSort());
+            }
+
+            // Mark those that already have correct position
+            int sortedCount = 0;
+            for (int i = 0; i < m_pokemonData.size(); i++)
+            {
+                if (m_pokemonData[i] == m_pokemonDataSorted[i])
+                {
+                    m_pokemonData[i].m_isSorted = true;
+                    if (m_pokemonData[i].m_dexNum > 0)
+                    {
+                        sortedCount++;
+                    }
+                }
+            }
+
+            emit printLog("Pokemon Sorted: " + QString::number(sortedCount) + "/" + QString::number(m_pokemonCount));
+            if (m_programSettings.m_livingDex)
+            {
+                emit printLog("No. of Pokemon Outside Living Dex: " + QString::number(livingDexOutsideCount));
+            }
+
+            // quit summary, start sorting
+            m_substage = SS_Swap;
+            runNextStateContinue();
+
+            emit printLog("Sorting started...");
+            m_videoManager->clearCaptures();
         }
         break;
     }

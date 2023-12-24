@@ -94,6 +94,7 @@ private:
         SS_Summary,
         SS_ScanDex,
 
+        SS_Sort,
         SS_Next,
         SS_Swap,
 
