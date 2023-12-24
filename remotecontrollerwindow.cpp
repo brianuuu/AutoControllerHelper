@@ -2325,6 +2325,14 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartCodeEntry(settings, parameter);
         break;
     }
+    case SP_HomeSorter:
+    {
+        SmartHomeSorter::Settings settings;
+        settings.m_count = ui->SP14_SB_Count->value();
+        settings.m_livingDex = ui->SP14_CB_Shiny->isChecked();
+        m_smartProgram = new SmartHomeSorter(settings, parameter);
+        break;
+    }
     case SP_YCommGlitch:
     {
         m_smartProgram = new SmartYCommGlitch(parameter);

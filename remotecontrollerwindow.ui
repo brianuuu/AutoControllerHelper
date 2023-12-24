@@ -1942,7 +1942,7 @@
                  </sizepolicy>
                 </property>
                 <property name="currentIndex">
-                 <number>18</number>
+                 <number>14</number>
                 </property>
                 <widget class="QWidget" name="page">
                  <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1974,8 +1974,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>384</width>
+                       <height>64</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -4092,8 +4092,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>294</width>
-                       <height>115</height>
+                       <width>498</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_37">
@@ -4102,7 +4102,7 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                         <item>
                          <widget class="QLabel" name="label_66">
                           <property name="text">
-                           <string>Scan Pasture Count:</string>
+                           <string>Scan Box Count:</string>
                           </property>
                          </widget>
                         </item>
@@ -4118,7 +4118,7 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                            <number>1</number>
                           </property>
                           <property name="maximum">
-                           <number>32</number>
+                           <number>100</number>
                           </property>
                          </widget>
                         </item>
@@ -4152,7 +4152,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                          <item>
                           <widget class="QLabel" name="label_67">
                            <property name="text">
-                            <string>WARNING: This may require up to 9 extra empty pastures!!</string>
+                            <string>WARNING: This may require extra empty boxes!!
+For Pokemon HOME, you will need at least 36 boxes for up to No. 1080.</string>
                            </property>
                           </widget>
                          </item>
@@ -4168,7 +4169,7 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                            <item>
                             <widget class="QCheckBox" name="SP14_CB_Alpha">
                              <property name="text">
-                              <string>Alpha</string>
+                              <string>Alpha (PLA only)</string>
                              </property>
                             </widget>
                            </item>
@@ -4239,8 +4240,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>198</width>
-                       <height>35</height>
+                       <width>498</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_41">
@@ -4300,8 +4301,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>224</width>
-                       <height>63</height>
+                       <width>498</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_43">
@@ -4395,8 +4396,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>238</width>
-                       <height>67</height>
+                       <width>498</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_45">
@@ -4612,8 +4613,8 @@ Enter Trade Partner Name:</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>380</width>
+                       <height>183</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_49">
@@ -4873,7 +4874,7 @@ Enter Trade Partner Name:</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>488</width>
+                       <width>371</width>
                        <height>245</height>
                       </rect>
                      </property>

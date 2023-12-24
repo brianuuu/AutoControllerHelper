@@ -42,6 +42,7 @@
 #include "SmartPrograms/Dev/smartsounddetection.h"
 #include "SmartPrograms/Dev/smarttestprogram.h"
 #include "SmartPrograms/Dev/smartcodeentry.h"
+#include "SmartPrograms/Dev/smarthomesorter.h"
 
 #include "SmartPrograms/PokemonSwSh/smartpurplebeamfilder.h"
 #include "SmartPrograms/PokemonSwSh/smartycommglitch.h"

@@ -14,6 +14,11 @@ SmartPLAPastureSorter::SmartPLAPastureSorter
 void SmartPLAPastureSorter::init()
 {
     SmartProgramBase::init();
+
+    if (m_programSettings.m_pastureCount > 32)
+    {
+        setState_error("Box count must be 32 or below");
+    }
 }
 
 void SmartPLAPastureSorter::reset()

@@ -27,6 +27,7 @@ enum SmartProgram : uint32_t
     SP_SoundDetection,
     SP_Test,
     SP_CodeEntry,
+    SP_HomeSorter,
 
     SP_PurpleBeamFinder,
     SP_YCommGlitch,
@@ -143,6 +144,7 @@ public:
             case SP_ColorCalibrator:        return "Dev: Color Calibrator";
             case SP_SoundDetection:         return "Dev: Sound Detection";
             case SP_CodeEntry:              return "Code Entry";
+            case SP_HomeSorter:             return "HOME Sorter";
 #if DEBUG_ENABLED
             case SP_Test:                   return "Test Program";
 #endif
@@ -221,6 +223,7 @@ public:
             case SP_SoundDetection:         return "SmartSoundDetection";
             case SP_Test:                   return "SmartTestProgram";
             case SP_CodeEntry:              return "SmartCodeEntry";
+            case SP_HomeSorter:             return "SmartHomeSorter";
 
             case SP_PurpleBeamFinder:       return "SmartPurpleBeamFilder";
             case SP_YCommGlitch:            return "SmartYCommGlitch";
@@ -284,6 +287,7 @@ public:
             case SP_SoundDetection:         return 17;
             case SP_Test:                   return 0;
             case SP_CodeEntry:              return 19;
+            case SP_HomeSorter:             return 14;
 
             case SP_PurpleBeamFinder:       return 2;
             case SP_YCommGlitch:            return 0;

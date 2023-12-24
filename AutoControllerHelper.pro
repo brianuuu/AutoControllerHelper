@@ -31,6 +31,7 @@ SOURCES += \
     SmartPrograms/Dev/smartcodeentry.cpp \
     SmartPrograms/Dev/smartcolorcalibrator.cpp \
     SmartPrograms/Dev/smartdelaycalibrator.cpp \
+    SmartPrograms/Dev/smarthomesorter.cpp \
     SmartPrograms/Dev/smartsounddetection.cpp \
     SmartPrograms/Dev/smarttestprogram.cpp \
     SmartPrograms/PokemonBDSP/smartbdspboxoperation.cpp \
@@ -91,6 +92,7 @@ HEADERS += \
     SmartPrograms/Dev/smartcodeentry.h \
     SmartPrograms/Dev/smartcolorcalibrator.h \
     SmartPrograms/Dev/smartdelaycalibrator.h \
+    SmartPrograms/Dev/smarthomesorter.h \
     SmartPrograms/Dev/smartsounddetection.h \
     SmartPrograms/Dev/smarttestprogram.h \
     SmartPrograms/PokemonBDSP/smartbdspboxoperation.h \
