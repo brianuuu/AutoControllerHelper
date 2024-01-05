@@ -31,6 +31,8 @@ void SmartHomeSorter::runNextState()
     case SS_Init:
     {
         m_pokemonCount = 0;
+        m_pokemonCountBox = 0;
+
         m_currentID = 0;
         m_position = Position();
         m_pokemonData.resize(m_programSettings.m_count * 30);
@@ -39,7 +41,7 @@ void SmartHomeSorter::runNextState()
         setState_frameAnalyzeRequest();
 
         emit printLog("Scanning number of Pokemon in each box...");
-        m_videoManager->setAreas({A_All});
+        m_videoManager->setAreas({A_ListStat});
         break;
     }
     case SS_ScanBox:
@@ -50,30 +52,38 @@ void SmartHomeSorter::runNextState()
         }
         else if (state == S_CaptureReady)
         {
-            int count = 0; // how many pokemon in this box
-            for (int i = 0; i < 30; i++)
+            // check if slot has pokemon
+            m_currentID = getIDFromPosition(m_position);
+            if (!checkBrightnessMeanTarget(A_ListStat.m_rect, C_Color_Summary, 230))
             {
-                int x = i % 6;
-                int y = i / 6;
-                if (!checkBrightnessMeanTarget(GetCaptureAreaOfPos(x,y).m_rect, C_Color_Empty, 250))
-                {
-                    count++;
-                    m_pokemonCount++;
+                m_pokemonCount++;
+                m_pokemonCountBox++;
 
-                    PokemonData& data = m_pokemonData[m_position.m_box * 30 + i];
-                    data.m_dexNum = -1; // set to -1 = there is a pokemon here
-                }
+                PokemonData& data = m_pokemonData[m_currentID];
+                data.m_dexNum = -1; // set to -1 = there is a pokemon here
+            }
+            else
+            {
+                emit printLog(getPositionString(getPositionFromID(m_currentID)) + ": No Pokemon");
             }
 
-            emit printLog("Box " + QString::number(m_position.m_box + 1) + " has " + QString::number(count) + " pokemon");
+            if (m_position.m_point != QPoint(5,4))
+            {
+                // next pokemon
+                setState_runCommand(gotoNextPokemon(m_position, true));
+                break;
+            }
 
-            if (count == 0)
+            emit printLog("Box " + QString::number(m_position.m_box + 1) + " has " + QString::number(m_pokemonCountBox) + " Pokemon");
+            if (m_pokemonCountBox == 0)
             {
                 if (m_position.m_box < m_programSettings.m_count - 1)
                 {
                     // next box
-                    m_position.m_box++;
-                    setState_runCommand("R,1,Nothing,30");
+                    Position target = Position();
+                    target.m_box = m_position.m_box + 1;
+                    setState_runCommand(gotoPosition(m_position, target, true));
+                    m_position = target;
                 }
                 else
                 {
@@ -188,7 +198,8 @@ void SmartHomeSorter::runNextState()
                     setState_runCommand("B,60,Loop,1," + gotoPosition(m_position, target, true));
                     m_position = target;
 
-                    m_videoManager->setAreas({A_All});
+                    m_pokemonCountBox = 0;
+                    m_videoManager->setAreas({A_ListStat});
                     break;
                 }
 
@@ -493,6 +504,42 @@ QString SmartHomeSorter::gotoPosition(Position from, Position to, bool addDelay)
     }
 
     return command;
+}
+
+QString SmartHomeSorter::gotoNextPokemon(Position &pos, bool addDelay)
+{
+    // This does a zig-zag path to save a bit of time within the same box
+    Position posPrev = pos;
+    if (pos.m_point == QPoint(5,4))
+    {
+        // should not be using this
+        return "";
+    }
+
+    if (pos.m_point.y() % 2 == 0)
+    {
+        if (pos.m_point.x() == 5)
+        {
+            pos.m_point.ry()++;
+        }
+        else
+        {
+            pos.m_point.rx()++;
+        }
+    }
+    else
+    {
+        if (pos.m_point.x() == 0)
+        {
+            pos.m_point.ry()++;
+        }
+        else
+        {
+            pos.m_point.rx()--;
+        }
+    }
+
+    return gotoPosition(posPrev, pos, addDelay);
 }
 
 int SmartHomeSorter::getIDFromPosition(Position pos)

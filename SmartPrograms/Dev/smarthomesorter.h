@@ -66,7 +66,9 @@ private:
 
     int findClosestUnsortedID();
     int findClosestTargetID();
+
     static QString gotoPosition(Position from, Position to, bool addDelay);
+    static QString gotoNextPokemon(Position& pos, bool addDelay);
     static int getIDFromPosition(Position pos);
     static Position getPositionFromID(int id);
     static QString getPositionString(Position pos);
@@ -75,12 +77,12 @@ private:
 
     // List of test color
     HSVRange const C_Color_Empty = HSVRange(0,0,220,359,40,255); // >250
-    HSVRange const C_Color_Summary = HSVRange(150,130,170,190,255,210); // >180
+    HSVRange const C_Color_Summary = HSVRange(150,130,170,190,255,210); // >180, (list) >230
     HSVRange const C_Color_Text = HSVRange(0,0,210,359,255,255);
     HSVRange const C_Color_Shiny = HSVRange(0,0,50,359,70,220); // >50
 
     // List of test point/area
-    CaptureArea const A_All = CaptureArea(52,126,552,380, QColor(255,0,0));
+    CaptureArea const A_ListStat = CaptureArea(904,574,350,30, QColor(255,0,0));
     CaptureArea const A_Summary = CaptureArea(513,176,274,36, QColor(255,0,0));
     CaptureArea const A_Number = CaptureArea(575,183,51,20, QColor(255,0,0));
     CaptureArea const A_Shiny = CaptureArea(912,73,26,28, QColor(255,0,0));
@@ -108,6 +110,7 @@ private:
 
     int const m_maxDexNum = 1080;
     int m_pokemonCount;
+    int m_pokemonCountBox;
     int m_currentID;
     int m_checkCount;
     Position m_position;
