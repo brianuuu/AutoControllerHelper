@@ -369,15 +369,31 @@ int SmartHomeSorter::findClosestUnsortedID()
     int boxMove = 0;
     while (m_position.m_box + boxMove < m_programSettings.m_count || m_position.m_box - boxMove >= 0)
     {
-        // TODO: try find adjacent slots for optimization
         if (m_position.m_box + boxMove < m_programSettings.m_count)
         {
-            for (int i = m_position.m_box + boxMove * 30; i < (m_position.m_box + boxMove + 1) * 30; i++)
+            // try find adjacent slots from current cursor position
+            Position positionInBox = m_position;
+            positionInBox.m_box += boxMove;
+
+            int returnID = -1;
+            int maxDist = 10;
+            for (int i = (m_position.m_box + boxMove) * 30; i < (m_position.m_box + boxMove + 1) * 30; i++)
             {
                 if (!m_pokemonData[i].m_isSorted && m_pokemonData[i].m_dexNum > 0)
                 {
-                    return i;
+                    Position pos = getPositionFromID(i);
+                    int dist = qAbs(pos.m_point.x() - positionInBox.m_point.x()) + qAbs(pos.m_point.y() - positionInBox.m_point.y());
+                    if (dist < maxDist)
+                    {
+                        returnID = i;
+                        maxDist = dist;
+                    }
                 }
+            }
+
+            if (returnID >= 0)
+            {
+                return returnID;
             }
         }
 
@@ -389,12 +405,29 @@ int SmartHomeSorter::findClosestUnsortedID()
 
         if (m_position.m_box - boxMove >= 0)
         {
+            // try find adjacent slots from current cursor position
+            Position positionInBox = m_position;
+            positionInBox.m_box -= boxMove;
+
+            int returnID = -1;
+            int maxDist = 10;
             for (int i = (m_position.m_box - boxMove) * 30; i < (m_position.m_box - boxMove + 1) * 30; i++)
             {
                 if (!m_pokemonData[i].m_isSorted && m_pokemonData[i].m_dexNum > 0)
                 {
-                    return i;
+                    Position pos = getPositionFromID(i);
+                    int dist = qAbs(pos.m_point.x() - positionInBox.m_point.x()) + qAbs(pos.m_point.y() - positionInBox.m_point.y());
+                    if (dist < maxDist)
+                    {
+                        returnID = i;
+                        maxDist = dist;
+                    }
                 }
+            }
+
+            if (returnID >= 0)
+            {
+                return returnID;
             }
         }
 
