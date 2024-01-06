@@ -864,6 +864,8 @@ void RemoteControllerWindow::SerialConnectComplete()
         msg += "\n1. Installed SmartProgram.hex to the board";
         msg += "\n2. Have correct wire connections between board and CP210x chip";
         msg += "\n3. Board connect to Switch after disconnecting other controllers";
+        msg += "\n4. Restart Switch by holding power button for 5s and press restart";
+        msg += "\n5. For Arduino Uno R3, you may have to remove a chip, follow manual section 1.5.6";
         msg += "\nFor more information please read the manual.";
         QMessageBox::critical(this, "Error", msg, QMessageBox::Ok);
         SerialDisconnect();
