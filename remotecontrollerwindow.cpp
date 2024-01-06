@@ -1752,13 +1752,13 @@ void RemoteControllerWindow::on_SP6_CB_Skips_clicked()
 void RemoteControllerWindow::on_SP9_CB_Mode_currentIndexChanged(int index)
 {
     SmartSVEggOperation::EggOperationType type = SmartSVEggOperation::EggOperationType(index);
-    ui->SP9_SB_Sandwich->setEnabled(type == SmartSVEggOperation::EOT_Collector);
-    ui->SP9_CB_Sound->setEnabled(type != SmartSVEggOperation::EOT_Collector);
-    ui->SP9_SB_Column->setEnabled(type == SmartSVEggOperation::EOT_Hatcher);
-    ui->SP9_CB_HatchSandwich->setEnabled(type != SmartSVEggOperation::EOT_Collector);
-    ui->SP9_CB_ShinySave->setEnabled(type != SmartSVEggOperation::EOT_Collector);
-    ui->SP9_CB_BackupSave->setEnabled(type == SmartSVEggOperation::EOT_Shiny);
-    ui->SP9_CB_Wingull->setEnabled(type != SmartSVEggOperation::EOT_Collector);
+    ui->SP9_SB_Sandwich->setEnabled(type == SmartSVEggOperation::EggOperationType::EOT_Collector);
+    ui->SP9_CB_Sound->setEnabled(type != SmartSVEggOperation::EggOperationType::EOT_Collector);
+    ui->SP9_SB_Column->setEnabled(type == SmartSVEggOperation::EggOperationType::EOT_Hatcher);
+    ui->SP9_CB_HatchSandwich->setEnabled(type != SmartSVEggOperation::EggOperationType::EOT_Collector);
+    ui->SP9_CB_ShinySave->setEnabled(type != SmartSVEggOperation::EggOperationType::EOT_Collector);
+    ui->SP9_CB_BackupSave->setEnabled(type == SmartSVEggOperation::EggOperationType::EOT_Shiny);
+    ui->SP9_CB_Wingull->setEnabled(type != SmartSVEggOperation::EggOperationType::EOT_Collector);
 }
 
 void RemoteControllerWindow::on_SP19_SP_Count_valueChanged(int arg1)
@@ -1792,31 +1792,55 @@ void RemoteControllerWindow::on_SP19_SP_Select_clicked()
 
 void RemoteControllerWindow::on_SP20_CB_Mode_currentIndexChanged(int index)
 {
-    SmartEggOperation::EggOperationType type = SmartEggOperation::EggOperationType(index);
-    ui->SP20_SB_Collect->setEnabled(type == SmartEggOperation::EOT_Collector);
-    ui->SP20_SB_Column->setEnabled(type == SmartEggOperation::EOT_Hatcher);
-    ui->SP20_CB_HatchExtra->setEnabled(type != SmartEggOperation::EOT_Collector && type != SmartEggOperation::EOT_Remainder && type != SmartEggOperation::EOT_Parent);
-    ui->SP20_RB_ShinyDisable->setEnabled(type != SmartEggOperation::EOT_Collector);
-    ui->SP20_RB_ShinySound->setEnabled(type != SmartEggOperation::EOT_Collector);
-    ui->SP20_RB_ShinyDelay->setEnabled(type != SmartEggOperation::EOT_Collector && type != SmartEggOperation::EOT_Remainder);
-    if (type == SmartEggOperation::EOT_Remainder && ui->SP20_RB_ShinyDelay->isChecked())
-    {
-        ui->SP20_RB_ShinyDisable->setChecked(true);
-    }
-    ui->SP20_TW_Keep->setEnabled(type != SmartEggOperation::EOT_Collector);
-    ui->SP20_CB_ParentGender->setEnabled(type == SmartEggOperation::EOT_Parent);
+    SmartProgram const sp = SmartProgramBase::getProgramEnumFromName(ui->LW_SmartProgram->currentItem()->text());
 
-    switch (type)
+    if (sp == SP_EggOperation)
     {
-    case SmartEggOperation::EOT_Shiny:
-        ui->SP20_TW_Keep->SetMode(PokemonStatTableWidget::Mode::Shiny);
-        break;
-    case SmartEggOperation::EOT_Parent:
-        ui->SP20_TW_Keep->SetMode(PokemonStatTableWidget::Mode::Parent);
-        break;
-    default:
+        SmartEggOperation::EggOperationType type = SmartEggOperation::EggOperationType(index);
+        ui->SP20_SB_Collect->setEnabled(type == SmartEggOperation::EggOperationType::EOT_Collector);
+        ui->SP20_SB_Column->setEnabled(type == SmartEggOperation::EggOperationType::EOT_Hatcher);
+        ui->SP20_CB_HatchExtra->setEnabled(type != SmartEggOperation::EggOperationType::EOT_Collector && type != SmartEggOperation::EggOperationType::EOT_Remainder && type != SmartEggOperation::EggOperationType::EOT_Parent);
+        ui->SP20_RB_ShinyDisable->setEnabled(type != SmartEggOperation::EggOperationType::EOT_Collector);
+        ui->SP20_RB_ShinySound->setEnabled(type != SmartEggOperation::EggOperationType::EOT_Collector);
+        ui->SP20_RB_ShinyDelay->setEnabled(type != SmartEggOperation::EggOperationType::EOT_Collector && type != SmartEggOperation::EggOperationType::EOT_Remainder);
+        if (type == SmartEggOperation::EggOperationType::EOT_Remainder && ui->SP20_RB_ShinyDelay->isChecked())
+        {
+            ui->SP20_RB_ShinyDisable->setChecked(true);
+        }
+        ui->SP20_TW_Keep->setEnabled(type != SmartEggOperation::EggOperationType::EOT_Collector);
+        ui->SP20_CB_ParentGender->setEnabled(type == SmartEggOperation::EggOperationType::EOT_Parent);
+
+        switch (type)
+        {
+        case SmartEggOperation::EggOperationType::EOT_Shiny:
+            ui->SP20_TW_Keep->SetMode(PokemonStatTableWidget::Mode::Shiny);
+            break;
+        case SmartEggOperation::EggOperationType::EOT_Parent:
+            ui->SP20_TW_Keep->SetMode(PokemonStatTableWidget::Mode::Parent);
+            break;
+        default:
+            ui->SP20_TW_Keep->SetMode(PokemonStatTableWidget::Mode::Default);
+            break;
+        }
+    }
+    else if (sp == SP_BDSP_EggOperation)
+    {
+        SmartBDSPEggOperation::EggOperationType type = SmartBDSPEggOperation::EggOperationType(index);
+        if (type >= SmartBDSPEggOperation::EggOperationType::EOT_COUNT)
+        {
+            ui->SP20_CB_Mode->setCurrentIndex(0);
+            return;
+        }
+
+        ui->SP20_SB_Collect->setEnabled(type == SmartBDSPEggOperation::EggOperationType::EOT_Collector);
+        ui->SP20_SB_Column->setEnabled(type == SmartBDSPEggOperation::EggOperationType::EOT_Hatcher);
+        ui->SP20_CB_HatchExtra->setEnabled(false);
+        ui->SP20_RB_ShinyDisable->setEnabled(type != SmartBDSPEggOperation::EggOperationType::EOT_Collector);
+        ui->SP20_RB_ShinySound->setEnabled(type != SmartBDSPEggOperation::EggOperationType::EOT_Collector);
+        ui->SP20_RB_ShinyDelay->setEnabled(false);
+        ui->SP20_TW_Keep->setEnabled(false);
         ui->SP20_TW_Keep->SetMode(PokemonStatTableWidget::Mode::Default);
-        break;
+        ui->SP20_CB_ParentGender->setEnabled(false);
     }
 }
 
@@ -2041,11 +2065,21 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
         ui->SPGeneric1_Count->setRange(1,999);
         break;
     }
+    case SP_EggOperation:
+    {
+        on_SP20_CB_Mode_currentIndexChanged(ui->SP20_CB_Mode->currentIndex());
+        break;
+    }
     case SP_BDSP_BoxDuplication:
     {
         ui->SPGeneric1_Note->setText("Note: You MUST have Menu Glitch active, which has been patched in the newest version.\nThis is for duplicating Pokemon, for items, use Box Operation program instead.");
         ui->SPGeneric1_Label->setText("No. of Boxes to Duplicate:");
         ui->SPGeneric1_Count->setRange(1,39);
+        break;
+    }
+    case SP_BDSP_EggOperation:
+    {
+        on_SP20_CB_Mode_currentIndexChanged(ui->SP20_CB_Mode->currentIndex());
         break;
     }
     case SP_SV_ItemDuplication:
@@ -2444,6 +2478,23 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     case SP_BDSP_DuplicateItem1to30:
     {
         m_smartProgram = new SmartBDSPDuplicateItem1to30(parameter);
+        break;
+    }
+    case SP_BDSP_EggOperation:
+    {
+        SmartBDSPEggOperation::Settings settings;
+        settings.m_operation = SmartBDSPEggOperation::EggOperationType(ui->SP20_CB_Mode->currentIndex());
+        settings.m_targetEggCount = ui->SP20_SB_Collect->value();
+        settings.m_columnsToHatch = ui->SP20_SB_Column->value();
+        if (ui->SP20_RB_ShinySound->isChecked())
+        {
+            settings.m_shinyDetection = SmartBDSPEggOperation::ShinyDetectionType::SDT_Sound;
+        }
+        else
+        {
+            settings.m_shinyDetection = SmartBDSPEggOperation::ShinyDetectionType::SDT_Disable;
+        }
+        m_smartProgram = new SmartBDSPEggOperation(settings, parameter);
         break;
     }
     case SP_PLA_NuggetFarmer:

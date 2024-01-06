@@ -65,7 +65,7 @@ void SmartSVEggOperation::runNextState()
         setState_runCommand(C_Restart);
 
         m_shinySoundDetected = false;
-        if ((m_programSettings.m_isShinyDetection || m_programSettings.m_isShinyWingull) && m_programSettings.m_operation != EOT_Collector)
+        if ((m_programSettings.m_isShinyDetection || m_programSettings.m_isShinyWingull) && m_programSettings.m_operation != EggOperationType::EOT_Collector)
         {
             // Setup sound detection
             m_shinySoundID = m_audioManager->addDetection("PokemonSV/ShinySFXHatch", 0.2f, 5000);
@@ -119,7 +119,7 @@ void SmartSVEggOperation::runNextState()
             }
             else if (!checkAverageColorMatch(A_Title.m_rect, QColor(0,0,0)))
             {
-                if (m_programSettings.m_operation == EOT_Shiny && m_programSettings.m_isUseBackupSave)
+                if (m_programSettings.m_operation == EggOperationType::EOT_Shiny && m_programSettings.m_isUseBackupSave)
                 {
                     emit printLog("Title detected! Loading backup save...");
                     setState_runCommand("Nothing,200,BXDUp,2,ASpam,120");
@@ -155,7 +155,7 @@ void SmartSVEggOperation::runNextState()
             }
             else if (!checkAverageColorMatch(A_Title.m_rect, QColor(0,0,0)))
             {
-                if (m_programSettings.m_operation == EOT_Hatcher)
+                if (m_programSettings.m_operation == EggOperationType::EOT_Hatcher)
                 {
                     if (m_programSettings.m_isHatchWithSandwich)
                     {
@@ -253,7 +253,7 @@ void SmartSVEggOperation::runNextState()
         {
             if (m_timer.elapsed() > 10000)
             {
-                if (m_programSettings.m_operation == EOT_Collector && m_sandwichCount > 0)
+                if (m_programSettings.m_operation == EggOperationType::EOT_Collector && m_sandwichCount > 0)
                 {
                     incrementStat(m_statError);
                     emit printLog("Unable to detect sandwich menu, but there are already eggs collected, stopping program", LOG_ERROR);
@@ -310,11 +310,11 @@ void SmartSVEggOperation::runNextState()
         if (state == S_CommandFinished)
         {
             m_sandwichTimer.restart();
-            if (m_programSettings.m_operation == EOT_Hatcher
-            || (m_programSettings.m_operation == EOT_Shiny && m_sandwichCount >= 2))
+            if (m_programSettings.m_operation == EggOperationType::EOT_Hatcher
+            || (m_programSettings.m_operation == EggOperationType::EOT_Shiny && m_sandwichCount >= 2))
             {
                 Command commandIndex = C_PackUp2;
-                if (m_programSettings.m_operation == EOT_Shiny && m_sandwichCount < 10)
+                if (m_programSettings.m_operation == EggOperationType::EOT_Shiny && m_sandwichCount < 10)
                 {
                     // if shiny mode and m_sandwichCount is >=2 but not >=10
                     // that means we are further away from lighthouse
@@ -360,7 +360,7 @@ void SmartSVEggOperation::runNextState()
                 }
 
                 emit printLog("Total eggs collected: " + QString::number(m_eggsCollected));
-                if (m_programSettings.m_operation == EOT_Collector)
+                if (m_programSettings.m_operation == EggOperationType::EOT_Collector)
                 {
                     if (m_sandwichCount < m_programSettings.m_sandwichCount)
                     {
@@ -439,7 +439,7 @@ void SmartSVEggOperation::runNextState()
             // check if we can talk to the basket within 5 seconds
             if (!m_eggDialogDetected && m_timer.elapsed() > 5000)
             {
-                if (m_programSettings.m_operation == EOT_Collector && m_eggsCollected > 0)
+                if (m_programSettings.m_operation == EggOperationType::EOT_Collector && m_eggsCollected > 0)
                 {
                     incrementStat(m_statError);
                     emit printLog("Unable to talk to egg basket, but there are already eggs collected, stopping program", LOG_ERROR);
@@ -507,7 +507,7 @@ void SmartSVEggOperation::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            if (m_programSettings.m_operation == EOT_Shiny && m_programSettings.m_isUseBackupSave && m_sandwichCount == 10)
+            if (m_programSettings.m_operation == EggOperationType::EOT_Shiny && m_programSettings.m_isUseBackupSave && m_sandwichCount == 10)
             {
                 emit printLog("Saving game with normal save system...");
                 runToBoxCommand("", "R,2,Nothing,2,Loop,3,ASpam,30,Nothing,50,ASpam,10,Nothing,20");
@@ -537,7 +537,7 @@ void SmartSVEggOperation::runNextState()
             }
             else if (checkBrightnessMeanTarget(GetBoxCaptureAreaOfPos(1,1).m_rect, C_Color_Yellow, 130) || checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Yellow, 200))
             {
-                if (m_programSettings.m_operation == EOT_Shiny && m_sandwichCount == 10)
+                if (m_programSettings.m_operation == EggOperationType::EOT_Shiny && m_sandwichCount == 10)
                 {
                     // fake more sandwich so we don't repeat this
                     m_sandwichCount++;
@@ -968,7 +968,7 @@ void SmartSVEggOperation::runNextState()
                             command += ",Loop,1,B,1,Nothing,1,Loop,3,Nothing,60,Loop,1,R,2,Nothing,2,Loop,3,ASpam,30,Nothing,50";
                         }
                     }
-                    else if (m_programSettings.m_operation == EOT_Shiny)
+                    else if (m_programSettings.m_operation == EggOperationType::EOT_Shiny)
                     {
                         emit printLog("No shiny pokemon is found...restarting game");
                         m_substage = SS_Restart;
@@ -1109,7 +1109,7 @@ void SmartSVEggOperation::runRestartCommand(QString error, bool capture)
         return;
     }
 
-    if (m_programSettings.m_operation == EOT_Hatcher && m_eggColumnsHatched > 0)
+    if (m_programSettings.m_operation == EggOperationType::EOT_Hatcher && m_eggColumnsHatched > 0)
     {
         error = "An error has occurred but " + QString::number(m_eggColumnsHatched) + " column(s) of eggs has been hatched, preventing restart";
         emit printLog(error);
@@ -1118,7 +1118,7 @@ void SmartSVEggOperation::runRestartCommand(QString error, bool capture)
         return;
     }
 
-    if (m_programSettings.m_operation == EOT_Hatcher)
+    if (m_programSettings.m_operation == EggOperationType::EOT_Hatcher)
     {
         // removed number of hatched eggs, since we are hatching them again...
         incrementStat(m_statEggHatched, -m_eggsHatched);
@@ -1153,7 +1153,7 @@ void SmartSVEggOperation::runPicnicCommand()
     // make sandwich before hatching
     m_substageAfterMainMenu = SS_Picnic;
 
-    if (m_sandwichCount == 0 && m_programSettings.m_operation != EOT_Hatcher)
+    if (m_sandwichCount == 0 && m_programSettings.m_operation != EggOperationType::EOT_Hatcher)
     {
         // for collector/shiny mode, we have to walk around to talk to egg basket
         m_commandAfterMainMenu = m_commands[C_Picnic];

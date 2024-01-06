@@ -61,6 +61,7 @@
 #include "SmartPrograms/PokemonBDSP/smartbdspboxoperation.h"
 #include "SmartPrograms/PokemonBDSP/smartbdspshinylegendary.h"
 #include "SmartPrograms/PokemonBDSP/smartbdspduplicateitem1to30.h"
+#include "SmartPrograms/PokemonBDSP/smartbdspeggoperation.h"
 
 #include "SmartPrograms/PokemonPLA/smartplanuggetfarmer.h"
 #include "SmartPrograms/PokemonPLA/smartplaresetalphapokemon.h"

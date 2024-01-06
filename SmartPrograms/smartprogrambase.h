@@ -49,6 +49,7 @@ enum SmartProgram : uint32_t
     SP_BDSP_BoxOperation,
     SP_BDSP_ShinyLegendary,
     SP_BDSP_DuplicateItem1to30,
+    SP_BDSP_EggOperation,
 
     SP_PLA_NuggetFarmer,
     SP_PLA_ResetAlphaPokemon,
@@ -169,6 +170,7 @@ public:
             case SP_BDSP_BoxOperation:      return "Box Operation";
             case SP_BDSP_ShinyLegendary:    return "Reset Legendary";
             case SP_BDSP_DuplicateItem1to30:return "Duplicate Item 1 to 30";
+            case SP_BDSP_EggOperation:      return "Egg Operation (BDSP)";
 
             case SP_PLA_NuggetFarmer:       return "Nugget Farmer";
             case SP_PLA_ResetAlphaPokemon:  return "Reset Alpha Gallade/Crobat";
@@ -245,6 +247,7 @@ public:
             case SP_BDSP_BoxOperation:      return "SmartBDSPBoxOperation";
             case SP_BDSP_ShinyLegendary:    return "SmartBDSPShinyLegendary";
             case SP_BDSP_DuplicateItem1to30:return "SmartBDSPDuplicateItem1to30";
+            case SP_BDSP_EggOperation:      return "SmartBDSPEggOperation";
 
             case SP_PLA_NuggetFarmer:       return "SmartPLANuggetFarmer";
             case SP_PLA_ResetAlphaPokemon:  return "SmartPLAResetAlphaPokemon";
@@ -309,6 +312,7 @@ public:
             case SP_BDSP_BoxOperation:      return 10;
             case SP_BDSP_ShinyLegendary:    return 11;
             case SP_BDSP_DuplicateItem1to30:return 0;
+            case SP_BDSP_EggOperation:      return 20;
 
             case SP_PLA_NuggetFarmer:       return 15;
             case SP_PLA_ResetAlphaPokemon:  return 12;

@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SmartBDSPStarter>
+	<C_Restart>Home,1,Nothing,21,X,1,ASpam,120</C_Restart>
+	<C_RestartNoUpdate>Home,1,Nothing,21,X,10,A,20,LDown,1,LUp,1,A,20,LUp,1,ASpam,120</C_RestartNoUpdate>
+	<C_CycleCollect>LDownRight,1,LRight,1,LUpRight,1,LUp,1,LUpLeft,1,LLeft,1,LDownLeft,2,LDown,1,Loop,40,Plus,1,LDownLeft,5,LUpRight,8,LRight,4</C_CycleCollect>
+	<C_Collect>A,1,BSpam,50</C_Collect>
+	<C_CycleReturn>LLeft,6,LDownLeft,5,LDown,3,Plus,1</C_CycleReturn>
+</SmartBDSPStarter>

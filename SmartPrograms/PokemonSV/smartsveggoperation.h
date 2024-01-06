@@ -8,7 +8,7 @@
 class SmartSVEggOperation : public SmartProgramBase
 {
 public:
-    enum EggOperationType : uint8_t
+    enum class EggOperationType : uint8_t
     {
         EOT_Collector = 0,
         EOT_Hatcher,

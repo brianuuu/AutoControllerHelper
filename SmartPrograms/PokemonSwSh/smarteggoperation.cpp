@@ -43,7 +43,7 @@ void SmartEggOperation::reset()
 
     // extra pokemon we want to keep
     m_hatchedStat = PokemonStatTable();
-    if (m_programSettings.m_operation != EOT_Collector)
+    if (m_programSettings.m_operation != EggOperationType::EOT_Collector)
     {
         m_keepList = m_programSettings.m_statTable->GetTableList();
         updateKeepDummy();
@@ -99,7 +99,7 @@ void SmartEggOperation::updateKeepDummy()
         }
 
         // need to check gender in parent mode if parent in nursery isn't ditto
-        if (m_programSettings.m_operation == EOT_Parent && m_programSettings.m_parentGender != GenderType::GT_Any)
+        if (m_programSettings.m_operation == EggOperationType::EOT_Parent && m_programSettings.m_parentGender != GenderType::GT_Any)
         {
             m_keepDummy.m_gender = GenderType::GT_Male;
         }
@@ -166,33 +166,33 @@ void SmartEggOperation::runNextState()
         }
         else
         {
-            if (m_programSettings.m_operation == EOT_Shiny && m_keepList.isEmpty())
+            if (m_programSettings.m_operation == EggOperationType::EOT_Shiny && m_keepList.isEmpty())
             {
                 incrementStat(m_statError);
                 setState_error("No Pokemon to keep is set");
                 break;
             }
 
-            if (m_programSettings.m_operation == EOT_Remainder && m_programSettings.m_shinyDetection == SDT_Delay)
+            if (m_programSettings.m_operation == EggOperationType::EOT_Remainder && m_programSettings.m_shinyDetection == ShinyDetectionType::SDT_Delay)
             {
                 incrementStat(m_statError);
                 setState_error("Fade Out Delay is not able in Remainder Mode");
                 break;
             }
 
-            if (m_programSettings.m_operation == EOT_Parent && m_keepList.size() != 1)
+            if (m_programSettings.m_operation == EggOperationType::EOT_Parent && m_keepList.size() != 1)
             {
                 incrementStat(m_statError);
                 setState_error("Parent Mode expected only 1 Pokemon in keep list");
                 break;
             }
 
-            if (m_programSettings.m_operation == EOT_Collector)
+            if (m_programSettings.m_operation == EggOperationType::EOT_Collector)
             {
                 // force disable shiny detection
-                m_programSettings.m_shinyDetection = SDT_Disable;
+                m_programSettings.m_shinyDetection = ShinyDetectionType::SDT_Disable;
             }
-            else if (m_programSettings.m_shinyDetection == SDT_Sound)
+            else if (m_programSettings.m_shinyDetection == ShinyDetectionType::SDT_Sound)
             {
                 // Setup sound detection
                 m_shinySoundID = m_audioManager->addDetection("PokemonSwSh/ShinySFXHatch", 0.2f, 5000);
@@ -223,7 +223,7 @@ void SmartEggOperation::runNextState()
 
             switch (m_programSettings.m_operation)
             {
-            case EOT_Collector:
+            case EggOperationType::EOT_Collector:
             {
                 if (countPair.second == 5)
                 {
@@ -241,13 +241,13 @@ void SmartEggOperation::runNextState()
                 }
                 break;
             }
-            case EOT_Hatcher:
-            case EOT_Remainder:
+            case EggOperationType::EOT_Hatcher:
+            case EggOperationType::EOT_Remainder:
             {
                 if (countPair.second == 0)
                 {
                     emit printLog("Only 1 Pokemon in party confirmed");
-                    if (m_programSettings.m_operation == EOT_Hatcher)
+                    if (m_programSettings.m_operation == EggOperationType::EOT_Hatcher)
                     {
                         m_initVerified = false;
                         m_substage = SS_ToBox;
@@ -272,15 +272,15 @@ void SmartEggOperation::runNextState()
                 }
                 break;
             }
-            case EOT_Shiny:
-            case EOT_Parent:
+            case EggOperationType::EOT_Shiny:
+            case EggOperationType::EOT_Parent:
             {
                 if (countPair.second == 5)
                 {
                     emit printLog("Full party confirmed");
                     m_initVerified = false;
 
-                    if (m_programSettings.m_operation == EOT_Parent && m_keepList[0].m_nature != NatureType::NT_Any)
+                    if (m_programSettings.m_operation == EggOperationType::EOT_Parent && m_keepList[0].m_nature != NatureType::NT_Any)
                     {
                         m_substage = SS_InitCheckItem;
                         setState_runCommand("X,1,Nothing,20");
@@ -370,7 +370,7 @@ void SmartEggOperation::runNextState()
                 emit printLog("Box at Judge View confirmed");
                 switch (m_programSettings.m_operation)
                 {
-                case EOT_Hatcher:
+                case EggOperationType::EOT_Hatcher:
                 {
                     m_initVerified = true;
                     m_substage = SS_ToBox;
@@ -378,7 +378,7 @@ void SmartEggOperation::runNextState()
                     m_videoManager->clearCaptures();
                     break;
                 }
-                case EOT_Shiny:
+                case EggOperationType::EOT_Shiny:
                 {
                     // now check if box has 25 pokmon
                     m_substage = SS_InitEmptyColumnStart;
@@ -386,7 +386,7 @@ void SmartEggOperation::runNextState()
                     m_videoManager->setAreas({A_Level});
                     break;
                 }
-                case EOT_Parent:
+                case EggOperationType::EOT_Parent:
                 {
                     // now check if box has 25 pokmon (not include parent)
                     m_substage = SS_InitEmptyColumnStart;
@@ -411,7 +411,7 @@ void SmartEggOperation::runNextState()
         {
             // check keep box first column of egg box is empty
             m_substage = SS_InitEmptyColumn;
-            QString command = m_programSettings.m_operation == EOT_Shiny ? "DDown,1,LDown,1,Loop,2" : "DDown,1,LDown,1,DDown,1";
+            QString command = m_programSettings.m_operation == EggOperationType::EOT_Shiny ? "DDown,1,LDown,1,Loop,2" : "DDown,1,LDown,1,DDown,1";
             setState_runCommand(command + ",L,1,Nothing,5,Loop,1,"
                                 "DRight,1,LRight,1,DRight,1,LRight,1,DRight,1,LUp,1,"
                                 "DLeft,1,LLeft,1,DLeft,1,LLeft,1,DLeft,1,LUp,1,Loop,2,"
@@ -460,7 +460,7 @@ void SmartEggOperation::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            if (m_programSettings.m_operation == EOT_Parent)
+            if (m_programSettings.m_operation == EggOperationType::EOT_Parent)
             {
                 // check parent's current stats
                 m_substage = SS_CheckStats;
@@ -690,7 +690,7 @@ void SmartEggOperation::runNextState()
         {
             if (m_eggsCollected >= m_programSettings.m_targetEggCount)
             {
-                if (m_programSettings.m_operation == EOT_Shiny || m_programSettings.m_operation == EOT_Parent)
+                if (m_programSettings.m_operation == EggOperationType::EOT_Shiny || m_programSettings.m_operation == EggOperationType::EOT_Parent)
                 {
                     m_programSettings.m_columnsToHatch = 1;
                     resetHatcherModeMembers();
@@ -789,7 +789,7 @@ void SmartEggOperation::runNextState()
                     incrementStat(m_statError);
                     setState_error("There are no eggs in party, something went really wrong");
                 }
-                else if ((m_programSettings.m_operation == EOT_Shiny || m_programSettings.m_operation == EOT_Parent) && m_eggsToHatchColumn < 5)
+                else if ((m_programSettings.m_operation == EggOperationType::EOT_Shiny || m_programSettings.m_operation == EggOperationType::EOT_Parent) && m_eggsToHatchColumn < 5)
                 {
                     incrementStat(m_statError);
                     setState_error("Shiny/Parent Mode always expect to have 5 eggs, something went really wrong");
@@ -905,7 +905,7 @@ void SmartEggOperation::runNextState()
                 // shiny detection
                 switch (m_programSettings.m_shinyDetection)
                 {
-                case SDT_Delay:
+                case ShinyDetectionType::SDT_Delay:
                 {
                     if (m_fadeOutDelayTime == 0)
                     {
@@ -927,7 +927,7 @@ void SmartEggOperation::runNextState()
                     }
                     break;
                 }
-                case SDT_Sound:
+                case ShinyDetectionType::SDT_Sound:
                 {
                     m_audioManager->stopDetection(m_shinySoundID);
                     break;
@@ -1088,7 +1088,7 @@ void SmartEggOperation::runNextState()
                 m_hatchedStat.m_shiny = ShinyType::SPT_No;
             }
 
-            if (m_programSettings.m_operation == EOT_Parent && !m_initVerified)
+            if (m_programSettings.m_operation == EggOperationType::EOT_Parent && !m_initVerified)
             {
                 m_substage = SS_InitCheckParent;
             }
@@ -1207,7 +1207,7 @@ void SmartEggOperation::runNextState()
                     emit printLog(log + " is SHINY!!!", LOG_SUCCESS);
                 }
 
-                if (m_programSettings.m_operation == EOT_Parent)
+                if (m_programSettings.m_operation == EggOperationType::EOT_Parent)
                 {
                     // this is the target parent we want, just move it to top right position
                     emit printLog("Target Parent is found! Moving it to top left of Box!");
@@ -1226,7 +1226,7 @@ void SmartEggOperation::runNextState()
                 runKeepPokemonCommand();
                 break;
             }
-            else if (m_programSettings.m_operation == EOT_Parent && m_keepList[0].m_target > 0)
+            else if (m_programSettings.m_operation == EggOperationType::EOT_Parent && m_keepList[0].m_target > 0)
             {
                 if (m_programSettings.m_parentGender != GenderType::GT_Any && m_programSettings.m_parentGender == m_hatchedStat.m_gender)
                 {
@@ -1397,7 +1397,7 @@ void SmartEggOperation::runNextState()
                 }
 
                 // we need to leave a new parent
-                if (m_programSettings.m_operation == EOT_Parent && m_leaveParent)
+                if (m_programSettings.m_operation == EggOperationType::EOT_Parent && m_leaveParent)
                 {
                     if (m_keepList[0].m_nature == m_parentStat.m_nature)
                     {
@@ -1455,7 +1455,7 @@ void SmartEggOperation::runNextState()
                 }
 
                 // continue collecting more eggs
-                if ((m_programSettings.m_operation == EOT_Shiny || m_programSettings.m_operation == EOT_Parent) && missingTarget)
+                if ((m_programSettings.m_operation == EggOperationType::EOT_Shiny || m_programSettings.m_operation == EggOperationType::EOT_Parent) && missingTarget)
                 {
                     emit printLog("Taking 5 filler Pokemon from Keep Box to party");
                     m_substage = SS_TakeFiller;
@@ -1464,7 +1464,7 @@ void SmartEggOperation::runNextState()
                 }
 
                 // For parent mode after finishing, always take parent out
-                if (m_programSettings.m_operation == EOT_Parent)
+                if (m_programSettings.m_operation == EggOperationType::EOT_Parent)
                 {
                     m_programSettings.m_isHatchExtra = true;
                 }

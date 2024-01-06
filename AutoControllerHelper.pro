@@ -36,6 +36,7 @@ SOURCES += \
     SmartPrograms/Dev/smarttestprogram.cpp \
     SmartPrograms/PokemonBDSP/smartbdspboxoperation.cpp \
     SmartPrograms/PokemonBDSP/smartbdspduplicateitem1to30.cpp \
+    SmartPrograms/PokemonBDSP/smartbdspeggoperation.cpp \
     SmartPrograms/PokemonBDSP/smartbdspshinylegendary.cpp \
     SmartPrograms/PokemonBDSP/smartbdspstarter.cpp \
     SmartPrograms/PokemonPLA/smartpladistortionwaiter.cpp \
@@ -97,6 +98,7 @@ HEADERS += \
     SmartPrograms/Dev/smarttestprogram.h \
     SmartPrograms/PokemonBDSP/smartbdspboxoperation.h \
     SmartPrograms/PokemonBDSP/smartbdspduplicateitem1to30.h \
+    SmartPrograms/PokemonBDSP/smartbdspeggoperation.h \
     SmartPrograms/PokemonBDSP/smartbdspshinylegendary.h \
     SmartPrograms/PokemonBDSP/smartbdspstarter.h \
     SmartPrograms/PokemonPLA/smartpladistortionwaiter.h \

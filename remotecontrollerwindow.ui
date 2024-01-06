@@ -1942,7 +1942,7 @@
                  </sizepolicy>
                 </property>
                 <property name="currentIndex">
-                 <number>14</number>
+                 <number>20</number>
                 </property>
                 <widget class="QWidget" name="page">
                  <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1974,8 +1974,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>384</width>
-                       <height>64</height>
+                       <width>498</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -2034,7 +2034,7 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>323</width>
+                       <width>488</width>
                        <height>309</height>
                       </rect>
                      </property>
@@ -3398,7 +3398,7 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>389</width>
+                       <width>488</width>
                        <height>259</height>
                       </rect>
                      </property>
@@ -3633,8 +3633,8 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>262</width>
-                       <height>84</height>
+                       <width>498</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_29">
@@ -3789,8 +3789,8 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>274</width>
-                       <height>186</height>
+                       <width>498</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_31">
@@ -3915,8 +3915,8 @@ If the list doesn't have the specific Pokemon, select Others.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>352</width>
-                       <height>80</height>
+                       <width>498</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_33">
@@ -4027,8 +4027,8 @@ If the list doesn't have the specific Pokemon, select Others.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>397</width>
-                       <height>68</height>
+                       <width>498</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_35">
@@ -4613,8 +4613,8 @@ Enter Trade Partner Name:</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>380</width>
-                       <height>183</height>
+                       <width>498</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_49">
@@ -4874,7 +4874,7 @@ Enter Trade Partner Name:</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>371</width>
+                       <width>488</width>
                        <height>245</height>
                       </rect>
                      </property>
@@ -4913,12 +4913,12 @@ Enter Trade Partner Name:</string>
                           </item>
                           <item>
                            <property name="text">
-                            <string>Remainder Mode</string>
+                            <string>Remainder Mode (SwSh)</string>
                            </property>
                           </item>
                           <item>
                            <property name="text">
-                            <string>Parent Mode</string>
+                            <string>Parent Mode (SwSh)</string>
                            </property>
                           </item>
                          </widget>

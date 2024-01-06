@@ -9,7 +9,7 @@
 class SmartEggOperation : public SmartProgramBase
 {
 public:
-    enum EggOperationType : uint8_t
+    enum class EggOperationType : uint8_t
     {
         EOT_Collector = 0,
         EOT_Hatcher,
@@ -19,7 +19,7 @@ public:
         EOT_COUNT,
     };
 
-    enum ShinyDetectionType : uint8_t
+    enum class ShinyDetectionType : uint8_t
     {
         SDT_Disable = 0,
         SDT_Sound,
