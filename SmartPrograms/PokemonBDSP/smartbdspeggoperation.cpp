@@ -23,11 +23,18 @@ void SmartBDSPEggOperation::reset()
 
     m_substage = SS_Init;
 
+    m_watchEnabled = false;
     m_resetCountdown = 0;
-    m_watchColor = QColor(0,0,0);
 
     m_dialogDetected = false;
     m_eggsCollected = 0;
+
+    m_eggColumnsHatched = 0;
+    m_eggsToHatchCount = 0;
+    m_eggsToHatchColumn = 0;
+    m_isStatView = false;
+
+    m_shinyCount = 0;
 }
 
 void SmartBDSPEggOperation::runNextState()
@@ -50,21 +57,23 @@ void SmartBDSPEggOperation::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            if (m_resetCountdown == 0)
+            if (m_resetCountdown == 0 && m_programSettings.m_operation != EggOperationType::EOT_Hatcher)
             {
+                m_watchEnabled = false;
                 m_resetCountdown = 10;
+
                 m_eggsCollected = 0;
+                m_isStatView = false;
 
                 m_substage = SS_Restart;
                 setState_runCommand(m_settings->isPreventUpdate() ? C_RestartNoUpdate : C_Restart);
             }
-            else if (m_watchColor == QColor(0,0,0))
+            else if (!m_watchEnabled)
             {
-                emit printLog("Calibrating Poketch color...");
                 m_substage = SS_Watch;
-                setState_runCommand("R,1,Nothing,30");
+                setState_frameAnalyzeRequest();
 
-                m_videoManager->setAreas({A_Watch, A_Dialog});
+                m_videoManager->setAreas({A_Watch});
             }
             else
             {
@@ -72,6 +81,7 @@ void SmartBDSPEggOperation::runNextState()
                 {
                     if (m_eggsCollected >= m_programSettings.m_targetEggCount)
                     {
+                        // enough eggs collected
                         m_substage = SS_Finished;
                         setState_runCommand("Home,2");
                     }
@@ -86,12 +96,29 @@ void SmartBDSPEggOperation::runNextState()
                 }
                 else if (m_programSettings.m_operation == EggOperationType::EOT_Hatcher)
                 {
-                    // TODO:
+                    // open box
+                    if (m_isStatView)
+                    {
+                        m_substage = SS_ToBox;
+                        setState_runCommand(C_ToBox);
+                    }
+                    else
+                    {
+                        m_substage = SS_CheckView;
+                        setState_runCommand(m_commands[C_ToBox] + ",LLeft,1,Nothing,20");
+
+                        m_videoManager->setAreas({A_Pokemon, A_Stat});
+                    }
                 }
-                else
+                else // shiny mode
                 {
-                    // TODO: reached shiny target?
-                    if (m_eggsCollected >= 5)
+                    if (m_shinyCount >= m_programSettings.m_statTable->GetTableList()[0].m_target)
+                    {
+                        // reached shiny target?
+                        m_substage = SS_Finished;
+                        setState_runCommand("Home,2");
+                    }
+                    else if (m_eggsCollected >= 5)
                     {
                         // TODO: start hatching one column
                         m_eggsCollected = 0;
@@ -118,11 +145,28 @@ void SmartBDSPEggOperation::runNextState()
         }
         else if (state == S_CaptureReady)
         {
-            m_watchColor = getAverageColor(A_Watch.m_rect);
-            emit printLog("Poketch Color = {" + QString::number(m_watchColor.red()) + "," + QString::number(m_watchColor.green()) + "," + QString::number(m_watchColor.blue()) + "}");
+            if (!checkAverageColorMatch(A_Watch.m_rect, C_Color_Watch))
+            {
+                if (m_watchEnabled)
+                {
+                    setState_error("Unable to detect Poketch");
+                }
+                else
+                {
+                    m_watchEnabled = true;
+                    emit printLog("Enabling Poketch...");
 
-            m_substage = SS_Start;
-            setState_runCommand("Nothing,1");
+                    setState_runCommand("R,1,Nothing,30");
+                }
+            }
+            else
+            {
+                m_watchEnabled = true;
+                emit printLog("Poketch detected");
+
+                m_substage = SS_Start;
+                setState_runCommand("Nothing,1");
+            }
         }
         break;
     }
@@ -158,7 +202,7 @@ void SmartBDSPEggOperation::runNextState()
                     m_videoManager->clearCaptures();
                     break;
                 }
-                else if (!checkAverageColorMatch(A_Watch.m_rect, m_watchColor))
+                else if (!checkAverageColorMatch(A_Watch.m_rect, C_Color_Watch))
                 {
                     m_substage = SS_CollectSuccess;
                     setState_runCommand("ASpam,60,Loop,1,BSpam,2,Loop,0", true);
@@ -194,7 +238,7 @@ void SmartBDSPEggOperation::runNextState()
                 incrementStat(m_error);
                 setState_error("Unable to detect finish collecting egg");
             }
-            else if (checkAverageColorMatch(A_Watch.m_rect, m_watchColor))
+            else if (checkAverageColorMatch(A_Watch.m_rect, C_Color_Watch))
             {
                 m_substage = SS_Start;
                 setState_runCommand(C_CycleReturn);
@@ -205,6 +249,261 @@ void SmartBDSPEggOperation::runNextState()
             }
         }
 
+        break;
+    }
+    case SS_ToBox:
+    {
+        if (state == S_CommandFinished)
+        {
+            if (m_eggColumnsHatched == 0)
+            {
+                // pick up first column
+                m_substage = SS_PickEggs;
+                setState_runCommand("Y,1,Nothing,1,Y,1,A,1,Loop,1,DDown,1,Nothing,4,Loop,4,A,6,DLeft,1,DDown,1,A,32");
+
+                m_eggsToHatchColumn = 0;
+                m_videoManager->setAreas({A_Pokemon, A_Stat});
+            }
+            else
+            {
+                m_substage = SS_CheckShiny;
+                setState_runCommand("DLeft,1,Nothing,4,DDown,1,Nothing,20");
+            }
+        }
+        break;
+    }
+    case SS_CheckView:
+    {
+        if (state == S_CommandFinished)
+        {
+            setState_frameAnalyzeRequest();
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (!checkBrightnessMeanTarget(A_Stat.m_rect, C_Color_Dialog, 230))
+            {
+                if (m_isStatView)
+                {
+                     setState_error("Unable to detect Stat/Judge View");
+                }
+                else
+                {
+                    m_isStatView = true;
+                    emit printLog("Box is not at Stat/Judge View, fixing it for you...", LOG_WARNING);
+                    setState_runCommand("Plus,1,Nothing,20");
+                }
+            }
+            else
+            {
+                emit printLog("Stat/Judge View confirmed");
+                m_substage = SS_ToBox;
+                setState_runCommand("LRight,1,Nothing,6");
+            }
+        }
+        break;
+    }
+    case SS_CheckShiny:
+    {
+        if (state == S_CommandFinished)
+        {
+            if (m_eggsToHatchCount == 0)
+            {
+                if (m_eggColumnsHatched >= m_programSettings.m_columnsToHatch)
+                {
+                    // done
+                    m_substage = SS_QuitBox;
+                    setState_runCommand(C_QuitBox);
+                }
+                else
+                {
+                    // this column is done, pick up next column
+                    QString command = "Y,1,DUp,1,Nothing,4,Y,1,DRight,1,Nothing,4,Loop,1"; // go to box top left
+                    int moveColumnCount = m_eggColumnsHatched % 6;
+                    if (moveColumnCount == 0)
+                    {
+                        // next box
+                        command += ",R,22,Loop,1";
+                    }
+                    else
+                    {
+                        // move to column
+                        command += ",DRight,1,Nothing,4,Loop," + QString::number(moveColumnCount);
+                    }
+                    command += ",A,1,Loop,1,DDown,1,Nothing,4,Loop,4,A,6,DDown,1,Loop,1"; // pick up column
+                    command += ",DLeft,1,Nothing,1,Loop," + QString::number(moveColumnCount + 1); // move to party
+                    command += ",A,32"; // drop at party
+
+                    m_substage = SS_PickEggs;
+                    setState_runCommand(command);
+
+                    m_eggsToHatchColumn = 0;
+                    m_videoManager->setAreas({A_Pokemon, A_Stat});
+                }
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
+                m_videoManager->setAreas({A_Shiny, A_Pokemon, A_Stat});
+            }
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (!checkBrightnessMeanTarget(A_Stat.m_rect, C_Color_Dialog, 230))
+            {
+                setState_error("Expected Pokemon, none detected");
+            }
+            else if (checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Dialog, 230))
+            {
+                setState_error("Unexpected egg detected");
+            }
+            else
+            {
+                QString log = "Column " + QString::number(m_eggColumnsHatched) + " row " + QString::number(6 - m_eggsToHatchCount);
+                if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 60))
+                {
+                    // shiny found
+                    m_shinyCount++;
+                    incrementStat(m_statShinyHatched);
+                    emit printLog(log + " is SHINY!!! Moving it to Keep Box!", LOG_SUCCESS);
+
+                    int moveBoxCount = (m_eggColumnsHatched % 6) + 1;
+                    QString command = "Y,1,A,6,DUp,1,LUp,1,DUp,1,DRight,1,Loop,1"; // move cursor to Box List
+                    command += ",L,1,Nothing,21,Loop," + QString::number(moveBoxCount); // move to keep box
+                    command += ",A,1,Nothing,20,Loop,2,B,20,Loop,1"; // drop to keep box
+                    command += ",R,1,Nothing,21,Loop," + QString::number(moveBoxCount); // return to egg box
+                    command += ",DLeft,1,Loop,1,DDown,1,Nothing,4,Loop,3,Y,1,Nothing,1,Loop,2,Nothing,20"; // return to 2nd party
+                    setState_runCommand(command);
+                }
+                else
+                {
+                    // release non-shiny
+                    emit printLog(log + " is not shiny, releasing");
+                    setState_runCommand(C_Release);
+                }
+
+                m_eggsToHatchCount--;
+            }
+        }
+        break;
+    }
+    case SS_PickEggs:
+    {
+        if (state == S_CommandFinished)
+        {
+            setState_frameAnalyzeRequest();
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (checkBrightnessMeanTarget(A_Stat.m_rect, C_Color_Dialog, 230))
+            {
+                if (!checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Dialog, 230))
+                {
+                    setState_error("Only excepting eggs in party");
+                    break;
+                }
+
+                m_eggsToHatchColumn++;
+                if (m_eggsToHatchColumn < 5)
+                {
+                    setState_runCommand("DDown,1,Nothing,25");
+                    break;
+                }
+            }
+
+            if (m_eggsToHatchColumn == 0)
+            {
+                setState_error("No eggs detected for current column");
+                break;
+            }
+
+            emit printLog("Hatching column " + QString::number(m_eggColumnsHatched + 1) + " with " + QString::number(m_eggsToHatchColumn) + " eggs");
+            m_substage = SS_QuitBox;
+            setState_runCommand(C_QuitBox);
+
+            m_eggsToHatchCount = 0;
+            m_videoManager->clearCaptures();
+
+        }
+        break;
+    }
+    case SS_QuitBox:
+    {
+        if (state == S_CommandFinished)
+        {
+            if (m_eggColumnsHatched >= m_programSettings.m_columnsToHatch)
+            {
+                m_substage = SS_Finished;
+                setState_runCommand("Home,2");
+            }
+            else if (m_eggsToHatchCount < m_eggsToHatchColumn)
+            {
+                // start hatching eggs
+                m_substage = SS_HatchEggs;
+                setState_runCommand(C_CycleHatch, true);
+
+                m_hatchingDialog = 0;
+
+                m_videoManager->setAreas({A_Dialog});
+                m_timer.restart();
+            }
+            else
+            {
+                // finish hatching current column of eggs, check shiny
+                m_eggColumnsHatched++;
+
+                m_substage = SS_ToBox;
+                setState_runCommand(C_ToBox);
+
+                m_videoManager->clearCaptures();
+            }
+        }
+        break;
+    }
+    case SS_HatchEggs:
+    {
+        if (state == S_CommandFinished)
+        {
+            setState_frameAnalyzeRequest();
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (m_timer.elapsed() < 1000) // buffer
+            {
+                setState_frameAnalyzeRequest();
+            }
+            else if (m_timer.elapsed() > 600000) // 10min
+            {
+                setState_error("Unable to hatch any eggs over 10 minutes");
+            }
+            else if (checkBrightnessMeanTarget(A_Dialog.m_rect, C_Color_Dialog, 230))
+            {
+                m_hatchingDialog++;
+                if (m_hatchingDialog == 1)
+                {
+                    m_eggsToHatchCount++;
+                    incrementStat(m_statEggHatched);
+
+                    // spam and skip the first black flash
+                    emit printLog("Oh? Egg no." + QString::number(m_statEggHatched.first) + " is hatching! (" + QString::number(m_eggsToHatchColumn - m_eggsToHatchCount) + " remaining)");
+                    setState_runCommand("ASpam,180");
+                }
+                else // 2 & 3
+                {
+                    // double click to pass dialog
+                    QString command = "ASpam,4,Nothing,120";
+                    if (m_hatchingDialog == 3)
+                    {
+                        m_substage = SS_QuitBox;
+                        command += ",LLeft,20,LDown,10";
+                    }
+                    setState_runCommand(command);
+                }
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
+            }
+        }
         break;
     }
     case SS_Restart:

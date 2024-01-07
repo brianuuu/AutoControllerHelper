@@ -1832,14 +1832,19 @@ void RemoteControllerWindow::on_SP20_CB_Mode_currentIndexChanged(int index)
             return;
         }
 
+        if (ui->SP20_RB_ShinyDelay->isChecked())
+        {
+            ui->SP20_RB_ShinyDisable->setChecked(true);
+        }
+
         ui->SP20_SB_Collect->setEnabled(type == SmartBDSPEggOperation::EggOperationType::EOT_Collector);
         ui->SP20_SB_Column->setEnabled(type == SmartBDSPEggOperation::EggOperationType::EOT_Hatcher);
         ui->SP20_CB_HatchExtra->setEnabled(false);
         ui->SP20_RB_ShinyDisable->setEnabled(type != SmartBDSPEggOperation::EggOperationType::EOT_Collector);
         ui->SP20_RB_ShinySound->setEnabled(type != SmartBDSPEggOperation::EggOperationType::EOT_Collector);
         ui->SP20_RB_ShinyDelay->setEnabled(false);
-        ui->SP20_TW_Keep->setEnabled(false);
-        ui->SP20_TW_Keep->SetMode(PokemonStatTableWidget::Mode::Default);
+        ui->SP20_TW_Keep->setEnabled(type == SmartBDSPEggOperation::EggOperationType::EOT_Shiny);
+        ui->SP20_TW_Keep->SetMode(PokemonStatTableWidget::Mode::SingleShiny);
         ui->SP20_CB_ParentGender->setEnabled(false);
     }
 }
@@ -2486,6 +2491,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         settings.m_operation = SmartBDSPEggOperation::EggOperationType(ui->SP20_CB_Mode->currentIndex());
         settings.m_targetEggCount = ui->SP20_SB_Collect->value();
         settings.m_columnsToHatch = ui->SP20_SB_Column->value();
+        settings.m_statTable = ui->SP20_TW_Keep;
         if (ui->SP20_RB_ShinySound->isChecked())
         {
             settings.m_shinyDetection = SmartBDSPEggOperation::ShinyDetectionType::SDT_Sound;

@@ -4,6 +4,7 @@
 #include <QElapsedTimer>
 #include <QWidget>
 #include "../smartprogrambase.h"
+#include "../Widgets/pokemonstattablewidget.h"
 
 class SmartBDSPEggOperation : public SmartProgramBase
 {
@@ -28,6 +29,7 @@ public:
         int m_targetEggCount;
         int m_columnsToHatch;
         ShinyDetectionType m_shinyDetection;
+        PokemonStatTableWidget const* m_statTable;
     };
 
 public:
@@ -49,15 +51,24 @@ private:
     Command const C_CycleCollect        = 2;
     Command const C_Collect             = 3;
     Command const C_CycleReturn         = 4;
-    Command const C_COUNT               = 5;
+    Command const C_ToBox               = 5;
+    Command const C_QuitBox             = 6;
+    Command const C_CycleHatch          = 7;
+    Command const C_Release             = 8;
+    Command const C_COUNT               = 9;
 
     // List of test color
     HSVRange const C_Color_Dialog = HSVRange(0,0,230,359,30,255); // >150
+    HSVRange const C_Color_Shiny = HSVRange(320,0,150,20,255,255); // >60
+    QColor const C_Color_Watch = QColor(147,0,49);
 
     // List of test point/area
     CaptureArea const A_Title = CaptureArea(400,380,520,100);
     CaptureArea const A_Dialog = CaptureArea(718,650,300,40);
     CaptureArea const A_Watch = CaptureArea(1241,142,26,48);
+    CaptureArea const A_Pokemon = CaptureArea(900,184,100,180);
+    CaptureArea const A_Stat = CaptureArea(1170,184,100,180);
+    CaptureArea const A_Shiny = CaptureArea(1234,106,33,33);
 
     // Substages
     enum Substage
@@ -70,6 +81,13 @@ private:
         SS_CycleCollect,
         SS_Collect,
         SS_CollectSuccess,
+
+        SS_ToBox,
+        SS_CheckView,
+        SS_CheckShiny,
+        SS_PickEggs,
+        SS_QuitBox,
+        SS_HatchEggs,
 
         SS_Restart,
         SS_Intro,
@@ -84,11 +102,22 @@ private:
     QElapsedTimer m_timer;
     Settings m_programSettings;
 
+    bool m_watchEnabled;
     int m_resetCountdown;
-    QColor m_watchColor;
 
+    // collect
     bool m_dialogDetected;
     int m_eggsCollected;
+
+    // hatch
+    int m_eggColumnsHatched;
+    int m_eggsToHatchCount; // how many eggs we have hatched for the current column?
+    int m_eggsToHatchColumn; // hatching for this loop? should always be 5 but can be fewer
+    bool m_isStatView;
+    int m_hatchingDialog; // how many times white detected during hatch (should be 3)
+
+    // shiny
+    int m_shinyCount; // how many shiny pokemon found overall
 
     // Stats
     Stat m_error;

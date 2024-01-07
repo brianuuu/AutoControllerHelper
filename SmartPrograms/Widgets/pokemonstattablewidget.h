@@ -39,6 +39,9 @@ public:
 
         // only one slot allowed, disable shiny
         Parent,
+
+        // auto create first and only slot for shiny
+        SingleShiny,
     };
 
 public:

@@ -5,4 +5,8 @@
 	<C_CycleCollect>LDownRight,1,LRight,1,LUpRight,1,LUp,1,LUpLeft,1,LLeft,1,LDownLeft,2,LDown,1,Loop,40,Plus,1,LDownLeft,5,LUpRight,8,LRight,4</C_CycleCollect>
 	<C_Collect>A,1,BSpam,50</C_Collect>
 	<C_CycleReturn>LLeft,6,LDownLeft,5,LDown,3,Plus,1</C_CycleReturn>
+	<C_ToBox>X,20,A,30,R,40</C_ToBox>
+	<C_QuitBox>B,1,Nothing,20,Loop,3</C_QuitBox>
+	<C_CycleHatch>LDownRight,1,LRight,1,LUpRight,1,LUp,1,LUpLeft,1,LLeft,1,LDownLeft,2,LDown,1,Loop,0</C_CycleHatch>
+	<C_Release>A,8,DUp,1,Nothing,1,DUp,1,A,8,DUp,1,A,20,B,5,DUp,1,Nothing,4,DDown,1,Nothing,24</C_Release>
 </SmartBDSPStarter>

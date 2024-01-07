@@ -205,8 +205,10 @@ void PokemonStatTableWidget::SetMode(PokemonStatTableWidget::Mode mode)
     }
 
     // for parent mode, disable the + button
-    QToolButton* toolButton = qobject_cast<QToolButton*>(cellWidget(rowCount() - 1, CT_Add));
-    toolButton->setEnabled(mode != Mode::Parent);
+    {
+        QToolButton* toolButton = qobject_cast<QToolButton*>(cellWidget(rowCount() - 1, CT_Add));
+        toolButton->setEnabled(mode != Mode::Parent && mode != Mode::SingleShiny);
+    }
 }
 
 PokemonStatTableList PokemonStatTableWidget::GetTableList() const
@@ -304,6 +306,11 @@ void PokemonStatTableWidget::AddPokemon()
                 comboBox->addItem(PokemonDatabase::getIVTypeName(IVType(j)));
             }
             setCellWidget(row, i, comboBox);
+
+            if (m_mode == Mode::SingleShiny)
+            {
+                comboBox->setEnabled(false);
+            }
         }
     }
 
@@ -315,6 +322,11 @@ void PokemonStatTableWidget::AddPokemon()
             comboBox->addItem(PokemonDatabase::getNatureTypeName(NatureType(i), true));
         }
         setCellWidget(row, CT_Nature, comboBox);
+
+        if (m_mode == Mode::SingleShiny)
+        {
+            comboBox->setEnabled(false);
+        }
     }
 
     // gender
@@ -325,6 +337,11 @@ void PokemonStatTableWidget::AddPokemon()
             comboBox->addItem(PokemonDatabase::getGenderTypeName(GenderType(i)));
         }
         setCellWidget(row, CT_Gender, comboBox);
+
+        if (m_mode == Mode::SingleShiny)
+        {
+            comboBox->setEnabled(false);
+        }
     }
 
     // shiny
@@ -334,11 +351,11 @@ void PokemonStatTableWidget::AddPokemon()
         {
             comboBox->addItem(PokemonDatabase::getShinyTypeName(ShinyType(i)));
         }
-        if (row == 0 && m_mode == Mode::Shiny)
+        if (row == 0 && (m_mode == Mode::Shiny || m_mode == Mode::SingleShiny))
         {
             comboBox->setCurrentIndex(ShinyType::SPT_Yes);
         }
-        if (m_mode == Mode::Parent)
+        if (m_mode == Mode::Parent || m_mode == Mode::SingleShiny)
         {
             comboBox->setEnabled(false);
         }
@@ -348,7 +365,7 @@ void PokemonStatTableWidget::AddPokemon()
     // change + to - button
     QToolButton* toolButton = qobject_cast<QToolButton*>(cellWidget(row, CT_Add));
     toolButton->setText("-");
-    if (row == 0 && m_mode == Mode::Parent)
+    if (row == 0 && (m_mode == Mode::Parent || m_mode == Mode::SingleShiny))
     {
         toolButton->setEnabled(false);
     }
