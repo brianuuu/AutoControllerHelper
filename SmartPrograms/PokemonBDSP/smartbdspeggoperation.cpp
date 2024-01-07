@@ -267,7 +267,7 @@ void SmartBDSPEggOperation::runNextState()
             {
                 // pick up first column
                 m_substage = SS_PickEggs;
-                setState_runCommand("Y,1,Nothing,1,Y,1,A,1,Loop,1,DDown,1,Nothing,4,Loop,4,A,6,DLeft,1,DDown,1,A,32");
+                setState_runCommand("Y,1,Nothing,1,Y,1,A,1,Loop,1,DDown,1,Nothing,6,Loop,4,A,6,DLeft,1,DDown,1,A,32");
 
                 m_eggsToHatchColumn = 0;
                 m_videoManager->setAreas({A_Pokemon, A_Stat});
@@ -275,7 +275,7 @@ void SmartBDSPEggOperation::runNextState()
             else
             {
                 m_substage = SS_CheckShiny;
-                setState_runCommand("DLeft,1,Nothing,4,DDown,1,Nothing,20");
+                setState_runCommand("DLeft,1,Nothing,6,DDown,1,Nothing,20");
             }
         }
         break;
@@ -325,7 +325,7 @@ void SmartBDSPEggOperation::runNextState()
                 else
                 {
                     // this column is done, pick up next column
-                    QString command = "Y,1,DUp,1,Nothing,4,Y,1,DRight,1,Nothing,4,Loop,1"; // go to box top left
+                    QString command = "Y,1,DUp,1,Nothing,6,Y,1,DRight,1,Nothing,6,Loop,1"; // go to box top left
                     int moveColumnCount = m_eggColumnsHatched % 6;
                     if (moveColumnCount == 0)
                     {
@@ -335,9 +335,9 @@ void SmartBDSPEggOperation::runNextState()
                     else
                     {
                         // move to column
-                        command += ",DRight,1,Nothing,4,Loop," + QString::number(moveColumnCount);
+                        command += ",DRight,1,Nothing,6,Loop," + QString::number(moveColumnCount);
                     }
-                    command += ",A,1,Loop,1,DDown,1,Nothing,4,Loop,4,A,6,DDown,1,Loop,1"; // pick up column
+                    command += ",A,1,Loop,1,DDown,1,Nothing,6,Loop,4,A,6,DDown,1,Loop,1"; // pick up column
                     command += ",DLeft,1,Nothing,1,Loop," + QString::number(moveColumnCount + 1); // move to party
                     command += ",A,32"; // drop at party
 
@@ -379,7 +379,7 @@ void SmartBDSPEggOperation::runNextState()
                     command += ",L,1,Nothing,21,Loop," + QString::number(moveBoxCount); // move to keep box
                     command += ",A,1,Nothing,20,Loop,2,B,20,Loop,1"; // drop to keep box
                     command += ",R,1,Nothing,21,Loop," + QString::number(moveBoxCount); // return to egg box
-                    command += ",DLeft,1,Loop,1,DDown,1,Nothing,4,Loop,3,Y,1,Nothing,1,Loop,2,Nothing,20"; // return to 2nd party
+                    command += ",DLeft,1,Loop,1,DDown,1,Nothing,6,Loop,3,Y,1,Nothing,1,Loop,2,Nothing,20"; // return to 2nd party
                     setState_runCommand(command);
                 }
                 else
