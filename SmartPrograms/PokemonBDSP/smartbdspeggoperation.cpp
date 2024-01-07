@@ -76,7 +76,7 @@ void SmartBDSPEggOperation::runNextState()
                 m_substage = SS_Restart;
                 setState_runCommand(m_settings->isPreventUpdate() ? C_RestartNoUpdate : C_Restart);
             }
-            else if (!m_watchEnabled)
+            else if (!m_watchEnabled && m_programSettings.m_operation != EggOperationType::EOT_Hatcher)
             {
                 m_substage = SS_Watch;
                 setState_frameAnalyzeRequest();
@@ -452,12 +452,6 @@ void SmartBDSPEggOperation::runNextState()
                 m_hatchingDialog = 0;
                 m_shinyDetected = false;
 
-                // sound detection
-                if (m_shinySoundID > 0)
-                {
-                    m_audioManager->startDetection(m_shinySoundID);
-                }
-
                 m_videoManager->setAreas({A_Dialog});
                 m_timer.restart();
             }
@@ -497,6 +491,12 @@ void SmartBDSPEggOperation::runNextState()
                 {
                     m_eggsToHatchCount++;
                     incrementStat(m_statEggHatched);
+
+                    // sound detection
+                    if (m_shinySoundID > 0)
+                    {
+                        m_audioManager->startDetection(m_shinySoundID);
+                    }
 
                     // spam and skip the first black flash
                     emit printLog("Oh? Egg no." + QString::number(m_statEggHatched.first) + " is hatching! (" + QString::number(m_eggsToHatchColumn - m_eggsToHatchCount) + " remaining)");
