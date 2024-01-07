@@ -285,7 +285,7 @@ void PokemonStatTableWidget::AddPokemon()
     // target box
     {
         QSpinBox* spinBox = new QSpinBox();
-        spinBox->setRange(1, 100);
+        spinBox->setRange(1, m_mode == Mode::SingleShiny ? 25 : 100);
         spinBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         spinBox->setFixedWidth(40);
         setCellWidget(row, CT_Target, spinBox);

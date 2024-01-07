@@ -35,6 +35,7 @@ void SmartBDSPEggOperation::reset()
     m_isStatView = false;
 
     m_shinyCount = 0;
+    m_shinySoundID = 0;
 }
 
 void SmartBDSPEggOperation::runNextState()
@@ -51,6 +52,13 @@ void SmartBDSPEggOperation::runNextState()
 
         m_substage = SS_Start;
         setState_runCommand("Nothing,1");
+
+        if (m_programSettings.m_operation != EggOperationType::EOT_Collector && m_programSettings.m_shinyDetection == ShinyDetectionType::SDT_Sound)
+        {
+            // Setup sound detection
+            m_shinySoundID = m_audioManager->addDetection("PokemonBDSP/ShinySFX", 0.2f, 5000);
+            connect(m_audioManager, &AudioManager::soundDetected, this, &SmartBDSPEggOperation::soundDetected);
+        }
         break;
     }
     case SS_Start:
@@ -366,7 +374,7 @@ void SmartBDSPEggOperation::runNextState()
                     incrementStat(m_statShinyHatched);
                     emit printLog(log + " is SHINY!!! Moving it to Keep Box!", LOG_SUCCESS);
 
-                    int moveBoxCount = (m_eggColumnsHatched % 6) + 1;
+                    int moveBoxCount = (m_eggColumnsHatched + 5) / 6;
                     QString command = "Y,1,A,6,DUp,1,LUp,1,DUp,1,DRight,1,Loop,1"; // move cursor to Box List
                     command += ",L,1,Nothing,21,Loop," + QString::number(moveBoxCount); // move to keep box
                     command += ",A,1,Nothing,20,Loop,2,B,20,Loop,1"; // drop to keep box
@@ -442,6 +450,13 @@ void SmartBDSPEggOperation::runNextState()
                 setState_runCommand(C_CycleHatch, true);
 
                 m_hatchingDialog = 0;
+                m_shinyDetected = false;
+
+                // sound detection
+                if (m_shinySoundID > 0)
+                {
+                    m_audioManager->startDetection(m_shinySoundID);
+                }
 
                 m_videoManager->setAreas({A_Dialog});
                 m_timer.restart();
@@ -494,7 +509,13 @@ void SmartBDSPEggOperation::runNextState()
                     if (m_hatchingDialog == 3)
                     {
                         m_substage = SS_QuitBox;
+                        if (m_shinyDetected)
+                        {
+                            command += ",Capture,22";
+                        }
                         command += ",LLeft,20,LDown,10";
+
+                        m_audioManager->stopDetection(m_shinySoundID);
                     }
                     setState_runCommand(command);
                 }
@@ -567,4 +588,12 @@ void SmartBDSPEggOperation::runNextState()
     }
 
     SmartProgramBase::runNextState();
+}
+
+void SmartBDSPEggOperation::soundDetected(int id)
+{
+    if (id == m_shinySoundID && m_substage == SS_HatchEggs)
+    {
+        m_shinyDetected = true;
+    }
 }

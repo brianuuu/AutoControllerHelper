@@ -40,6 +40,9 @@ public:
 
     virtual SmartProgram getProgramEnum() { return SP_BDSP_EggOperation; }
 
+private slots:
+    void soundDetected(int id);
+
 private:
     virtual void init();
     virtual void reset();
@@ -118,6 +121,8 @@ private:
 
     // shiny
     int m_shinyCount; // how many shiny pokemon found overall
+    int m_shinySoundID;
+    bool m_shinyDetected; // the current hatched egg is a shiny
 
     // Stats
     Stat m_error;
