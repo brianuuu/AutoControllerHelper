@@ -33,6 +33,7 @@ void SmartBDSPEggOperation::reset()
     m_eggsToHatchColumn = 0;
     m_isStatView = false;
 
+    m_shinyWasFound = false;
     m_shinyCount = 0;
     m_shinySoundID = 0;
     m_loopDone = 0;
@@ -118,6 +119,7 @@ void SmartBDSPEggOperation::runNextState()
                     else if (m_eggsCollected >= 5)
                     {
                         // start hatching 1st column
+                        m_shinyWasFound = false;
                         m_eggsCollected = 0;
                         m_eggColumnsHatched = 0;
                         m_eggsToHatchColumn = 0;
@@ -287,7 +289,9 @@ void SmartBDSPEggOperation::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            if (m_shinyCount >= m_programSettings.m_statTable->GetTableList()[0].m_target)
+            int shinyRemaining = qMax(0, m_programSettings.m_statTable->GetTableList()[0].m_target - m_shinyCount);
+            emit printLog(QString::number(m_shinyCount) + " shiny was found (" + QString::number(shinyRemaining) + " left)");
+            if (shinyRemaining == 0)
             {
                 // reached shiny target, go to keep box and finish
                 m_substage = SS_Finished;
@@ -297,16 +301,15 @@ void SmartBDSPEggOperation::runNextState()
 
             m_eggsCollected = 0;
 
-            // TODO: save every shiny found
-            // hatched 100 eggs, restart game
+            // hatched 50 eggs, restart game
             m_loopDone++;
-            if (m_loopDone == 20 && m_shinyCount == 0)
+            if (m_loopDone >= 10 && !m_shinyWasFound)
             {
                 m_watchEnabled = false;
                 m_loopDone = 0;
 
                 m_isStatView = false;
-                emit printLog("No shinies after 100 eggs, restarting game to prevent crash");
+                emit printLog("It's been over 50 eggs, restarting game to prevent crash");
 
                 m_substage = SS_Restart;
                 setState_runCommand(m_settings->isPreventUpdate() ? C_RestartNoUpdate : C_Restart);
@@ -314,8 +317,12 @@ void SmartBDSPEggOperation::runNextState()
             }
 
             // start from beginning
+            if (m_shinyWasFound)
+            {
+                emit printLog("Saving game as a shiny was found...");
+            }
             m_substage = SS_Start;
-            setState_runCommand(C_QuitBox);
+            setState_runCommand(m_shinyWasFound ? C_QuitBoxSave : C_QuitBox);
         }
         break;
     }
@@ -444,6 +451,7 @@ void SmartBDSPEggOperation::runNextState()
                 {
                     // shiny found
                     m_shinyCount++;
+                    m_shinyWasFound = true;
                     incrementStat(m_statShinyHatched);
                     emit printLog(log + " is SHINY!!! Moving it to Keep Box!", LOG_SUCCESS);
 

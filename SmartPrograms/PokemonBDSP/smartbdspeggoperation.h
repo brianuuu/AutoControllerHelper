@@ -60,7 +60,8 @@ private:
     Command const C_Release             = 8;
     Command const C_PartyKeep           = 9;
     Command const C_PartyBack           = 10;
-    Command const C_COUNT               = 11;
+    Command const C_QuitBoxSave         = 11;
+    Command const C_COUNT               = 12;
 
     // List of test color
     HSVRange const C_Color_Dialog = HSVRange(0,0,230,359,30,255); // >150
@@ -124,6 +125,7 @@ private:
     int m_hatchingDialog; // how many times white detected during hatch (should be 3)
 
     // shiny
+    bool m_shinyWasFound; // there was a shiny in the current 5 eggs
     int m_shinyCount; // how many shiny pokemon found overall
     int m_shinySoundID;
     bool m_shinyDetected; // the current hatched egg is a shiny
