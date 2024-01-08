@@ -24,7 +24,6 @@ void SmartBDSPEggOperation::reset()
     m_substage = SS_Init;
 
     m_watchEnabled = false;
-    m_resetCountdown = 0;
 
     m_dialogDetected = false;
     m_eggsCollected = 0;
@@ -36,6 +35,7 @@ void SmartBDSPEggOperation::reset()
 
     m_shinyCount = 0;
     m_shinySoundID = 0;
+    m_loopDone = 0;
 }
 
 void SmartBDSPEggOperation::runNextState()
@@ -65,18 +65,7 @@ void SmartBDSPEggOperation::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            if (m_resetCountdown == 0 && m_programSettings.m_operation != EggOperationType::EOT_Hatcher)
-            {
-                m_watchEnabled = false;
-                m_resetCountdown = 10;
-
-                m_eggsCollected = 0;
-                m_isStatView = false;
-
-                m_substage = SS_Restart;
-                setState_runCommand(m_settings->isPreventUpdate() ? C_RestartNoUpdate : C_Restart);
-            }
-            else if (!m_watchEnabled && m_programSettings.m_operation != EggOperationType::EOT_Hatcher)
+            if (!m_watchEnabled && m_programSettings.m_operation != EggOperationType::EOT_Hatcher)
             {
                 m_substage = SS_Watch;
                 setState_frameAnalyzeRequest();
@@ -122,22 +111,47 @@ void SmartBDSPEggOperation::runNextState()
                 {
                     if (m_shinyCount >= m_programSettings.m_statTable->GetTableList()[0].m_target)
                     {
-                        // reached shiny target?
+                        // reached shiny target? should not reach here
                         m_substage = SS_Finished;
                         setState_runCommand("Home,2");
                     }
                     else if (m_eggsCollected >= 5)
                     {
-                        // TODO: start hatching one column
+                        // start hatching 1st column
                         m_eggsCollected = 0;
+                        m_eggColumnsHatched = 0;
+                        m_eggsToHatchColumn = 0;
                         m_programSettings.m_columnsToHatch = 1;
+
+                        // open box
+                        if (m_isStatView)
+                        {
+                            m_substage = SS_PartyKeep;
+                            setState_runCommand(C_ToBox);
+                        }
+                        else
+                        {
+                            m_substage = SS_CheckView;
+                            setState_runCommand(m_commands[C_ToBox] + ",LLeft,1,Nothing,20");
+
+                            m_videoManager->setAreas({A_Pokemon, A_Stat});
+                        }
                     }
                     else
                     {
                         // more eggs to collect
                         m_substage = SS_CycleCollect;
-                        setState_runCommand(C_CycleCollect);
+                        if (m_loopDone > 0 && m_eggsCollected == 0)
+                        {
+                            // immediately talk to nursery, should have an egg by now
+                            setState_runCommand("Nothing,5");
+                        }
+                        else
+                        {
+                            setState_runCommand(C_CycleCollect);
+                        }
 
+                        m_programSettings.m_targetEggCount = 5;
                         m_videoManager->setAreas({A_Watch, A_Dialog});
                     }
                 }
@@ -259,6 +273,52 @@ void SmartBDSPEggOperation::runNextState()
 
         break;
     }
+    case SS_PartyKeep:
+    {
+        if (state == S_CommandFinished)
+        {
+            emit printLog("Putting 5 filler Pokemon to Keep Box");
+            m_substage = SS_ToBox;
+            setState_runCommand(C_PartyKeep);
+        }
+        break;
+    }
+    case SS_PartyBack:
+    {
+        if (state == S_CommandFinished)
+        {
+            if (m_shinyCount >= m_programSettings.m_statTable->GetTableList()[0].m_target)
+            {
+                // reached shiny target, go to keep box and finish
+                m_substage = SS_Finished;
+                setState_runCommand("L,22,Home,2");
+                break;
+            }
+
+            m_eggsCollected = 0;
+
+            // TODO: save every shiny found
+            // hatched 100 eggs, restart game
+            m_loopDone++;
+            if (m_loopDone == 20 && m_shinyCount == 0)
+            {
+                m_watchEnabled = false;
+                m_loopDone = 0;
+
+                m_isStatView = false;
+                emit printLog("No shinies after 100 eggs, restarting game to prevent crash");
+
+                m_substage = SS_Restart;
+                setState_runCommand(m_settings->isPreventUpdate() ? C_RestartNoUpdate : C_Restart);
+                break;
+            }
+
+            // start from beginning
+            m_substage = SS_Start;
+            setState_runCommand(C_QuitBox);
+        }
+        break;
+    }
     case SS_ToBox:
     {
         if (state == S_CommandFinished)
@@ -303,8 +363,9 @@ void SmartBDSPEggOperation::runNextState()
             }
             else
             {
+                m_isStatView = true;
                 emit printLog("Stat/Judge View confirmed");
-                m_substage = SS_ToBox;
+                m_substage = (m_programSettings.m_operation == EggOperationType::EOT_Shiny) ? SS_PartyKeep : SS_ToBox;
                 setState_runCommand("LRight,1,Nothing,6");
             }
         }
@@ -318,9 +379,21 @@ void SmartBDSPEggOperation::runNextState()
             {
                 if (m_eggColumnsHatched >= m_programSettings.m_columnsToHatch)
                 {
-                    // done
-                    m_substage = SS_QuitBox;
-                    setState_runCommand(C_QuitBox);
+                    if (m_programSettings.m_operation == EggOperationType::EOT_Shiny)
+                    {
+                        // shiny mode put party back
+                        emit printLog("Taking 5 filler Pokemon from Keep Box to party");
+                        m_substage = SS_PartyBack;
+                        setState_runCommand(C_PartyBack);
+                    }
+                    else
+                    {
+                        // done
+                        m_substage = SS_QuitBox;
+                        setState_runCommand(C_QuitBox);
+                    }
+
+                    m_videoManager->clearCaptures();
                 }
                 else
                 {
@@ -414,6 +487,12 @@ void SmartBDSPEggOperation::runNextState()
                 if (m_eggsToHatchColumn < 5)
                 {
                     setState_runCommand("DDown,1,Nothing,25");
+                    break;
+                }
+
+                if (m_programSettings.m_operation == EggOperationType::EOT_Shiny && m_eggsToHatchColumn != 5)
+                {
+                    setState_error("Always expecting 5 eggs in party in Shiny Mode");
                     break;
                 }
             }

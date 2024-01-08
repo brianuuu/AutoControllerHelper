@@ -58,7 +58,9 @@ private:
     Command const C_QuitBox             = 6;
     Command const C_CycleHatch          = 7;
     Command const C_Release             = 8;
-    Command const C_COUNT               = 9;
+    Command const C_PartyKeep           = 9;
+    Command const C_PartyBack           = 10;
+    Command const C_COUNT               = 11;
 
     // List of test color
     HSVRange const C_Color_Dialog = HSVRange(0,0,230,359,30,255); // >150
@@ -85,6 +87,9 @@ private:
         SS_Collect,
         SS_CollectSuccess,
 
+        SS_PartyKeep,
+        SS_PartyBack,
+
         SS_ToBox,
         SS_CheckView,
         SS_CheckShiny,
@@ -106,7 +111,6 @@ private:
     Settings m_programSettings;
 
     bool m_watchEnabled;
-    int m_resetCountdown;
 
     // collect
     bool m_dialogDetected;
@@ -123,6 +127,7 @@ private:
     int m_shinyCount; // how many shiny pokemon found overall
     int m_shinySoundID;
     bool m_shinyDetected; // the current hatched egg is a shiny
+    int m_loopDone;
 
     // Stats
     Stat m_error;
