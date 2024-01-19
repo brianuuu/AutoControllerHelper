@@ -130,6 +130,8 @@ void SmartBDSPEggOperation::runNextState()
                         {
                             m_substage = SS_PartyKeep;
                             setState_runCommand(C_ToBox);
+
+                            m_videoManager->clearCaptures();
                         }
                         else
                         {
@@ -173,6 +175,7 @@ void SmartBDSPEggOperation::runNextState()
             {
                 if (m_watchEnabled)
                 {
+                    incrementStat(m_error);
                     setState_error("Unable to detect Poketch");
                 }
                 else
@@ -309,17 +312,19 @@ void SmartBDSPEggOperation::runNextState()
                 m_loopDone = 0;
 
                 m_isStatView = false;
-                emit printLog("It's been over 50 eggs, restarting game to prevent crash");
+                emit printLog("It's been over 50 eggs, restarting game to prevent crash", LOG_WARNING);
 
                 m_substage = SS_Restart;
                 setState_runCommand(m_settings->isPreventUpdate() ? C_RestartNoUpdate : C_Restart);
+
+                m_videoManager->clearCaptures();
                 break;
             }
 
             // start from beginning
             if (m_shinyWasFound)
             {
-                emit printLog("Saving game as a shiny was found...");
+                emit printLog("Saving game as a shiny was found");
             }
             m_substage = SS_Start;
             setState_runCommand(m_shinyWasFound ? C_QuitBoxSave : C_QuitBox);
@@ -334,7 +339,7 @@ void SmartBDSPEggOperation::runNextState()
             {
                 // pick up first column
                 m_substage = SS_PickEggs;
-                setState_runCommand("Y,1,Nothing,1,Y,1,A,1,Loop,1,DDown,1,Nothing,6,Loop,4,A,6,DLeft,1,DDown,1,A,32");
+                setState_runCommand("Y,1,Nothing,1,Y,1,A,1,Loop,1,DDown,1,Nothing,6,Loop,6,A,6,DLeft,1,DDown,1,A,32");
 
                 m_eggsToHatchColumn = 0;
                 m_videoManager->setAreas({A_Pokemon, A_Stat});
@@ -359,7 +364,8 @@ void SmartBDSPEggOperation::runNextState()
             {
                 if (m_isStatView)
                 {
-                     setState_error("Unable to detect Stat/Judge View");
+                    incrementStat(m_error);
+                    setState_error("Unable to detect Stat/Judge View");
                 }
                 else
                 {
@@ -417,7 +423,7 @@ void SmartBDSPEggOperation::runNextState()
                         // move to column
                         command += ",DRight,1,Nothing,6,Loop," + QString::number(moveColumnCount);
                     }
-                    command += ",A,1,Loop,1,DDown,1,Nothing,6,Loop,4,A,6,DDown,1,Loop,1"; // pick up column
+                    command += ",A,1,Loop,1,DDown,1,Nothing,6,Loop,6,A,6,DDown,1,Loop,1"; // pick up column
                     command += ",DLeft,1,Nothing,1,Loop," + QString::number(moveColumnCount + 1); // move to party
                     command += ",A,32"; // drop at party
 
@@ -438,10 +444,12 @@ void SmartBDSPEggOperation::runNextState()
         {
             if (!checkBrightnessMeanTarget(A_Stat.m_rect, C_Color_Dialog, 230))
             {
+                incrementStat(m_error);
                 setState_error("Expected Pokemon, none detected");
             }
             else if (checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Dialog, 230))
             {
+                incrementStat(m_error);
                 setState_error("Unexpected egg detected");
             }
             else
@@ -487,6 +495,7 @@ void SmartBDSPEggOperation::runNextState()
             {
                 if (!checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Dialog, 230))
                 {
+                    incrementStat(m_error);
                     setState_error("Only excepting eggs in party");
                     break;
                 }
@@ -500,6 +509,7 @@ void SmartBDSPEggOperation::runNextState()
 
                 if (m_programSettings.m_operation == EggOperationType::EOT_Shiny && m_eggsToHatchColumn != 5)
                 {
+                    incrementStat(m_error);
                     setState_error("Always expecting 5 eggs in party in Shiny Mode");
                     break;
                 }
@@ -507,6 +517,7 @@ void SmartBDSPEggOperation::runNextState()
 
             if (m_eggsToHatchColumn == 0)
             {
+                incrementStat(m_error);
                 setState_error("No eggs detected for current column");
                 break;
             }
@@ -569,6 +580,7 @@ void SmartBDSPEggOperation::runNextState()
             }
             else if (m_timer.elapsed() > 600000) // 10min
             {
+                incrementStat(m_error);
                 setState_error("Unable to hatch any eggs over 10 minutes");
             }
             else if (checkBrightnessMeanTarget(A_Dialog.m_rect, C_Color_Dialog, 230))
