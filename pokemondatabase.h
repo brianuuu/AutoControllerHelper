@@ -140,6 +140,7 @@ public:
     // Pokemon
     static NatureType getNatureFromStats(StatType inc, StatType dec);
     static OCREntries const& getEntries_PokemonIV(GameLanguage gameLanguage);
+    static QStringList const& getList_PokeBalls();
 
     // Pokedex
     static OCREntries const& getEntries_PokedexNational(GameLanguage gameLanguage);
@@ -150,6 +151,8 @@ public:
     static OCREntries const& getEntries_PLADistortion(GameLanguage gameLanguage);
     static OCREntries const getEntries_PLAMassOutbreak(GameLanguage gameLanguage);
 
+    // Pokemon Sword & Shield
+    static QStringList const& getList_SwShSprites();
 private:
     typedef QMap<GameLanguage, OCREntries> Database;
 
@@ -163,6 +166,7 @@ private:
 private:
     // Pokemon
     Database m_database_PokedexIV;
+    QStringList m_list_Pokeballs;
 
     // Pokedex
     Database m_database_PokedexNational;
@@ -170,6 +174,9 @@ private:
     // Pokemon Legends: Arceus
     QStringList m_list_PLAOutbreak;
     Database m_database_PLADistortion;
+
+    // Pokemon Sword & Shield
+    QStringList m_list_SwShSprites;
 };
 
 #endif // POKEMONDATABASE_H

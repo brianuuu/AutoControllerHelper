@@ -332,6 +332,12 @@ const PokemonDatabase::OCREntries &PokemonDatabase::getEntries_PokemonIV(GameLan
     return instance().m_database_PokedexIV[gameLanguage];
 }
 
+const QStringList &PokemonDatabase::getList_PokeBalls()
+{
+    instance().getList("PokemonCommon/Pokemon-Balls", instance().m_list_Pokeballs);
+    return instance().m_list_Pokeballs;
+}
+
 // -----------------------------------------------
 // Pokedex
 // -----------------------------------------------
@@ -379,6 +385,15 @@ const PokemonDatabase::OCREntries PokemonDatabase::getEntries_PLAMassOutbreak(Ga
 }
 
 // -----------------------------------------------
+// Pokemon Sword & Shield
+// -----------------------------------------------
+const QStringList &PokemonDatabase::getList_SwShSprites()
+{
+    instance().getList("PokemonSwSh/Pokemon-Sprites", instance().m_list_SwShSprites);
+    return instance().m_list_SwShSprites;
+}
+
+// -----------------------------------------------
 // Json functions
 // -----------------------------------------------
 bool PokemonDatabase::readJson(const QString &path, QJsonObject& jsonObject)
@@ -405,6 +420,9 @@ bool PokemonDatabase::readJson(const QString &path, QJsonObject& jsonObject)
 // -----------------------------------------------
 bool PokemonDatabase::getList(const QString &name, QStringList &list)
 {
+    // Use this function to lazily initialize list if it's not created yet
+    if (!list.isEmpty()) return true;
+
     QFile file(RESOURCES_PATH + name + ".txt");
     if (file.open(QIODevice::Text | QIODevice::ReadOnly))
     {
