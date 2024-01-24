@@ -6,6 +6,7 @@ SmartBrightnessMeanFinder::SmartBrightnessMeanFinder
     QLabel* labelMean,
     QPushButton* imageMatchBtn,
     QLabel* labelImageMatch,
+    QCheckBox* matchScale,
     QPushButton* ocrBtn,
     QLineEdit* ocrLE,
     QPushButton* ocrNumBtn,
@@ -18,6 +19,7 @@ SmartBrightnessMeanFinder::SmartBrightnessMeanFinder
     , m_meanOutput(labelMean)
     , m_imageMatchBtn(imageMatchBtn)
     , m_imageMatchResult(labelImageMatch)
+    , m_imageMatchScale(matchScale)
     , m_ocrBtn(ocrBtn)
     , m_ocrLE(ocrLE)
     , m_ocrNumBtn(ocrNumBtn)
@@ -129,21 +131,27 @@ void SmartBrightnessMeanFinder::runNextState()
             // Image matching
             if (m_imageMatchStarted)
             {
-                if (m_imageMatchImage.width() > m_spinBoxes[2]->value() || m_imageMatchImage.height() > m_spinBoxes[3]->value())
+                QImage const image = m_imageMatchScale->isChecked() ? m_imageMatchImage.scaled(m_spinBoxes[2]->value(), m_spinBoxes[3]->value()) : m_imageMatchImage;
+                if (image.width() > m_spinBoxes[2]->value() || image.height() > m_spinBoxes[3]->value())
                 {
                     emit printLog("Capture dimension too small", LOG_WARNING);
+                    m_imageMatchStarted = false;
+                }
+                else if (image.width() < m_spinBoxes[2]->value() / 2 || image.height() < m_spinBoxes[3]->value() / 2)
+                {
+                    emit printLog("Image is too small, less than half size of capture area", LOG_WARNING);
                     m_imageMatchStarted = false;
                 }
                 else
                 {
                     double maxRatio = 0;
                     QPoint maxRatioOffset(0,0);
-                    for (int y = 0; y <= rect.height() - m_imageMatchImage.height(); y++)
+                    for (int y = 0; y <= rect.height() - image.height(); y++)
                     {
-                        for (int x = 0; x <= rect.width() - m_imageMatchImage.width(); x++)
+                        for (int x = 0; x <= rect.width() - image.width(); x++)
                         {
-                            QRect cropRect(rect.left() + x, rect.top() + y, m_imageMatchImage.width(), m_imageMatchImage.height());
-                            double ratio = getImageMatch(cropRect, hsvRange, m_imageMatchImage);
+                            QRect cropRect(rect.left() + x, rect.top() + y, image.width(), image.height());
+                            double ratio = getImageMatch(cropRect, hsvRange, image);
                             if (ratio > maxRatio)
                             {
                                 maxRatio = ratio;
@@ -178,10 +186,13 @@ void SmartBrightnessMeanFinder::imageMatchAdd()
     if (file.isEmpty()) return;
 
     QImage tempImage(file);
-    if (tempImage.width() > m_spinBoxes[2]->value() || tempImage.height() > m_spinBoxes[3]->value())
+    if (!m_imageMatchScale->isChecked())
     {
-        emit printLog("Image dimension too large", LOG_ERROR);
-        return;
+        if (tempImage.width() > m_spinBoxes[2]->value() || tempImage.height() > m_spinBoxes[3]->value())
+        {
+            emit printLog("Image dimension too large", LOG_ERROR);
+            return;
+        }
     }
 
     m_imageMatchImage = tempImage.convertToFormat(QImage::Format_MonoLSB, Qt::MonoOnly);

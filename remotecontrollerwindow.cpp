@@ -2324,6 +2324,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
                     ui->SP1_L_Mean,
                     ui->SP1_PB_MatchImage,
                     ui->SP1_L_MatchResult,
+                    ui->SP1_CB_MatchScale,
                     ui->SP1_PB_OCR,
                     ui->SP1_LE_OCR,
                     ui->SP1_PB_OCRNumber,

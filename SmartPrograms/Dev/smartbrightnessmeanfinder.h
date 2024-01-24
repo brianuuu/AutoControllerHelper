@@ -15,6 +15,7 @@ public:
             QLabel* labelMean,
             QPushButton* imageMatchBtn,
             QLabel* labelImageMatch,
+            QCheckBox* matchScale,
             QPushButton* ocrBtn,
             QLineEdit* ocrLE,
             QPushButton* ocrNumBtn,
@@ -57,6 +58,7 @@ private:
 
     QPushButton* m_imageMatchBtn;
     QLabel* m_imageMatchResult;
+    QCheckBox* m_imageMatchScale;
     bool m_imageMatchStarted;
     QImage m_imageMatchImage;
 
