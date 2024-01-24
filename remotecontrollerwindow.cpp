@@ -1744,6 +1744,11 @@ void RemoteControllerWindow::on_SP2_SB_Y_valueChanged(int arg1)
     m_vlcWrapper->getVideoManager()->setDefaultArea(rect);
 }
 
+void RemoteControllerWindow::on_SP5_CB_Raid_toggled(bool checked)
+{
+    ui->SP5_SB_Skips->setEnabled(!checked);
+}
+
 void RemoteControllerWindow::on_SP6_CB_Skips_clicked()
 {
     ui->SP6_SB_Skips->setEnabled(ui->SP6_CB_Skips->isChecked());
@@ -2392,7 +2397,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     }
     case SP_DaySkipper:
     {
-        m_smartProgram = new SmartDaySkipper(ui->SP5_SB_Skips->value(), ui->SP5_TimeLeft, parameter);
+        m_smartProgram = new SmartDaySkipper(ui->SP5_SB_Skips->value(), ui->SP5_CB_Raid->isChecked(), ui->SP5_TimeLeft, parameter);
         break;
     }
     case SP_BattleTower:

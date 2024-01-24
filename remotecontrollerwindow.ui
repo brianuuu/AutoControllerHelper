@@ -2858,6 +2858,13 @@ This program works regardless of Switch's current date.</string>
                        </widget>
                       </item>
                       <item>
+                       <widget class="QCheckBox" name="SP5_CB_Raid">
+                        <property name="text">
+                         <string>Raid 3 Day Skip Mode (Y-comm glitch not requied)</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
                        <layout class="QHBoxLayout" name="horizontalLayout_24">
                         <item>
                          <widget class="QLabel" name="label_39">

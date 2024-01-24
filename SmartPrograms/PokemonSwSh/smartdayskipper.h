@@ -9,6 +9,7 @@ class SmartDaySkipper : public SmartProgramBase
 public:
     explicit SmartDaySkipper(
             int skips,
+            bool raidMode,
             QLabel* estimateLabel,
             SmartProgramParameter parameter
             );
@@ -32,19 +33,39 @@ private:
     Command const C_BackToGame  = 8;
     Command const C_SkipJPMonth = 9;
     Command const C_SkipJPYear  = 10;
-    Command const C_COUNT       = 11;
+    Command const C_ToSyncTime  = 11;
+    Command const C_SkipJPYearRaid  = 12;
+    Command const C_SkipEUYearRaid  = 13;
+    Command const C_SkipUSYearRaid  = 14;
+    Command const C_RestartGame = 15;
+    Command const C_StartGameA  = 16;
+    Command const C_StartRaid   = 17;
+    Command const C_COUNT       = 18;
 
     // List of test color
 
     // List of test point/area
+    CaptureArea const A_RaidStart = CaptureArea(1166,554,32,32);
+    CapturePoint const P_Center = CapturePoint(640,0);
+    CaptureArea const A_EnterGame = CaptureArea(600,0,80,80);
 
     // Substages
     enum Substage
     {
         SS_Init,
+
         SS_ToOK,
         SS_Back2000,
         SS_Skip,
+
+        SS_StartRaid,
+        SS_RaidMonCheck,
+        SS_ToSyncTime,
+        SS_SkipYearRaid,
+        SS_RestartGame,   // Close and launch game
+        SS_StartGame,   // Press A when intro starts
+        SS_EnterGame,    // Wait until black screen goes away
+
         SS_BackToGame,
     };
     Substage m_substage;
@@ -53,6 +74,7 @@ private:
     QDate m_date;
     int m_skipsLeft;
     int m_skippedDays;
+    bool m_raidMode;
     DateArrangement m_dateArrangement;
     QLabel* m_estimateLabel;
 

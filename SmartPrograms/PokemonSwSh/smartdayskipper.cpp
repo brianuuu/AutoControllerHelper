@@ -3,12 +3,14 @@
 SmartDaySkipper::SmartDaySkipper
 (
     int skips,
+    bool raidMode,
     QLabel* estimateLabel,
     SmartProgramParameter parameter
 )
     : SmartProgramBase(parameter)
     , m_skipsLeft(skips)
     , m_skippedDays(0)
+    , m_raidMode(raidMode)
     , m_dateArrangement(parameter.settings->getDateArrangement())
     , m_estimateLabel(estimateLabel)
 {
@@ -36,6 +38,16 @@ void SmartDaySkipper::runNextState()
     {
     case SS_Init:
     {
+        if (m_raidMode)
+        {
+            m_substage = SS_StartRaid;
+            setState_runCommand(C_StartRaid);
+            emit printLog("Raid 3 Day Skip Mode Enabled");
+            emit printLog("WARNING: This program will not stop on its own!", LOG_WARNING);
+            m_videoManager->setAreas({A_RaidStart});
+            break;
+        }
+
         switch (m_dateArrangement)
         {
             case DA_JP: emit printLog("Date Arrangement: JP is set"); break;
@@ -156,10 +168,157 @@ void SmartDaySkipper::runNextState()
 
         break;
     }
+    case SS_StartRaid:
+    {
+        if (state == S_CommandFinished)
+        {
+            setState_frameAnalyzeRequest();
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (checkAverageColorMatch(A_RaidStart.m_rect, QColor(0,0,0)))
+            {
+                if (m_skippedDays < 3)
+                {
+                    emit printLog("Raid start detected, skipping year...");
+                    m_substage = SS_ToSyncTime;
+                    setState_runCommand(C_ToSyncTime);
+                }
+                else
+                {
+                    emit printLog("Raid start detected, STOP the program if Pokemon is correct!", LOG_WARNING);
+                    m_substage = SS_RaidMonCheck;
+                    setState_runCommand("DDown,1,Nothing,1,Loop,60");
+                }
+                m_videoManager->clearCaptures();
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
+            }
+        }
+        break;
+    }
+    case SS_RaidMonCheck:
+    {
+        if (state == S_CommandFinished)
+        {
+            emit printLog("Syncing time and restarting game...");
+            m_substage = SS_ToSyncTime;
+            setState_runCommand(C_ToSyncTime);
+        }
+        break;
+    }
+    case SS_ToSyncTime:
+    {
+        if (state == S_CommandFinished)
+        {
+            if (m_skippedDays == 3)
+            {
+                m_skippedDays = 0;
+                m_substage = SS_RestartGame;
+                setState_runCommand(C_RestartGame);
+            }
+            else
+            {
+                m_skippedDays++;
+                m_substage = SS_SkipYearRaid;
+                switch (m_dateArrangement)
+                {
+                    case DA_JP: setState_runCommand(C_SkipJPYearRaid); break;
+                    case DA_EU: setState_runCommand(C_SkipEUYearRaid); break;
+                    case DA_US: setState_runCommand(C_SkipUSYearRaid); break;
+                }
+            }
+        }
+        break;
+    }
+    case SS_SkipYearRaid:
+    {
+        if (state == S_CommandFinished)
+        {
+            m_substage = SS_BackToGame;
+            setState_runCommand(C_BackToGame);
+        }
+        break;
+    }
+    case SS_RestartGame:
+    {
+        if (state == S_CommandFinished)
+        {
+            m_videoManager->getFrame(m_capture);
+
+            // Wait until screen is not black anymore (intro plays)
+            bool introStarted = !checkPixelColorMatch(P_Center.m_point, QColor(0,0,0));
+            if (introStarted)
+            {
+                m_substage = SS_StartGame;
+                setState_runCommand(C_StartGameA);
+                emit printLog("Intro started, entering game...");
+            }
+            else
+            {
+                runNextStateContinue();
+            }
+        }
+        break;
+    }
+    case SS_StartGame:
+    {
+        if (state == S_CommandFinished)
+        {
+            m_videoManager->getFrame(m_capture);
+
+            // Wait until screen to be black
+            bool enteredBlackScreen = checkPixelColorMatch(P_Center.m_point, QColor(0,0,0));
+            if (enteredBlackScreen)
+            {
+                m_substage = SS_EnterGame;
+
+                m_videoManager->clearCaptures();
+                m_videoManager->setAreas({A_EnterGame});
+            }
+
+            runNextStateContinue();
+        }
+
+        break;
+    }
+    case SS_EnterGame:
+    {
+        if (state == S_CommandFinished)
+        {
+            m_videoManager->getFrame(m_capture);
+
+            // Wait until screen to be not black anymore
+            bool enteredGame = !checkAverageColorMatch(A_EnterGame.m_rect, QColor(0,0,0));
+            if (enteredGame)
+            {
+                m_substage = SS_StartRaid;
+                setState_runCommand(C_StartRaid);
+                m_videoManager->setAreas({A_RaidStart});
+            }
+            else
+            {
+                runNextStateContinue();
+            }
+        }
+
+        break;
+    }
     case SS_BackToGame:
     {
         if (state == S_CommandFinished)
         {
+            if (m_raidMode)
+            {
+                emit printLog("Quitting Raid...Currently at Day " + QString::number(m_skippedDays + 1));
+                m_substage = SS_StartRaid;
+                setState_runCommand("B,32,Nothing,1,A,200,Nothing,1,A,12,Nothing,1,A,6,Nothing,1," + m_commands[C_StartRaid]);
+                m_videoManager->setAreas({A_RaidStart});
+                break;
+            }
+
             setState_completed();
             emit printLog("Total time spent: " + secondsToString(m_startDateTime.secsTo(QDateTime::currentDateTime())));
         }

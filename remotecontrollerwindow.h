@@ -171,6 +171,8 @@ private slots:
     void on_SP2_SB_X_valueChanged(int arg1);
     void on_SP2_SB_Y_valueChanged(int arg1);
 
+    void on_SP5_CB_Raid_toggled(bool checked);
+
     void on_SP6_CB_Skips_clicked();
 
     void on_SP9_CB_Mode_currentIndexChanged(int index);
