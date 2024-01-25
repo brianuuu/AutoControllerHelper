@@ -373,32 +373,27 @@ public:
     {
         switch (sp)
         {
-        // all simple program return false
-        case SP_DelayCalibrator:
-        case SP_BrightnessMeanFinder:
-        case SP_ColorCalibrator:
-        case SP_SoundDetection:
-        case SP_Test:
-        case SP_CodeEntry:
-        case SP_BattleTower:
-        case SP_BoxRelease:
-        case SP_TradePartnerFinder:
-        case SP_BDSP_MenuGlitch113:
-        case SP_BDSP_BoxDuplication:
-        case SP_PLA_BraviaryGainHeight:
-        case SP_SV_ItemDuplication:
-        case SP_SV_BoxRelease:
-        case SP_SV_BoxReleaseSafe:
-        case SP_SV_GimmighoulFarmer:
-        case SP_SV_TradePartnerFinder:
-        case SP_TOTK_BowFuseDuplication:
-        case SP_TOTK_MineruDuplication:
-        case SP_TOTK_ShieldSurfDuplication:
-        case SP_TOTK_ZonaiDeviceDuplication:
-        case SP_S3_TableturfSkip:
-            return false;
-        default:
+        case SP_HomeSorter:
+
+        case SP_SurpriseTrade:
+        case SP_EggOperation:
+
+        case SP_BDSP_Starter:
+        case SP_BDSP_ShinyLegendary:
+        case SP_BDSP_EggOperation:
+
+        case SP_PLA_NuggetFarmer:
+        case SP_PLA_ResetAlphaPokemon:
+        case SP_PLA_OutbreakFinder:
+        case SP_PLA_PastureSorter:
+
+        case SP_SV_SurpriseTrade:
+        case SP_SV_EggOperation:
+
+        case SP_S3_TableturfCloneJelly:
             return true;
+        default:
+            return false;
         }
     }
 
