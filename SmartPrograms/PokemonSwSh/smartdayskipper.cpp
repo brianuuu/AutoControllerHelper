@@ -67,6 +67,7 @@ void SmartDaySkipper::reset()
 
     m_substage = SS_Init;
     m_skippedDays = 0;
+    m_isFound = false;
 }
 
 void SmartDaySkipper::runNextState()
@@ -149,8 +150,8 @@ void SmartDaySkipper::runNextState()
             if (m_skipsLeft == 0)
             {
                 m_substage = SS_BackToGame;
-                setState_runCommand(C_BackToGame);
-                emit printLog("Skip completed, going back to game");
+                setState_runCommand(m_commands[C_SyncTime] + "," + m_commands[C_BackToGame]);
+                emit printLog("Skip completed, syncing time and going back to game");
             }
             else
             {
@@ -216,7 +217,7 @@ void SmartDaySkipper::runNextState()
 
                 if (m_skippedDays == 3)
                 {
-                    m_videoManager->setAreas({A_Sprite});
+                    m_videoManager->setAreas({A_Sprite, A_Switch});
                 }
             }
             else
@@ -263,8 +264,10 @@ void SmartDaySkipper::runNextState()
                 }
                 else
                 {
-                    emit printLog(m_pokemonList[foundIndex] + " found!", LOG_SUCCESS);
-                    setState_completed();
+                    m_isFound = true;
+                    emit printLog(m_pokemonList[foundIndex] + " is found! Syncing time before finishing", LOG_SUCCESS);
+                    m_substage = SS_ToSyncTime;
+                    setState_runCommand(m_commands[C_ToSyncTime] + ",ASpam,4,Nothing,5," + m_commands[C_BackToGame]);
                 }
 
                 m_videoManager->clearCaptures();
@@ -280,7 +283,11 @@ void SmartDaySkipper::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            if (m_skippedDays == 3)
+            if (m_isFound)
+            {
+                setState_completed();
+            }
+            else if (m_skippedDays == 3)
             {
                 m_skippedDays = 0;
                 m_substage = SS_RestartGame;
@@ -381,7 +388,7 @@ void SmartDaySkipper::runNextState()
             {
                 emit printLog("Quitting Raid...Currently at Day " + QString::number(m_skippedDays + 1));
                 m_substage = SS_StartRaid;
-                setState_runCommand("B,1,Loop,1,ASpam,2,Loop,0", true);
+                setState_runCommand("BSpam,6,Loop,1,ASpam,2,Loop,0", true);
                 m_videoManager->setAreas({A_Invite, A_Switch});
                 break;
             }

@@ -81,6 +81,7 @@ private:
     DateArrangement m_dateArrangement;
     QLabel* m_estimateLabel;
 
+    bool m_isFound;
     QStringList m_pokemonList;
     QVector<QImage> m_imageTests;
 
