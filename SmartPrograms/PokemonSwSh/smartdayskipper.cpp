@@ -4,6 +4,7 @@ SmartDaySkipper::SmartDaySkipper
 (
     int skips,
     bool raidMode,
+    QString const& pokemonList,
     QLabel* estimateLabel,
     SmartProgramParameter parameter
 )
@@ -15,6 +16,43 @@ SmartDaySkipper::SmartDaySkipper
     , m_estimateLabel(estimateLabel)
 {
     init();
+
+    if (m_raidMode)
+    {
+        if (pokemonList.isEmpty())
+        {
+            setState_error("No Pokemon listed");
+            return;
+        }
+
+        m_pokemonList = pokemonList.split(',');
+        for (QString& pokemon : m_pokemonList)
+        {
+            if (pokemon.isEmpty())
+            {
+                setState_error("Empty name detected");
+                return;
+            }
+            else if (m_pokemonList.count(pokemon) > 1)
+            {
+                setState_error(pokemon + " is duplicated");
+                return;
+            }
+            else if (!pokemon.front().isUpper())
+            {
+                pokemon[0] = pokemon[0].toUpper();
+            }
+
+            if (!PokemonDatabase::getList_SwShSprites().contains(pokemon))
+            {
+                setState_error(pokemon + " is not a valid Pokemon");
+                return;
+            }
+
+            QImage img = QImage(QString(RESOURCES_PATH) + "PokemonSwSh/Silhouettes/" + pokemon + ".bmp");
+            m_imageTests.push_back(img.scaled(A_Sprite.m_rect.size()).convertToFormat(QImage::Format_MonoLSB, Qt::MonoOnly));
+        }
+    }
 }
 
 void SmartDaySkipper::init()
@@ -41,10 +79,9 @@ void SmartDaySkipper::runNextState()
         if (m_raidMode)
         {
             m_substage = SS_StartRaid;
-            setState_runCommand(C_StartRaid);
+            setState_runCommand("ASpam,2,Loop,0", true);
             emit printLog("Raid 3 Day Skip Mode Enabled");
-            emit printLog("WARNING: This program will not stop on its own!", LOG_WARNING);
-            m_videoManager->setAreas({A_RaidStart});
+            m_videoManager->setAreas({A_Invite, A_Switch});
             break;
         }
 
@@ -170,27 +207,17 @@ void SmartDaySkipper::runNextState()
     }
     case SS_StartRaid:
     {
-        if (state == S_CommandFinished)
+        if (state == S_CaptureReady)
         {
-            setState_frameAnalyzeRequest();
-        }
-        else if (state == S_CaptureReady)
-        {
-            if (checkAverageColorMatch(A_RaidStart.m_rect, QColor(0,0,0)))
+            if (checkAverageColorMatch(A_Invite.m_rect, QColor(0,0,0)))
             {
-                if (m_skippedDays < 3)
+                m_substage = SS_Invite;
+                setState_runCommand("Nothing,10");
+
+                if (m_skippedDays == 3)
                 {
-                    emit printLog("Raid start detected, skipping year...");
-                    m_substage = SS_ToSyncTime;
-                    setState_runCommand(C_ToSyncTime);
+                    m_videoManager->setAreas({A_Sprite});
                 }
-                else
-                {
-                    emit printLog("Raid start detected, STOP the program if Pokemon is correct!", LOG_WARNING);
-                    m_substage = SS_RaidMonCheck;
-                    setState_runCommand("DDown,1,Nothing,1,Loop,60");
-                }
-                m_videoManager->clearCaptures();
             }
             else
             {
@@ -199,13 +226,53 @@ void SmartDaySkipper::runNextState()
         }
         break;
     }
-    case SS_RaidMonCheck:
+    case SS_Invite:
     {
         if (state == S_CommandFinished)
         {
-            emit printLog("Syncing time and restarting game...");
-            m_substage = SS_ToSyncTime;
-            setState_runCommand(C_ToSyncTime);
+            setState_frameAnalyzeRequest();
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (checkAverageColorMatch(A_Switch.m_rect, QColor(0,0,0)))
+            {
+                if (m_skippedDays < 3)
+                {
+                    emit printLog("Raid start detected, skipping year...");
+                    m_substage = SS_ToSyncTime;
+                    setState_runCommand(C_ToSyncTime);
+                    m_videoManager->clearCaptures();
+                    break;
+                }
+
+                int foundIndex = -1;
+                for (int i = 0; i < m_imageTests.size(); i++)
+                {
+                    if (checkImageMatchTarget(A_Sprite.m_rect, C_Color_Black, m_imageTests[i], 0.5))
+                    {
+                        foundIndex = i;
+                        break;
+                    }
+                }
+
+                if (foundIndex == -1)
+                {
+                    emit printLog("No matching Pokemon, syncing time and restarting game...");
+                    m_substage = SS_ToSyncTime;
+                    setState_runCommand(C_ToSyncTime);
+                }
+                else
+                {
+                    emit printLog(m_pokemonList[foundIndex] + " found!", LOG_SUCCESS);
+                    setState_completed();
+                }
+
+                m_videoManager->clearCaptures();
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
+            }
         }
         break;
     }
@@ -295,8 +362,8 @@ void SmartDaySkipper::runNextState()
             if (enteredGame)
             {
                 m_substage = SS_StartRaid;
-                setState_runCommand(C_StartRaid);
-                m_videoManager->setAreas({A_RaidStart});
+                setState_runCommand("ASpam,2,Loop,0", true);
+                m_videoManager->setAreas({A_Invite, A_Switch});
             }
             else
             {
@@ -314,8 +381,8 @@ void SmartDaySkipper::runNextState()
             {
                 emit printLog("Quitting Raid...Currently at Day " + QString::number(m_skippedDays + 1));
                 m_substage = SS_StartRaid;
-                setState_runCommand("B,32,Nothing,1,A,200,Nothing,1,A,12,Nothing,1,A,6,Nothing,1," + m_commands[C_StartRaid]);
-                m_videoManager->setAreas({A_RaidStart});
+                setState_runCommand("B,1,Loop,1,ASpam,2,Loop,0", true);
+                m_videoManager->setAreas({A_Invite, A_Switch});
                 break;
             }
 

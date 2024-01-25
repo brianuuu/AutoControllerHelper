@@ -160,6 +160,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     }
     validCommands.sort();
     ui->LE_CommandSender->InitCompleter(validCommands);
+    ui->SP5_LE_PokemonList->InitCompleter(PokemonDatabase::getList_SwShSprites());
     ui->SP13_LE_PokemonList->InitCompleter(PokemonDatabase::getList_PLAMassOutbreak());
 
     // Logging
@@ -1747,6 +1748,7 @@ void RemoteControllerWindow::on_SP2_SB_Y_valueChanged(int arg1)
 void RemoteControllerWindow::on_SP5_CB_Raid_toggled(bool checked)
 {
     ui->SP5_SB_Skips->setEnabled(!checked);
+    ui->SP5_LE_PokemonList->setEnabled(checked);
 }
 
 void RemoteControllerWindow::on_SP6_CB_Skips_clicked()
@@ -2398,7 +2400,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     }
     case SP_DaySkipper:
     {
-        m_smartProgram = new SmartDaySkipper(ui->SP5_SB_Skips->value(), ui->SP5_CB_Raid->isChecked(), ui->SP5_TimeLeft, parameter);
+        m_smartProgram = new SmartDaySkipper(ui->SP5_SB_Skips->value(), ui->SP5_CB_Raid->isChecked(), ui->SP5_LE_PokemonList->text(), ui->SP5_TimeLeft, parameter);
         break;
     }
     case SP_BattleTower:

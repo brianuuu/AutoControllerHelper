@@ -10,6 +10,7 @@ public:
     explicit SmartDaySkipper(
             int skips,
             bool raidMode,
+            QString const& pokemonList,
             QLabel* estimateLabel,
             SmartProgramParameter parameter
             );
@@ -39,15 +40,17 @@ private:
     Command const C_SkipUSYearRaid  = 14;
     Command const C_RestartGame = 15;
     Command const C_StartGameA  = 16;
-    Command const C_StartRaid   = 17;
-    Command const C_COUNT       = 18;
+    Command const C_COUNT       = 17;
 
     // List of test color
+    HSVRange const C_Color_Black = HSVRange(0,0,0,359,255,30);
 
     // List of test point/area
-    CaptureArea const A_RaidStart = CaptureArea(1166,554,32,32);
+    CaptureArea const A_Invite = CaptureArea(1166,440,32,32);
+    CaptureArea const A_Switch = CaptureArea(1166,554,32,32);
     CapturePoint const P_Center = CapturePoint(640,0);
     CaptureArea const A_EnterGame = CaptureArea(600,0,80,80);
+    CaptureArea const A_Sprite = CaptureArea(126,161,364,300);
 
     // Substages
     enum Substage
@@ -59,7 +62,7 @@ private:
         SS_Skip,
 
         SS_StartRaid,
-        SS_RaidMonCheck,
+        SS_Invite,
         SS_ToSyncTime,
         SS_SkipYearRaid,
         SS_RestartGame,   // Close and launch game
@@ -77,6 +80,9 @@ private:
     bool m_raidMode;
     DateArrangement m_dateArrangement;
     QLabel* m_estimateLabel;
+
+    QStringList m_pokemonList;
+    QVector<QImage> m_imageTests;
 
     QDateTime m_startDateTime;
 
