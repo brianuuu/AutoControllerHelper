@@ -2,6 +2,7 @@
 #define SMARTDAYSKIPPER_H
 
 #include <QWidget>
+#include <QtConcurrent>
 #include "../smartprogrambase.h"
 
 class SmartDaySkipper : public SmartProgramBase
@@ -21,6 +22,9 @@ private:
     virtual void init();
     virtual void reset();
     virtual void runNextState();
+
+    void loadImages();
+    void testImages();
 
     // Command indices
     Command const C_StartOK     = 0;
@@ -48,6 +52,7 @@ private:
     // List of test point/area
     CaptureArea const A_Invite = CaptureArea(1166,440,32,32);
     CaptureArea const A_Switch = CaptureArea(1166,554,32,32);
+    CaptureArea const A_Quit = CaptureArea(1166,611,32,32);
     CapturePoint const P_Center = CapturePoint(640,0);
     CaptureArea const A_EnterGame = CaptureArea(600,0,80,80);
     CaptureArea const A_Sprite = CaptureArea(126,161,364,300);
@@ -63,8 +68,11 @@ private:
 
         SS_StartRaid,
         SS_Invite,
+        SS_CheckPokemon,
+        SS_QuitRaid,
         SS_ToSyncTime,
         SS_SkipYearRaid,
+
         SS_RestartGame,   // Close and launch game
         SS_StartGame,   // Press A when intro starts
         SS_EnterGame,    // Wait until black screen goes away
@@ -81,9 +89,10 @@ private:
     DateArrangement m_dateArrangement;
     QLabel* m_estimateLabel;
 
-    bool m_isFound;
     QStringList m_pokemonList;
-    QVector<QImage> m_imageTests;
+    static QMap<QString, QImage> m_imageTests; // cached only once
+    bool m_isFound;
+    int m_imageTestIndex;
 
     QDateTime m_startDateTime;
 

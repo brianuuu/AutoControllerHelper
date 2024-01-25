@@ -1,5 +1,7 @@
 #include "smartdayskipper.h"
 
+QMap<QString, QImage> SmartDaySkipper::m_imageTests;
+
 SmartDaySkipper::SmartDaySkipper
 (
     int skips,
@@ -48,10 +50,10 @@ SmartDaySkipper::SmartDaySkipper
                 setState_error(pokemon + " is not a valid Pokemon");
                 return;
             }
-
-            QImage img = QImage(QString(RESOURCES_PATH) + "PokemonSwSh/Silhouettes/" + pokemon + ".bmp");
-            m_imageTests.push_back(img.scaled(A_Sprite.m_rect.size()).convertToFormat(QImage::Format_MonoLSB, Qt::MonoOnly));
         }
+
+        // this is not thread-safe, but should definitely be finished by the time we start using them
+        QtConcurrent::run(this, &SmartDaySkipper::loadImages);
     }
 }
 
@@ -68,6 +70,7 @@ void SmartDaySkipper::reset()
     m_substage = SS_Init;
     m_skippedDays = 0;
     m_isFound = false;
+    m_imageTestIndex = -1;
 }
 
 void SmartDaySkipper::runNextState()
@@ -80,7 +83,7 @@ void SmartDaySkipper::runNextState()
         if (m_raidMode)
         {
             m_substage = SS_StartRaid;
-            setState_runCommand("ASpam,2,Loop,0", true);
+            setState_runCommand("ASpam,300", true);
             emit printLog("Raid 3 Day Skip Mode Enabled");
             m_videoManager->setAreas({A_Invite, A_Switch});
             break;
@@ -208,7 +211,13 @@ void SmartDaySkipper::runNextState()
     }
     case SS_StartRaid:
     {
-        if (state == S_CaptureReady)
+        if (state == S_CommandFinished)
+        {
+            emit printLog("Unable to detect raid start, restarting game", LOG_ERROR);
+            m_substage = SS_RestartGame;
+            setState_runCommand("Home,1,Nothing,16,X,4,ASpam,200");
+        }
+        else if (state == S_CaptureReady)
         {
             if (checkAverageColorMatch(A_Invite.m_rect, QColor(0,0,0)))
             {
@@ -243,39 +252,52 @@ void SmartDaySkipper::runNextState()
                     m_substage = SS_ToSyncTime;
                     setState_runCommand(C_ToSyncTime);
                     m_videoManager->clearCaptures();
-                    break;
-                }
-
-                int foundIndex = -1;
-                for (int i = 0; i < m_imageTests.size(); i++)
-                {
-                    if (checkImageMatchTarget(A_Sprite.m_rect, C_Color_Black, m_imageTests[i], 0.5))
-                    {
-                        foundIndex = i;
-                        break;
-                    }
-                }
-
-                if (foundIndex == -1)
-                {
-                    emit printLog("No matching Pokemon, syncing time and restarting game...");
-                    m_substage = SS_ToSyncTime;
-                    setState_runCommand(C_ToSyncTime);
                 }
                 else
                 {
-                    m_isFound = true;
-                    emit printLog(m_pokemonList[foundIndex] + " is found! Syncing time before finishing", LOG_SUCCESS);
-                    m_substage = SS_ToSyncTime;
-                    setState_runCommand(m_commands[C_ToSyncTime] + ",ASpam,4,Nothing,5," + m_commands[C_BackToGame]);
+                    // test image concurrently
+                    m_substage = SS_CheckPokemon;
+                    QtConcurrent::run(this, &SmartDaySkipper::testImages);
                 }
-
-                m_videoManager->clearCaptures();
             }
             else
             {
                 setState_frameAnalyzeRequest();
             }
+        }
+        break;
+    }
+    case SS_CheckPokemon:
+    {
+        if (state == S_CaptureReady)
+        {
+            // finished, what's the highest one?
+            QStringList const& list = PokemonDatabase::getList_SwShSprites();
+            int foundIndex = -1;
+            for (int j = 0; j < m_pokemonList.size(); j++)
+            {
+                if (list[m_imageTestIndex].contains(m_pokemonList[j]))
+                {
+                    foundIndex = j;
+                    break;
+                }
+            }
+
+            if (foundIndex == -1)
+            {
+                emit printLog(list[m_imageTestIndex] + " is not in listed Pokemon, syncing time and restarting game...");
+                m_substage = SS_ToSyncTime;
+                setState_runCommand(C_ToSyncTime);
+            }
+            else
+            {
+                m_isFound = true;
+                emit printLog(m_pokemonList[foundIndex] + " is found! Syncing time before finishing", LOG_SUCCESS);
+                m_substage = SS_ToSyncTime;
+                setState_runCommand(m_commands[C_ToSyncTime] + ",ASpam,4,Nothing,5," + m_commands[C_BackToGame]);
+            }
+
+            m_videoManager->clearCaptures();
         }
         break;
     }
@@ -313,6 +335,7 @@ void SmartDaySkipper::runNextState()
         {
             m_substage = SS_BackToGame;
             setState_runCommand(C_BackToGame);
+            m_videoManager->setAreas({A_Quit});
         }
         break;
     }
@@ -369,7 +392,7 @@ void SmartDaySkipper::runNextState()
             if (enteredGame)
             {
                 m_substage = SS_StartRaid;
-                setState_runCommand("ASpam,2,Loop,0", true);
+                setState_runCommand("ASpam,300", true);
                 m_videoManager->setAreas({A_Invite, A_Switch});
             }
             else
@@ -387,9 +410,8 @@ void SmartDaySkipper::runNextState()
             if (m_raidMode)
             {
                 emit printLog("Quitting Raid...Currently at Day " + QString::number(m_skippedDays + 1));
-                m_substage = SS_StartRaid;
-                setState_runCommand("BSpam,6,Loop,1,ASpam,2,Loop,0", true);
-                m_videoManager->setAreas({A_Invite, A_Switch});
+                m_substage = SS_QuitRaid;
+                setState_runCommand("BSpam,100", true);
                 break;
             }
 
@@ -398,9 +420,62 @@ void SmartDaySkipper::runNextState()
         }
         break;
     }
+    case SS_QuitRaid:
+    {
+        if (state == S_CommandFinished)
+        {
+            emit printLog("Unable to detect raid start, restarting game", LOG_ERROR);
+            m_substage = SS_RestartGame;
+            setState_runCommand("Home,1,Nothing,16,X,4,ASpam,200");
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (checkAverageColorMatch(A_Quit.m_rect, QColor(0,0,0)))
+            {
+                m_substage = SS_StartRaid;
+                setState_runCommand("ASpam,300", true);
+                m_videoManager->setAreas({A_Invite, A_Switch});
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
+            }
+        }
+        break;
+    }
     }
 
     SmartProgramBase::runNextState();
+}
+
+void SmartDaySkipper::loadImages()
+{
+    if (m_imageTests.empty())
+    {
+        for (QString const& pokemon : PokemonDatabase::getList_SwShSprites())
+        {
+            QImage img = QImage(QString(RESOURCES_PATH) + "PokemonSwSh/Silhouettes/" + pokemon + ".bmp");
+            m_imageTests[pokemon] = (img.scaled(A_Sprite.m_rect.size()).convertToFormat(QImage::Format_MonoLSB, Qt::MonoOnly));
+        }
+    }
+}
+
+void SmartDaySkipper::testImages()
+{
+    QStringList const& list = PokemonDatabase::getList_SwShSprites();
+    double maxRatio = 0.0;
+    for (int i = 0; i < list.size(); i++)
+    {
+        QImage const& img = m_imageTests[list[i]];
+        double ratio = getImageMatch(A_Sprite.m_rect, C_Color_Black, img);
+        if (ratio > maxRatio)
+        {
+            maxRatio = ratio;
+            m_imageTestIndex = i;
+        }
+    }
+
+    runNextStateContinue();
 }
 
 bool SmartDaySkipper::is1159PM()
