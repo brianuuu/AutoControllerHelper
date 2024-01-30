@@ -18,6 +18,7 @@
 #include <QGraphicsScene>
 #include <QKeyEvent>
 #include <QMessageBox>
+#include <QMenuBar>
 #include <QMouseEvent>
 #include <QScreen>
 #include <QSerialPort>
@@ -141,7 +142,6 @@ private slots:
     void on_PB_DLeft_clicked();
     void on_PB_DRight_clicked();
     void on_PB_MapDefault_clicked();
-    void on_PB_HideController_clicked();
 
     // Command sender
     void on_LE_CommandSender_textChanged(const QString &arg1);
@@ -196,12 +196,17 @@ private slots:
     void on_LW_SmartProgram_currentTextChanged(const QString &currentText);
     void on_CB_SmartProgram_currentIndexChanged(int index);
 
+    // Pop out
+    void ActionBreakLayout_triggered();
+    void ActionSmartProgram_triggered();
+    void ActionCommandLog_triggered();
+    void ActionController_triggered();
+
 private:
     // Others
     void PrintLog(QString const& log, QColor color = QColor(0,0,0));
     void SaveLog(QString const name = "Log");
     void UpdateLogStat();
-    void UpdateStatus(QString status, QColor color = QColor(0,0,0));
     void UpdateStats(SmartProgram const sp, bool reset = false);
 
     // Serial
@@ -225,6 +230,10 @@ private:
     // Camera
     void CameraToggle(bool on);
     void CameraCaptureToFile(QString name = "screenshot");
+
+    // Pop out
+    void PopOut();
+    void DeletePopOut();
 
 signals:
     void closeWindowSignal();
@@ -306,6 +315,15 @@ private:
     // PurpleBeamFinder
     QGraphicsScene* m_SP2_graphicScene;
     QGraphicsScene* m_SP2_graphicSceneMasked;
+
+    // Popup windows
+    QAction* m_actionBreakLayout = Q_NULLPTR;
+    QAction* m_actionSmartProgram = Q_NULLPTR;
+    QDialog* m_popOutSmartProgram = Q_NULLPTR;
+    QAction* m_actionCommandLog = Q_NULLPTR;
+    QDialog* m_popOutCommandLog = Q_NULLPTR;
+    QAction* m_actionController = Q_NULLPTR;
+    QDialog* m_popOutController = Q_NULLPTR;
 };
 
 #endif // REMOTECONTROLLERWINDOW_H

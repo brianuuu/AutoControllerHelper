@@ -309,6 +309,30 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     ui->SP19_SB_Width->setRange(1, screenSize.width());
     ui->SP19_SB_Height->setRange(1, screenSize.height());
     ui->SP19_LE_Code->setMaxLength(ui->SP19_SP_Count->value());
+
+    // manually create menu bar since QWidget can't do it
+    QMenuBar* menuBar = new QMenuBar();
+    QMenu *fileMenu = new QMenu("Window");
+    menuBar->addMenu(fileMenu);
+    this->layout()->setMenuBar(menuBar);
+    m_actionBreakLayout = fileMenu->addAction("Use Separate Layout");
+    m_actionBreakLayout->setCheckable(true);
+    connect(m_actionBreakLayout, &QAction::triggered, this, &RemoteControllerWindow::ActionBreakLayout_triggered);
+    m_actionSmartProgram = fileMenu->addAction("Smart Program Settings");
+    m_actionSmartProgram->setEnabled(false);
+    connect(m_actionSmartProgram, &QAction::triggered, this, &RemoteControllerWindow::ActionSmartProgram_triggered);
+    m_actionCommandLog = fileMenu->addAction("Command Sender && Log");
+    m_actionCommandLog->setEnabled(false);
+    connect(m_actionCommandLog, &QAction::triggered, this, &RemoteControllerWindow::ActionCommandLog_triggered);
+    m_actionController = fileMenu->addAction("Virtual Controller");
+    m_actionController->setCheckable(true);
+    m_actionController->setChecked(true);
+    connect(m_actionController, &QAction::triggered, this, &RemoteControllerWindow::ActionController_triggered);
+    if (m_settings->value("PopOut", false).toBool())
+    {
+        m_actionBreakLayout->setChecked(true);
+        PopOut();
+    }
 }
 
 RemoteControllerWindow::~RemoteControllerWindow()
@@ -410,15 +434,8 @@ void RemoteControllerWindow::closeEvent(QCloseEvent *event)
     m_settings->setValue("SandwichX", ui->SP9_SB_X->value());
     m_settings->setValue("SandwichY", ui->SP9_SB_Y->value());
 
-    if (m_smartSetting->isVisible())
-    {
-        m_smartSetting->close();
-    }
-
-    if (m_videoEffectSetting->isVisible())
-    {
-        m_videoEffectSetting->close();
-    }
+    // remove all pop out windows
+    DeletePopOut();
 
     emit closeWindowSignal();
 }
@@ -546,17 +563,6 @@ void RemoteControllerWindow::UpdateLogStat()
     stat += "&nbsp;&nbsp;<font color=\"#FFFF7800\">Warning: " + QString::number(m_warningCount) + "</font>";
     stat += "&nbsp;&nbsp;<font color=\"#FFFF0000\">Error: " + QString::number(m_errorCount) + "</font>";
     ui->L_LogStat->setText(stat);
-}
-
-void RemoteControllerWindow::UpdateStatus(QString status, QColor color)
-{
-    ui->L_Status->setText("Status: " + status);
-
-    QString styleSheet = "font-size: 13px; color: rgb(";
-    styleSheet += QString::number(color.red()) + ",";
-    styleSheet += QString::number(color.green()) + ",";
-    styleSheet += QString::number(color.blue()) + ");";
-    ui->L_Status->setStyleSheet(styleSheet);
 }
 
 void RemoteControllerWindow::UpdateStats(const SmartProgram sp, bool reset)
@@ -811,7 +817,6 @@ void RemoteControllerWindow::SerialConnect(const QString &port)
         ui->PB_Connect->setEnabled(false);
         ui->PB_Refresh->setEnabled(false);
         ui->CB_SerialPorts->setEnabled(false);
-        UpdateStatus("Connecting...", QColor(0, 0, 0));
         QTimer::singleShot(500, this, &RemoteControllerWindow::SerialConnectComplete);
 
         // Send a nothing command and check if it returns a feedback
@@ -840,7 +845,6 @@ void RemoteControllerWindow::SerialConnectComplete()
     {
         m_serialState = SS_Connect;
         PrintLog("Serial connected (Version: " + QString::number(m_hexVersion) + ")", LOG_SUCCESS);
-        UpdateStatus("Connected", LOG_SUCCESS);
         ui->PB_Connect->setEnabled(true);
         ui->PB_Connect->setText("Disconnect");
         ui->PB_Refresh->setEnabled(false);
@@ -886,7 +890,6 @@ void RemoteControllerWindow::SerialDisconnect()
         PrintLog("Serial disconnected", LOG_ERROR);
     }
 
-    UpdateStatus("Disconnected", LOG_ERROR);
     ui->PB_Connect->setEnabled(true);
     ui->PB_Connect->setText("Connect");
     ui->PB_Refresh->setEnabled(true);
@@ -1105,12 +1108,6 @@ void RemoteControllerWindow::on_PB_MapDefault_clicked()
     {
         SetButtonMapText(pb);
     }
-}
-
-void RemoteControllerWindow::on_PB_HideController_clicked()
-{
-    ui->GB_Controller->setHidden(!ui->GB_Controller->isHidden());
-    ui->PB_HideController->setText(QString(ui->GB_Controller->isHidden() ? "Unhide" : "Hide") + " Virtual Controler");
 }
 
 //---------------------------------------------------------------------------
@@ -1607,6 +1604,18 @@ void RemoteControllerWindow::on_CB_AudioDisplayMode_currentIndexChanged(int inde
         break;
     }
     }
+
+    if (m_actionBreakLayout && m_actionBreakLayout->isChecked())
+    {
+        if (ui->CB_AudioDisplayMode->currentIndex() == ADM_None)
+        {
+            setFixedSize(700,560);
+        }
+        else
+        {
+            setFixedSize(700,670);
+        }
+    }
 }
 
 void RemoteControllerWindow::on_SB_AudioFreqLow_valueChanged(int arg1)
@@ -1702,6 +1711,118 @@ void RemoteControllerWindow::CameraCaptureToFile(QString name)
     m_vlcWrapper->getVideoManager()->getFrame(frame);
     frame.save(SCREENSHOT_PATH + nameWithTime);
     PrintLog("Screenshot saved: " + nameWithTime);
+}
+
+//---------------------------------------------------------------------------
+// Pop out
+//---------------------------------------------------------------------------
+void RemoteControllerWindow::PopOut()
+{
+    {
+        m_actionSmartProgram->setEnabled(true);
+        m_popOutSmartProgram = new QDialog();
+        m_popOutSmartProgram->setFont(font());
+        m_popOutSmartProgram->setWindowTitle(ui->GB_SmartProgram->title());
+        m_popOutSmartProgram->setWindowFlags(m_popOutSmartProgram->windowFlags() & ~Qt::WindowContextHelpButtonHint);
+        ui->GB_SmartProgram->setTitle("");
+        QVBoxLayout* vBoxLayout = new QVBoxLayout();
+        vBoxLayout->addItem(ui->scrollAreaWidgetContents_16->layout()->takeAt(1));
+        vBoxLayout->addItem(ui->VL_Camera->takeAt(4));
+        m_popOutSmartProgram->setLayout(vBoxLayout);
+        ActionSmartProgram_triggered();
+        m_popOutSmartProgram->move(m_settings->value("PopOutSmartProgramPos", m_popOutSmartProgram->pos()).toPoint());
+        m_popOutSmartProgram->resize(m_settings->value("PopOutSmartProgramSize", m_popOutSmartProgram->size()).toSize());
+    }
+
+    {
+        m_actionCommandLog->setEnabled(true);
+        m_popOutCommandLog = new QDialog();
+        m_popOutCommandLog->setFont(font());
+        m_popOutCommandLog->setWindowTitle("Command Sender & Log");
+        m_popOutCommandLog->setWindowFlags(m_popOutCommandLog->windowFlags() & ~Qt::WindowContextHelpButtonHint);
+        ui->GB_Log->setTitle("");
+        ui->GB_Log->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        QVBoxLayout* vBoxLayout = new QVBoxLayout();
+        vBoxLayout->addWidget(ui->GB_Log);
+        m_popOutCommandLog->setLayout(vBoxLayout);
+        ActionCommandLog_triggered();
+        m_popOutCommandLog->move(m_settings->value("PopOutCommandLogPos", m_popOutCommandLog->pos()).toPoint());
+        m_popOutCommandLog->resize(m_settings->value("PopOutCommandLogSize", m_popOutCommandLog->size()).toSize());
+    }
+
+    {
+        m_actionController->setCheckable(false);
+        m_popOutController = new QDialog();
+        m_popOutController->setFont(font());
+        m_popOutController->setWindowTitle(ui->GB_Controller->title());
+        m_popOutController->setWindowFlags(m_popOutController->windowFlags() & ~Qt::WindowContextHelpButtonHint | Qt::MSWindowsFixedSizeDialogHint);
+        ui->GB_Controller->setTitle("");
+        QVBoxLayout* vBoxLayout = new QVBoxLayout();
+        vBoxLayout->addWidget(ui->GB_Controller);
+        m_popOutController->setLayout(vBoxLayout);
+
+        if (m_settings->value("ShowPopOutController", true).toBool())
+        {
+            ActionController_triggered();
+            m_popOutController->move(m_settings->value("PopOutControllerPos", m_popOutController->pos()).toPoint());
+        }
+    }
+
+    this->move(m_settings->value("PopOutMainWindow", this->pos()).toPoint());
+
+    // move serial port layout to above camera
+    ui->VL_Camera->insertWidget(0, ui->HL_SerialPorts);
+
+    delete ui->line;
+    delete ui->frame;
+    if (ui->CB_AudioDisplayMode->currentIndex() == ADM_None)
+    {
+        setFixedSize(700,560);
+    }
+    else
+    {
+        setFixedSize(700,670);
+    }
+}
+
+void RemoteControllerWindow::DeletePopOut()
+{
+    if (m_smartSetting->isVisible())
+    {
+        m_smartSetting->close();
+    }
+
+    if (m_videoEffectSetting->isVisible())
+    {
+        m_videoEffectSetting->close();
+    }
+
+    if (m_popOutSmartProgram && m_popOutSmartProgram->isVisible())
+    {
+        m_settings->setValue("PopOutSmartProgramPos", m_popOutSmartProgram->pos());
+        m_settings->setValue("PopOutSmartProgramSize", m_popOutSmartProgram->size());
+        m_popOutSmartProgram->close();
+    }
+
+    if (m_popOutCommandLog && m_popOutCommandLog->isVisible())
+    {
+        m_settings->setValue("PopOutCommandLogPos", m_popOutCommandLog->pos());
+        m_settings->setValue("PopOutCommandLogSize", m_popOutCommandLog->size());
+        m_popOutCommandLog->close();
+    }
+
+    if (m_popOutController && m_popOutController->isVisible())
+    {
+        m_settings->setValue("ShowPopOutController", true);
+        m_settings->setValue("PopOutControllerPos", m_popOutController->pos());
+        m_popOutController->close();
+    }
+    else
+    {
+        m_settings->setValue("ShowPopOutController", false);
+    }
+
+    m_settings->setValue("PopOutMainWindow", this->pos());
 }
 
 //---------------------------------------------------------------------------
@@ -2173,6 +2294,51 @@ void RemoteControllerWindow::on_CB_SmartProgram_currentIndexChanged(int index)
     ui->SW_Settings->setEnabled(false);
 }
 
+void RemoteControllerWindow::ActionBreakLayout_triggered()
+{
+    if (m_actionBreakLayout->isChecked())
+    {
+        m_settings->setValue("PopOut", true);
+        PopOut();
+    }
+    else
+    {
+        QMessageBox::information(this, "Break Layout", "Next restart of Smart Program Manager will return to original layout.");
+        m_settings->setValue("PopOut", false);
+        m_actionBreakLayout->setChecked(true);
+    }
+}
+
+void RemoteControllerWindow::ActionSmartProgram_triggered()
+{
+    m_popOutSmartProgram->show();
+    m_popOutSmartProgram->raise();
+}
+
+void RemoteControllerWindow::ActionCommandLog_triggered()
+{
+    m_popOutCommandLog->show();
+    m_popOutCommandLog->raise();
+}
+
+void RemoteControllerWindow::ActionController_triggered()
+{
+    if (m_popOutController)
+    {
+        ui->GB_Controller->setHidden(false);
+        m_popOutController->show();
+        m_popOutController->raise();
+    }
+    else if (m_actionController->isChecked())
+    {
+        ui->GB_Controller->setHidden(false);
+    }
+    else
+    {
+        ui->GB_Controller->setHidden(true);
+    }
+}
+
 void RemoteControllerWindow::SetCaptureAreaPos(QMouseEvent *event)
 {
     // Can't change while smart program is running
@@ -2271,7 +2437,7 @@ void RemoteControllerWindow::ValidateSmartProgramCommands()
 void RemoteControllerWindow::EnableSmartProgram()
 {
     bool canRun = CanRunSmartProgram();
-    ui->GB_SmartProgram->setEnabled(canRun);
+    //ui->GB_SmartProgram->setEnabled(canRun);
     ui->PB_StartSmartProgram->setEnabled(canRun);
 
     // if program is running...
