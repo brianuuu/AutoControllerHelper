@@ -425,6 +425,7 @@ void SmartDaySkipper::runNextState()
         if (state == S_CommandFinished)
         {
             emit printLog("Unable to detect raid start, restarting game", LOG_ERROR);
+            m_skippedDays = 0;
             m_substage = SS_RestartGame;
             setState_runCommand("Home,1,Nothing,16,X,4,ASpam,200");
         }
