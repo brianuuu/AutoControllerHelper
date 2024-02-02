@@ -33,6 +33,7 @@
 #include "vlcwrapper.h"
 #include "videoeffectsetting.h"
 #include "smartprogramsetting.h"
+#include "discordsettings.h"
 
 #include "SmartPrograms/smartprogrambase.h"
 #include "SmartPrograms/smartsimpleprogram.h"
@@ -201,6 +202,7 @@ private slots:
     void ActionSmartProgram_triggered();
     void ActionCommandLog_triggered();
     void ActionController_triggered();
+    void ActionDiscord_triggered();
 
 private:
     // Others
@@ -296,6 +298,7 @@ private:
     SmartProgramBase* m_smartProgram = Q_NULLPTR;
     SmartProgramSetting* m_smartSetting = Q_NULLPTR;
     VideoEffectSetting* m_videoEffectSetting = Q_NULLPTR;
+    DiscordSettings* m_discordSettings = Q_NULLPTR;
 
     // Smart program
     void ValidateSmartProgramCommands();

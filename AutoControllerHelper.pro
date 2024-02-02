@@ -5,6 +5,7 @@ QT       += serialport
 QT       += multimedia
 QT       += multimediawidgets
 QT       += concurrent
+QT       += websockets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,6 +28,44 @@ SOURCES += \
     Audio/audiomanager.cpp \
     Audio/peakfinder.cpp \
     Audio/wavfile.cpp \
+    QDiscord/Discord/Client.cpp \
+    QDiscord/Discord/GatewayEvents.cpp \
+    QDiscord/Discord/GatewaySocket.cpp \
+    QDiscord/Discord/HttpService.cpp \
+    QDiscord/Discord/Objects/Activity.cpp \
+    QDiscord/Discord/Objects/Attachment.cpp \
+    QDiscord/Discord/Objects/Ban.cpp \
+    QDiscord/Discord/Objects/Channel.cpp \
+    QDiscord/Discord/Objects/Connection.cpp \
+    QDiscord/Discord/Objects/Embed.cpp \
+    QDiscord/Discord/Objects/Emoji.cpp \
+    QDiscord/Discord/Objects/Guild.cpp \
+    QDiscord/Discord/Objects/GuildEmbed.cpp \
+    QDiscord/Discord/Objects/GuildMember.cpp \
+    QDiscord/Discord/Objects/Integration.cpp \
+    QDiscord/Discord/Objects/Invite.cpp \
+    QDiscord/Discord/Objects/Message.cpp \
+    QDiscord/Discord/Objects/Overwrite.cpp \
+    QDiscord/Discord/Objects/PresenceUpdate.cpp \
+    QDiscord/Discord/Objects/Reaction.cpp \
+    QDiscord/Discord/Objects/Role.cpp \
+    QDiscord/Discord/Objects/User.cpp \
+    QDiscord/Discord/Objects/VoiceRegion.cpp \
+    QDiscord/Discord/Objects/VoiceState.cpp \
+    QDiscord/Discord/Objects/Webhook.cpp \
+    QDiscord/Discord/Patches/ChannelPatch.cpp \
+    QDiscord/Discord/Patches/EmojiPatch.cpp \
+    QDiscord/Discord/Patches/GuildEmbedPatch.cpp \
+    QDiscord/Discord/Patches/GuildMemberPatch.cpp \
+    QDiscord/Discord/Patches/GuildPatch.cpp \
+    QDiscord/Discord/Patches/IntegrationPatch.cpp \
+    QDiscord/Discord/Patches/MessagePatch.cpp \
+    QDiscord/Discord/Patches/RolePatch.cpp \
+    QDiscord/Discord/Patches/UserPatch.cpp \
+    QDiscord/Discord/Patches/WebhookPatch.cpp \
+    QDiscord/Discord/Token.cpp \
+    QDiscord/Discord/Url.cpp \
+    QDiscord/Helpers/EmbedsClient.cpp \
     SmartPrograms/Dev/smartbrightnessmeanfinder.cpp \
     SmartPrograms/Dev/smartcodeentry.cpp \
     SmartPrograms/Dev/smartcolorcalibrator.cpp \
@@ -74,6 +113,7 @@ SOURCES += \
     SmartPrograms/smartsimpleprogram.cpp \
     Video/videomanager.cpp \
     commandsender.cpp \
+    discordsettings.cpp \
     main.cpp \
     autocontrollerwindow.cpp \
     pokemondatabase.cpp \
@@ -89,6 +129,48 @@ HEADERS += \
     Audio/audiomanager.h \
     Audio/peakfinder.h \
     Audio/wavfile.h \
+    QDiscord/Discord.h \
+    QDiscord/Discord/Client.h \
+    QDiscord/Discord/GatewayEvents.h \
+    QDiscord/Discord/GatewaySocket.h \
+    QDiscord/Discord/HttpService.h \
+    QDiscord/Discord/Objects/Activity.h \
+    QDiscord/Discord/Objects/Attachment.h \
+    QDiscord/Discord/Objects/Ban.h \
+    QDiscord/Discord/Objects/Channel.h \
+    QDiscord/Discord/Objects/Connection.h \
+    QDiscord/Discord/Objects/Embed.h \
+    QDiscord/Discord/Objects/Emoji.h \
+    QDiscord/Discord/Objects/Guild.h \
+    QDiscord/Discord/Objects/GuildEmbed.h \
+    QDiscord/Discord/Objects/GuildMember.h \
+    QDiscord/Discord/Objects/Integration.h \
+    QDiscord/Discord/Objects/Invite.h \
+    QDiscord/Discord/Objects/Message.h \
+    QDiscord/Discord/Objects/Overwrite.h \
+    QDiscord/Discord/Objects/PresenceUpdate.h \
+    QDiscord/Discord/Objects/Reaction.h \
+    QDiscord/Discord/Objects/Role.h \
+    QDiscord/Discord/Objects/User.h \
+    QDiscord/Discord/Objects/VoiceRegion.h \
+    QDiscord/Discord/Objects/VoiceState.h \
+    QDiscord/Discord/Objects/Webhook.h \
+    QDiscord/Discord/Patches/ChannelPatch.h \
+    QDiscord/Discord/Patches/EmojiPatch.h \
+    QDiscord/Discord/Patches/GuildEmbedPatch.h \
+    QDiscord/Discord/Patches/GuildMemberPatch.h \
+    QDiscord/Discord/Patches/GuildPatch.h \
+    QDiscord/Discord/Patches/IntegrationPatch.h \
+    QDiscord/Discord/Patches/MessagePatch.h \
+    QDiscord/Discord/Patches/Patch.h \
+    QDiscord/Discord/Patches/RolePatch.h \
+    QDiscord/Discord/Patches/UserPatch.h \
+    QDiscord/Discord/Patches/WebhookPatch.h \
+    QDiscord/Discord/Payload.h \
+    QDiscord/Discord/Promise.h \
+    QDiscord/Discord/Token.h \
+    QDiscord/Discord/Url.h \
+    QDiscord/Helpers/EmbedsClient.h \
     SmartPrograms/Dev/smartbrightnessmeanfinder.h \
     SmartPrograms/Dev/smartcodeentry.h \
     SmartPrograms/Dev/smartcolorcalibrator.h \
@@ -138,6 +220,7 @@ HEADERS += \
     autocontrollerdefines.h \
     autocontrollerwindow.h \
     commandsender.h \
+    discordsettings.h \
     pokemondatabase.h \
     pushbuttonmapping.h \
     remotecontrollerwindow.h \
@@ -147,6 +230,7 @@ HEADERS += \
 
 FORMS += \
     autocontrollerwindow.ui \
+    discordsettings.ui \
     remotecontrollerwindow.ui \
     smartprogramsetting.ui \
     videoeffectsetting.ui

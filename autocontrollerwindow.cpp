@@ -1,8 +1,6 @@
 #include "autocontrollerwindow.h"
 #include "ui_autocontrollerwindow.h"
 
-static const QString c_version = "5.7.0";
-
 //---------------------------------------------------------------------------
 // Constructor
 //---------------------------------------------------------------------------
@@ -230,7 +228,7 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     ui->AutoHost_LinkCode->setValidator( new QIntValidator(0, 99999999, this) );
 
     // Version
-    this->setWindowTitle(this->windowTitle() + " v" + c_version);
+    this->setWindowTitle(this->windowTitle() + " v" + VERSION);
     m_networkManager = new QNetworkAccessManager();
     connect(m_networkManager, &QNetworkAccessManager::finished, this, &autocontrollerwindow::on_NetworkManager_Finished);
     CheckVersion();
@@ -437,7 +435,7 @@ void autocontrollerwindow::on_NetworkManager_Finished(QNetworkReply *reply)
     QString newVersion = answer.mid(verStart, verEnd - verStart);
 
     QStringList newVerNo = newVersion.split('.');
-    QStringList curVerNo = c_version.split('.');
+    QStringList curVerNo = QString(VERSION).split('.');
 
     bool outdated = false;
     for (int i = 0; i < newVerNo.size(); i++)

@@ -333,6 +333,13 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
         m_actionBreakLayout->setChecked(true);
         PopOut();
     }
+
+    // Discord settings
+    m_discordSettings = new DiscordSettings();
+    QMenu *discordMenu = new QMenu("Discord");
+    menuBar->addMenu(discordMenu);
+    QAction* discordAction = discordMenu->addAction("Connection Settings");
+    connect(discordAction, &QAction::triggered, this, &RemoteControllerWindow::ActionDiscord_triggered);
 }
 
 RemoteControllerWindow::~RemoteControllerWindow()
@@ -1797,6 +1804,11 @@ void RemoteControllerWindow::DeletePopOut()
         m_videoEffectSetting->close();
     }
 
+    if (m_discordSettings->isVisible())
+    {
+        m_discordSettings->close();
+    }
+
     if (m_popOutSmartProgram && m_popOutSmartProgram->isVisible())
     {
         m_settings->setValue("PopOutSmartProgramPos", m_popOutSmartProgram->pos());
@@ -2337,6 +2349,12 @@ void RemoteControllerWindow::ActionController_triggered()
     {
         ui->GB_Controller->setHidden(true);
     }
+}
+
+void RemoteControllerWindow::ActionDiscord_triggered()
+{
+    m_discordSettings->show();
+    m_discordSettings->raise();
 }
 
 void RemoteControllerWindow::SetCaptureAreaPos(QMouseEvent *event)
