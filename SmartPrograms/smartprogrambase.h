@@ -18,6 +18,7 @@
 
 #include "../vlcwrapper.h"
 #include "../smartprogramsetting.h"
+#include "../discordsettings.h"
 
 enum SmartProgram : uint32_t
 {
@@ -82,6 +83,7 @@ enum SmartProgram : uint32_t
 struct SmartProgramParameter
 {
     VLCWrapper* vlcWrapper;
+    DiscordSettings* discordSettings;
     SmartProgramSetting* settings;
     QLabel* statsLabel;
     QWidget* parent;
@@ -90,6 +92,7 @@ struct SmartProgramParameter
 
     SmartProgramParameter(
             VLCWrapper* _vlcWrapper,
+            DiscordSettings* _discordSettings,
             SmartProgramSetting* _settings,
             QLabel* _statsLabel,
             QWidget* _parent = nullptr,
@@ -97,6 +100,7 @@ struct SmartProgramParameter
             QGraphicsScene* _previewMasked = nullptr
             )
         : vlcWrapper(_vlcWrapper)
+        , discordSettings(_discordSettings)
         , settings(_settings)
         , statsLabel(_statsLabel)
         , parent(_parent)
@@ -461,6 +465,9 @@ public slots:
     void on_OCRErrorOccurred(QProcess::ProcessError error);
     void on_OCRFinished();
 
+    // discord messages
+    void sendRegularDiscordMessage();
+
 protected:
     virtual void init();
     virtual void reset();
@@ -529,14 +536,20 @@ protected:
     void incrementStat(Stat& stat, int addCount = 1);
     void updateStats();
 
+    // Discord messages
+    void sendDiscordMessage(QString const& title, bool isMention, QColor color = QColor(0,0,0), QImage const* img = nullptr, QList<Discord::EmbedField> const& fields = {});
+
 protected:
     AudioManager*           m_audioManager;
     VideoManager*           m_videoManager;
+    DiscordSettings*        m_discordSettings;
     QImage                  m_capture;
     SmartProgramSetting*    m_settings;
     QLabel*                 m_statsLabel;
     QGraphicsScene*         m_preview;
     QGraphicsScene*         m_previewMasked;
+    QDateTime               m_startDateTime;
+    bool                    m_hadDiscordMessage;
 
     // Commands
     Command m_commandIndex;

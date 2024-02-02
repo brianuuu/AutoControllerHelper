@@ -200,6 +200,8 @@ public:
 	/* Setters */
 	
 	void setFields(const QList<EmbedField>& fields) { fields_ = fields; }
+    void addField(const EmbedField& field) { fields_.append(field); }
+    void insertField(int i, const EmbedField& field) { fields_.insert(i, field); }
 
 	void setTimestamp(const QDateTime& timestamp) { timestamp_ = timestamp; }
 	void setTitle(const QString& title) { title_ = title; }

@@ -145,7 +145,7 @@ public:
 	Promise<Message>& createMessage(snowflake_t channel_id, const QString& content);
     Promise<Message>& createMessage(snowflake_t channel_id, const Embed& embed, const QString& content = "");
   Promise<Message>& createImageMessage(snowflake_t channel_id, const UploadAttachment &attachment, const QString & content);
-	Promise<Message>& createImageMessage(snowflake_t channel_id, const UploadAttachment &attachment, const Discord::Embed & embed);
+    Promise<Message>& createImageMessage(snowflake_t channel_id, const UploadAttachment &attachment, const Discord::Embed & embed, const QString& content = "");
 	Promise<>& createReaction(snowflake_t channel_id, snowflake_t message_id,
 		const QString& emoji);
 	Promise<Invite>& createChannelInvite(snowflake_t channel_id, int max_age, int max_uses,

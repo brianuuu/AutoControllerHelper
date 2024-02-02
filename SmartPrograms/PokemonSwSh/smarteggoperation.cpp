@@ -887,6 +887,9 @@ void SmartEggOperation::runNextState()
                 m_audioManager->startDetection(m_shinySoundID);
             }
 
+            // cache image to send if shiny
+            m_videoManager->getFrame(m_hatchImage);
+
             setState_runCommand("BSpam,2,Loop,0", true);
             m_videoManager->setAreas({A_Dialog});
         }
@@ -1170,6 +1173,18 @@ void SmartEggOperation::runNextState()
                 }
             }
 
+            // Discord message
+            Discord::EmbedField embedField;
+            embedField.setName("Keep List");
+            QString fieldMsg;
+            for (int i = 0; i < m_keepList.size(); i++)
+            {
+                PokemonStatTable const & table = m_keepList[i];
+                fieldMsg += (i == 0) ? "" : "\n";
+                fieldMsg += "Slot " + QString::number(i+1) + ": " + QString::number(table.m_target) + " remaining";
+            }
+            embedField.setValue(fieldMsg);
+
             // print current stats
             if (checkedStats)
             {
@@ -1197,6 +1212,13 @@ void SmartEggOperation::runNextState()
                 {
                     m_shinyWasDetected--;
                 }
+
+                // send discord message
+                if (m_programSettings.m_shinyDetection == ShinyDetectionType::SDT_Disable)
+                {
+                    m_videoManager->getFrame(m_hatchImage);
+                }
+                sendDiscordMessage("Shiny Found!", true, QColor(255,255,0), &m_hatchImage, {embedField});
             }
 
             m_eggsToHatchCount--;
@@ -1205,6 +1227,12 @@ void SmartEggOperation::runNextState()
                 if (isShiny)
                 {
                     emit printLog(log + " is SHINY!!!", LOG_SUCCESS);
+                }
+                else
+                {
+                    // keeping non-shiny, report
+                    m_videoManager->getFrame(m_hatchImage);
+                    sendDiscordMessage("Target Pokemon Found!", true, QColor(255,255,0), &m_hatchImage, {embedField});
                 }
 
                 if (m_programSettings.m_operation == EggOperationType::EOT_Parent)

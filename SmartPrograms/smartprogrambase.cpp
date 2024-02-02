@@ -6,12 +6,14 @@ SmartProgramBase::SmartProgramBase(SmartProgramParameter parameter)
     : QWidget(parameter.parent)
     , m_ocrHSVRange(0,0,0,0,0,0)
 {
-    m_audioManager  = parameter.vlcWrapper->getAudioManager();
-    m_videoManager  = parameter.vlcWrapper->getVideoManager();
-    m_settings      = parameter.settings;
-    m_statsLabel    = parameter.statsLabel;
-    m_preview       = parameter.preview;
-    m_previewMasked = parameter.previewMasked;
+    m_audioManager      = parameter.vlcWrapper->getAudioManager();
+    m_videoManager      = parameter.vlcWrapper->getVideoManager();
+    m_discordSettings   = parameter.discordSettings;
+    m_settings          = parameter.settings;
+    m_statsLabel        = parameter.statsLabel;
+    m_preview           = parameter.preview;
+    m_previewMasked     = parameter.previewMasked;
+    m_startDateTime     = QDateTime::currentDateTime();
 
     init();
 }
@@ -31,6 +33,10 @@ bool SmartProgramBase::run()
 
         m_audioManager->stopDetection();
         m_videoManager->clearCaptures();
+
+        // discord
+        m_hadDiscordMessage = false;
+        QTimer::singleShot(1000 * 60 * 60 + 1000, this, &SmartProgramBase::sendRegularDiscordMessage);
         return true;
     }
 
@@ -962,6 +968,12 @@ void SmartProgramBase::on_OCRFinished()
     m_runNextState = true;
 }
 
+void SmartProgramBase::sendRegularDiscordMessage()
+{
+    sendDiscordMessage("Program Status", false);
+    QTimer::singleShot(1000 * 60 * 60, this, &SmartProgramBase::sendRegularDiscordMessage);
+}
+
 void SmartProgramBase::runNextStateDelay(int milliseconds)
 {
     m_runStateDelayTimer.start(milliseconds);
@@ -979,6 +991,15 @@ void SmartProgramBase::runNextState()
         stop();
         emit printLog(m_errorMsg, LOG_ERROR);
         emit completed();
+
+        // long running program
+        if (m_hadDiscordMessage)
+        {
+            QImage frame;
+            m_videoManager->getFrame(frame);
+            sendDiscordMessage("Error Occured", false, LOG_ERROR, &frame);
+        }
+
         break;
     }
     case S_Completed:
@@ -986,6 +1007,12 @@ void SmartProgramBase::runNextState()
         stop();
         emit printLog("-----------Finished-----------");
         emit completed();
+
+        // long running program
+        if (m_hadDiscordMessage)
+        {
+            sendDiscordMessage("Program Finished", false, LOG_SUCCESS);
+        }
         break;
     }
     case S_CommandRunning:
@@ -1133,4 +1160,35 @@ void SmartProgramBase::updateStats()
         }
     }
     m_statsLabel->setText(statsStr);
+}
+
+void SmartProgramBase::sendDiscordMessage(const QString &title, bool isMention, QColor color, const QImage *img, const QList<Discord::EmbedField> &fields)
+{
+    Discord::Embed embed = m_discordSettings->getEmbedTemplate(title);
+    embed.setColor(color.rgb() & 0xFFFFFF);
+
+    // add custom fields
+    for (Discord::EmbedField const& field : fields)
+    {
+        embed.addField(field);
+    }
+
+    // append program stats
+    SmartProgram sp = getProgramEnum();
+    QString fieldMsg = getProgramGamePrefix(sp) + ": " + getProgramNameFromEnum(sp);
+
+    qint64 mins = m_startDateTime.secsTo(QDateTime::currentDateTime()) / 60;
+    qint64 hours = mins / 60;
+    mins %= 60;
+    fieldMsg += "\n Up Time: " + QString::number(hours) + " hours " + QString::number(mins) + " minutes";
+
+    if (m_statsLabel->text() != "N/A")
+    {
+        fieldMsg += "\n" + m_statsLabel->text();
+    }
+    embed.addField(Discord::EmbedField("Smart Program Stats", fieldMsg, false));
+
+    // send message
+    m_discordSettings->sendMessage(embed, isMention, img);
+    m_hadDiscordMessage = true;
 }

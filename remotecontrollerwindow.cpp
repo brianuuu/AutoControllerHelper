@@ -2487,7 +2487,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = Q_NULLPTR;
     }
 
-    SmartProgramParameter parameter(m_vlcWrapper, m_smartSetting, ui->L_CurrentStats, this);
+    SmartProgramParameter parameter(m_vlcWrapper, m_discordSettings, m_smartSetting, ui->L_CurrentStats, this);
     bool enableUI = SmartProgramBase::getProgramEnableUI(sp);
 
     switch (sp)

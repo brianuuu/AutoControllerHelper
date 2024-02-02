@@ -1496,10 +1496,11 @@ Promise<Message>& Client::createImageMessage(snowflake_t channel_id, const Uploa
 	return (*promise);
 }
 
-Promise<Message>& Client::createImageMessage(snowflake_t channel_id, const UploadAttachment &attachment, const Discord::Embed & embed)
+Promise<Message>& Client::createImageMessage(snowflake_t channel_id, const UploadAttachment &attachment, const Discord::Embed & embed, const QString & content)
 {
 	QString endpoint = QString("/channels/%1/messages").arg(channel_id);
 	QJsonObject payload;
+    payload["content"] = content;
 	payload["embed"] = QJsonObject(embed);
 	
   QNetworkReply* reply = http_service_.postMultipart(token_, endpoint, attachment, payload);

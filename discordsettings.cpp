@@ -113,3 +113,55 @@ Discord::Embed DiscordSettings::getEmbedTemplate(const QString &title)
     embed.setDescription("By Auto Controller v" + QString(VERSION) + " ([GitHub](https://github.com/brianuuu/AutoController_swsh)/[Discord](https://discord.gg/GWEurpGZNM))");
     return embed;
 }
+
+void DiscordSettings::sendMessage(const Discord::Embed &embed, bool isMention, const QImage *img)
+{
+    if (!m_isLoggedIn || (ui->LE_Channel->text().isEmpty() && ui->LE_Owner->text().isEmpty())) return;
+
+    // create attachment
+    Discord::UploadAttachment u;
+    if (img)
+    {
+        u.type = Discord::UploadImageSupportedExtension::PNG;
+        u.name = "attachment.png";
+        QBuffer buffer(&u.file);
+        buffer.open(QIODevice::WriteOnly);
+        (*img).save(&buffer, "PNG");
+    }
+
+    // mention
+    QString const mention = isMention ? getOwnerMention() : "";
+
+    // send to channel
+    if (!ui->LE_Channel->text().isEmpty())
+    {
+        snowflake_t id = ui->LE_Channel->text().toULongLong();
+        if (img)
+        {
+            m_client.createImageMessage(id, u, embed, mention);
+        }
+        else
+        {
+            m_client.createMessage(id, embed, mention);
+        }
+    }
+
+    // send DM
+    if (!ui->LE_Owner->text().isEmpty())
+    {
+        snowflake_t id = ui->LE_Owner->text().toULongLong();
+        m_client.createDm(id).then(
+            [this, img, u, embed, mention](Discord::Channel const& c)
+            {
+                if (img)
+                {
+                    m_client.createImageMessage(c.id(), u, embed, mention);
+                }
+                else
+                {
+                    m_client.createMessage(c.id(), embed, mention);
+                }
+            }
+        );
+    }
+}

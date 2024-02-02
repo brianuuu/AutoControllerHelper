@@ -1,6 +1,7 @@
 #ifndef DISCORDSETTINGS_H
 #define DISCORDSETTINGS_H
 
+#include <QBuffer>
 #include <QLayout>
 #include <QRegExpValidator>
 #include <QSettings>
@@ -34,9 +35,13 @@ private slots:
     void on_PB_Channel_clicked();
     void on_PB_Owner_clicked();
 
-private:
+public:
+    // getters
     QString getOwnerMention();
     Discord::Embed getEmbedTemplate(QString const& title);
+
+    // senders
+    void sendMessage( Discord::Embed const& embed, bool isMention, QImage const* img = nullptr);
 
 private:
     Ui::DiscordSettings *ui;
