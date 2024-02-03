@@ -123,6 +123,7 @@ private:
     int m_eggsToHatchColumn; // hatching for this loop? should always be 5 but can be fewer
     bool m_isStatView;
     int m_hatchingDialog; // how many times white detected during hatch (should be 3)
+    QImage m_hatchImage;
 
     // shiny
     bool m_shinyWasFound; // there was a shiny in the current 5 eggs

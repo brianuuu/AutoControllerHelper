@@ -463,6 +463,14 @@ void SmartBDSPEggOperation::runNextState()
                     incrementStat(m_statShinyHatched);
                     emit printLog(log + " is SHINY!!! Moving it to Keep Box!", LOG_SUCCESS);
 
+                    // send discord message
+                    if (m_programSettings.m_shinyDetection == ShinyDetectionType::SDT_Disable)
+                    {
+                        m_videoManager->getFrame(m_hatchImage);
+                    }
+                    sendDiscordMessage("Shiny Found!", true, QColor(255,255,0), &m_hatchImage);
+
+                    // run keep command
                     int moveBoxCount = (m_eggColumnsHatched + 5) / 6;
                     QString command = "Y,1,A,6,DUp,1,LUp,1,DUp,1,DRight,1,Loop,1"; // move cursor to Box List
                     command += ",L,1,Nothing,21,Loop," + QString::number(moveBoxCount); // move to keep box
@@ -694,5 +702,8 @@ void SmartBDSPEggOperation::soundDetected(int id)
     if (id == m_shinySoundID && m_substage == SS_HatchEggs)
     {
         m_shinyDetected = true;
+
+        // cache image to send if shiny
+        m_videoManager->getFrame(m_hatchImage);
     }
 }

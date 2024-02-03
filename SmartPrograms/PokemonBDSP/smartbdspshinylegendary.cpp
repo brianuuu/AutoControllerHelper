@@ -166,6 +166,10 @@ void SmartBDSPShinyLegendary::runNextState()
                         QString str = "\"Go! Your Pokemon!\" dialog detected, time taken: " + QString::number(elapsed) + "ms, ";
                         if (elapsed > 2000)
                         {
+                            QImage frame;
+                            m_videoManager->getFrame(frame);
+                            sendDiscordMessage("Shiny Found!", true, QColor(255,255,0), &frame);
+
                             // shiny found!
                             m_substage = SS_Finish;
                             setState_runCommand(C_Capture);
