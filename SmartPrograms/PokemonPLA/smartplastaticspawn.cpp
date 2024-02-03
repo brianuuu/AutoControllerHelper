@@ -348,12 +348,16 @@ void SmartPLAStaticSpawn::soundDetected(int id)
         incrementStat(m_statShiny);
         m_shinyDetected = true;
 
+        QImage frame;
+        m_videoManager->getFrame(frame);
         if (m_ignoreEarlyShiny && m_timer.remainingTime() > 0)
         {
+            sendDiscordMessage("Shiny Sound Detected! (Ignored)", true, QColor(0,0,0), &frame);
             emit printLog("Shiny sound detected but user has set ignore early shinies...", LOG_WARNING);
         }
         else
         {
+            sendDiscordMessage("Shiny Sound Detected!", true, QColor(255,255,0), &frame);
             emit printLog("SHINY POKEMON FOUND!", LOG_SUCCESS);
             m_substage = SS_Capture;
             runNextStateContinue();

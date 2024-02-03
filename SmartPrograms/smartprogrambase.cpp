@@ -1164,6 +1164,8 @@ void SmartProgramBase::updateStats()
 
 void SmartProgramBase::sendDiscordMessage(const QString &title, bool isMention, QColor color, const QImage *img, const QList<Discord::EmbedField> &fields)
 {
+    if (!m_discordSettings->canSendMessage()) return;
+
     Discord::Embed embed = m_discordSettings->getEmbedTemplate(title);
     embed.setColor(color.rgb() & 0xFFFFFF);
 

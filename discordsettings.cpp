@@ -113,9 +113,14 @@ Discord::Embed DiscordSettings::getEmbedTemplate(const QString &title)
     return embed;
 }
 
+bool DiscordSettings::canSendMessage()
+{
+    return m_isLoggedIn && (!ui->LE_Channel->text().isEmpty() || !ui->LE_Owner->text().isEmpty());
+}
+
 void DiscordSettings::sendMessage(const Discord::Embed &embed, bool isMention, const QImage *img)
 {
-    if (!m_isLoggedIn || (ui->LE_Channel->text().isEmpty() && ui->LE_Owner->text().isEmpty())) return;
+    if (!canSendMessage()) return;
 
     // create attachment
     Discord::UploadAttachment u;
