@@ -16,7 +16,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Discord Connection Settings</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

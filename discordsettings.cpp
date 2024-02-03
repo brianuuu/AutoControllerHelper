@@ -10,9 +10,8 @@ DiscordSettings::DiscordSettings(QWidget *parent) :
     this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
     m_isLoggedIn = false;
-    QRegExpValidator reg(QRegExp("[0-9]*"));
-    ui->LE_Channel->setValidator(&reg);
-    ui->LE_Owner->setValidator(&reg);
+    ui->LE_Channel->setValidator(new QRegExpValidator(QRegExp("[0-9]*")));
+    ui->LE_Owner->setValidator(new QRegExpValidator(QRegExp("[0-9]*")));
 
     m_settings = new QSettings("brianuuu", "AutoControllerHelper", this);
     ui->LE_Token->setText(m_settings->value("DiscordToken", "").toString());
