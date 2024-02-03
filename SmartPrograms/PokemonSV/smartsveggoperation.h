@@ -152,6 +152,7 @@ private:
     bool m_flySuccess; // check if we were able to fly
     typedef QPair<QPoint,int> PosEggCountMap;
     QVector<PosEggCountMap> m_shinyPositions; // how many shiny we found this session (pos,egg no)
+    QImage m_hatchImage;
 
     int m_shinySoundID;
     int m_shinyBattleID;
