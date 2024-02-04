@@ -151,7 +151,7 @@ void SmartPLAMMORespawn::soundDetected(int id)
 
         QImage frame;
         m_videoManager->getFrame(frame);
-        sendDiscordMessage("Target Pokemon Found!", true, QColor(255,255,0), &m_hatchImage, {embedField});
+        sendDiscordMessage("Shiny Sound Detected!", true, QColor(255,255,0), &frame);
 
         emit printLog("SHINY POKEMON FOUND!", LOG_SUCCESS);
         m_substage = SS_Capture;

@@ -215,7 +215,7 @@ void SmartPLAStaticSpawn::runNextState()
             }
             else
             {
-                setState_runCommand("A,1,Nothing,20");
+                setState_runCommand("A,1,Nothing,25");
             }
         }
         break;
