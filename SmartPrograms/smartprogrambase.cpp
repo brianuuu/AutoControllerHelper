@@ -988,31 +988,31 @@ void SmartProgramBase::runNextState()
     case S_Error:
     case S_NotStarted:
     {
-        stop();
-        emit printLog(m_errorMsg, LOG_ERROR);
-        emit completed();
-
         // long running program
         if (m_hadDiscordMessage)
         {
+            Discord::EmbedField embedField("Error Message", m_errorMsg, false);
             QImage frame;
             m_videoManager->getFrame(frame);
-            sendDiscordMessage("Error Occured", false, LOG_ERROR, &frame);
+            sendDiscordMessage("Error Occured", false, LOG_ERROR, &frame, {embedField});
         }
 
+        stop();
+        emit printLog(m_errorMsg, LOG_ERROR);
+        emit completed();
         break;
     }
     case S_Completed:
     {
-        stop();
-        emit printLog("-----------Finished-----------");
-        emit completed();
-
         // long running program
         if (m_hadDiscordMessage)
         {
             sendDiscordMessage("Program Finished", false, LOG_SUCCESS);
         }
+
+        stop();
+        emit printLog("-----------Finished-----------");
+        emit completed();
         break;
     }
     case S_CommandRunning:
