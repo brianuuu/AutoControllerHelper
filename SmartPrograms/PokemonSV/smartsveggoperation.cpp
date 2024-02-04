@@ -720,9 +720,6 @@ void SmartSVEggOperation::runNextState()
             {
                 if (m_shinySoundDetected)
                 {
-                    // Discord message
-                    sendDiscordMessage("Shiny Found!", true, QColor(255,255,0), &m_hatchImage);
-
                     incrementStat(m_statShinyHatched);
                     emit printLog("Encountered wild SHINY pokemon, capturing video!", LOG_SUCCESS);
                     m_substage = SS_Finished;
@@ -937,9 +934,10 @@ void SmartSVEggOperation::runNextState()
                     // send discord message
                     if (!m_programSettings.m_isShinyDetection)
                     {
-                        m_videoManager->getFrame(m_hatchImage);
+                        QImage frame;
+                        m_videoManager->getFrame(frame);
+                        sendDiscordMessage("Shiny Found!", true, QColor(255,255,0), &frame);
                     }
-                    sendDiscordMessage("Shiny Found!", true, QColor(255,255,0), &m_hatchImage);
                 }
                 else
                 {
@@ -1228,7 +1226,8 @@ void SmartSVEggOperation::soundDetected(int id)
 
     if (m_shinySoundDetected)
     {
-        // cache image to send if shiny
-        m_videoManager->getFrame(m_hatchImage);
+        QImage frame;
+        m_videoManager->getFrame(frame);
+        sendDiscordMessage("Shiny Found!", true, QColor(255,255,0), &frame);
     }
 }

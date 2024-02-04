@@ -466,9 +466,10 @@ void SmartBDSPEggOperation::runNextState()
                     // send discord message
                     if (m_programSettings.m_shinyDetection == ShinyDetectionType::SDT_Disable)
                     {
-                        m_videoManager->getFrame(m_hatchImage);
+                        QImage frame;
+                        m_videoManager->getFrame(frame);
+                        sendDiscordMessage("Shiny Found!", true, QColor(255,255,0), &frame);
                     }
-                    sendDiscordMessage("Shiny Found!", true, QColor(255,255,0), &m_hatchImage);
 
                     // run keep command
                     int moveBoxCount = (m_eggColumnsHatched + 5) / 6;
@@ -703,7 +704,9 @@ void SmartBDSPEggOperation::soundDetected(int id)
     {
         m_shinyDetected = true;
 
-        // cache image to send if shiny
-        m_videoManager->getFrame(m_hatchImage);
+        // send discord message
+        QImage frame;
+        m_videoManager->getFrame(frame);
+        sendDiscordMessage("Shiny Found!", true, QColor(255,255,0), &frame);
     }
 }
