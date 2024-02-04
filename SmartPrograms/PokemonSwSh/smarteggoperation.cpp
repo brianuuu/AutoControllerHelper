@@ -888,7 +888,11 @@ void SmartEggOperation::runNextState()
             }
 
             // cache image to send if shiny
-            m_videoManager->getFrame(m_hatchImage);
+            if (!m_shinyImage)
+            {
+                m_shinyImage = new QImage();
+                m_videoManager->getFrame(*m_shinyImage);
+            }
 
             setState_runCommand("BSpam,2,Loop,0", true);
             m_videoManager->setAreas({A_Dialog});
@@ -957,6 +961,12 @@ void SmartEggOperation::runNextState()
                         // TODO: square/star shiny one video each
                         emit printLog("SHINY Pokemon detected! But we have already captured the same video, skipping capture");
                     }
+                }
+                else if (m_shinyImage)
+                {
+                    // not shiny, delete image
+                    delete m_shinyImage;
+                    m_shinyImage = Q_NULLPTR;
                 }
 
                 QString command = m_commands[C_HatchReturn];
@@ -1214,11 +1224,14 @@ void SmartEggOperation::runNextState()
                 }
 
                 // send discord message
-                if (m_programSettings.m_shinyDetection == ShinyDetectionType::SDT_Disable)
+                QImage frame;
+                m_videoManager->getFrame(frame);
+                sendDiscordMessage("Shiny Found!", true, QColor(255,255,0), m_shinyImage ? m_shinyImage : &frame, {embedField});
+                if (m_shinyImage)
                 {
-                    m_videoManager->getFrame(m_hatchImage);
+                    delete m_shinyImage;
+                    m_shinyImage = Q_NULLPTR;
                 }
-                sendDiscordMessage("Shiny Found!", true, QColor(255,255,0), &m_hatchImage, {embedField});
             }
 
             m_eggsToHatchCount--;
@@ -1231,8 +1244,9 @@ void SmartEggOperation::runNextState()
                 else
                 {
                     // keeping non-shiny, report
-                    m_videoManager->getFrame(m_hatchImage);
-                    sendDiscordMessage("Target Pokemon Found!", true, QColor(255,255,0), &m_hatchImage, {embedField});
+                    QImage frame;
+                    m_videoManager->getFrame(frame);
+                    sendDiscordMessage("Target Pokemon Found!", true, QColor(255,255,0), &frame, {embedField});
                 }
 
                 if (m_programSettings.m_operation == EggOperationType::EOT_Parent)
