@@ -17,4 +17,6 @@
 	<C_SkipUSYearRaid>LDown,1,RDown,1,A,4,Nothing,1,LRight,1,RRight,1,LUpA,1,LRight,1,RRight,1,LRight,1,A,1,Nothing,6</C_SkipUSYearRaid>
 	<C_RestartGame>ASpam,4,Nothing,5,Home,1,Nothing,16,X,4,ASpam,200</C_RestartGame>
 	<C_StartGameA>Nothing,21,A,1,Nothing,40</C_StartGameA>
+	<C_DaylightJPEU>A,4,LLeft,1,RLeft,1,Loop,1,LUp,1,RUp,1,Loop,2,DRight,1,LRightA,1,Nothing,2</C_DaylightJPEU>
+	<C_DaylightUS>A,4,LLeft,1,RUp,1,LRightA,1,Nothing,2</C_DaylightUS>
 </SmartDaySkipper>

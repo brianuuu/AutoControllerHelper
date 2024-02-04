@@ -41,6 +41,7 @@ public:
     Discord::Embed getEmbedTemplate(QString const& title);
 
     // senders
+    bool canSendMessage();
     void sendMessage( Discord::Embed const& embed, bool isMention, QImage const* img = nullptr);
 
 private:

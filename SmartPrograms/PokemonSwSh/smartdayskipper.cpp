@@ -485,6 +485,12 @@ bool SmartDaySkipper::is1159PM()
     return currentTime.hour() == 23 && currentTime.minute() == 59;
 }
 
+bool SmartDaySkipper::isDaylightSaving()
+{
+    QTime const currentTime = QTime::currentTime();
+    return currentTime.hour() >= 0 && currentTime.hour() <= 3;
+}
+
 void SmartDaySkipper::runSyncTime()
 {
     bool is1159 = is1159PM();
@@ -495,7 +501,20 @@ void SmartDaySkipper::runSyncTime()
         m_skippedDays++;
     }
 
-    setState_runCommand(is1159 ? C_SyncTimeWait : C_SyncTime);
+    QString command = is1159 ? m_commands[C_SyncTimeWait] : m_commands[C_SyncTime];
+    if (isDaylightSaving())
+    {
+        emit printLog("Current time is between Daylight Saving time, changing hours to prevent error", LOG_WARNING);
+        command += ",";
+        switch (m_dateArrangement)
+        {
+            case DA_JP: command += m_commands[C_DaylightJPEU]; break;
+            case DA_EU: command += m_commands[C_DaylightJPEU]; break;
+            case DA_US: command += m_commands[C_DaylightUS]; break;
+        }
+    }
+
+    setState_runCommand(command);
     m_date = QDate::currentDate();
 }
 

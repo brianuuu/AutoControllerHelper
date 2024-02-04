@@ -548,7 +548,7 @@ protected:
     QLabel*                 m_statsLabel;
     QGraphicsScene*         m_preview;
     QGraphicsScene*         m_previewMasked;
-    QDateTime               m_startDateTime;
+    QDateTime               m_programStartDateTime;
     bool                    m_hadDiscordMessage;
 
     // Commands

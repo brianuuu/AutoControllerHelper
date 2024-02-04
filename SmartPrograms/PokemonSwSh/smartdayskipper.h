@@ -44,7 +44,9 @@ private:
     Command const C_SkipUSYearRaid  = 14;
     Command const C_RestartGame = 15;
     Command const C_StartGameA  = 16;
-    Command const C_COUNT       = 17;
+    Command const C_DaylightJPEU    = 17;
+    Command const C_DaylightUS      = 18;
+    Command const C_COUNT           = 19;
 
     // List of test color
     HSVRange const C_Color_Black = HSVRange(0,0,0,359,255,30);
@@ -97,6 +99,7 @@ private:
     QDateTime m_startDateTime;
 
     bool is1159PM();
+    bool isDaylightSaving();
     void runSyncTime();
     QString secondsToString(double time);
     QString getToJanuary();

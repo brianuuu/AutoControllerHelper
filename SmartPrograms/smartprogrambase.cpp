@@ -13,7 +13,7 @@ SmartProgramBase::SmartProgramBase(SmartProgramParameter parameter)
     m_statsLabel        = parameter.statsLabel;
     m_preview           = parameter.preview;
     m_previewMasked     = parameter.previewMasked;
-    m_startDateTime     = QDateTime::currentDateTime();
+    m_programStartDateTime     = QDateTime::currentDateTime();
 
     init();
 }
@@ -1179,7 +1179,7 @@ void SmartProgramBase::sendDiscordMessage(const QString &title, bool isMention, 
     SmartProgram sp = getProgramEnum();
     QString fieldMsg = getProgramGamePrefix(sp) + ": " + getProgramNameFromEnum(sp);
 
-    qint64 mins = m_startDateTime.secsTo(QDateTime::currentDateTime()) / 60;
+    qint64 mins = m_programStartDateTime.secsTo(QDateTime::currentDateTime()) / 60;
     qint64 hours = mins / 60;
     mins %= 60;
     fieldMsg += "\n Up Time: " + QString::number(hours) + " hours " + QString::number(mins) + " minutes";
