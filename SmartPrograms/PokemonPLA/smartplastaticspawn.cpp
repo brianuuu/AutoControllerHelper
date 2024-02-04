@@ -145,10 +145,10 @@ void SmartPLAStaticSpawn::runNextState()
         }
         else if (state == S_CaptureReady)
         {
-            if (m_elapsedTimer.elapsed() > 20000)
+            if (m_elapsedTimer.elapsed() > 30000)
             {
                 incrementStat(m_statError);
-                emit printLog("Unable to detect title screen or game starting, the game might have crashed, restarting...", LOG_ERROR);
+                emit printLog("Unable to detect title screen or game starting for too long, the game might have crashed, restarting...", LOG_ERROR);
                 runRestartCommand();
             }
             else if (!checkAverageColorMatch(A_Title.m_rect, QColor(0,0,0)))
