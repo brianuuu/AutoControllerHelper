@@ -285,7 +285,7 @@ void SmartDaySkipper::runNextState()
 
             if (foundIndex == -1)
             {
-                emit printLog(list[m_imageTestIndex] + " is not in listed Pokemon, syncing time and restarting game...");
+                emit printLog(list[m_imageTestIndex] + " is not in listed Pokemon, syncing time and restarting game...", LOG_WARNING);
                 m_substage = SS_ToSyncTime;
                 setState_runCommand(C_ToSyncTime);
             }
