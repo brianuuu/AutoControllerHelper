@@ -887,13 +887,6 @@ void SmartEggOperation::runNextState()
                 m_audioManager->startDetection(m_shinySoundID);
             }
 
-            // cache image to send if shiny
-            if (!m_shinyImage)
-            {
-                m_shinyImage = new QImage();
-                m_videoManager->getFrame(*m_shinyImage);
-            }
-
             setState_runCommand("BSpam,2,Loop,0", true);
             m_videoManager->setAreas({A_Dialog});
         }
@@ -961,12 +954,6 @@ void SmartEggOperation::runNextState()
                         // TODO: square/star shiny one video each
                         emit printLog("SHINY Pokemon detected! But we have already captured the same video, skipping capture");
                     }
-                }
-                else if (m_shinyImage)
-                {
-                    // not shiny, delete image
-                    delete m_shinyImage;
-                    m_shinyImage = Q_NULLPTR;
                 }
 
                 QString command = m_commands[C_HatchReturn];
@@ -1221,16 +1208,6 @@ void SmartEggOperation::runNextState()
                 if (m_shinyWasDetected > 0)
                 {
                     m_shinyWasDetected--;
-                }
-
-                // send discord message
-                QImage frame;
-                m_videoManager->getFrame(frame);
-                sendDiscordMessage("Shiny Found!", true, QColor(255,255,0), m_shinyImage ? m_shinyImage : &frame, {embedField});
-                if (m_shinyImage)
-                {
-                    delete m_shinyImage;
-                    m_shinyImage = Q_NULLPTR;
                 }
             }
 
@@ -2053,5 +2030,10 @@ void SmartEggOperation::soundDetected(int id)
     if (id == m_shinySoundID && m_substage == SS_Hatching)
     {
         m_shinyDetected = true;
+
+        // send discord message
+        QImage frame;
+        m_videoManager->getFrame(frame);
+        sendDiscordMessage("Shiny Found!", true, QColor(255,255,0), &frame);
     }
 }

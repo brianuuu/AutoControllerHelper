@@ -197,7 +197,6 @@ private:
     PokemonStatTable m_hatchedStat; // stats of current pokemon
     PokemonStatTable m_keepDummy; // dummy table to look up which stat we need to check
     PokemonStatTableList m_keepList; // list of extra pokemon we want to keep
-    QImage* m_shinyImage = Q_NULLPTR;
 
     // parent
     PokemonStatTable m_parentStat; // stats of current parent
