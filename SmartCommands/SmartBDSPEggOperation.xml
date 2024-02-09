@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<SmartBDSPStarter>
+<SmartBDSPEggOperation>
 	<C_Restart>Home,1,Nothing,21,X,1,ASpam,120</C_Restart>
 	<C_RestartNoUpdate>Home,1,Nothing,21,X,10,A,20,LDown,1,LUp,1,A,20,LUp,1,ASpam,120</C_RestartNoUpdate>
 	<C_CycleCollect>LDownRight,1,LRight,1,LUpRight,1,LUp,1,LUpLeft,1,LLeft,1,LDownLeft,2,LDown,1,Loop,40</C_CycleCollect>
@@ -12,4 +12,4 @@
 	<C_PartyKeep>Y,1,DLeft,1,Nothing,6,Y,1,DDown,1,Nothing,6,A,1,Loop,1,DDown,1,Nothing,6,Loop,6,A,6,DUp,1,DRight,1,L,22,A,12,Y,1,R,22</C_PartyKeep>
 	<C_PartyBack>DUp,1,Nothing,6,DRight,1,Nothing,6,Y,1,L,22,Y,1,A,1,Loop,1,DDown,1,Nothing,6,Loop,6,A,6,DLeft,1,DDown,1,A,12,DUp,1,Nothing,6,DRight,1,Nothing,6,Y,1,R,22</C_PartyBack>
 	<C_QuitBoxSave>BSpam,4,Nothing,20,Loop,2,R,1,ASpam,100</C_QuitBoxSave>
-</SmartBDSPStarter>
+</SmartBDSPEggOperation>
