@@ -978,7 +978,7 @@ void SmartSVEggOperation::runNextState()
                     }
                     else if (m_programSettings.m_operation == EggOperationType::EOT_Shiny)
                     {
-                        emit printLog("No shiny pokemon is found...restarting game");
+                        emit printLog("No shiny pokemon is found...restarting game", LOG_WARNING);
                         m_substage = SS_Restart;
                         m_videoManager->clearCaptures();
                         setState_runCommand(C_Restart);
