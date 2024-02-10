@@ -536,6 +536,7 @@ protected:
     void incrementStat(Stat& stat, int addCount = 1);
     void updateStats();
 
+public:
     // Discord messages
     void sendDiscordMessage(QString const& title, bool isMention, QColor color = QColor(0,0,0), QImage const* img = nullptr, QList<Discord::EmbedField> const& fields = {});
 

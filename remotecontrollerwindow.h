@@ -204,6 +204,11 @@ private slots:
     void ActionController_triggered();
     void ActionDiscord_triggered();
 
+    // Discord
+    void DiscordScreenshot(snowflake_t id);
+    void DiscordStatus(snowflake_t id);
+    void DiscordCommand(snowflake_t id, QString const command);
+
 private:
     // Others
     void PrintLog(QString const& log, QColor color = QColor(0,0,0));

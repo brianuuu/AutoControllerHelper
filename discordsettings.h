@@ -35,6 +35,13 @@ private slots:
     void on_PB_Channel_clicked();
     void on_PB_Owner_clicked();
 
+    void handleMessage(const Discord::Message& message);
+
+signals:
+    void signalScreenshot(snowflake_t id);
+    void signalStatus(snowflake_t id);
+    void signalCommand(snowflake_t id, QString const command);
+
 public:
     // getters
     QString getOwnerMention();
@@ -42,7 +49,10 @@ public:
 
     // senders
     bool canSendMessage();
-    void sendMessage( Discord::Embed const& embed, bool isMention, QImage const* img = nullptr);
+    void sendMessage(Discord::Embed const& embed, bool isMention, QImage const* img = nullptr);
+
+    void sendMessage(snowflake_t channelId, QString const& content);
+    void sendImageMessage(snowflake_t channelId, QImage const& img);
 
 private:
     Ui::DiscordSettings *ui;

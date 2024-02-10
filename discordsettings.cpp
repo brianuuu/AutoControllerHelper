@@ -1,6 +1,8 @@
 #include "discordsettings.h"
 #include "ui_discordsettings.h"
 
+#include "SmartPrograms/smartprogrambase.h"
+
 DiscordSettings::DiscordSettings(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::DiscordSettings)
@@ -22,6 +24,8 @@ DiscordSettings::DiscordSettings(QWidget *parent) :
     {
         on_PB_Connect_clicked();
     }
+
+    connect(&m_client, &Discord::Client::onMessageCreate, this, &DiscordSettings::handleMessage);
 }
 
 DiscordSettings::~DiscordSettings()
@@ -167,5 +171,63 @@ void DiscordSettings::sendMessage(const Discord::Embed &embed, bool isMention, c
                 }
             }
         );
+    }
+}
+
+void DiscordSettings::sendMessage(snowflake_t channelId, const QString &content)
+{
+    m_client.createMessage(channelId, content);
+}
+
+void DiscordSettings::sendImageMessage(snowflake_t channelId, const QImage &img)
+{
+    Discord::UploadAttachment u;
+    u.type = Discord::UploadImageSupportedExtension::PNG;
+    u.name = "attachment.png";
+    QBuffer buffer(&u.file);
+    buffer.open(QIODevice::WriteOnly);
+    img.save(&buffer, "PNG");
+
+    m_client.createImageMessage(channelId, u, "");
+}
+
+void DiscordSettings::handleMessage(const Discord::Message &message)
+{
+    if (!m_isLoggedIn || ui->LE_Owner->text().isEmpty()) return;
+
+    // only respond to owner
+    snowflake_t id = ui->LE_Owner->text().toULongLong();
+    if (message.author().id() != id) return;
+    if (!message.content().startsWith('!')) return;
+
+    if (message.content() == "!screenshot")
+    {
+        emit signalScreenshot(message.channelId());
+        return;
+    }
+
+    if (message.content() == "!status")
+    {
+        emit signalStatus(message.channelId());
+        return;
+    }
+
+    if (message.content().startsWith("!command "))
+    {
+        QStringList args = message.content().split(' ');
+        args.pop_front();
+        if (args.size() != 1) return;
+
+        QString errorMsg;
+        if (SmartProgramBase::validateCommand(args[0], errorMsg))
+        {
+            emit signalCommand(message.channelId(), args[0]);
+        }
+        else
+        {
+            m_client.createMessage(message.channelId(), "Error: " + errorMsg);
+        }
+
+        return;
     }
 }

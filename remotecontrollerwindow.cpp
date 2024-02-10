@@ -340,6 +340,9 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     menuBar->addMenu(discordMenu);
     QAction* discordAction = discordMenu->addAction("Connection Settings");
     connect(discordAction, &QAction::triggered, this, &RemoteControllerWindow::ActionDiscord_triggered);
+    connect(m_discordSettings, &DiscordSettings::signalScreenshot, this, &RemoteControllerWindow::DiscordScreenshot);
+    connect(m_discordSettings, &DiscordSettings::signalStatus, this, &RemoteControllerWindow::DiscordStatus);
+    connect(m_discordSettings, &DiscordSettings::signalCommand, this, &RemoteControllerWindow::DiscordCommand);
 }
 
 RemoteControllerWindow::~RemoteControllerWindow()
@@ -2355,6 +2358,45 @@ void RemoteControllerWindow::ActionDiscord_triggered()
 {
     m_discordSettings->show();
     m_discordSettings->raise();
+}
+
+void RemoteControllerWindow::DiscordScreenshot(snowflake_t id)
+{
+    if (m_vlcWrapper->getVideoManager()->isStarted())
+    {
+        QImage frame;
+        m_vlcWrapper->getVideoManager()->getFrame(frame);
+        m_discordSettings->sendImageMessage(id, frame);
+    }
+    else
+    {
+        m_discordSettings->sendMessage(id, "Camera not started");
+    }
+}
+
+void RemoteControllerWindow::DiscordStatus(snowflake_t id)
+{
+    if (m_smartProgram)
+    {
+        m_smartProgram->sendDiscordMessage("Program Status", false);
+    }
+    else
+    {
+        m_discordSettings->sendMessage(id, "No Smart Program is running");
+    }
+}
+
+void RemoteControllerWindow::DiscordCommand(snowflake_t id, const QString command)
+{
+    if (m_smartProgram)
+    {
+        m_discordSettings->sendMessage(id, "Cannot run command while Smart Program is running");
+    }
+    else
+    {
+        SendCommand(command);
+        m_discordSettings->sendMessage(id, "Command sent. Note: no message return when command is finished");
+    }
 }
 
 void RemoteControllerWindow::SetCaptureAreaPos(QMouseEvent *event)
