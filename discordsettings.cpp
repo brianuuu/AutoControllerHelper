@@ -20,6 +20,7 @@ DiscordSettings::DiscordSettings(QWidget *parent) :
     ui->LE_Channel->setText(m_settings->value("DiscordChannel", "").toString());
     ui->LE_Owner->setText(m_settings->value("DiscordOwner", "").toString());
     ui->CB_Launch->setChecked(m_settings->value("DiscordStart", false).toBool());
+    ui->CB_StatusDM->setChecked(m_settings->value("DiscordStatusDM", true).toBool());
     if (ui->CB_Launch->isChecked())
     {
         on_PB_Connect_clicked();
@@ -39,6 +40,7 @@ void DiscordSettings::closeEvent(QCloseEvent *event)
     m_settings->setValue("DiscordChannel", ui->LE_Channel->text());
     m_settings->setValue("DiscordOwner", ui->LE_Owner->text());
     m_settings->setValue("DiscordStart", ui->CB_Launch->isChecked());
+    m_settings->setValue("DiscordStatusDM", ui->CB_StatusDM->isChecked());
 }
 
 void DiscordSettings::on_LE_Token_textChanged(const QString &arg1)
@@ -140,8 +142,15 @@ void DiscordSettings::sendMessage(const Discord::Embed &embed, bool isMention, c
     // mention
     QString const mention = isMention ? getOwnerMention() : "";
 
+    // status DM
+    bool dmOnly = false;
+    if (ui->CB_StatusDM->isChecked() && embed.title() == "Program Status")
+    {
+        dmOnly = true;
+    }
+
     // send to channel
-    if (!ui->LE_Channel->text().isEmpty())
+    if (!ui->LE_Channel->text().isEmpty() && !dmOnly)
     {
         snowflake_t id = ui->LE_Channel->text().toULongLong();
         if (img)

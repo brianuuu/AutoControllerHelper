@@ -156,6 +156,16 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="CB_StatusDM">
+     <property name="text">
+      <string>Send Program Status to DM only</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
       <widget class="QPushButton" name="PB_Channel">
