@@ -1942,7 +1942,7 @@ void RemoteControllerWindow::on_SP20_CB_Mode_currentIndexChanged(int index)
         SmartEggOperation::EggOperationType type = SmartEggOperation::EggOperationType(index);
         ui->SP20_SB_Collect->setEnabled(type == SmartEggOperation::EggOperationType::EOT_Collector);
         ui->SP20_SB_Column->setEnabled(type == SmartEggOperation::EggOperationType::EOT_Hatcher);
-        ui->SP20_CB_HatchExtra->setEnabled(type != SmartEggOperation::EggOperationType::EOT_Collector && type != SmartEggOperation::EggOperationType::EOT_Remainder && type != SmartEggOperation::EggOperationType::EOT_Parent);
+        ui->SP20_CB_HatchExtra->setEnabled(type != SmartEggOperation::EggOperationType::EOT_Collector && type != SmartEggOperation::EggOperationType::EOT_Remainder && type != SmartEggOperation::EggOperationType::EOT_Parent && type != SmartEggOperation::EggOperationType::EOT_Multi);
         ui->SP20_RB_ShinyDisable->setEnabled(type != SmartEggOperation::EggOperationType::EOT_Collector);
         ui->SP20_RB_ShinySound->setEnabled(type != SmartEggOperation::EggOperationType::EOT_Collector);
         ui->SP20_RB_ShinyDelay->setEnabled(type != SmartEggOperation::EggOperationType::EOT_Collector && type != SmartEggOperation::EggOperationType::EOT_Remainder);
@@ -1957,6 +1957,10 @@ void RemoteControllerWindow::on_SP20_CB_Mode_currentIndexChanged(int index)
         {
         case SmartEggOperation::EggOperationType::EOT_Shiny:
             ui->SP20_TW_Keep->SetMode(PokemonStatTableWidget::Mode::Shiny);
+            break;
+        case SmartEggOperation::EggOperationType::EOT_Multi:
+            ui->SP20_TW_Keep->SetMode(PokemonStatTableWidget::Mode::Multi);
+            ui->SP20_CB_HatchExtra->setChecked(true);
             break;
         case SmartEggOperation::EggOperationType::EOT_Parent:
             ui->SP20_TW_Keep->SetMode(PokemonStatTableWidget::Mode::Parent);

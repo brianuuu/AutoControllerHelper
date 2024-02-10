@@ -37,6 +37,9 @@ public:
         // auto create first slot default to be shiny
         Shiny,
 
+        // always assume slots to be shiny
+        Multi,
+
         // only one slot allowed, disable shiny
         Parent,
 

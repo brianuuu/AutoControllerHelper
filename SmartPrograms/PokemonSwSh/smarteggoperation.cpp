@@ -24,7 +24,6 @@ void SmartEggOperation::reset()
     m_substage = SS_Init;
     m_initVerified = false;
 
-    m_firstCollectCycle = true;
     resetCollectorModeMembers();
     resetHatcherModeMembers();
     m_fadeOutDelayTime = 0; // should not reset
@@ -33,6 +32,8 @@ void SmartEggOperation::reset()
     m_parentStat = PokemonStatTable();
     m_leaveParent = false;
     m_natureMatched = false;
+
+    m_multiParentIndex = -1;
 
     m_videoCaptured = false;
     m_shinySoundID = 0;
@@ -166,6 +167,28 @@ void SmartEggOperation::runNextState()
         }
         else
         {
+            if (m_programSettings.m_operation == EggOperationType::EOT_Multi)
+            {
+                if (m_keepList.size() <= 1)
+                {
+                    // one keep pokemon in multi mode = shiny mode
+                    m_programSettings.m_operation = EggOperationType::EOT_Shiny;
+                }
+                else
+                {
+                    if (m_keepList.size() > 31)
+                    {
+                        // too many parent WTF
+                        incrementStat(m_statError);
+                        setState_error("Too many slots in keep list, max 31");
+                        break;
+                    }
+
+                    m_programSettings.m_isHatchExtra = true;
+                    m_multiParentIndex = 0;
+                }
+            }
+
             if (m_programSettings.m_operation == EggOperationType::EOT_Shiny && m_keepList.isEmpty())
             {
                 incrementStat(m_statError);
@@ -231,7 +254,7 @@ void SmartEggOperation::runNextState()
                     emit printLog("Full party confirmed");
                     m_initVerified = true;
                     m_substage = SS_CollectCycle;
-                    setState_runCommand("BSpam,40," + m_commands[m_firstCollectCycle ? C_CollectFirst : C_CollectCycle]);
+                    setState_runCommand("BSpam,40," + m_commands[C_CollectFirst]);
                     m_videoManager->clearCaptures();
                 }
                 else
@@ -244,7 +267,7 @@ void SmartEggOperation::runNextState()
             case EggOperationType::EOT_Hatcher:
             case EggOperationType::EOT_Remainder:
             {
-                if (countPair.second == 0)
+                if (countPair.first == 0 && countPair.second == 0)
                 {
                     emit printLog("Only 1 Pokemon in party confirmed");
                     if (m_programSettings.m_operation == EggOperationType::EOT_Hatcher)
@@ -268,11 +291,12 @@ void SmartEggOperation::runNextState()
                 else
                 {
                     incrementStat(m_statError);
-                    setState_error("There should only 1 Pokemon with Flame Body in the team in Hatcher/Remainder Mode");
+                    setState_error("There should be only 1 Pokemon with Flame Body in the team in Hatcher/Remainder Mode");
                 }
                 break;
             }
             case EggOperationType::EOT_Shiny:
+            case EggOperationType::EOT_Multi:
             case EggOperationType::EOT_Parent:
             {
                 if (countPair.second == 5)
@@ -295,7 +319,7 @@ void SmartEggOperation::runNextState()
                 else
                 {
                     incrementStat(m_statError);
-                    setState_error("There should be a full party while using Shiny/Parent Mode");
+                    setState_error("There should be a full party while using Shiny/Multi/Parent Mode");
                 }
                 break;
             }
@@ -379,6 +403,7 @@ void SmartEggOperation::runNextState()
                     break;
                 }
                 case EggOperationType::EOT_Shiny:
+                case EggOperationType::EOT_Multi:
                 {
                     // now check if box has 25 pokmon
                     m_substage = SS_InitEmptyColumnStart;
@@ -410,8 +435,9 @@ void SmartEggOperation::runNextState()
         if (state == S_CommandFinished)
         {
             // check keep box first column of egg box is empty
+            emit printLog("Verifying Egg Box first column and Keep Box...");
             m_substage = SS_InitEmptyColumn;
-            QString command = m_programSettings.m_operation == EggOperationType::EOT_Shiny ? "DDown,1,LDown,1,Loop,2" : "DDown,1,LDown,1,DDown,1";
+            QString command = m_programSettings.m_operation == EggOperationType::EOT_Parent ? "DDown,1,LDown,1,DDown,1" : "DDown,1,LDown,1,Loop,2";
             setState_runCommand(command + ",L,1,Nothing,5,Loop,1,"
                                 "DRight,1,LRight,1,DRight,1,LRight,1,DRight,1,LUp,1,"
                                 "DLeft,1,LLeft,1,DLeft,1,LLeft,1,DLeft,1,LUp,1,Loop,2,"
@@ -449,6 +475,7 @@ void SmartEggOperation::runNextState()
     {
         if (state == S_CommandFinished)
         {
+            emit printLog("Verifying remaining columns in Egg Box...");
             m_substage = SS_InitOtherColumns;
             setState_runCommand("DLeft,1,LLeft,1,DLeft,1,LLeft,1,DDown,1,"
                                 "LRight,1,DRight,1,LRight,1,DRight,1,LDown,1,Loop,2,"
@@ -457,6 +484,7 @@ void SmartEggOperation::runNextState()
         break;
     }
     case SS_InitOtherColumns:
+    case SS_InitParentBox:
     {
         if (state == S_CommandFinished)
         {
@@ -467,15 +495,27 @@ void SmartEggOperation::runNextState()
                 setState_runCommand("DLeft,1,LUp,1,DUp,1,LUp,1,DUp,1,Nothing,20");
                 m_videoManager->setAreas(GetCheckStatCaptureAreas());
             }
-            else
+            else if (m_programSettings.m_operation == EggOperationType::EOT_Multi && m_substage == SS_InitOtherColumns)
+            {
+                // check parent box
+                m_substage = SS_InitParentBoxStart;
+                setState_runCommand("DLeft,1,LUp,1,DUp,1,LUp,1,DUp,1,R,1,Nothing,20");
+            }
+            else // EOT_Shiny, EOT_Multi
             {
                 // we can finally start
                 m_initVerified = true;
                 m_programSettings.m_targetEggCount = 5;
-                emit printLog("Keep Box and Egg Box setup correctly confirmed");
+                emit printLog("Setup verification completed");
+
+                QString command = "BSpam,80," + m_commands[C_CollectFirst];
+                if (m_substage == SS_InitParentBox)
+                {
+                    command = "L,1,Nothing,5," + command;
+                }
 
                 m_substage = SS_CollectCycle;
-                setState_runCommand("BSpam,80," + m_commands[m_firstCollectCycle ? C_CollectFirst : C_CollectCycle]);
+                setState_runCommand(command);
                 m_videoManager->clearCaptures();
             }
         }
@@ -489,11 +529,46 @@ void SmartEggOperation::runNextState()
             {
                 // other column should NOT be empty
                 incrementStat(m_statError);
-                emit printLog("2nd to 6th column of Box should NOT be empty in Shiny Mode", LOG_ERROR);
+                if (m_substage == SS_InitOtherColumns)
+                {
+                    emit printLog("2nd to 6th column of Box should NOT be empty", LOG_ERROR);
+                }
+                else
+                {
+                    emit printLog("Expecting " + QString::number(m_keepList.size() - 1) + " parent(s) in Parent Box", LOG_ERROR);
+                }
 
                 m_substage = SS_Finished;
                 setState_runCommand("Nothing,10");
             }
+        }
+        break;
+    }
+    case SS_InitParentBoxStart:
+    {
+        if (state == S_CommandFinished)
+        {
+            int const parentCount = m_keepList.size() - 1;
+            emit printLog("Verifying Parent Box...");
+            m_substage = SS_InitParentBox;
+
+            QString command;
+            if (parentCount > 6)
+            {
+                // move rows
+                command = "DRight,1,LRight,1,DRight,1,LRight,1,DRight,1,"
+                          "DLeft,1,LLeft,1,DLeft,1,LLeft,1,DLeft,1,LDown,1,";
+                command += "Loop," + QString::number((parentCount - 1) / 6) + ",";
+            }
+
+            if ((parentCount - 1) % 6 > 0)
+            {
+                // move columns
+                command += "DRight,1,Nothing,1,Loop," + QString::number((parentCount - 1) % 6) + ",";
+            }
+
+            command += "Nothing,20";
+            setState_runCommand(command, true);
         }
         break;
     }
@@ -548,7 +623,6 @@ void SmartEggOperation::runNextState()
                 break;
             }
 
-            m_firstCollectCycle = false;
             m_talkDialogAttempts++;
             m_timer.restart();
             setState_runCommand("A,20,Nothing,20", true);
@@ -690,18 +764,18 @@ void SmartEggOperation::runNextState()
         {
             if (m_eggsCollected >= m_programSettings.m_targetEggCount)
             {
-                if (m_programSettings.m_operation == EggOperationType::EOT_Shiny || m_programSettings.m_operation == EggOperationType::EOT_Parent)
+                if (m_programSettings.m_operation == EggOperationType::EOT_Collector)
+                {
+                    m_substage = SS_Finished;
+                    setState_runCommand("Home,2");
+                }
+                else // EOT_Shiny, EOT_Multi, EOT_Parent
                 {
                     m_programSettings.m_columnsToHatch = 1;
                     resetHatcherModeMembers();
 
                     m_substage = SS_BoxFiller;
                     setState_runCommand(C_ToBox);
-                }
-                else
-                {
-                    m_substage = SS_Finished;
-                    setState_runCommand("Home,2");
                 }
             }
             else
@@ -789,10 +863,10 @@ void SmartEggOperation::runNextState()
                     incrementStat(m_statError);
                     setState_error("There are no eggs in party, something went really wrong");
                 }
-                else if ((m_programSettings.m_operation == EggOperationType::EOT_Shiny || m_programSettings.m_operation == EggOperationType::EOT_Parent) && m_eggsToHatchColumn < 5)
+                else if ((m_programSettings.m_operation == EggOperationType::EOT_Shiny || m_programSettings.m_operation == EggOperationType::EOT_Multi || m_programSettings.m_operation == EggOperationType::EOT_Parent) && m_eggsToHatchColumn < 5)
                 {
                     incrementStat(m_statError);
-                    setState_error("Shiny/Parent Mode always expect to have 5 eggs, something went really wrong");
+                    setState_error("Shiny/Multi/Parent Mode always expect to have 5 eggs, something went really wrong");
                 }
                 else
                 {
@@ -1157,6 +1231,12 @@ void SmartEggOperation::runNextState()
             int matchedTarget = -1;
             for (int i = 0; i < m_keepList.size(); i++)
             {
+                if (m_multiParentIndex >= 0 && m_multiParentIndex != i)
+                {
+                    // multi mode only check specific slot
+                    continue;
+                }
+
                 PokemonStatTable& table = m_keepList[i];
                 if (table.m_target > 0 && m_hatchedStat.Match(table))
                 {
@@ -1358,6 +1438,37 @@ void SmartEggOperation::runNextState()
                     break;
                 }
 
+                if (m_programSettings.m_operation == EggOperationType::EOT_Multi && m_hatchExtraEgg && m_multiParentIndex < m_keepList.size() - 1)
+                {
+                    // move next parent to the top left of Egg Box
+                    m_multiParentIndex++;
+                    QString command = "Nothing,20,Y,1,A,3,DUp,1,DRight,1,A,3,Nothing,1,A,3,R,1,Nothing,5,Loop,1"; // put previous parent to top left, pick up
+                    if (m_multiParentIndex > 6)
+                    {
+                        // move rows
+                        command += ",DDown,1,Nothing,1,Loop," + QString::number((m_multiParentIndex - 1) / 6);
+                    }
+                    if ((m_multiParentIndex - 1) % 6 > 0)
+                    {
+                        // move columns
+                        command += ",DRight,1,Nothing,1,Loop," + QString::number((m_multiParentIndex - 1) % 6);
+                    }
+                    command += ",A,6,L,1,Nothing,5"; // swap parent positions
+                    command += ",B,40,Loop,1,R,1,Nothing,1,Loop,5,Nothing,40,DLeft,1,DDown,1"; // re-enter box and move the 2nd party slot
+
+                    // print stats and reset them
+                    emit printLog("Parent Slot " + QString::number(m_multiParentIndex) + " completed, collect/hatch stats will be reset", LOG_WARNING);
+                    emit printLog(m_statsLabel->text(), LOG_WARNING);
+                    incrementStat(m_statEggCollected, -m_statEggCollected.first);
+                    incrementStat(m_statEggHatched, -m_statEggHatched.first);
+
+                    // ready to leave next parent
+                    m_leaveParent = true;
+                    m_substage = SS_HatchComplete;
+                    setState_runCommand(command);
+                    break;
+                }
+
                 // now in multiselect mode
                 m_substage = SS_NextColumn;
                 setState_runCommand("Nothing,20,Y,1,DUp,1,Y,1,DRight,1");
@@ -1407,6 +1518,12 @@ void SmartEggOperation::runNextState()
                 bool missingTarget = false;
                 for (int i = 0; i < m_keepList.size(); i++)
                 {
+                    if (m_multiParentIndex >= 0 && m_multiParentIndex != i)
+                    {
+                        // multi mode only check specific slot
+                        continue;
+                    }
+
                     PokemonStatTable const& table = m_keepList[i];
                     emit printLog(">>>>> Keep Slot " + QString::number(i+1) + ": " + QString::number(table.m_target) + " remaining");
                     if (table.m_target > 0)
@@ -1474,7 +1591,7 @@ void SmartEggOperation::runNextState()
                 }
 
                 // continue collecting more eggs
-                if ((m_programSettings.m_operation == EggOperationType::EOT_Shiny || m_programSettings.m_operation == EggOperationType::EOT_Parent) && missingTarget)
+                if ((m_programSettings.m_operation == EggOperationType::EOT_Shiny || m_programSettings.m_operation == EggOperationType::EOT_Multi || m_programSettings.m_operation == EggOperationType::EOT_Parent) && missingTarget)
                 {
                     emit printLog("Taking 5 filler Pokemon from Keep Box to party");
                     m_substage = SS_TakeFiller;
@@ -1482,8 +1599,8 @@ void SmartEggOperation::runNextState()
                     break;
                 }
 
-                // For parent mode after finishing, always take parent out
-                if (m_programSettings.m_operation == EggOperationType::EOT_Parent)
+                // For parent/multi mode after finishing, always take parent out
+                if (m_programSettings.m_operation == EggOperationType::EOT_Parent || m_programSettings.m_operation == EggOperationType::EOT_Multi)
                 {
                     m_programSettings.m_isHatchExtra = true;
                 }
@@ -1551,7 +1668,7 @@ void SmartEggOperation::runNextState()
             }
             else
             {
-                // force param to reset (mainly for parent mode)
+                // force param to reset (mainly for parent/multi mode)
                 m_programSettings.m_isHatchExtra = false;
                 m_hatchExtraEgg = false;
 

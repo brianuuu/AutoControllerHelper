@@ -16,6 +16,7 @@ public:
         EOT_Shiny,
         EOT_Remainder,
         EOT_Parent,
+        EOT_Multi,
         EOT_COUNT,
     };
 
@@ -130,6 +131,8 @@ private:
         SS_InitEmptyColumn,
         SS_InitOtherColumnsStart,
         SS_InitOtherColumns,
+        SS_InitParentBoxStart,
+        SS_InitParentBox,
         SS_InitCheckParent,
 
         // parent
@@ -181,7 +184,6 @@ private:
     bool m_initVerified = false;
 
     // collect
-    bool m_firstCollectCycle;
     int m_eggsCollected;
     int m_talkDialogAttempts;
     int m_eggCollectAttempts;
@@ -202,6 +204,9 @@ private:
     PokemonStatTable m_parentStat; // stats of current parent
     bool m_leaveParent; // are we going to leave a new parent next loop?
     bool m_natureMatched; // children should now have the same nature as parent
+
+    // multi
+    int m_multiParentIndex;
 
     // final
     bool m_videoCaptured; // have we taken a capture for this shiny yet?
