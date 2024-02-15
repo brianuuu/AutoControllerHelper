@@ -53,7 +53,17 @@ SmartDaySkipper::SmartDaySkipper
         }
 
         // this is not thread-safe, but should definitely be finished by the time we start using them
-        QtConcurrent::run(this, &SmartDaySkipper::loadImages);
+        m_concurrentStop = 0;
+        m_future = QtConcurrent::run(this, &SmartDaySkipper::loadImages);
+    }
+}
+
+SmartDaySkipper::~SmartDaySkipper()
+{
+    m_concurrentStop = 1;
+    if (m_future.isRunning())
+    {
+        m_future.waitForFinished();
     }
 }
 
@@ -257,7 +267,7 @@ void SmartDaySkipper::runNextState()
                 {
                     // test image concurrently
                     m_substage = SS_CheckPokemon;
-                    QtConcurrent::run(this, &SmartDaySkipper::testImages);
+                    m_future = QtConcurrent::run(this, &SmartDaySkipper::testImages);
                 }
             }
             else
@@ -455,6 +465,8 @@ void SmartDaySkipper::loadImages()
     {
         for (QString const& pokemon : PokemonDatabase::getList_SwShSprites())
         {
+            if (m_concurrentStop > 0) return;
+
             QImage img = QImage(QString(RESOURCES_PATH) + "PokemonSwSh/Silhouettes/" + pokemon + ".bmp");
             m_imageTests[pokemon] = (img.scaled(A_Sprite.m_rect.size()).convertToFormat(QImage::Format_MonoLSB, Qt::MonoOnly));
         }
@@ -467,6 +479,8 @@ void SmartDaySkipper::testImages()
     double maxRatio = 0.0;
     for (int i = 0; i < list.size(); i++)
     {
+        if (m_concurrentStop > 0) return;
+
         QImage const& img = m_imageTests[list[i]];
         double ratio = getImageMatch(A_Sprite.m_rect, C_Color_Black, img);
         if (ratio > maxRatio)
@@ -476,6 +490,7 @@ void SmartDaySkipper::testImages()
         }
     }
 
+    if (m_concurrentStop > 0) return;
     runNextStateContinue();
 }
 

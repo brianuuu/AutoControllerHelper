@@ -15,6 +15,7 @@ public:
             QLabel* estimateLabel,
             SmartProgramParameter parameter
             );
+    ~SmartDaySkipper();
 
     virtual SmartProgram getProgramEnum() { return SP_DaySkipper; }
 
@@ -95,6 +96,8 @@ private:
     static QMap<QString, QImage> m_imageTests; // cached only once
     bool m_isFound;
     int m_imageTestIndex;
+    QAtomicInt m_concurrentStop;
+    QFuture<void> m_future;
 
     QDateTime m_startDateTime;
 
