@@ -163,7 +163,7 @@ void SmartTradePartnerFinder::runNextState()
         }
         else if (state == S_CaptureReady)
         {
-            if (m_timer.elapsed() > 60000)
+            if (m_timer.elapsed() > 180000)
             {
                 setState_error("Unable to find any trading partner for too long");
             }
