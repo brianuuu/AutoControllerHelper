@@ -94,7 +94,7 @@ private:
     Command const C_COUNT           = 16;
 
     // List of test color
-    HSVRange const C_Color_Black = HSVRange(0,0,0,359,30,100); // >180
+    HSVRange const C_Color_Black = HSVRange(0,0,0,359,30,120); // >180
     HSVRange const C_Color_Grey = HSVRange(0,0,200,359,20,240); // >190
     HSVRange const C_Color_White = HSVRange(0,0,220,359,30,255); // >240
     HSVRange const C_Color_Box = HSVRange(50,170,220,110,255,255); // >240
