@@ -393,6 +393,46 @@ const QStringList &PokemonDatabase::getList_SwShSprites()
     return instance().m_list_SwShSprites;
 }
 
+const QStringList &PokemonDatabase::getList_SwShMaxLairRental()
+{
+    instance().getList("PokemonSwSh/MaxLair/Pokemon-Rental", instance().m_list_SwShMaxLairRental);
+    return instance().m_list_SwShMaxLairRental;
+}
+
+const QStringList &PokemonDatabase::getList_SwShMaxLairBoss()
+{
+    instance().getList("PokemonSwSh/MaxLair/Pokemon-Boss", instance().m_list_SwShMaxLairBoss);
+    return instance().m_list_SwShMaxLairBoss;
+}
+
+const PokemonDatabase::OCREntries PokemonDatabase::getEntries_SwShMaxLairRental(GameLanguage gameLanguage)
+{
+    return getEntries_PokedexSubList(gameLanguage, getList_SwShMaxLairRental());
+}
+
+const PokemonDatabase::OCREntries PokemonDatabase::getEntries_SwShMaxLairBoss(GameLanguage gameLanguage)
+{
+    return getEntries_PokedexSubList(gameLanguage, getList_SwShMaxLairBoss());
+}
+
+const PokemonDatabase::OCREntries &PokemonDatabase::getEntries_SwShMaxLairAbilities(GameLanguage gameLanguage)
+{
+    instance().getDatabase("PokemonSwSh/MaxLair/Abilities", gameLanguage, instance().m_database_SwShMaxLairAbilities);
+    return instance().m_database_SwShMaxLairAbilities[gameLanguage];
+}
+
+const PokemonDatabase::OCREntries &PokemonDatabase::getEntries_SwShMaxLairMoves(GameLanguage gameLanguage)
+{
+    instance().getDatabase("PokemonSwSh/MaxLair/Moves", gameLanguage, instance().m_database_SwShMaxLairMoves);
+    return instance().m_database_SwShMaxLairMoves[gameLanguage];
+}
+
+const PokemonDatabase::OCREntries &PokemonDatabase::getEntries_SwShMaxLairMaxMoves(GameLanguage gameLanguage)
+{
+    instance().getDatabase("PokemonSwSh/MaxLair/MaxMoves", gameLanguage, instance().m_database_SwShMaxLairMaxMoves);
+    return instance().m_database_SwShMaxLairMaxMoves[gameLanguage];
+}
+
 // -----------------------------------------------
 // Json functions
 // -----------------------------------------------

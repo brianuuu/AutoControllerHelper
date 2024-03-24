@@ -238,6 +238,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     ui->SP2_Frame_Hide->setVisible(false);
 
     SmartPLAStaticSpawn::populateStaticPokemon(ui->SP16_CB_StaticPokemon);
+    SmartMaxLair::populateMaxLairBoss(ui->SP21_CB_Boss);
 
     // Call this after all smart program values are set up above
     //ui->LW_SmartProgram->setCurrentRow(0);
@@ -2691,6 +2692,14 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     case SP_TradePartnerFinder:
     {
         m_smartProgram = new SmartTradePartnerFinder(ui->SP18_LE_Name->text(), ui->SP18_LE_LinkCode->text(), ui->SP18_CB_Spam->isChecked(), parameter);
+        break;
+    }
+    case SP_MaxLair:
+    {
+        SmartMaxLair::Settings settings;
+        settings.m_bossIndex = ui->SP21_CB_Boss->currentIndex();
+        settings.m_bossDownPress = ui->SP21_SB_Slot->value() - 1;
+        m_smartProgram = new SmartMaxLair(settings, parameter);
         break;
     }
     case SP_BDSP_Starter:

@@ -133,6 +133,9 @@ public:
 public:
     typedef QMap<QString, QStringList> OCREntries;
 
+    // Json functions
+    static bool readJson(QString const& path, QJsonObject &jsonObject);
+
     // String manipulation
     static QString stringRemoveNonAlphaNumeric(QString const& str);
     static QString normalizeString(QString const& str);
@@ -153,11 +156,16 @@ public:
 
     // Pokemon Sword & Shield
     static QStringList const& getList_SwShSprites();
+    static QStringList const& getList_SwShMaxLairRental();
+    static QStringList const& getList_SwShMaxLairBoss();
+    static OCREntries const getEntries_SwShMaxLairRental(GameLanguage gameLanguage);
+    static OCREntries const getEntries_SwShMaxLairBoss(GameLanguage gameLanguage);
+    static OCREntries const& getEntries_SwShMaxLairAbilities(GameLanguage gameLanguage);
+    static OCREntries const& getEntries_SwShMaxLairMoves(GameLanguage gameLanguage);
+    static OCREntries const& getEntries_SwShMaxLairMaxMoves(GameLanguage gameLanguage);
+
 private:
     typedef QMap<GameLanguage, OCREntries> Database;
-
-    // Json functions
-    static bool readJson(QString const& path, QJsonObject &jsonObject);
 
     // Helper Functions
     static bool getList(QString const& name, QStringList& list);
@@ -177,6 +185,11 @@ private:
 
     // Pokemon Sword & Shield
     QStringList m_list_SwShSprites;
+    QStringList m_list_SwShMaxLairRental;
+    QStringList m_list_SwShMaxLairBoss;
+    Database m_database_SwShMaxLairAbilities;
+    Database m_database_SwShMaxLairMoves;
+    Database m_database_SwShMaxLairMaxMoves;
 };
 
 #endif // POKEMONDATABASE_H

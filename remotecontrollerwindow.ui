@@ -1914,7 +1914,7 @@
                  </sizepolicy>
                 </property>
                 <property name="currentIndex">
-                 <number>20</number>
+                 <number>21</number>
                 </property>
                 <widget class="QWidget" name="page">
                  <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1946,8 +1946,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>384</width>
-                       <height>64</height>
+                       <width>498</width>
+                       <height>210</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -2561,8 +2561,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>279</width>
+                       <height>102</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -2694,8 +2694,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>120</width>
+                       <height>66</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -2816,8 +2816,8 @@ Some programs may require settings like &quot;Game Language&quot; or
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>405</width>
+                       <height>203</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -5136,6 +5136,117 @@ Enter Trade Partner Name:</string>
                       </item>
                       <item>
                        <spacer name="verticalSpacer_19">
+                        <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>20</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </widget>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+                <widget class="QWidget" name="page_21">
+                 <layout class="QVBoxLayout" name="verticalLayout_52">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QScrollArea" name="scrollArea_23">
+                    <property name="frameShape">
+                     <enum>QFrame::Panel</enum>
+                    </property>
+                    <property name="lineWidth">
+                     <number>2</number>
+                    </property>
+                    <property name="widgetResizable">
+                     <bool>true</bool>
+                    </property>
+                    <widget class="QWidget" name="scrollAreaWidgetContents_23">
+                     <property name="geometry">
+                      <rect>
+                       <x>0</x>
+                       <y>0</y>
+                       <width>498</width>
+                       <height>210</height>
+                      </rect>
+                     </property>
+                     <layout class="QVBoxLayout" name="verticalLayout_53">
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_19">
+                        <item>
+                         <widget class="QLabel" name="label_91">
+                          <property name="text">
+                           <string>Boss:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QComboBox" name="SP21_CB_Boss">
+                          <property name="minimumSize">
+                           <size>
+                            <width>100</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_92">
+                          <property name="text">
+                           <string>    Slot:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSpinBox" name="SP21_SB_Slot">
+                          <property name="minimumSize">
+                           <size>
+                            <width>40</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                          <property name="minimum">
+                           <number>1</number>
+                          </property>
+                          <property name="maximum">
+                           <number>3</number>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <spacer name="horizontalSpacer_27">
+                          <property name="orientation">
+                           <enum>Qt::Horizontal</enum>
+                          </property>
+                          <property name="sizeHint" stdset="0">
+                           <size>
+                            <width>40</width>
+                            <height>20</height>
+                           </size>
+                          </property>
+                         </spacer>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <spacer name="verticalSpacer_20">
                         <property name="orientation">
                          <enum>Qt::Vertical</enum>
                         </property>

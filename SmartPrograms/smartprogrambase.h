@@ -43,6 +43,7 @@ enum SmartProgram : uint32_t
     SP_EggOperation,
     SP_BoxRelease,
     SP_TradePartnerFinder,
+    SP_MaxLair,
 
     SP_BDSP_Starter,
     SP_BDSP_MenuGlitch113,
@@ -167,6 +168,7 @@ public:
             case SP_EggOperation:           return "Egg Operation";
             case SP_BoxRelease:             return "Box Release";
             case SP_TradePartnerFinder:     return "Trade Partner Finder";
+            case SP_MaxLair:                return "Auto Dynamax Adventure";
 
             case SP_BDSP_Starter:           return "Reset Starter";
             case SP_BDSP_MenuGlitch113:     return "Menu Glitch v1.1.3";
@@ -244,6 +246,7 @@ public:
             case SP_EggOperation:           return "SmartEggOperation";
             case SP_BoxRelease:             return "SmartBoxReleases";
             case SP_TradePartnerFinder:     return "SmartTradePartnerFinder";
+            case SP_MaxLair:                return "SmartMaxLair";
 
             case SP_BDSP_Starter:           return "SmartBDSPStarter";
             case SP_BDSP_MenuGlitch113:     return "SmartBDSPMenuGlitch113";
@@ -309,6 +312,7 @@ public:
             case SP_EggOperation:           return 20;
             case SP_BoxRelease:             return 4;
             case SP_TradePartnerFinder:     return 18;
+            case SP_MaxLair:                return 21;
 
             case SP_BDSP_Starter:           return 7;
             case SP_BDSP_MenuGlitch113:     return 0;
@@ -381,6 +385,7 @@ public:
 
         case SP_SurpriseTrade:
         case SP_EggOperation:
+        // TODO: case SP_MaxLair:
 
         case SP_BDSP_Starter:
         case SP_BDSP_ShinyLegendary:
