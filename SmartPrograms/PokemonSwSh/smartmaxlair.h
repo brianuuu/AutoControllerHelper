@@ -34,12 +34,18 @@ private:
     virtual void reset();
     virtual void runNextState();
 
+    void resetBattleParams(bool isBeginning);
+
     // Command indices
 
     // List of test color
     HSVRange const C_Color_Black = HSVRange(0,0,0,359,30,120); // >180
     HSVRange const C_Color_TextB = HSVRange(0,0,0,359,30,150); // for black text OCR
     HSVRange const C_Color_TextW = HSVRange(0,0,150,359,30,255); // for white text OCR
+    HSVRange const C_Color_RStick = HSVRange(0,0,180,359,30,255);
+    HSVRange const C_Color_Fight = HSVRange(300,100,100,355,255,255); // >80
+    HSVRange const C_Color_Cheer = HSVRange(160,100,100,220,255,255); // >60
+    HSVRange const C_Color_Dynamax = HSVRange(0,0,220,359,100,255);
 
     // List of test point/area
     CaptureArea const A_Selection[4] =
@@ -79,6 +85,24 @@ private:
         CaptureArea(906,297,250,32),
         CaptureArea(906,483,250,32)
     };
+    CaptureArea const A_RStick = CaptureArea(1157,638,40,40);
+    CaptureArea const A_Fight = CaptureArea(1188,488,63,63);
+    CapturePoint const P_Pokemon = CapturePoint(1050,597);
+    CapturePoint const P_Run = CapturePoint(1050,674);
+    CapturePoint const A_Trainers[4] =
+    {
+        CapturePoint(318,460),
+        CapturePoint(619,460),
+        CapturePoint(920,460),
+        CapturePoint(1221,460)
+    };
+    CaptureArea const A_Opponent = CaptureArea(265,70,360,54);
+    CaptureArea const A_OpponentTypes[2] =
+    {
+        CaptureArea(304,126,96,28),
+        CaptureArea(448,126,96,28)
+    };
+    CaptureArea const A_Dynamax = CaptureArea(734,566,52,39);
 
     // Substages
     enum Substage
@@ -91,6 +115,10 @@ private:
 
         SS_RentalSelect,
         SS_FindPath,
+        SS_Battle,
+        SS_Fight,
+        SS_Target,
+        SS_CheckOpponent,
     };
     Substage m_substage;
 
@@ -101,6 +129,7 @@ private:
         int m_stats[ST_COUNT];
         QVector<int> m_moves;
         QVector<int> m_maxMoves;
+        MoveType m_types[2];
     };
     typedef QPair<QString, RentalData> IDRentalPair;
     static QVector<IDRentalPair> m_bossData;
@@ -111,8 +140,10 @@ private:
 
     struct MoveData
     {
+        QString m_name;
         int m_pp;
         int m_power;
+        MoveType m_type;
         double m_accuracy;
         double m_factor;
         bool m_isSpecial;
@@ -123,14 +154,28 @@ private:
     QElapsedTimer m_timer;
     Settings m_programSettings;
     int m_ocrIndex;
+    QImage m_imageMatch_RStick;
+    QImage m_imageMatch_Dynamax;
 
     struct RentalSearch
     {
         QString m_name;
         QString m_ability;
         int m_firstMove;
+        MoveType m_types[2];
     };
     QVector<RentalSearch> m_rentalSearch;
+    QVector<MoveData> m_rentalMoveData;
+    int m_rentalIndex;
+    RentalSearch m_opponentSearch;
+    int m_opponentIndex;
+
+    // battle
+    bool m_checkOpponent;
+    int m_battleCount;
+    int m_turnCount;
+    int m_dynamaxCount;
+    int m_cursorPos;
 
     // Stats
     Stat m_statError;

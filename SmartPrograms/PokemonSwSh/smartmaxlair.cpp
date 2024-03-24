@@ -66,6 +66,26 @@ void SmartMaxLair::reset()
     SmartProgramBase::reset();
 
     m_substage = SS_Init;
+    setImageMatchFromResource("SwSh_RStick", m_imageMatch_RStick);
+    setImageMatchFromResource("SwSh_Dynamax", m_imageMatch_Dynamax);
+
+    resetBattleParams(true);
+}
+
+void SmartMaxLair::resetBattleParams(bool isBeginning)
+{
+    m_checkOpponent = false;
+    m_turnCount = 0;
+    m_dynamaxCount = -1; // -1: can dynamax, >=0: dynamax turns remain
+    m_cursorPos = 0; // first move
+
+    if (isBeginning)
+    {
+        m_battleCount = 0;
+        m_rentalMoveData.clear();
+        m_rentalIndex = -1;
+        m_opponentIndex = -1;
+    }
 }
 
 void SmartMaxLair::runNextState()
@@ -78,11 +98,27 @@ void SmartMaxLair::runNextState()
         initStat(m_statError, "Errors");
         m_timer.restart();
 
-        bool testRentalSelect = true;
+        bool testRentalSelect = false;
         if (testRentalSelect)
         {
             m_substage = SS_RentalSelect;
             setState_frameAnalyzeRequest();
+            break;
+        }
+
+        bool testFindPath = false;
+        if (testFindPath)
+        {
+            m_substage = SS_FindPath;
+            setState_runCommand("Nothing,10");
+            break;
+        }
+
+        bool testBattle = false;
+        if (testBattle)
+        {
+            m_substage = SS_Battle;
+            setState_runCommand("Nothing,10");
             break;
         }
 
@@ -111,6 +147,7 @@ void SmartMaxLair::runNextState()
         {
             if (checkBrightnessMeanTarget(A_Selection[1].m_rect, C_Color_Black, 180))
             {
+                resetBattleParams(true);
                 m_substage = SS_BossSelect;
                 m_videoManager->setAreas({A_Selection[0], A_Selection[1], A_Selection[2]});
             }
@@ -284,6 +321,9 @@ void SmartMaxLair::runNextState()
                 m_ocrIndex++;
                 if (m_ocrIndex == 9)
                 {
+                    m_rentalIndex = -1;
+                    QVector<int> rentalIndices(3, -1);
+
                     QString id;
                     int selectIndex = -1;
                     double maxScore = 0;
@@ -297,11 +337,13 @@ void SmartMaxLair::runNextState()
                         }
 
                         bool found = false;
-                        for (IDRentalPair const& idPair : m_rentalData)
+                        for (int j = 0; j < m_rentalData.size(); j++)
                         {
+                            IDRentalPair const& idPair = m_rentalData[j];
                             RentalData const& data = idPair.second;
                             if (data.m_name == search.m_name && data.m_moves.at(0) == search.m_firstMove && data.m_ability == search.m_ability)
                             {
+                                rentalIndices[i] = j;
                                 id = idPair.first;
                                 found = true;
                                 break;
@@ -342,9 +384,16 @@ void SmartMaxLair::runNextState()
 
                         m_substage = SS_FindPath;
                         setState_runCommand(command);
-
-                        m_timer.restart();
                         m_videoManager->clearCaptures();
+
+                        // grab rental pokemon's move data
+                        m_rentalMoveData.clear();
+                        m_rentalIndex = rentalIndices[selectIndex];
+                        RentalData const& data = m_rentalData[m_rentalIndex].second;
+                        for (int const& moveID : data.m_moves)
+                        {
+                            m_rentalMoveData.push_back(m_moveData[moveID]);
+                        }
                     }
                     else
                     {
@@ -365,11 +414,282 @@ void SmartMaxLair::runNextState()
         if (state == S_CommandFinished)
         {
             setState_frameAnalyzeRequest();
+
+            m_timer.restart();
+            m_videoManager->setAreas({A_RStick});
         }
         else if (state == S_CaptureReady)
         {
-            // TODO:
-            setState_completed();
+            if (m_timer.elapsed() > 30000)
+            {
+                incrementStat(m_statError);
+                setState_error("Unable to detect pick path sequence");
+            }
+            else if (checkImageMatchTarget(A_RStick.m_rect, C_Color_RStick, m_imageMatch_RStick, 0.5))
+            {
+                m_checkOpponent = false;
+                emit printLog("Picking path...");
+
+                m_substage = SS_Battle;
+                setState_runCommand("A,1,Nothing,40");
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
+            }
+        }
+        break;
+    }
+    case SS_Battle:
+    {
+        if (state == S_CommandFinished)
+        {
+            // TODO: detect berries, scientist, backpacker
+            // TODO: detect catch screen
+            // TODO: detect defeat screen
+            setState_runCommand("BSpam,2,Loop,0", true);
+
+            m_timer.restart();
+            m_videoManager->setPoints({P_Pokemon,P_Run});
+            m_videoManager->setAreas({A_Fight});
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (m_timer.elapsed() > 120000)
+            {
+                incrementStat(m_statError);
+                setState_error("No detection for too long");
+            }
+            else if (checkPixelColorMatch(P_Pokemon.m_point, QColor(253,253,253)) && checkPixelColorMatch(P_Run.m_point, QColor(253,253,253)))
+            {
+                if (checkBrightnessMeanTarget(A_Fight.m_rect, C_Color_Fight, 80))
+                {
+                    m_videoManager->clearCaptures();
+                    if (!m_checkOpponent)
+                    {
+                        m_battleCount++;
+                        emit printLog("Battle " + QString::number(m_battleCount) + " started!", LOG_IMPORTANT);
+
+                        if (m_battleCount < 4)
+                        {
+                            emit printLog("Checking opponent...");
+                            m_substage = SS_Target;
+                            setState_runCommand("Y,1,Nothing,20");
+                            m_videoManager->setPoints({A_Trainers[0], A_Trainers[1], A_Trainers[2], A_Trainers[3]});
+                            break;
+                        }
+                        else
+                        {
+                            m_checkOpponent = true;
+                        }
+                    }
+
+                    // Fight
+                    m_substage = SS_Fight;
+                    setState_runCommand("A,1,Nothing,40");
+
+                    m_turnCount++;
+                    if (m_dynamaxCount > 0)
+                    {
+                        m_dynamaxCount--;
+                    }
+                    else if (m_dynamaxCount == -1)
+                    {
+                        m_videoManager->setAreas({A_Dynamax});
+                    }
+                }
+                else if (checkBrightnessMeanTarget(A_Fight.m_rect, C_Color_Cheer, 60))
+                {
+                    emit printLog("Turn " + QString::number(m_turnCount) + ": Cheering...");
+                    setState_runCommand("ASpam,10,BSpam,100");
+
+                    if (m_dynamaxCount > 0)
+                    {
+                        // died during dynamax
+                        m_dynamaxCount = 0;
+                    }
+                    m_turnCount++;
+                    m_videoManager->clearCaptures();
+                }
+                else
+                {
+                    setState_frameAnalyzeRequest();
+                }
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
+            }
+        }
+        break;
+    }
+    case SS_Fight:
+    {
+        if (state == S_CommandFinished)
+        {
+            setState_frameAnalyzeRequest();
+        }
+        else if (state == S_CaptureReady)
+        {
+            // Check if we can dynamax
+            QString command;
+            if (m_dynamaxCount == -1 && checkImageMatchTarget(A_Dynamax.m_rect, C_Color_Dynamax, m_imageMatch_Dynamax, 0.5))
+            {
+                m_dynamaxCount = 3;
+                command = "DLeft,1,A,1,Nothing,10,Loop,1,";
+            }
+
+            // TODO: Calculate best move to use
+            int moveToUse = 0;
+            if (moveToUse > m_cursorPos)
+            {
+                command += "DDown,1,Loop," + QString::number(moveToUse - m_cursorPos);
+            }
+            else if (moveToUse < m_cursorPos)
+            {
+                command += "DUp,1,Loop," + QString::number(m_cursorPos - moveToUse);
+            }
+            else
+            {
+                command += "A,1,Nothing,20";
+            }
+
+            m_cursorPos = moveToUse;
+            m_rentalMoveData[moveToUse].m_pp--;
+
+            // grab data to print...
+            RentalData const& rentalData = m_rentalData[m_rentalIndex].second;
+            int const moveID = m_dynamaxCount > 0 ? rentalData.m_maxMoves[moveToUse] : rentalData.m_moves[moveToUse];
+            MoveData const& moveData = m_moveData[moveID];
+            emit printLog("Turn " + QString::number(m_turnCount) + ": Using " + moveData.m_name + " (Score = " + QString::number(0) + ")");
+
+            m_substage = SS_Target;
+            setState_runCommand(command);
+        }
+        break;
+    }
+    case SS_Target:
+    {
+        if (state == S_CommandFinished)
+        {
+            setState_frameAnalyzeRequest();
+            m_timer.restart();
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (m_timer.elapsed() > 5000)
+            {
+                // TODO: use 2nd best move, can be disabled/tormented
+                incrementStat(m_statError);
+                setState_error("Unable to detect target select menu");
+            }
+            else if (checkPixelColorMatch(A_Trainers[0].m_point, QColor(0,0,0))
+                  && checkPixelColorMatch(A_Trainers[1].m_point, QColor(0,0,0))
+                  && checkPixelColorMatch(A_Trainers[2].m_point, QColor(0,0,0))
+                  && checkPixelColorMatch(A_Trainers[3].m_point, QColor(0,0,0)))
+            {
+                if (m_checkOpponent)
+                {
+                    // use move on default target
+                    m_substage = SS_Battle;
+                    setState_runCommand("ASpam,10,BSpam,100");
+                }
+                else
+                {
+                    m_substage = SS_CheckOpponent;
+                    setState_runCommand("DUp,1,A,1,Nothing,40");
+                }
+                m_videoManager->clearCaptures();
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
+            }
+        }
+        break;
+    }
+    case SS_CheckOpponent:
+    {
+        if (state == S_CommandFinished)
+        {
+            m_ocrIndex = 0;
+            setState_ocrRequest(A_Opponent.m_rect, C_Color_TextB);
+
+            m_opponentSearch.m_types[0] = MT_COUNT;
+            m_opponentSearch.m_types[1] = MT_COUNT;
+            m_videoManager->setAreas({A_Opponent, A_OpponentTypes[0], A_OpponentTypes[1]});
+        }
+        else if (state == S_OCRReady)
+        {
+            if (m_ocrIndex == 0)
+            {
+                // Name OCR
+                QString const result = matchStringDatabase(m_allRentalEntries);
+                if (result.isEmpty())
+                {
+                    incrementStat(m_statError);
+                    setState_error("Rental Pokemon entry not found");
+                    break;
+                }
+
+                m_opponentSearch.m_name = result;
+                setState_ocrRequest(A_OpponentTypes[0].m_rect, C_Color_TextW);
+            }
+            else
+            {
+                // Type OCR
+                PokemonDatabase::OCREntries const& entries = PokemonDatabase::getEntries_PokemonTypes(m_settings->getGameLanguage());
+                QString const result = matchStringDatabase(entries);
+                if (result.isEmpty())
+                {
+                    incrementStat(m_statError);
+                    emit printLog("Type entry not found", LOG_ERROR);
+                }
+
+                m_opponentSearch.m_types[m_ocrIndex - 1] = PokemonDatabase::getMoveTypeFromString(result);
+                if (m_ocrIndex == 2)
+                {
+                    m_opponentIndex = -1;
+                    for (int i = 0; i < m_rentalData.size(); i++)
+                    {
+                        IDRentalPair const& idPair = m_rentalData[i];
+                        RentalData const& data = idPair.second;
+                        if (data.m_name == m_opponentSearch.m_name)
+                        {
+                            m_opponentIndex = i;
+                            if (m_opponentSearch.m_types[0] == MT_COUNT)
+                            {
+                                // language does not support type search
+                                break;
+                            }
+                            else if (data.m_types[0] == m_opponentSearch.m_types[0] && data.m_types[1] == m_opponentSearch.m_types[1])
+                            {
+                                break;
+                            }
+                        }
+                    }
+
+                    if (m_opponentIndex >= 0)
+                    {
+                        emit printLog("Opponent: " + m_rentalData[m_opponentIndex].second.m_name, LOG_IMPORTANT);
+
+                        m_substage = SS_Battle;
+                        setState_runCommand("BSpam,2");
+                        m_checkOpponent = true;
+                    }
+                    else
+                    {
+                        incrementStat(m_statError);
+                        setState_error("Unable to detect opponent Pokemon");
+                    }
+                }
+                else
+                {
+                    setState_ocrRequest(A_OpponentTypes[1].m_rect, C_Color_TextW);
+                }
+            }
+
+            m_ocrIndex++;
         }
         break;
     }
@@ -436,6 +756,8 @@ bool SmartMaxLair::populateMaxLairRentalBossData()
             //qDebug() << it.key();
             list.push_back(IDRentalPair(it.key(), RentalData()));
             RentalData& data = list[list.size() - 1].second;
+            data.m_types[0] = MT_COUNT;
+            data.m_types[1] = MT_COUNT;
 
             QJsonObject dataObject = it.value().toObject();
             for (auto itData = dataObject.begin(); itData != dataObject.end(); ++itData)
@@ -476,6 +798,15 @@ bool SmartMaxLair::populateMaxLairRentalBossData()
                         data.m_maxMoves.push_back(value.toInt());
                     }
                 }
+                else if (itData.key() == "types")
+                {
+                    int index = 0;
+                    for (QJsonValueRef value : itData.value().toArray())
+                    {
+                        //qDebug() << "types" << index << ":" << value.toString();
+                        data.m_types[index++] = PokemonDatabase::getMoveTypeFromString(value.toString());
+                    }
+                }
             }
         }
 
@@ -506,7 +837,12 @@ bool SmartMaxLair::populateMaxLairMoveData()
         QJsonObject dataObject = it.value().toObject();
         for (auto itData = dataObject.begin(); itData != dataObject.end(); ++itData)
         {
-            if (itData.key() == "pp")
+            if (itData.key() == "id")
+            {
+                data.m_name = itData.value().toString();
+                //qDebug() << "id" << data.m_name;
+            }
+            else if (itData.key() == "pp")
             {
                 data.m_pp = itData.value().toInt();
                 //qDebug() << "pp" << data.m_pp;
@@ -530,6 +866,11 @@ bool SmartMaxLair::populateMaxLairMoveData()
             {
                 data.m_isSpecial = itData.value().toString() == "special";
                 //qDebug() << "isSpecial" << data.m_isSpecial;
+            }
+            else if (itData.key() == "type")
+            {
+                data.m_type = PokemonDatabase::getMoveTypeFromString(itData.value().toString());
+                //qDebug() << "type" << itData.value().toString();
             }
         }
     }

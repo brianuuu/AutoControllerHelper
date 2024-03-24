@@ -109,6 +109,30 @@ enum ShinyType : uint8_t
     SPT_COUNT
 };
 
+enum MoveType : uint8_t
+{
+    MT_Bug,
+    MT_Dark,
+    MT_Dragon,
+    MT_Electric,
+    MT_Fairy,
+    MT_Fighting,
+    MT_Fire,
+    MT_Flying,
+    MT_Ghost,
+    MT_Grass,
+    MT_Ground,
+    MT_Ice,
+    MT_Normal,
+    MT_Poison,
+    MT_Psychic,
+    MT_Rock,
+    MT_Steel,
+    MT_Water,
+
+    MT_COUNT
+};
+
 class PokemonDatabase
 {
 private:
@@ -124,6 +148,7 @@ public:
     static QString getNatureTypeName(NatureType type, bool fullName);
     static QString getGenderTypeName(GenderType type);
     static QString getShinyTypeName(ShinyType type);
+    static MoveType getMoveTypeFromString(QString const& type);
 
     // PLA Enums
     static QString PLAAreaTypeToString(PLAAreaType type);
@@ -143,6 +168,7 @@ public:
     // Pokemon
     static NatureType getNatureFromStats(StatType inc, StatType dec);
     static OCREntries const& getEntries_PokemonIV(GameLanguage gameLanguage);
+    static OCREntries const& getEntries_PokemonTypes(GameLanguage gameLanguage);
     static QStringList const& getList_PokeBalls();
 
     // Pokedex
@@ -173,7 +199,8 @@ private:
 
 private:
     // Pokemon
-    Database m_database_PokedexIV;
+    Database m_database_PokemonIV;
+    Database m_database_PokemonTypes;
     QStringList m_list_Pokeballs;
 
     // Pokedex

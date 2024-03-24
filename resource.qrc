@@ -7,5 +7,7 @@
         <file>ImageMatch/PLA_RoyalWyrdeer.bmp</file>
         <file>ImageMatch/PLA_RoyalBraviary.bmp</file>
         <file>ImageMatch/PLA_Shiny.bmp</file>
+        <file>ImageMatch/SwSh_RStick.bmp</file>
+        <file>ImageMatch/SwSh_Dynamax.bmp</file>
     </qresource>
 </RCC>

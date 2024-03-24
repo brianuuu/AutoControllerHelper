@@ -128,6 +128,30 @@ QString PokemonDatabase::getShinyTypeName(ShinyType type)
     }
 }
 
+MoveType PokemonDatabase::getMoveTypeFromString(const QString &type)
+{
+    if (type == "bug") return MT_Bug;
+    if (type == "dark") return MT_Dark;
+    if (type == "dragon") return MT_Dragon;
+    if (type == "electric") return MT_Electric;
+    if (type == "fairy") return MT_Fairy;
+    if (type == "fighting") return MT_Fighting;
+    if (type == "fire") return MT_Fire;
+    if (type == "flying") return MT_Flying;
+    if (type == "ghost") return MT_Ghost;
+    if (type == "grass") return MT_Grass;
+    if (type == "ground") return MT_Ground;
+    if (type == "ice") return MT_Ice;
+    if (type == "normal") return MT_Normal;
+    if (type == "poison") return MT_Poison;
+    if (type == "psychic") return MT_Psychic;
+    if (type == "rock") return MT_Rock;
+    if (type == "steel") return MT_Steel;
+    if (type == "water") return MT_Water;
+
+    return MT_COUNT;
+}
+
 QString PokemonDatabase::PLAAreaTypeToString(PLAAreaType type)
 {
     switch (type)
@@ -328,8 +352,14 @@ NatureType PokemonDatabase::getNatureFromStats(StatType inc, StatType dec)
 
 const PokemonDatabase::OCREntries &PokemonDatabase::getEntries_PokemonIV(GameLanguage gameLanguage)
 {
-    instance().getDatabase("PokemonCommon/PokemonIV", gameLanguage, instance().m_database_PokedexIV);
-    return instance().m_database_PokedexIV[gameLanguage];
+    instance().getDatabase("PokemonCommon/PokemonIV", gameLanguage, instance().m_database_PokemonIV);
+    return instance().m_database_PokemonIV[gameLanguage];
+}
+
+const PokemonDatabase::OCREntries &PokemonDatabase::getEntries_PokemonTypes(GameLanguage gameLanguage)
+{
+    instance().getDatabase("PokemonCommon/PokemonTypes", gameLanguage, instance().m_database_PokemonTypes);
+    return instance().m_database_PokemonTypes[gameLanguage];
 }
 
 const QStringList &PokemonDatabase::getList_PokeBalls()
