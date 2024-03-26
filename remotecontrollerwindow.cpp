@@ -238,7 +238,9 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     ui->SP2_Frame_Hide->setVisible(false);
 
     SmartPLAStaticSpawn::populateStaticPokemon(ui->SP16_CB_StaticPokemon);
-    SmartMaxLair::populateMaxLairBoss(ui->SP21_CB_Boss);
+    SmartMaxLair::populateMaxLairBoss(ui->SP21_CB_Legend);
+    PokemonDatabase::populatePokeballs(ui->SP21_CB_LegendBall);
+    PokemonDatabase::populatePokeballs(ui->SP21_CB_BossBall);
 
     // Call this after all smart program values are set up above
     //ui->LW_SmartProgram->setCurrentRow(0);
@@ -2697,8 +2699,10 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     case SP_MaxLair:
     {
         SmartMaxLair::Settings settings;
-        settings.m_bossIndex = ui->SP21_CB_Boss->currentIndex();
-        settings.m_bossDownPress = ui->SP21_SB_Slot->value() - 1;
+        settings.m_legendIndex = ui->SP21_CB_Legend->currentIndex();
+        settings.m_legendDownPress = ui->SP21_SB_Slot->value() - 1;
+        settings.m_legendBall = (BallType)ui->SP21_CB_LegendBall->currentIndex();
+        settings.m_bossBall = (BallType)ui->SP21_CB_BossBall->currentIndex();
         m_smartProgram = new SmartMaxLair(settings, parameter);
         break;
     }

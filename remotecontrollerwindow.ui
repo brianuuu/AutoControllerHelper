@@ -1946,8 +1946,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>384</width>
+                       <height>64</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -3000,8 +3000,8 @@ check the manual</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>318</width>
+                       <height>56</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_19">
@@ -3101,8 +3101,8 @@ check the manual</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>289</width>
+                       <height>57</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_22">
@@ -3205,8 +3205,8 @@ check the manual</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>392</width>
+                       <height>137</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_24">
@@ -3408,7 +3408,7 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>488</width>
+                       <width>389</width>
                        <height>259</height>
                       </rect>
                      </property>
@@ -3643,8 +3643,8 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>262</width>
+                       <height>84</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_29">
@@ -3799,8 +3799,8 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>274</width>
+                       <height>186</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_31">
@@ -3925,8 +3925,8 @@ If the list doesn't have the specific Pokemon, select Others.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>352</width>
+                       <height>80</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_33">
@@ -4037,8 +4037,8 @@ If the list doesn't have the specific Pokemon, select Others.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>397</width>
+                       <height>68</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_35">
@@ -4102,8 +4102,8 @@ Autofill is available, if the Pokemon is not in the list, it's not a Mass Outbre
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>349</width>
+                       <height>128</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_37">
@@ -4250,8 +4250,8 @@ For Pokemon HOME, you will need at least 36 boxes for up to No. 1080.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>198</width>
+                       <height>35</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_41">
@@ -4311,8 +4311,8 @@ For Pokemon HOME, you will need at least 36 boxes for up to No. 1080.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>224</width>
+                       <height>63</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_43">
@@ -4406,8 +4406,8 @@ For Pokemon HOME, you will need at least 36 boxes for up to No. 1080.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>238</width>
+                       <height>67</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_45">
@@ -4532,8 +4532,8 @@ For Pokemon HOME, you will need at least 36 boxes for up to No. 1080.</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>357</width>
+                       <height>160</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_47">
@@ -4623,8 +4623,8 @@ Enter Trade Partner Name:</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>380</width>
+                       <height>183</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_49">
@@ -4884,7 +4884,7 @@ Enter Trade Partner Name:</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>488</width>
+                       <width>371</width>
                        <height>245</height>
                       </rect>
                      </property>
@@ -5193,12 +5193,12 @@ Enter Trade Partner Name:</string>
                         <item>
                          <widget class="QLabel" name="label_91">
                           <property name="text">
-                           <string>Boss:</string>
+                           <string>Legendary:</string>
                           </property>
                          </widget>
                         </item>
                         <item>
-                         <widget class="QComboBox" name="SP21_CB_Boss">
+                         <widget class="QComboBox" name="SP21_CB_Legend">
                           <property name="minimumSize">
                            <size>
                             <width>100</width>
@@ -5232,6 +5232,57 @@ Enter Trade Partner Name:</string>
                         </item>
                         <item>
                          <spacer name="horizontalSpacer_27">
+                          <property name="orientation">
+                           <enum>Qt::Horizontal</enum>
+                          </property>
+                          <property name="sizeHint" stdset="0">
+                           <size>
+                            <width>40</width>
+                            <height>20</height>
+                           </size>
+                          </property>
+                         </spacer>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_57">
+                        <item>
+                         <widget class="QLabel" name="label_93">
+                          <property name="text">
+                           <string>Legendary Ball:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QComboBox" name="SP21_CB_LegendBall">
+                          <property name="minimumSize">
+                           <size>
+                            <width>100</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_94">
+                          <property name="text">
+                           <string>    Boss Ball:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QComboBox" name="SP21_CB_BossBall">
+                          <property name="minimumSize">
+                           <size>
+                            <width>100</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <spacer name="horizontalSpacer_28">
                           <property name="orientation">
                            <enum>Qt::Horizontal</enum>
                           </property>

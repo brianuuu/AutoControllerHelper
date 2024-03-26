@@ -3,6 +3,7 @@
 
 #include "autocontrollerdefines.h"
 
+#include <QComboBox>
 #include <QDebug>
 #include <QFile>
 #include <QJsonArray>
@@ -133,6 +134,39 @@ enum MoveType : uint8_t
     MT_COUNT
 };
 
+enum BallType: uint8_t
+{
+    BT_Beast,
+    BT_Cherish,
+    BT_Dive,
+    BT_Dream,
+    BT_Dusk,
+    BT_Fast,
+    BT_Friend,
+    BT_Great,
+    BT_Heal,
+    BT_Heavy,
+    BT_Level,
+    BT_Love,
+    BT_Lure,
+    BT_Luxury,
+    BT_Master,
+    BT_Moon,
+    BT_Nest,
+    BT_Net,
+    BT_Park,
+    BT_Poke,
+    BT_Premier,
+    BT_Quick,
+    BT_Repeat,
+    BT_Safari,
+    BT_Sport,
+    BT_Timer,
+    BT_Ultra,
+
+    BT_COUNT
+};
+
 class PokemonDatabase
 {
 private:
@@ -149,6 +183,7 @@ public:
     static QString getGenderTypeName(GenderType type);
     static QString getShinyTypeName(ShinyType type);
     static MoveType getMoveTypeFromString(QString const& type);
+    static BallType getBallTypeFromString(QString const& type);
 
     // PLA Enums
     static QString PLAAreaTypeToString(PLAAreaType type);
@@ -169,7 +204,9 @@ public:
     static NatureType getNatureFromStats(StatType inc, StatType dec);
     static OCREntries const& getEntries_PokemonIV(GameLanguage gameLanguage);
     static OCREntries const& getEntries_PokemonTypes(GameLanguage gameLanguage);
-    static QStringList const& getList_PokeBalls();
+    static OCREntries const& getEntries_Pokeballs(GameLanguage gameLanguage);
+    static QStringList const& getList_Pokeballs();
+    static void populatePokeballs(QComboBox* cb);
 
     // Pokedex
     static OCREntries const& getEntries_PokedexNational(GameLanguage gameLanguage);
@@ -201,6 +238,7 @@ private:
     // Pokemon
     Database m_database_PokemonIV;
     Database m_database_PokemonTypes;
+    Database m_database_Pokeballs;
     QStringList m_list_Pokeballs;
 
     // Pokedex

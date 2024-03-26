@@ -152,6 +152,39 @@ MoveType PokemonDatabase::getMoveTypeFromString(const QString &type)
     return MT_COUNT;
 }
 
+BallType PokemonDatabase::getBallTypeFromString(const QString &type)
+{
+    if (type == "beast-ball") return BT_Beast;
+    if (type == "cherish-ball") return BT_Cherish;
+    if (type == "dive-ball") return BT_Dive;
+    if (type == "dream-ball") return BT_Dream;
+    if (type == "dusk-ball") return BT_Dusk;
+    if (type == "fast-ball") return BT_Fast;
+    if (type == "friend-ball") return BT_Friend;
+    if (type == "great-ball") return BT_Great;
+    if (type == "heal-ball") return BT_Heal;
+    if (type == "heavy-ball") return BT_Heavy;
+    if (type == "level-ball") return BT_Level;
+    if (type == "love-ball") return BT_Love;
+    if (type == "lure-ball") return BT_Lure;
+    if (type == "luxury-ball") return BT_Luxury;
+    if (type == "master-ball") return BT_Master;
+    if (type == "moon-ball") return BT_Moon;
+    if (type == "nest-ball") return BT_Nest;
+    if (type == "net-ball") return BT_Net;
+    if (type == "park-ball") return BT_Park;
+    if (type == "poke-ball") return BT_Poke;
+    if (type == "premier-ball") return BT_Premier;
+    if (type == "quick-ball") return BT_Quick;
+    if (type == "repeat-ball") return BT_Repeat;
+    if (type == "safari-ball") return BT_Safari;
+    if (type == "sport-ball") return BT_Sport;
+    if (type == "timer-ball") return BT_Timer;
+    if (type == "ultra-ball") return BT_Ultra;
+
+    return BT_COUNT;
+}
+
 QString PokemonDatabase::PLAAreaTypeToString(PLAAreaType type)
 {
     switch (type)
@@ -362,10 +395,25 @@ const PokemonDatabase::OCREntries &PokemonDatabase::getEntries_PokemonTypes(Game
     return instance().m_database_PokemonTypes[gameLanguage];
 }
 
-const QStringList &PokemonDatabase::getList_PokeBalls()
+const PokemonDatabase::OCREntries &PokemonDatabase::getEntries_Pokeballs(GameLanguage gameLanguage)
+{
+    instance().getDatabase("PokemonCommon/Pokeballs", gameLanguage, instance().m_database_Pokeballs);
+    return instance().m_database_Pokeballs[gameLanguage];
+}
+
+const QStringList &PokemonDatabase::getList_Pokeballs()
 {
     instance().getList("PokemonCommon/Pokemon-Balls", instance().m_list_Pokeballs);
     return instance().m_list_Pokeballs;
+}
+
+void PokemonDatabase::populatePokeballs(QComboBox *cb)
+{
+    for (QString const& ball : getList_Pokeballs())
+    {
+        cb->addItem(QIcon(RESOURCES_PATH + QString("PokemonCommon/Balls/") + ball + ".png"), ball + " Ball");
+        cb->setIconSize(QSize(24,24));
+    }
 }
 
 // -----------------------------------------------

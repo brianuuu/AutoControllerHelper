@@ -11,8 +11,10 @@ class SmartMaxLair : public SmartProgramBase
 public:
     struct Settings
     {
-        int m_bossIndex;
-        int m_bossDownPress;
+        int m_legendIndex;
+        int m_legendDownPress;
+        BallType m_legendBall;
+        BallType m_bossBall;
     };
 
 public:
@@ -67,23 +69,26 @@ private:
         CaptureArea(818,426,32,32), // white
         CaptureArea(818,612,32,32)  // white
     };
-    CaptureArea const A_RentalName[3] =
+    CaptureArea const A_RentalName[4] =
     {
         CaptureArea(620,204,220,32), // black
         CaptureArea(620,390,220,32), // white
-        CaptureArea(620,576,220,32)  // white
+        CaptureArea(620,576,220,32), // white
+        CaptureArea(620,432,220,32)  // swap
     };
-    CaptureArea const A_RentalAbility[3] =
+    CaptureArea const A_RentalAbility[4] =
     {
         CaptureArea(620,238,220,32), // black
         CaptureArea(620,424,220,32), // white
-        CaptureArea(620,610,220,32)  // white
+        CaptureArea(620,610,220,32), // white
+        CaptureArea(620,466,220,32)  // swap
     };
-    CaptureArea const A_RentalMove[3] =
+    CaptureArea const A_RentalMove[4] =
     {
         CaptureArea(906,111,250,32),
         CaptureArea(906,297,250,32),
-        CaptureArea(906,483,250,32)
+        CaptureArea(906,483,250,32),
+        CaptureArea(906,337,250,32)
     };
     CaptureArea const A_RStick = CaptureArea(1157,638,40,40);
     CaptureArea const A_Fight = CaptureArea(1188,488,63,63);
@@ -96,13 +101,24 @@ private:
         CapturePoint(920,460),
         CapturePoint(1221,460)
     };
-    CaptureArea const A_Opponent = CaptureArea(265,70,360,54);
-    CaptureArea const A_OpponentTypes[2] =
+    CaptureArea const A_Boss = CaptureArea(265,70,360,54);
+    CaptureArea const A_BossTypes[2] =
     {
         CaptureArea(304,126,96,28),
         CaptureArea(448,126,96,28)
     };
     CaptureArea const A_Dynamax = CaptureArea(734,566,52,39);
+    CaptureArea const A_SwapButtons[2] =
+    {
+        CaptureArea(1108,554,32,32),
+        CaptureArea(1108,612,32,32)
+    };
+    CapturePoint const P_Catch[2] =
+    {
+        CapturePoint(1257,626,QColor(0,255,255)),
+        CapturePoint(1257,682,QColor(0,255,255))
+    };
+    CaptureArea const A_Ball = CaptureArea(876,446,272,46);
 
     // Substages
     enum Substage
@@ -118,7 +134,9 @@ private:
         SS_Battle,
         SS_Fight,
         SS_Target,
-        SS_CheckOpponent,
+        SS_CheckBoss,
+
+        SS_Catch,
     };
     Substage m_substage;
 
@@ -167,11 +185,12 @@ private:
     QVector<RentalSearch> m_rentalSearch;
     QVector<MoveData> m_rentalMoveData;
     int m_rentalIndex;
-    RentalSearch m_opponentSearch;
-    int m_opponentIndex;
+
+    RentalSearch m_bossSearch;
+    int m_bossIndex;
+    bool m_bossChecked;
 
     // battle
-    bool m_checkOpponent;
     int m_battleCount;
     int m_turnCount;
     int m_dynamaxCount;
