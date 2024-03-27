@@ -138,6 +138,8 @@ private:
         SS_CheckBoss,
 
         SS_Catch,
+        SS_RentalSwap,
+        SS_TakeReward,
     };
     Substage m_substage;
 
@@ -190,6 +192,7 @@ private:
 
     typedef QPair<int, double> MoveIDScore;
     QVector<MoveIDScore> m_moveScoreList;
+    bool m_ballFound[BT_COUNT];
 
     RentalSearch m_bossSearch;
     int m_bossIndex;

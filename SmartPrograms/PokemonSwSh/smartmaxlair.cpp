@@ -123,6 +123,14 @@ void SmartMaxLair::runNextState()
             break;
         }
 
+        bool testCatch = false;
+        if (testCatch)
+        {
+            m_substage = SS_Catch;
+            setState_runCommand("A,1,Nothing,30");
+            break;
+        }
+
         m_substage = SS_Start;
         setState_runCommand("Nothing,5");
 
@@ -422,7 +430,9 @@ void SmartMaxLair::runNextState()
         }
         else if (state == S_CaptureReady)
         {
-            if (m_timer.elapsed() > 30000)
+            // TODO: detect battle start here
+            // TODO: detect berries, scientist, backpacker
+            if (m_timer.elapsed() > 60000)
             {
                 incrementStat(m_statError);
                 setState_error("Unable to detect pick path sequence");
@@ -446,7 +456,6 @@ void SmartMaxLair::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            // TODO: detect berries, scientist, backpacker
             setState_runCommand("BSpam,2,Loop,0", true);
 
             m_timer.restart();
@@ -497,7 +506,7 @@ void SmartMaxLair::runNextState()
 
                     // Fight
                     m_substage = SS_Fight;
-                    setState_runCommand("A,1,Nothing,40");
+                    setState_runCommand("A,1,Nothing,30");
 
                     if (m_dynamaxCount > 0)
                     {
@@ -533,12 +542,17 @@ void SmartMaxLair::runNextState()
                 if (checkPixelColorMatch(P_Catch[0].m_point, QColor(0,0,0)) && checkPixelColorMatch(P_Catch[1].m_point, QColor(253,253,253)))
                 {
                     // Battle complete
-                    emit printLog(m_rentalData[m_bossIndex].second.m_name + " defeated!", LOG_IMPORTANT);
+                    emit printLog((m_battleCount == 4 ? m_bossData[m_programSettings.m_legendIndex].second.m_name : m_rentalData[m_bossIndex].second.m_name) + " defeated!", LOG_IMPORTANT);
 
                     m_substage = SS_Catch;
-                    setState_runCommand("A,1,Nothing,40");
+                    setState_runCommand("A,1,Nothing,30");
 
                     m_videoManager->clearCaptures();
+                    m_ocrIndex = 0;
+                    for (int i = 0; i < BT_COUNT; i++)
+                    {
+                        m_ballFound[i] = false;
+                    }
                     break;
                 }
 
@@ -597,6 +611,9 @@ void SmartMaxLair::runNextState()
 
             m_substage = SS_Target;
             setState_runCommand(command);
+
+            m_videoManager->clearCaptures();
+            m_videoManager->setPoints({A_Trainers[0], A_Trainers[1], A_Trainers[2], A_Trainers[3]});
         }
         break;
     }
@@ -648,21 +665,22 @@ void SmartMaxLair::runNextState()
                     m_substage = SS_Battle;
                     setState_runCommand("ASpam,10,BSpam,100");
 
+                    // used move successfully
+                    // TODO: pressure
+                    m_rentalPPData[m_cursorPos]--;
+                    m_moveScoreList.clear();
+
                     // grab data to print...
                     m_turnCount++;
                     RentalData const& rentalData = m_rentalData[m_rentalIndex].second;
                     int const moveID = m_dynamaxCount > 0 ? rentalData.m_maxMoves[m_cursorPos] : rentalData.m_moves[m_cursorPos];
                     MoveData const& moveData = m_moveData[moveID];
-                    emit printLog("Turn " + QString::number(m_turnCount) + ": Using " + moveData.m_name + " (Score = " + QString::number(m_moveScoreList.front().second) + ")");
-
-                    // used move successfully
-                    m_rentalPPData[m_cursorPos]--;
-                    m_moveScoreList.clear();
+                    emit printLog("Turn " + QString::number(m_turnCount) + ": Using " + moveData.m_name + " (Score = " + QString::number(m_moveScoreList.front().second) + ", PP Left: " + QString::number(m_rentalPPData[m_cursorPos]) + ")");
                 }
                 else
                 {
                     m_substage = SS_CheckBoss;
-                    setState_runCommand("DUp,1,A,1,Nothing,40");
+                    setState_runCommand("DUp,1,A,1,Nothing,30");
                 }
                 m_videoManager->clearCaptures();
             }
@@ -705,7 +723,7 @@ void SmartMaxLair::runNextState()
                 // Type OCR
                 PokemonDatabase::OCREntries const& entries = PokemonDatabase::getEntries_PokemonTypes(m_settings->getGameLanguage());
                 QString const result = matchStringDatabase(entries);
-                if (result.isEmpty())
+                if (result.isEmpty() && m_ocrIndex == 1)
                 {
                     incrementStat(m_statError);
                     emit printLog("Type entry not found", LOG_ERROR);
@@ -763,11 +781,189 @@ void SmartMaxLair::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            m_ocrIndex = 0;
+            m_ocrIndex++;
+            if (m_ocrIndex >= BT_COUNT)
+            {
+                incrementStat(m_statError);
+                setState_error("Unable to detect any Pokeball names");
+                break;
+            }
+
             setState_ocrRequest(A_Ball.m_rect, C_Color_TextW);
             m_videoManager->setAreas({A_Ball});
         }
         else if (state == S_OCRReady)
+        {
+            PokemonDatabase::OCREntries const& entries = PokemonDatabase::getEntries_Pokeballs(m_settings->getGameLanguage());
+            QString const result = matchStringDatabase(entries);
+            if (result.isEmpty())
+            {
+                incrementStat(m_statError);
+                emit printLog("Pokeball entry not found", LOG_ERROR);
+            }
+            else
+            {
+                BallType type = PokemonDatabase::getBallTypeFromString(result);
+                if (type < BT_COUNT)
+                {
+                    m_ballFound[type] = true;
+                    if (type == (m_battleCount == 4 ? m_programSettings.m_legendBall : m_programSettings.m_bossBall))
+                    {
+                        emit printLog("Catching Boss with " + PokemonDatabase::getList_Pokeballs().at(type) + " Ball");
+
+                        m_substage = (m_battleCount == 4) ? SS_TakeReward : SS_RentalSwap;
+                        setState_runCommand("ASpam,10,Nothing,200");
+
+                        m_videoManager->clearCaptures();
+                        break;
+                    }
+                }
+            }
+
+            setState_runCommand("DLeft,1,Nothing,20");
+        }
+        break;
+    }
+    case SS_RentalSwap:
+    {
+        if (state == S_CommandFinished)
+        {
+            setState_frameAnalyzeRequest();
+
+            m_timer.restart();
+            m_videoManager->setAreas({A_SwapButtons[0], A_SwapButtons[1]});
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (m_timer.elapsed() > 30000)
+            {
+                incrementStat(m_statError);
+                setState_error("Unable to detect rental swap screen for too long");
+            }
+            else if (checkAverageColorMatch(A_SwapButtons[0].m_rect, QColor(0,0,0)) && checkAverageColorMatch(A_SwapButtons[1].m_rect, QColor(253,253,253)))
+            {
+                m_ocrIndex = 0;
+                setState_ocrRequest(A_RentalName[3].m_rect, C_Color_TextB);
+                m_videoManager->setAreas({A_RentalName[3], A_RentalAbility[3], A_RentalMove[3]});
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
+            }
+        }
+        else if (state == S_OCRReady)
+        {
+            if (m_ocrIndex == 0)
+            {
+                // Name OCR
+                QString const result = matchStringDatabase(m_allRentalEntries);
+                if (result.isEmpty())
+                {
+                    incrementStat(m_statError);
+                    setState_error("Rental Pokemon entry not found");
+                    break;
+                }
+
+                m_bossSearch.m_name = result;
+                m_ocrIndex++;
+                setState_ocrRequest(A_RentalAbility[3].m_rect, C_Color_TextB);
+            }
+            else if (m_ocrIndex == 1)
+            {
+                // Ability OCR
+                PokemonDatabase::OCREntries const& entries = PokemonDatabase::getEntries_SwShMaxLairAbilities(m_settings->getGameLanguage());
+                QString const result = matchStringDatabase(entries);
+                if (result.isEmpty())
+                {
+                    incrementStat(m_statError);
+                    setState_error("Ability entry not found");
+                    break;
+                }
+
+                m_bossSearch.m_ability = result;
+                m_ocrIndex++;
+                setState_ocrRequest(A_RentalMove[3].m_rect, C_Color_TextB);
+            }
+            else
+            {
+                // First Move OCR
+                PokemonDatabase::OCREntries const& entries = PokemonDatabase::getEntries_SwShMaxLairMoves(m_settings->getGameLanguage());
+                QString const result = matchStringDatabase(entries);
+                if (result.isEmpty())
+                {
+                    incrementStat(m_statError);
+                    setState_error("Move entry not found");
+                    break;
+                }
+
+                m_bossSearch.m_firstMove = result.toInt();
+
+                QString id;
+                m_bossIndex = -1;
+
+                for (int i = 0; i < m_rentalData.size(); i++)
+                {
+                    IDRentalPair const& idPair = m_rentalData[i];
+                    RentalData const& data = idPair.second;
+                    if (data.m_name == m_bossSearch.m_name && data.m_moves.at(0) == m_bossSearch.m_firstMove && data.m_ability == m_bossSearch.m_ability)
+                    {
+                        m_bossIndex = i;
+                        id = idPair.first;
+                        break;
+                    }
+                }
+
+                if (m_bossIndex < 0)
+                {
+                    incrementStat(m_statError);
+                    setState_error("Unable to find Rental Pokemon {" + m_bossSearch.m_name + ", " + m_bossSearch.m_ability + ", " + QString::number(m_bossSearch.m_firstMove) + "}");
+                    break;
+                }
+
+                // TODO: use FindPath to detect scientist/backpacker
+                m_substage = m_battleCount < 3 ? SS_FindPath : SS_Battle;
+                m_videoManager->clearCaptures();
+
+                if (!m_matchupData.contains(id))
+                {
+                    incrementStat(m_statError);
+                    emit printLog("Unable to find matchup data for '" + id + "'", LOG_ERROR);
+                }
+                else
+                {
+                    double score = m_matchupData[id].at(m_programSettings.m_legendIndex);
+                    emit printLog("Rental Pokemon '" + id + "' VS '" + m_bossData[m_programSettings.m_legendIndex].first + "' score: " + QString::number(score));
+                    if (score > m_rentalScore)
+                    {
+                        m_rentalScore = score;
+                        emit printLog("Swapping Rental Pokemon with " + m_rentalSearch[m_bossIndex].m_name, LOG_IMPORTANT);
+
+                        setState_runCommand("ASpam,10,Nothing,30");
+
+                        // grab rental pokemon's move data
+                        m_rentalPPData.clear();
+                        m_rentalIndex = m_bossIndex;
+                        RentalData const& data = m_rentalData[m_rentalIndex].second;
+                        for (int const& moveID : data.m_moves)
+                        {
+                            m_rentalPPData.push_back(m_moveData[moveID].m_pp);
+                        }
+
+                        resetBattleParams(false);
+                        break;
+                    }
+                }
+
+                emit printLog("Not swapping Rental Pokemon", LOG_IMPORTANT);
+                setState_runCommand("BSpam,10,Nothing,30");
+                resetBattleParams(false);
+            }
+        }
+        break;
+    }
+    case SS_TakeReward:
+    {
+        if (state == S_CommandFinished)
         {
             // TODO:
             setState_completed();
