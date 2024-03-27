@@ -207,6 +207,7 @@ public:
     static OCREntries const& getEntries_Pokeballs(GameLanguage gameLanguage);
     static QStringList const& getList_Pokeballs();
     static void populatePokeballs(QComboBox* cb);
+    static double typeMatchupMultiplier(MoveType atk, MoveType def1, MoveType def2 = MT_COUNT);
 
     // Pokedex
     static OCREntries const& getEntries_PokedexNational(GameLanguage gameLanguage);
@@ -240,6 +241,7 @@ private:
     Database m_database_PokemonTypes;
     Database m_database_Pokeballs;
     QStringList m_list_Pokeballs;
+    double m_typeMatchupTable[MT_COUNT][MT_COUNT];
 
     // Pokedex
     Database m_database_PokedexNational;

@@ -8,7 +8,151 @@ PokemonDatabase& PokemonDatabase::instance()
 
 PokemonDatabase::PokemonDatabase()
 {
+    for (int atk = 0; atk < MT_COUNT; atk++)
+    {
+        for (int def = 0; def < MT_COUNT; def++)
+        {
+            m_typeMatchupTable[atk][def] = 1.0;
+        }
+    }
 
+    m_typeMatchupTable[MT_Normal][MT_Rock] = 0.5;
+    m_typeMatchupTable[MT_Normal][MT_Steel] = 0.5;
+    m_typeMatchupTable[MT_Normal][MT_Ghost] = 0;
+
+    m_typeMatchupTable[MT_Fire][MT_Fire] = 0.5;
+    m_typeMatchupTable[MT_Fire][MT_Water] = 0.5;
+    m_typeMatchupTable[MT_Fire][MT_Rock] = 0.5;
+    m_typeMatchupTable[MT_Fire][MT_Dragon] = 0.5;
+    m_typeMatchupTable[MT_Fire][MT_Grass] = 2.0;
+    m_typeMatchupTable[MT_Fire][MT_Ice] = 2.0;
+    m_typeMatchupTable[MT_Fire][MT_Bug] = 2.0;
+    m_typeMatchupTable[MT_Fire][MT_Steel] = 2.0;
+
+    m_typeMatchupTable[MT_Water][MT_Water] = 0.5;
+    m_typeMatchupTable[MT_Water][MT_Grass] = 0.5;
+    m_typeMatchupTable[MT_Water][MT_Dragon] = 0.5;
+    m_typeMatchupTable[MT_Water][MT_Fire] = 2.0;
+    m_typeMatchupTable[MT_Water][MT_Ground] = 2.0;
+    m_typeMatchupTable[MT_Water][MT_Rock] = 2.0;
+
+    m_typeMatchupTable[MT_Grass][MT_Fire] = 0.5;
+    m_typeMatchupTable[MT_Grass][MT_Grass] = 0.5;
+    m_typeMatchupTable[MT_Grass][MT_Poison] = 0.5;
+    m_typeMatchupTable[MT_Grass][MT_Flying] = 0.5;
+    m_typeMatchupTable[MT_Grass][MT_Bug] = 0.5;
+    m_typeMatchupTable[MT_Grass][MT_Dragon] = 0.5;
+    m_typeMatchupTable[MT_Grass][MT_Steel] = 0.5;
+    m_typeMatchupTable[MT_Grass][MT_Water] = 2.0;
+    m_typeMatchupTable[MT_Grass][MT_Ground] = 2.0;
+    m_typeMatchupTable[MT_Grass][MT_Rock] = 2.0;
+
+    m_typeMatchupTable[MT_Electric][MT_Ground] = 0.0;
+    m_typeMatchupTable[MT_Electric][MT_Grass] = 0.5;
+    m_typeMatchupTable[MT_Electric][MT_Electric] = 0.5;
+    m_typeMatchupTable[MT_Electric][MT_Dragon] = 0.5;
+    m_typeMatchupTable[MT_Electric][MT_Water] = 2.0;
+    m_typeMatchupTable[MT_Electric][MT_Flying] = 2.0;
+
+    m_typeMatchupTable[MT_Ice][MT_Fire] = 0.5;
+    m_typeMatchupTable[MT_Ice][MT_Water] = 0.5;
+    m_typeMatchupTable[MT_Ice][MT_Ice] = 0.5;
+    m_typeMatchupTable[MT_Ice][MT_Steel] = 0.5;
+    m_typeMatchupTable[MT_Ice][MT_Grass] = 2.0;
+    m_typeMatchupTable[MT_Ice][MT_Ground] = 2.0;
+    m_typeMatchupTable[MT_Ice][MT_Flying] = 2.0;
+    m_typeMatchupTable[MT_Ice][MT_Dragon] = 2.0;
+
+    m_typeMatchupTable[MT_Fighting][MT_Ghost] = 0.0;
+    m_typeMatchupTable[MT_Fighting][MT_Poison] = 0.5;
+    m_typeMatchupTable[MT_Fighting][MT_Flying] = 0.5;
+    m_typeMatchupTable[MT_Fighting][MT_Psychic] = 0.5;
+    m_typeMatchupTable[MT_Fighting][MT_Bug] = 0.5;
+    m_typeMatchupTable[MT_Fighting][MT_Fairy] = 0.5;
+    m_typeMatchupTable[MT_Fighting][MT_Normal] = 2.0;
+    m_typeMatchupTable[MT_Fighting][MT_Ice] = 2.0;
+    m_typeMatchupTable[MT_Fighting][MT_Rock] = 2.0;
+    m_typeMatchupTable[MT_Fighting][MT_Dark] = 2.0;
+    m_typeMatchupTable[MT_Fighting][MT_Steel] = 2.0;
+
+    m_typeMatchupTable[MT_Poison][MT_Steel] = 0.0;
+    m_typeMatchupTable[MT_Poison][MT_Poison] = 0.5;
+    m_typeMatchupTable[MT_Poison][MT_Ground] = 0.5;
+    m_typeMatchupTable[MT_Poison][MT_Rock] = 0.5;
+    m_typeMatchupTable[MT_Poison][MT_Ghost] = 0.5;
+    m_typeMatchupTable[MT_Poison][MT_Grass] = 2.0;
+    m_typeMatchupTable[MT_Poison][MT_Fairy] = 2.0;
+
+    m_typeMatchupTable[MT_Ground][MT_Flying] = 0.0;
+    m_typeMatchupTable[MT_Ground][MT_Grass] = 0.5;
+    m_typeMatchupTable[MT_Ground][MT_Bug] = 0.5;
+    m_typeMatchupTable[MT_Ground][MT_Fire] = 2.0;
+    m_typeMatchupTable[MT_Ground][MT_Electric] = 2.0;
+    m_typeMatchupTable[MT_Ground][MT_Poison] = 2.0;
+    m_typeMatchupTable[MT_Ground][MT_Rock] = 2.0;
+    m_typeMatchupTable[MT_Ground][MT_Steel] = 2.0;
+
+    m_typeMatchupTable[MT_Flying][MT_Electric] = 0.5;
+    m_typeMatchupTable[MT_Flying][MT_Rock] = 0.5;
+    m_typeMatchupTable[MT_Flying][MT_Steel] = 0.5;
+    m_typeMatchupTable[MT_Flying][MT_Grass] = 2.0;
+    m_typeMatchupTable[MT_Flying][MT_Fighting] = 2.0;
+    m_typeMatchupTable[MT_Flying][MT_Bug] = 2.0;
+
+    m_typeMatchupTable[MT_Psychic][MT_Dark] = 0.0;
+    m_typeMatchupTable[MT_Psychic][MT_Psychic] = 0.5;
+    m_typeMatchupTable[MT_Psychic][MT_Steel] = 0.5;
+    m_typeMatchupTable[MT_Psychic][MT_Fighting] = 2.0;
+    m_typeMatchupTable[MT_Psychic][MT_Poison] = 2.0;
+
+    m_typeMatchupTable[MT_Bug][MT_Fire] = 0.5;
+    m_typeMatchupTable[MT_Bug][MT_Fire] = 0.5;
+    m_typeMatchupTable[MT_Bug][MT_Poison] = 0.5;
+    m_typeMatchupTable[MT_Bug][MT_Flying] = 0.5;
+    m_typeMatchupTable[MT_Bug][MT_Ghost] = 0.5;
+    m_typeMatchupTable[MT_Bug][MT_Steel] = 0.5;
+    m_typeMatchupTable[MT_Bug][MT_Fairy] = 0.5;
+    m_typeMatchupTable[MT_Bug][MT_Grass] = 2.0;
+    m_typeMatchupTable[MT_Bug][MT_Psychic] = 2.0;
+    m_typeMatchupTable[MT_Bug][MT_Dark] = 2.0;
+
+    m_typeMatchupTable[MT_Rock][MT_Fighting] = 0.5;
+    m_typeMatchupTable[MT_Rock][MT_Ground] = 0.5;
+    m_typeMatchupTable[MT_Rock][MT_Steel] = 0.5;
+    m_typeMatchupTable[MT_Rock][MT_Fire] = 2.0;
+    m_typeMatchupTable[MT_Rock][MT_Ice] = 2.0;
+    m_typeMatchupTable[MT_Rock][MT_Flying] = 2.0;
+    m_typeMatchupTable[MT_Rock][MT_Bug] = 2.0;
+
+    m_typeMatchupTable[MT_Ghost][MT_Normal] = 0.0;
+    m_typeMatchupTable[MT_Ghost][MT_Dark] = 0.5;
+    m_typeMatchupTable[MT_Ghost][MT_Psychic] = 2.0;
+    m_typeMatchupTable[MT_Ghost][MT_Ghost] = 2.0;
+
+    m_typeMatchupTable[MT_Dragon][MT_Fairy] = 0.0;
+    m_typeMatchupTable[MT_Dragon][MT_Steel] = 0.5;
+    m_typeMatchupTable[MT_Dragon][MT_Dragon] = 2.0;
+
+    m_typeMatchupTable[MT_Dark][MT_Fighting] = 0.5;
+    m_typeMatchupTable[MT_Dark][MT_Dark] = 0.5;
+    m_typeMatchupTable[MT_Dark][MT_Fairy] = 0.5;
+    m_typeMatchupTable[MT_Dark][MT_Psychic] = 2.0;
+    m_typeMatchupTable[MT_Dark][MT_Ghost] = 2.0;
+
+    m_typeMatchupTable[MT_Steel][MT_Fire] = 0.5;
+    m_typeMatchupTable[MT_Steel][MT_Water] = 0.5;
+    m_typeMatchupTable[MT_Steel][MT_Electric] = 0.5;
+    m_typeMatchupTable[MT_Steel][MT_Steel] = 0.5;
+    m_typeMatchupTable[MT_Steel][MT_Ice] = 2.0;
+    m_typeMatchupTable[MT_Steel][MT_Rock] = 2.0;
+    m_typeMatchupTable[MT_Steel][MT_Fairy] = 2.0;
+
+    m_typeMatchupTable[MT_Fairy][MT_Fire] = 0.5;
+    m_typeMatchupTable[MT_Fairy][MT_Poison] = 0.5;
+    m_typeMatchupTable[MT_Fairy][MT_Steel] = 0.5;
+    m_typeMatchupTable[MT_Fairy][MT_Fighting] = 2.0;
+    m_typeMatchupTable[MT_Fairy][MT_Dragon] = 2.0;
+    m_typeMatchupTable[MT_Fairy][MT_Dark] = 2.0;
 }
 
 QString PokemonDatabase::getGameLanguagePrefix(GameLanguage sp)
@@ -414,6 +558,11 @@ void PokemonDatabase::populatePokeballs(QComboBox *cb)
         cb->addItem(QIcon(RESOURCES_PATH + QString("PokemonCommon/Balls/") + ball + ".png"), ball + " Ball");
         cb->setIconSize(QSize(24,24));
     }
+}
+
+double PokemonDatabase::typeMatchupMultiplier(MoveType atk, MoveType def1, MoveType def2)
+{
+    return instance().m_typeMatchupTable[atk][def1] * (def2 == MT_COUNT ? 1.0 : instance().m_typeMatchupTable[atk][def2]);
 }
 
 // -----------------------------------------------
