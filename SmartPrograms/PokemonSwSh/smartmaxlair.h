@@ -37,6 +37,7 @@ private:
     virtual void runNextState();
 
     void resetBattleParams(bool isBeginning);
+    void calculateBestMove();
 
     // Command indices
 
@@ -183,8 +184,12 @@ private:
         MoveType m_types[2];
     };
     QVector<RentalSearch> m_rentalSearch;
-    QVector<MoveData> m_rentalMoveData;
+    QVector<int> m_rentalPPData;
     int m_rentalIndex;
+    double m_rentalScore;
+
+    typedef QPair<int, double> MoveIDScore;
+    QVector<MoveIDScore> m_moveScoreList;
 
     RentalSearch m_bossSearch;
     int m_bossIndex;
