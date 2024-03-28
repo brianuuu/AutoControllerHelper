@@ -49,8 +49,11 @@ private:
     HSVRange const C_Color_Fight = HSVRange(300,100,100,355,255,255); // >80
     HSVRange const C_Color_Cheer = HSVRange(160,100,100,220,255,255); // >60
     HSVRange const C_Color_Dynamax = HSVRange(0,0,220,359,100,255);
+    HSVRange const C_Color_Caught = HSVRange(280,200,130,340,255,190); // >230
+    HSVRange const C_Color_Shiny = HSVRange(300,100,150,359,255,255); // >30
 
     // List of test point/area
+    CaptureArea const A_SelectionBase = CaptureArea(886,549,148,12);
     CaptureArea const A_Selection[4] =
     {
         CaptureArea(943,390,84,34),
@@ -120,6 +123,12 @@ private:
         CapturePoint(1257,682,QColor(0,255,255))
     };
     CaptureArea const A_Ball = CaptureArea(876,446,272,46);
+    CaptureArea const A_Caught[2] =
+    {
+        CaptureArea(1202,46,72,72), // black
+        CaptureArea(1182,452,72,72) // pink
+    };
+    CaptureArea const A_Shiny = CaptureArea(103,386,26,26);
 
     // Substages
     enum Substage
@@ -139,6 +148,8 @@ private:
 
         SS_Catch,
         SS_RentalSwap,
+        SS_Result,
+        SS_CheckShiny,
         SS_TakeReward,
     };
     Substage m_substage;
@@ -177,6 +188,7 @@ private:
     int m_ocrIndex;
     QImage m_imageMatch_RStick;
     QImage m_imageMatch_Dynamax;
+    int m_bufferDetection;
 
     struct RentalSearch
     {
@@ -206,6 +218,10 @@ private:
 
     // Stats
     Stat m_statError;
+    Stat m_statRuns;
+    Stat m_statCaught;
+    Stat m_statWins;
+    Stat m_statShiny;
 };
 
 #endif // SMARTMAXLAIR_H

@@ -69,6 +69,7 @@ void SmartMaxLair::reset()
     setImageMatchFromResource("SwSh_RStick", m_imageMatch_RStick);
     setImageMatchFromResource("SwSh_Dynamax", m_imageMatch_Dynamax);
 
+    m_bufferDetection = 0;
     resetBattleParams(true);
 }
 
@@ -80,6 +81,7 @@ void SmartMaxLair::resetBattleParams(bool isBeginning)
     m_turnCount = 0;
     m_dynamaxCount = -1; // -1: can dynamax, >=0: dynamax turns remain
     m_cursorPos = 0; // first move
+    m_moveScoreList.clear();
 
     if (isBeginning)
     {
@@ -97,6 +99,10 @@ void SmartMaxLair::runNextState()
     case SS_Init:
     {
         initStat(m_statError, "Errors");
+        initStat(m_statRuns, "Runs");
+        initStat(m_statCaught, "Caught");
+        initStat(m_statWins, "Wins");
+        initStat(m_statShiny, "Shiny Found");
         m_timer.restart();
 
         bool testRentalSelect = false;
@@ -127,14 +133,21 @@ void SmartMaxLair::runNextState()
         if (testCatch)
         {
             m_substage = SS_Catch;
-            setState_runCommand("A,1,Nothing,30");
+            setState_runCommand("ASpam,4,Nothing,30");
+            break;
+        }
+
+        bool testResult = false;
+        if (testResult)
+        {
+            m_battleCount = 4;
+            m_substage = SS_Result;
+            setState_runCommand("Nothing,10");
             break;
         }
 
         m_substage = SS_Start;
         setState_runCommand("Nothing,5");
-
-        m_videoManager->setAreas({A_Selection[1]});
         break;
     }
     case SS_Start:
@@ -150,12 +163,13 @@ void SmartMaxLair::runNextState()
             else
             {
                 setState_frameAnalyzeRequest();
+                m_videoManager->setAreas({A_SelectionBase, A_Selection[1]});
             }
         }
         else if (state == S_CaptureReady)
         {
             // TODO: detect ore count
-            if (checkBrightnessMeanTarget(A_Selection[1].m_rect, C_Color_Black, 180))
+            if (checkAverageColorMatch(A_SelectionBase.m_rect, QColor(253,253,253)) && checkBrightnessMeanTarget(A_Selection[1].m_rect, C_Color_Black, 180))
             {
                 resetBattleParams(true);
                 m_substage = SS_BossSelect;
@@ -222,6 +236,9 @@ void SmartMaxLair::runNextState()
                   && checkAverageColorMatch(A_RaidStart[1].m_rect, QColor(253,253,253))
                   && checkAverageColorMatch(A_RaidStart[2].m_rect, QColor(253,253,253)))
             {
+                incrementStat(m_statRuns);
+                emit printLog("Starting Run No." + QString::number(m_statRuns.first), LOG_IMPORTANT);
+
                 m_substage = SS_RentalSelect;
                 setState_runCommand("DDown,1,A,1");
 
@@ -386,7 +403,7 @@ void SmartMaxLair::runNextState()
                     if (selectIndex >= 0)
                     {
                         emit printLog("Selecting Slot " + QString::number(selectIndex + 1) + ": " + m_rentalSearch[selectIndex].m_name, LOG_IMPORTANT);
-                        QString command = "A,1,Nothing,300";
+                        QString command = "ASpam,10,Nothing,300";
                         if (selectIndex > 0)
                         {
                             command = "DDown,1,Nothing,1,Loop," + QString::number(selectIndex) + "," + command;
@@ -439,11 +456,13 @@ void SmartMaxLair::runNextState()
             }
             else if (checkImageMatchTarget(A_RStick.m_rect, C_Color_RStick, m_imageMatch_RStick, 0.5))
             {
-                m_bossChecked = false;
                 emit printLog("Picking path...");
 
                 m_substage = SS_Battle;
-                setState_runCommand("A,1,Nothing,40");
+                setState_runCommand("ASpam,10,Nothing,40");
+
+                m_bossChecked = false;
+                m_videoManager->clearCaptures();
             }
             else
             {
@@ -456,7 +475,14 @@ void SmartMaxLair::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            setState_runCommand("BSpam,2,Loop,0", true);
+            if (m_bufferDetection > 0)
+            {
+                setState_frameAnalyzeRequest();
+            }
+            else
+            {
+                setState_runCommand("BSpam,2,Loop,0", true);
+            }
 
             m_timer.restart();
             if (m_bossChecked)
@@ -484,6 +510,18 @@ void SmartMaxLair::runNextState()
                 // Fight or Cheer
                 if (checkBrightnessMeanTarget(A_Fight.m_rect, C_Color_Fight, 80))
                 {
+                    if (m_bufferDetection != 1)
+                    {
+                        // double detection
+                        m_bufferDetection = 1;
+                        setState_runCommand("Nothing,10");
+                        break;
+                    }
+                    else
+                    {
+                        m_bufferDetection = 0;
+                    }
+
                     m_videoManager->clearCaptures();
                     if (!m_bossChecked)
                     {
@@ -506,11 +544,16 @@ void SmartMaxLair::runNextState()
 
                     // Fight
                     m_substage = SS_Fight;
-                    setState_runCommand("A,1,Nothing,30");
+                    setState_runCommand("ASpam,4,Nothing,30");
 
                     if (m_dynamaxCount > 0)
                     {
                         m_dynamaxCount--;
+                        if (m_dynamaxCount == 0)
+                        {
+                            // cursor resets when dynamax completes
+                            m_cursorPos = 0;
+                        }
                     }
                     else if (m_dynamaxCount == -1)
                     {
@@ -522,6 +565,18 @@ void SmartMaxLair::runNextState()
 
                 if (checkBrightnessMeanTarget(A_Fight.m_rect, C_Color_Cheer, 60))
                 {
+                    if (m_bufferDetection != 2)
+                    {
+                        // double detection
+                        m_bufferDetection = 2;
+                        setState_runCommand("Nothing,10");
+                        break;
+                    }
+                    else
+                    {
+                        m_bufferDetection = 0;
+                    }
+
                     // Cheer
                     emit printLog("Turn " + QString::number(m_turnCount) + ": Cheering...");
                     setState_runCommand("ASpam,10,BSpam,100");
@@ -530,7 +585,10 @@ void SmartMaxLair::runNextState()
                     {
                         // died during dynamax
                         m_dynamaxCount = 0;
+                        m_cursorPos = 0;
                     }
+
+                    // TODO: 2 turn moves
                     m_turnCount++;
                     m_videoManager->clearCaptures();
                     break;
@@ -541,11 +599,27 @@ void SmartMaxLair::runNextState()
             {
                 if (checkPixelColorMatch(P_Catch[0].m_point, QColor(0,0,0)) && checkPixelColorMatch(P_Catch[1].m_point, QColor(253,253,253)))
                 {
+                    if (m_bufferDetection != 3)
+                    {
+                        // double detection
+                        m_bufferDetection = 3;
+                        setState_runCommand("Nothing,10");
+                        break;
+                    }
+                    else
+                    {
+                        m_bufferDetection = 0;
+                    }
+
                     // Battle complete
-                    emit printLog((m_battleCount == 4 ? m_bossData[m_programSettings.m_legendIndex].second.m_name : m_rentalData[m_bossIndex].second.m_name) + " defeated!", LOG_IMPORTANT);
+                    if (m_battleCount == 4)
+                    {
+                        incrementStat(m_statWins);
+                    }
+                    emit printLog((m_battleCount == 4 ? m_bossData[m_programSettings.m_legendIndex].second.m_name : m_rentalData[m_bossIndex].second.m_name) + " defeated!", LOG_SUCCESS);
 
                     m_substage = SS_Catch;
-                    setState_runCommand("A,1,Nothing,30");
+                    setState_runCommand("ASpam,4,Nothing,30");
 
                     m_videoManager->clearCaptures();
                     m_ocrIndex = 0;
@@ -560,6 +634,7 @@ void SmartMaxLair::runNextState()
                 // TODO: detect defeat screen
             }
 
+            m_bufferDetection = 0;
             setState_frameAnalyzeRequest();
         }
         break;
@@ -574,11 +649,17 @@ void SmartMaxLair::runNextState()
         {
             // Struggle should be impossible??
             // Check if we can dynamax
+            // TODO: Wide Guard against Zygarde do not dynamax
             QString command;
             if (m_dynamaxCount == -1 && checkImageMatchTarget(A_Dynamax.m_rect, C_Color_Dynamax, m_imageMatch_Dynamax, 0.5))
             {
                 m_dynamaxCount = 3;
-                command = "DLeft,1,A,1,Nothing,10,Loop,1,";
+                command = "DLeft,1,ASpam,4,Nothing,10,Loop,1,";
+            }
+            else if (m_dynamaxCount == 3 && !m_moveScoreList.empty())
+            {
+                // cursor was on dynamax button
+                command = "ASpam,4,Nothing,10,Loop,1,";
             }
 
             // Calculate best move to use
@@ -597,16 +678,14 @@ void SmartMaxLair::runNextState()
             int moveToUse = m_moveScoreList.front().first;
             if (moveToUse > m_cursorPos)
             {
-                command += "DDown,1,Loop," + QString::number(moveToUse - m_cursorPos);
+                command += "DDown,1,Nothing,1,Loop," + QString::number(moveToUse - m_cursorPos) + ",";
             }
             else if (moveToUse < m_cursorPos)
             {
-                command += "DUp,1,Loop," + QString::number(m_cursorPos - moveToUse);
+                command += "DUp,1,Nothing,1,Loop," + QString::number(m_cursorPos - moveToUse) + ",";
             }
-            else
-            {
-                command += "A,1,Nothing,20";
-            }
+
+            command += "ASpam,4,Nothing,20";
             m_cursorPos = moveToUse;
 
             m_substage = SS_Target;
@@ -645,7 +724,7 @@ void SmartMaxLair::runNextState()
                         m_moveScoreList.pop_front();
 
                         m_substage = SS_Battle;
-                        setState_error("BSpam,2");
+                        setState_runCommand("BSpam,2");
                     }
                 }
                 else
@@ -661,6 +740,8 @@ void SmartMaxLair::runNextState()
             {
                 if (m_bossChecked)
                 {
+                    // TODO: healing move default is enemy lol
+                    // TODO: self target move, Outrage etc.
                     // use move on default target
                     m_substage = SS_Battle;
                     setState_runCommand("ASpam,10,BSpam,100");
@@ -680,7 +761,7 @@ void SmartMaxLair::runNextState()
                 else
                 {
                     m_substage = SS_CheckBoss;
-                    setState_runCommand("DUp,1,A,1,Nothing,30");
+                    setState_runCommand("DUp,1,ASpam,4,Nothing,30");
                 }
                 m_videoManager->clearCaptures();
             }
@@ -754,6 +835,7 @@ void SmartMaxLair::runNextState()
 
                     if (m_bossIndex >= 0)
                     {
+                        // TODO: enemy is ditto
                         // TODO: ditto imposter, 5pp per move
                         emit printLog("Boss: " + m_rentalData[m_bossIndex].second.m_name, LOG_IMPORTANT);
 
@@ -809,15 +891,18 @@ void SmartMaxLair::runNextState()
                     m_ballFound[type] = true;
                     if (type == (m_battleCount == 4 ? m_programSettings.m_legendBall : m_programSettings.m_bossBall))
                     {
+                        incrementStat(m_statCaught);
                         emit printLog("Catching Boss with " + PokemonDatabase::getList_Pokeballs().at(type) + " Ball");
 
-                        m_substage = (m_battleCount == 4) ? SS_TakeReward : SS_RentalSwap;
+                        m_substage = (m_battleCount == 4) ? SS_Result : SS_RentalSwap;
                         setState_runCommand("ASpam,10,Nothing,200");
 
                         m_videoManager->clearCaptures();
                         break;
                     }
                 }
+
+                // TODO: detected same Pokeball
             }
 
             setState_runCommand("DLeft,1,Nothing,20");
@@ -936,8 +1021,7 @@ void SmartMaxLair::runNextState()
                     if (score > m_rentalScore)
                     {
                         m_rentalScore = score;
-                        emit printLog("Swapping Rental Pokemon with " + m_rentalSearch[m_bossIndex].m_name, LOG_IMPORTANT);
-
+                        emit printLog("Swapping Rental Pokemon with " + m_rentalData[m_bossIndex].second.m_name, LOG_IMPORTANT);
                         setState_runCommand("ASpam,10,Nothing,30");
 
                         // grab rental pokemon's move data
@@ -961,12 +1045,106 @@ void SmartMaxLair::runNextState()
         }
         break;
     }
+    case SS_Result:
+    {
+        if (state == S_CommandFinished)
+        {
+            setState_frameAnalyzeRequest();
+
+            m_timer.restart();
+            m_videoManager->setAreas({A_Caught[0], A_Caught[1]});
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (m_timer.elapsed() > 30000)
+            {
+                incrementStat(m_statError);
+                setState_error("Unable to detect Pokemon Caught screen for too long");
+            }
+            else if (checkAverageColorMatch(A_Caught[0].m_rect, QColor(0,0,0)) && checkBrightnessMeanTarget(A_Caught[1].m_rect, C_Color_Caught, 230))
+            {
+                emit printLog("Checking shiny for caught Pokemon");
+                m_substage = SS_CheckShiny;
+                setState_runCommand("Nothing,10,DUp,1,A,10,DDown,1,A,1,Nothing,70");
+                m_videoManager->clearCaptures();
+            }
+            else
+            {
+                setState_frameAnalyzeRequest();
+            }
+        }
+        break;
+    }
+    case SS_CheckShiny:
+    {
+        if (state == S_CommandFinished)
+        {
+            setState_frameAnalyzeRequest();
+            m_videoManager->setAreas({A_Shiny});
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 30))
+            {
+                if (m_battleCount == 4)
+                {
+                    // TODO: ignore legendary shiny, ore grind
+                    emit printLog("Legendary is SHINY, taking screenshot!", LOG_SUCCESS);
+                }
+                else
+                {
+                    emit printLog("Pokemon " + QString::number(m_battleCount) + " is SHINY, taking screenshot!", LOG_SUCCESS);
+                }
+
+                incrementStat(m_statShiny);
+                m_substage = SS_TakeReward;
+                setState_runCommand("BSpam,4,Nothing,60,Capture,1");
+                m_videoManager->clearCaptures();
+            }
+            else
+            {
+                emit printLog("Pokemon " + QString::number(m_battleCount) + " is not shiny...");
+                m_battleCount--;
+                if (m_battleCount == 0)
+                {
+                    emit printLog("Not taking any Pokemon");
+
+                    m_substage = SS_Start;
+                    setState_runCommand("BSpam,4,Nothing,60,BSpam,4,ASpam,140");
+
+                    m_timer.restart();
+                    m_videoManager->clearCaptures();
+                }
+                else
+                {
+                    // check next Pokemon above
+                    setState_runCommand("DUp,1,Nothing,30");
+                }
+            }
+        }
+        break;
+    }
     case SS_TakeReward:
     {
         if (state == S_CommandFinished)
         {
-            // TODO:
-            setState_completed();
+            QImage frame;
+            m_videoManager->getFrame(frame);
+            sendDiscordMessage("Shiny Found!", true, QColor(255,255,0), &frame);
+
+            if (m_battleCount == 4)
+            {
+                // let player take legendary
+                setState_completed();
+            }
+            else
+            {
+                // take normal shiny
+                m_substage = SS_Start;
+                setState_runCommand("ASpam,140");
+
+                m_timer.restart();
+            }
         }
         break;
     }
@@ -993,6 +1171,11 @@ void SmartMaxLair::calculateBestMove()
         // TODO: account for physical/special move and def
         double score = moveData.m_power * moveData.m_accuracy * moveData.m_factor;
         score *= PokemonDatabase::typeMatchupMultiplier(moveData.m_type, bossData.m_types[0], bossData.m_types[1]);
+        if (moveData.m_type == rentalData.m_types[0] || moveData.m_type == rentalData.m_types[1])
+        {
+            // STAB bonus
+            score *= 1.5;
+        }
         m_moveScoreList.push_back(MoveIDScore(i, score));
     }
 
@@ -1004,6 +1187,7 @@ void SmartMaxLair::calculateBestMove()
     );
 
     // TODO: handle exceptions, wide guard on Zygarde etc.
+    // TODO: ability immune, Levitate etc.
 }
 
 void SmartMaxLair::populateMaxLairBoss(QComboBox *cb)
