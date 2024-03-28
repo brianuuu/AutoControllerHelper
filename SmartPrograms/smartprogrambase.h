@@ -385,7 +385,7 @@ public:
 
         case SP_SurpriseTrade:
         case SP_EggOperation:
-        // TODO: case SP_MaxLair:
+        case SP_MaxLair:
 
         case SP_BDSP_Starter:
         case SP_BDSP_ShinyLegendary:
