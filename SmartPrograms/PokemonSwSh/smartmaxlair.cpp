@@ -547,7 +547,6 @@ void SmartMaxLair::runNextState()
                         else
                         {
                             m_bossCurrent = m_bossData[m_programSettings.m_legendIndex].second;
-                            m_bossNames.push_back(m_bossCurrent.m_name);
                             m_bossChecked = true;
                         }
                     }
@@ -662,7 +661,6 @@ void SmartMaxLair::runNextState()
                         m_bufferDetection = 0;
                     }
 
-                    m_battleCount--;
                     emit printLog("You've lost...", LOG_WARNING);
 
                     m_substage = SS_Result;
@@ -881,7 +879,6 @@ void SmartMaxLair::runNextState()
                     if (!m_bossCurrent.m_name.isEmpty())
                     {
                         // TODO: ditto imposter, 5pp per move
-                        m_bossNames.push_back(m_bossCurrent.m_name);
                         if (m_bossCurrent.m_name == "Ditto")
                         {
                             emit printLog("Boss: " + m_bossCurrent.m_name + " (Transformed to " + m_rentalCurrent.m_name + ")", LOG_IMPORTANT);
@@ -951,6 +948,7 @@ void SmartMaxLair::runNextState()
                         m_substage = (m_battleCount == 4) ? SS_Result : SS_RentalSwap;
                         setState_runCommand("ASpam,10,Nothing,200");
 
+                        m_bossNames.push_back(m_bossCurrent.m_name);
                         m_videoManager->clearCaptures();
                         break;
                     }
@@ -1105,7 +1103,7 @@ void SmartMaxLair::runNextState()
             setState_frameAnalyzeRequest();
 
             m_timer.restart();
-            if (m_battleCount < 4)
+            if (m_bossNames.size() < 4)
             {
                 m_videoManager->setAreas({A_Caught[0], A_Caught[1], A_SelectionBase});
             }
@@ -1121,7 +1119,7 @@ void SmartMaxLair::runNextState()
                 incrementStat(m_statError);
                 setState_error("Unable to detect Pokemon Caught screen for too long");
             }
-            else if (m_battleCount < 4 && checkAverageColorMatch(A_SelectionBase.m_rect, QColor(253,253,253)))
+            else if (m_bossNames.size() < 4 && checkAverageColorMatch(A_SelectionBase.m_rect, QColor(253,253,253)))
             {
                 // cancel Yes/No dialog (from BSpam after losing)
                 setState_runCommand("B,1,Nothing,30");
@@ -1152,7 +1150,7 @@ void SmartMaxLair::runNextState()
             if (checkBrightnessMeanTarget(A_Shiny.m_rect, C_Color_Shiny, 30))
             {
                 incrementStat(m_statShiny);
-                emit printLog(m_bossNames.at(m_battleCount - 1) + " is SHINY, taking screenshot!", LOG_SUCCESS);
+                emit printLog(m_bossNames.back() + " is SHINY, taking screenshot!", LOG_SUCCESS);
 
                 m_substage = SS_TakeReward;
                 setState_runCommand("BSpam,4,Nothing,60,Capture,1");
@@ -1162,9 +1160,9 @@ void SmartMaxLair::runNextState()
             else
             {
                 // TODO: lost first battle
-                m_battleCount--;
-                emit printLog(m_bossNames.at(m_battleCount) + " is not shiny...");
-                if (m_battleCount <= 0)
+                emit printLog(m_bossNames.back() + " is not shiny...");
+                m_bossNames.pop_back();
+                if (m_bossNames.empty())
                 {
                     emit printLog("Not taking any Pokemon");
 
@@ -1191,7 +1189,7 @@ void SmartMaxLair::runNextState()
             m_videoManager->getFrame(frame);
             sendDiscordMessage("Shiny Found!", true, QColor(255,255,0), &frame);
 
-            if (m_battleCount == 4)
+            if (m_bossNames.size() == 4)
             {
                 // let player take legendary
                 setState_completed();
