@@ -125,8 +125,8 @@ private:
     CaptureArea const A_Ball = CaptureArea(876,446,272,46);
     CaptureArea const A_Caught[2] =
     {
-        CaptureArea(1202,46,72,72), // black
-        CaptureArea(1182,452,72,72) // pink
+        CaptureArea(1202,46,72,72,QColor(255,0,0)), // black
+        CaptureArea(1182,452,72,72,QColor(255,0,0)) // pink
     };
     CaptureArea const A_Shiny = CaptureArea(103,386,26,26);
 
@@ -199,15 +199,16 @@ private:
     };
     QVector<RentalSearch> m_rentalSearch;
     QVector<int> m_rentalPPData;
-    int m_rentalIndex;
+    RentalData m_rentalCurrent;
     double m_rentalScore;
 
     typedef QPair<int, double> MoveIDScore;
     QVector<MoveIDScore> m_moveScoreList;
     bool m_ballFound[BT_COUNT];
 
+    QVector<QString> m_bossNames;
     RentalSearch m_bossSearch;
-    int m_bossIndex;
+    RentalData m_bossCurrent;
     bool m_bossChecked;
 
     // battle
