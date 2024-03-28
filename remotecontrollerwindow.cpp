@@ -329,7 +329,15 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     connect(m_actionCommandLog, &QAction::triggered, this, &RemoteControllerWindow::ActionCommandLog_triggered);
     m_actionController = fileMenu->addAction("Virtual Controller");
     m_actionController->setCheckable(true);
-    m_actionController->setChecked(true);
+    if (m_settings->value("ShowPopOutController", true).toBool())
+    {
+        m_actionController->setChecked(true);
+    }
+    else
+    {
+        m_actionController->setChecked(false);
+        ActionController_triggered();
+    }
     connect(m_actionController, &QAction::triggered, this, &RemoteControllerWindow::ActionController_triggered);
     if (m_settings->value("PopOut", false).toBool())
     {
@@ -1837,7 +1845,7 @@ void RemoteControllerWindow::DeletePopOut()
     }
     else
     {
-        m_settings->setValue("ShowPopOutController", false);
+        m_settings->setValue("ShowPopOutController", m_actionController->isChecked());
     }
 
     m_settings->setValue("PopOutMainWindow", this->pos());
