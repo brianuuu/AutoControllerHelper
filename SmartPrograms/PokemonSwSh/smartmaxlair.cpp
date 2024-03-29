@@ -974,8 +974,16 @@ void SmartMaxLair::runNextState()
                 BallType type = PokemonDatabase::getBallTypeFromString(result);
                 if (type < BT_COUNT)
                 {
+                    BallType targetType = (m_battleCount == 4 ? m_programSettings.m_legendBall : m_programSettings.m_bossBall);
+                    if (m_ballFound[type])
+                    {
+                        incrementStat(m_statError);
+                        setState_error("Unable to find " + PokemonDatabase::getList_Pokeballs().at(targetType) + " Ball");
+                        break;
+                    }
+
                     m_ballFound[type] = true;
-                    if (type == (m_battleCount == 4 ? m_programSettings.m_legendBall : m_programSettings.m_bossBall))
+                    if (type == targetType)
                     {
                         incrementStat(m_statCaught);
                         emit printLog("Catching Boss with " + PokemonDatabase::getList_Pokeballs().at(type) + " Ball");
