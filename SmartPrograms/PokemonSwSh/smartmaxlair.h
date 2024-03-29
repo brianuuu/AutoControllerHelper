@@ -129,6 +129,13 @@ private:
         CaptureArea(1182,452,72,72,QColor(255,0,0)) // pink
     };
     CaptureArea const A_Shiny = CaptureArea(103,386,26,26);
+    CaptureArea const A_MoveUsable[4] =
+    {
+        CaptureArea(1145,482,100,10),
+        CaptureArea(1145,551,100,10),
+        CaptureArea(1145,620,100,10),
+        CaptureArea(1145,689,100,10)
+    };
 
     // Substages
     enum Substage
@@ -198,12 +205,17 @@ private:
         MoveType m_types[2];
     };
     QVector<RentalSearch> m_rentalSearch;
-    QVector<int> m_rentalPPData;
     RentalData m_rentalCurrent;
     double m_rentalScore;
 
-    typedef QPair<int, double> MoveIDScore;
-    QVector<MoveIDScore> m_moveScoreList;
+    struct MoveScore
+    {
+        double m_score;
+        int m_moveIndex;
+        bool m_isMaxMove;
+    };
+    QVector<MoveScore> m_moveScoreList;
+    QVector<bool> m_moveUsable;
     bool m_ballFound[BT_COUNT];
 
     QVector<QString> m_bossNames;

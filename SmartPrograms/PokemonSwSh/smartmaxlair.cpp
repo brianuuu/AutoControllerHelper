@@ -82,12 +82,12 @@ void SmartMaxLair::resetBattleParams(bool isBeginning)
     m_dynamaxCount = -1; // -1: can dynamax, >=0: dynamax turns remain
     m_cursorPos = 0; // first move
     m_moveScoreList.clear();
+    m_moveUsable.resize(4);
 
     if (isBeginning)
     {
         m_battleCount = 0;
         m_rentalCurrent = RentalData();
-        m_rentalPPData.clear();
         m_bossNames.clear();
     }
 }
@@ -416,15 +416,9 @@ void SmartMaxLair::runNextState()
 
                         m_substage = SS_FindPath;
                         setState_runCommand(command);
-                        m_videoManager->clearCaptures();
 
-                        // grab rental pokemon's move data
-                        m_rentalPPData.clear();
                         m_rentalCurrent = m_rentalData[ rentalIndices[selectIndex] ].second;
-                        for (int const& moveID : m_rentalCurrent.m_moves)
-                        {
-                            m_rentalPPData.push_back(m_moveData[moveID].m_pp);
-                        }
+                        m_videoManager->clearCaptures();
                     }
                     else
                     {
@@ -553,6 +547,8 @@ void SmartMaxLair::runNextState()
 
                     m_substage = SS_Fight;
                     setState_runCommand("ASpam,4,Nothing,30");
+                    m_videoManager->clearPoints();
+                    m_videoManager->setAreas({A_MoveUsable[0],A_MoveUsable[1],A_MoveUsable[2],A_MoveUsable[3]});
 
                     if (m_dynamaxCount > 0)
                     {
@@ -563,10 +559,9 @@ void SmartMaxLair::runNextState()
                             m_cursorPos = 0;
                         }
                     }
-                    else if (m_dynamaxCount == -1)
+                    else if (m_dynamaxCount == -1 && m_moveScoreList.empty())
                     {
-                        m_videoManager->clearPoints();
-                        m_videoManager->setAreas({A_Dynamax});
+                        m_videoManager->setAreas({A_MoveUsable[0],A_MoveUsable[1],A_MoveUsable[2],A_MoveUsable[3],A_Dynamax});
                     }
                     break;
                 }
@@ -692,23 +687,24 @@ void SmartMaxLair::runNextState()
         else if (state == S_CaptureReady)
         {
             // Struggle should be impossible??
-            // Check if we can dynamax
             // TODO: Wide Guard against Zygarde do not dynamax
             QString command;
-            if (m_dynamaxCount == -1 && checkImageMatchTarget(A_Dynamax.m_rect, C_Color_Dynamax, m_imageMatch_Dynamax, 0.5))
+
+            // Check move usable
+            for (int i = 0; i < 4; i++)
             {
-                m_dynamaxCount = 3;
-                command = "DLeft,1,ASpam,4,Nothing,10,Loop,1,";
-            }
-            else if (m_dynamaxCount == 3 && !m_moveScoreList.empty())
-            {
-                // cursor was on dynamax button
-                command = "ASpam,4,Nothing,10,Loop,1,";
+                m_moveUsable[i] = checkAverageColorMatch(A_MoveUsable[i].m_rect, QColor(0,0,0));
             }
 
             // Calculate best move to use
             if (m_moveScoreList.isEmpty())
             {
+                // Check if we can dynamax
+                if (m_dynamaxCount == -1 && checkImageMatchTarget(A_Dynamax.m_rect, C_Color_Dynamax, m_imageMatch_Dynamax, 0.5))
+                {
+                    m_dynamaxCount = 3;
+                }
+
                 calculateBestMove();
                 if (m_moveScoreList.isEmpty())
                 {
@@ -717,20 +713,41 @@ void SmartMaxLair::runNextState()
                     break;
                 }
             }
+            else if (m_dynamaxCount == 3)
+            {
+                // cursor was on dynamax button, go back to moves
+                command = "DRight,1,Nothing,1,Loop,1,";
+            }
 
             // Choose move
-            int moveToUse = m_moveScoreList.front().first;
-            if (moveToUse > m_cursorPos)
+            MoveScore const& moveScore = m_moveScoreList.front();
+            if (moveScore.m_isMaxMove)
             {
-                command += "DDown,1,Nothing,1,Loop," + QString::number(moveToUse - m_cursorPos) + ",";
+                if (m_dynamaxCount == 3 || m_dynamaxCount == -1)
+                {
+                    // decided to dynamax
+                    m_dynamaxCount = 3;
+                    command += "DLeft,1,ASpam,4,Nothing,10,Loop,1,";
+                }
             }
-            else if (moveToUse < m_cursorPos)
+            else if (m_dynamaxCount == 3)
             {
-                command += "DUp,1,Nothing,1,Loop," + QString::number(m_cursorPos - moveToUse) + ",";
+                // decided to not dynamax
+                m_dynamaxCount = -1;
+            }
+
+            // move cursor up/down
+            if (moveScore.m_moveIndex > m_cursorPos)
+            {
+                command += "DDown,1,Nothing,1,Loop," + QString::number(moveScore.m_moveIndex - m_cursorPos) + ",";
+            }
+            else if (moveScore.m_moveIndex < m_cursorPos)
+            {
+                command += "DUp,1,Nothing,1,Loop," + QString::number(m_cursorPos - moveScore.m_moveIndex) + ",";
             }
 
             command += "ASpam,4,Nothing,20";
-            m_cursorPos = moveToUse;
+            m_cursorPos = moveScore.m_moveIndex;
 
             m_substage = SS_Target;
             setState_runCommand(command);
@@ -753,22 +770,27 @@ void SmartMaxLair::runNextState()
             {
                 if (m_bossChecked)
                 {
-                    if (m_moveScoreList.empty())
+                    if (m_moveScoreList.size() == 1)
                     {
                         incrementStat(m_statError);
                         setState_error("Unable to use any moves");
+                        break;
                     }
-                    else
-                    {
-                        // use next best move, can be disabled/tormented
-                        int const moveID = m_dynamaxCount > 0 ? m_rentalCurrent.m_maxMoves[m_cursorPos] : m_rentalCurrent.m_moves[m_cursorPos];
-                        MoveData const& moveData = m_moveData[moveID];
-                        emit printLog("Unable to use " + moveData.m_name + " (due to Torment/Disable etc.), trying next best move", LOG_WARNING);
-                        m_moveScoreList.pop_front();
 
-                        m_substage = SS_Battle;
-                        setState_runCommand("BSpam,2");
+                    // use next best move, can be disabled/tormented
+                    int const moveID = m_moveScoreList.front().m_isMaxMove ? m_rentalCurrent.m_maxMoves[m_cursorPos] : m_rentalCurrent.m_moves[m_cursorPos];
+                    MoveData const& moveData = m_moveData[moveID];
+                    emit printLog("Unable to use " + moveData.m_name + " (due to Torment/Disable etc.), trying next best move", LOG_WARNING);
+                    m_moveScoreList.pop_front();
+
+                    // need to fake increase dynamax turns as SS_Battle decrements it
+                    if (m_dynamaxCount > 0)
+                    {
+                        m_dynamaxCount++;
                     }
+
+                    m_substage = SS_Battle;
+                    setState_runCommand("BSpam,2");
                 }
                 else
                 {
@@ -789,17 +811,15 @@ void SmartMaxLair::runNextState()
                     m_substage = SS_Battle;
                     setState_runCommand("ASpam,10,BSpam,100");
 
-                    // used move successfully
-                    // TODO: pressure
-                    m_rentalPPData[m_cursorPos]--;
-                    m_moveScoreList.clear();
-
                     // grab data to print...
                     // TODO: 2 turn moves
                     m_turnCount++;
-                    int const moveID = m_dynamaxCount > 0 ? m_rentalCurrent.m_maxMoves[m_cursorPos] : m_rentalCurrent.m_moves[m_cursorPos];
+                    int const moveID = m_moveScoreList.front().m_isMaxMove ? m_rentalCurrent.m_maxMoves[m_cursorPos] : m_rentalCurrent.m_moves[m_cursorPos];
                     MoveData const& moveData = m_moveData[moveID];
-                    emit printLog("Turn " + QString::number(m_turnCount) + ": Using " + moveData.m_name + " (Score = " + QString::number(m_moveScoreList.front().second) + ", PP Left: " + QString::number(m_rentalPPData[m_cursorPos]) + ")");
+                    emit printLog("Turn " + QString::number(m_turnCount) + ": Using " + moveData.m_name + " (Score = " + QString::number(m_moveScoreList.front().m_score) + ")");
+
+                    // used move successfully
+                    m_moveScoreList.clear();
                 }
                 else
                 {
@@ -1076,14 +1096,7 @@ void SmartMaxLair::runNextState()
                         emit printLog("Swapping Rental Pokemon with " + m_bossCurrent.m_name, LOG_IMPORTANT);
                         setState_runCommand("ASpam,10,Nothing,30");
 
-                        // grab rental pokemon's move data
-                        m_rentalPPData.clear();
                         m_rentalCurrent = m_bossCurrent;
-                        for (int const& moveID : m_rentalCurrent.m_moves)
-                        {
-                            m_rentalPPData.push_back(m_moveData[moveID].m_pp);
-                        }
-
                         resetBattleParams(false);
                         break;
                     }
@@ -1213,35 +1226,61 @@ void SmartMaxLair::runNextState()
 void SmartMaxLair::calculateBestMove()
 {
     m_moveScoreList.clear();
-    QVector<int> const& moves = m_dynamaxCount > 0 ? m_rentalCurrent.m_maxMoves : m_rentalCurrent.m_moves;
-    for (int i = 0; i < 4; i++)
+    auto calculateBestMoveFromList = [&](QVector<int> const& moves, bool isMaxMoves)
     {
-        MoveData const& moveData = m_moveData[moves.at(i)];
-        if (m_rentalPPData.at(i) == 0)
-        {
-            continue;
-        }
+        MoveScore moveScore;
+        moveScore.m_isMaxMove = isMaxMoves;
 
-        // TODO: account for physical/special move and def
-        double score = moveData.m_power * moveData.m_accuracy * moveData.m_factor;
-        score *= PokemonDatabase::typeMatchupMultiplier(moveData.m_type, m_bossCurrent.m_types[0], m_bossCurrent.m_types[1]);
-        if (moveData.m_type == m_rentalCurrent.m_types[0] || moveData.m_type == m_rentalCurrent.m_types[1])
+        for (int i = 0; i < 4; i++)
         {
-            // STAB bonus
-            score *= 1.5;
+            MoveData const& moveData = m_moveData[moves.at(i)];
+            if (!m_moveUsable.at(i))
+            {
+                // ran out of PP
+                continue;
+            }
+
+            // TODO: account for physical/special move and def
+            double score = moveData.m_power * moveData.m_accuracy * moveData.m_factor;
+            score *= PokemonDatabase::typeMatchupMultiplier(moveData.m_type, m_bossCurrent.m_types[0], m_bossCurrent.m_types[1]);
+            if (moveData.m_type == m_rentalCurrent.m_types[0] || moveData.m_type == m_rentalCurrent.m_types[1])
+            {
+                // STAB bonus
+                score *= 1.5;
+            }
+
+            moveScore.m_moveIndex = i;
+            moveScore.m_score = score;
+            m_moveScoreList.push_back(moveScore);
+
+            // TODO: handle exceptions, wide guard on Zygarde etc.
+            // TODO: ability immune, Levitate, Dry Skin, Water Absorb, Lightling Rod etc.
         }
-        m_moveScoreList.push_back(MoveIDScore(i, score));
+    };
+
+    if (m_dynamaxCount == 3)
+    {
+        // can dynamax, calculate all moves
+        calculateBestMoveFromList(m_rentalCurrent.m_maxMoves, true);
+        calculateBestMoveFromList(m_rentalCurrent.m_moves, false);
+    }
+    else if (m_dynamaxCount > 0)
+    {
+        // during dynamax, only calculate max moves
+        calculateBestMoveFromList(m_rentalCurrent.m_maxMoves, true);
+    }
+    else
+    {
+        // normal form
+        calculateBestMoveFromList(m_rentalCurrent.m_moves, false);
     }
 
     std::sort(m_moveScoreList.begin(), m_moveScoreList.end(),
-        [](MoveIDScore const& a, MoveIDScore const& b)
+        [](MoveScore const& a, MoveScore const& b)
         {
-            return a.second > b.second;
+            return a.m_score > b.m_score;
         }
     );
-
-    // TODO: handle exceptions, wide guard on Zygarde etc.
-    // TODO: ability immune, Levitate, Dry Skin, Water Absorb, Lightling Rod etc.
 }
 
 void SmartMaxLair::populateMaxLairBoss(QComboBox *cb)
