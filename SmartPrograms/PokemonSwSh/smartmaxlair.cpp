@@ -542,6 +542,13 @@ void SmartMaxLair::runNextState()
                         {
                             m_bossCurrent = m_bossData[m_programSettings.m_legendIndex].second;
                             m_bossChecked = true;
+
+                            // Our Ditto transformed into boss
+                            if (m_rentalCurrent.m_name == "Ditto")
+                            {
+                                m_rentalCurrent = m_bossCurrent;
+                                m_rentalCurrent.m_name = "Ditto";
+                            }
                         }
                     }
 
@@ -898,7 +905,7 @@ void SmartMaxLair::runNextState()
 
                     if (!m_bossCurrent.m_name.isEmpty())
                     {
-                        // TODO: ditto imposter, 5pp per move
+                        // Boss Ditto transformed into our Pokemon
                         if (m_bossCurrent.m_name == "Ditto")
                         {
                             emit printLog("Boss: " + m_bossCurrent.m_name + " (Transformed to " + m_rentalCurrent.m_name + ")", LOG_IMPORTANT);
@@ -908,6 +915,13 @@ void SmartMaxLair::runNextState()
                         else
                         {
                             emit printLog("Boss: " + m_bossCurrent.m_name, LOG_IMPORTANT);
+                        }
+
+                        // Our Ditto transformed into boss
+                        if (m_rentalCurrent.m_name == "Ditto")
+                        {
+                            m_rentalCurrent = m_bossCurrent;
+                            m_rentalCurrent.m_name = "Ditto";
                         }
 
                         m_substage = SS_Battle;
