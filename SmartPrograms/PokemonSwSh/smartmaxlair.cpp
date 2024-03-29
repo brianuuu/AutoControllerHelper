@@ -693,8 +693,6 @@ void SmartMaxLair::runNextState()
         }
         else if (state == S_CaptureReady)
         {
-            // Struggle should be impossible??
-            // TODO: Wide Guard against Zygarde do not dynamax
             QString command;
 
             // Check move usable
@@ -715,8 +713,11 @@ void SmartMaxLair::runNextState()
                 calculateBestMove();
                 if (m_moveScoreList.isEmpty())
                 {
-                    incrementStat(m_statError);
-                    setState_error("Unable to calculate score for using any moves");
+                    m_turnCount++;
+                    emit printLog("Turn " + QString::number(m_turnCount) + ": Using Struggle");
+
+                    m_substage = SS_Battle;
+                    setState_runCommand("BSpam,2");
                     break;
                 }
             }
