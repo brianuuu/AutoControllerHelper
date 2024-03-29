@@ -94,7 +94,7 @@ private:
         CaptureArea(906,483,250,32),
         CaptureArea(906,337,250,32)
     };
-    CaptureArea const A_RStick = CaptureArea(1157,638,40,40);
+    CaptureArea const A_RStick = CaptureArea(1157,638,40,40,QColor(0,255,255));
     CaptureArea const A_Fight = CaptureArea(1188,488,63,63);
     CapturePoint const P_Pokemon = CapturePoint(1050,597);
     CapturePoint const P_Run = CapturePoint(1050,674);
@@ -136,6 +136,8 @@ private:
         CaptureArea(1145,620,100,10),
         CaptureArea(1145,689,100,10)
     };
+    CaptureArea const A_Person = CaptureArea(431,689,410,10,QColor(255,0,0));
+    CaptureArea const A_Backpacker = CaptureArea(1066,366,100,100);
 
     // Substages
     enum Substage
@@ -145,9 +147,11 @@ private:
         SS_Start,
         SS_BossSelect,
         SS_StartDA,
-
         SS_RentalSelect,
+
         SS_FindPath,
+        SS_Person,
+
         SS_Battle,
         SS_Fight,
         SS_Target,

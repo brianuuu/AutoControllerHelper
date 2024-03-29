@@ -414,6 +414,7 @@ void SmartMaxLair::runNextState()
                             command = "DDown,1,Nothing,1,Loop," + QString::number(selectIndex) + "," + command;
                         }
 
+                        m_timer.restart();
                         m_substage = SS_FindPath;
                         setState_runCommand(command);
 
@@ -440,8 +441,8 @@ void SmartMaxLair::runNextState()
         {
             setState_frameAnalyzeRequest();
 
-            m_timer.restart();
-            m_videoManager->setAreas({A_RStick});
+            m_videoManager->setPoints({P_Pokemon,P_Run});
+            m_videoManager->setAreas({A_RStick, A_Fight, A_Person});
         }
         else if (state == S_CaptureReady)
         {
@@ -452,14 +453,60 @@ void SmartMaxLair::runNextState()
                 incrementStat(m_statError);
                 setState_error("Unable to detect pick path sequence");
             }
+            else if (checkPixelColorMatch(P_Pokemon.m_point, QColor(253,253,253)) && checkPixelColorMatch(P_Run.m_point, QColor(253,253,253)) && checkBrightnessMeanTarget(A_Fight.m_rect, C_Color_Fight, 80))
+            {
+                // Battle started
+                m_substage = SS_Battle;
+                setState_frameAnalyzeRequest();
+            }
+            else if (checkAverageColorMatch(A_Person.m_rect, QColor(253,253,253)))
+            {
+                // detect scientist or backpacker
+                m_substage = SS_Person;
+                setState_frameAnalyzeRequest();
+
+                m_timer.restart();
+                m_videoManager->clearPoints();
+                m_videoManager->setAreas({A_Backpacker, A_SelectionBase});
+            }
             else if (checkImageMatchTarget(A_RStick.m_rect, C_Color_RStick, m_imageMatch_RStick, 0.5))
             {
                 emit printLog("Picking path...");
-
-                m_substage = SS_Battle;
                 setState_runCommand("ASpam,10,Nothing,40");
 
                 m_bossChecked = false;
+                m_videoManager->clearCaptures();
+            }
+            else
+            {
+                setState_runCommand("BSpam,20");
+            }
+        }
+        break;
+    }
+    case SS_Person:
+    {
+        if (state == S_CaptureReady)
+        {
+            if (m_timer.elapsed() > 10000)
+            {
+                emit printLog("Unable to detect Scientist or Backpacker...", LOG_WARNING);
+                m_substage = SS_FindPath;
+                setState_runCommand("BSpam,20");
+                m_videoManager->clearCaptures();
+            }
+            else if (checkAverageColorMatch(A_Backpacker.m_rect, QColor(12,178,247)))
+            {
+                emit printLog("Encountered a Backpacker!");
+                m_substage = SS_FindPath;
+                setState_runCommand("BSpam,100");
+                m_videoManager->clearCaptures();
+            }
+            else if (checkAverageColorMatch(A_SelectionBase.m_rect, QColor(253,253,253)))
+            {
+                emit printLog("Encountered a Scientist!");
+                m_substage = SS_FindPath;
+                setState_runCommand("BSpam,120");
                 m_videoManager->clearCaptures();
             }
             else
@@ -996,8 +1043,6 @@ void SmartMaxLair::runNextState()
                         break;
                     }
                 }
-
-                // TODO: detected same Pokeball
             }
 
             setState_runCommand("DLeft,1,Nothing,20");
@@ -1100,8 +1145,8 @@ void SmartMaxLair::runNextState()
                     break;
                 }
 
-                // TODO: use FindPath to detect scientist/backpacker
-                m_substage = m_battleCount < 3 ? SS_FindPath : SS_Battle;
+                m_timer.restart();
+                m_substage = SS_FindPath;
                 m_videoManager->clearCaptures();
 
                 if (!m_matchupData.contains(id))
