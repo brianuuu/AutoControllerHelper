@@ -1323,30 +1323,167 @@ void SmartMaxLair::calculateBestMove()
             }
 
             // TODO: account for physical/special move and def
-            double score = moveData.m_power * moveData.m_accuracy * moveData.m_factor;
-            score *= PokemonDatabase::typeMatchupMultiplier(moveData.m_type, m_bossCurrent.m_types[0], m_bossCurrent.m_types[1]);
-            if (moveData.m_type == m_rentalCurrent.m_types[0] || moveData.m_type == m_rentalCurrent.m_types[1])
-            {
-                // STAB bonus
-                score *= 1.5;
-            }
+            double power = moveData.m_power;
+            double accuracy = moveData.m_accuracy;
+            double factor = moveData.m_factor;
+            bool useTypeMatchup = true;
 
             // Immunity
             if (m_abilityImmunity.count(m_bossCurrent.m_ability) && moveData.m_type == m_abilityImmunity[m_bossCurrent.m_ability])
             {
-                score = 0;
+                power = 0;
+            }
+
+            // STAB bonus
+            if (moveData.m_type == m_rentalCurrent.m_types[0] || moveData.m_type == m_rentalCurrent.m_types[1])
+            {
+                if (m_rentalCurrent.m_ability == "adaptability")
+                {
+                    power *= 2.0;
+                }
+                else
+                {
+                    power *= 1.5;
+                }
+            }
+
+            // No Guard
+            if (m_bossCurrent.m_ability == "no-guard" || m_rentalCurrent.m_ability == "no-guard")
+            {
+                // No Guard ignores accuracy
+                accuracy = 1.0;
+            }
+
+            // Boss Abilities
+            if (m_bossCurrent.m_ability == "fur-coat")
+            {
+                // Fur Coat halves physical damage
+                if (!moveData.m_isSpecial)
+                {
+                    power *= 0.5;
+                }
+            }
+            else if (m_bossCurrent.m_ability == "thick-fat")
+            {
+                // Thick Fat halves Fire/Ice damage
+                if (moveData.m_type == MT_Fire || moveData.m_type == MT_Ice)
+                {
+                    power *= 0.5;
+                }
+            }
+            else if (m_bossCurrent.m_ability == "dry-skin")
+            {
+                // Fire-type attacks do 25% more damage to a Pokémon with Dry Skin
+                if (moveData.m_type == MT_Fire)
+                {
+                    power *= 1.25;
+                }
+            }
+            else if (m_bossCurrent.m_ability == "ice-scales")
+            {
+                // Ice Scales halves special damage
+                if (moveData.m_isSpecial)
+                {
+                    power *= 0.5;
+                }
+            }
+
+            // Rental Abilities
+            if (m_rentalCurrent.m_ability == "iron-fist")
+            {
+                // Increase punching move by 20%
+                // All moves from Hiitmonchan, Focus Punch, Shadow Punch, Bullet Punch, Hammer Arm
+                if ((m_rentalCurrent.m_name == "Hitmonchan" && !isMaxMoves) || moves.at(i) == 264 || moves.at(i) == 325 || moves.at(i) == 418 || moves.at(i) == 359)
+                {
+                    power *= 1.2;
+                }
+            }
+            else if (m_rentalCurrent.m_ability == "scrappy")
+            {
+                // Scrappy can hit Ghost type with Normal/Fighting type moves
+                if ((moveData.m_type == MT_Normal || moveData.m_type == MT_Fighting) && (m_bossCurrent.m_types[0] == MT_Ghost || m_bossCurrent.m_types[1] == MT_Ghost))
+                {
+                    useTypeMatchup = false;
+                    if (m_bossCurrent.m_types[0] == MT_Ghost)
+                    {
+                        factor *= PokemonDatabase::typeMatchupMultiplier(moveData.m_type, m_bossCurrent.m_types[1]);
+                    }
+                    else
+                    {
+                        factor *= PokemonDatabase::typeMatchupMultiplier(moveData.m_type, m_bossCurrent.m_types[0]);
+                    }
+                }
+            }
+            else if (m_rentalCurrent.m_ability == "technician")
+            {
+                // Technician boost move power 60 or less by 50%
+                if (moveData.m_power <= 60)
+                {
+                    power *= 1.5;
+                }
+            }
+            else if (m_rentalCurrent.m_ability == "huge-power")
+            {
+                // Huge Power doubles physical moves power
+                if (!moveData.m_isSpecial)
+                {
+                    power *= 2.0;
+                }
+            }
+            else if (m_rentalCurrent.m_ability == "refrigerate")
+            {
+                // Increases the power of Normal-type moves by 20%. It then changes those moves to Ice-type.
+                if (moveData.m_type == MT_Normal)
+                {
+                    power *= 1.2;
+
+                    useTypeMatchup = false;
+                    factor *= PokemonDatabase::typeMatchupMultiplier(MT_Ice, m_bossCurrent.m_types[0], m_bossCurrent.m_types[1]);
+                }
+            }
+            else if (m_rentalCurrent.m_ability == "tough-claws")
+            {
+                // Barbaracle increases damage for all moves except for Blizzard
+                if (moves.at(i) != 59 && !isMaxMoves)
+                {
+                    power *= 1.3;
+                }
+            }
+            else if (m_rentalCurrent.m_ability == "strong-jaw")
+            {
+                // Increase biting move power by 50% (only Crunch)
+                if (moves.at(i) == 242)
+                {
+                    power *= 1.5;
+                }
+            }
+            else if (m_rentalCurrent.m_ability == "sheer-force")
+            {
+                // Moves with a secondary effect are increased in power by 30% but lose their secondary effect
+                if (moves.at(i) == 442 || moves.at(i) == 430)
+                {
+                    power *= 1.3;
+                }
+            }
+
+            // Calculate final score
+            double score = factor * power * accuracy;
+            if (useTypeMatchup)
+            {
+                score *= PokemonDatabase::typeMatchupMultiplier(moveData.m_type, m_bossCurrent.m_types[0], m_bossCurrent.m_types[1]);
+            }
+
+            // Zygarde & Wide Guard
+            if (moves.at(i) == 469 && m_bossCurrent.m_name == "Zygarde")
+            {
+                score = 99999;
             }
 
             moveScore.m_moveIndex = i;
             moveScore.m_score = score;
             m_moveScoreList.push_back(moveScore);
 
-            // TODO: handle exceptions, wide guard on Zygarde etc.
-            // TODO: handle Morkepo Hunger Switch
-            // TODO: Fur Coat halves physical damage
-            // TODO: No Guard changes accuracy
-            // TODO: Iron Fist, Thick Fat, Scrappy, Adaptability, Technician, Huge Power, Tough Claws, Refrigerate, Corrosion
-            // TODO: Dry Skin (fire attack), Strong Jaw, Ice Scales, Sheer Force
+            // TODO: handle Morpeko Hunger Switch
         }
     };
 
