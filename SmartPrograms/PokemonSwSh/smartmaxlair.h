@@ -192,6 +192,7 @@ private:
         bool m_isSpecial;
     };
     static QMap<int, MoveData> m_moveData;
+    static QMap<QString, MoveType> m_abilityImmunity;
 
     // Members
     QElapsedTimer m_timer;

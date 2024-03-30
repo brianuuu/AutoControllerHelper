@@ -6,6 +6,7 @@ PokemonDatabase::OCREntries SmartMaxLair::m_allBossEntries;
 PokemonDatabase::OCREntries SmartMaxLair::m_allRentalEntries;
 QMap<QString, QVector<double>> SmartMaxLair::m_matchupData;
 QMap<int, SmartMaxLair::MoveData> SmartMaxLair::m_moveData;
+QMap<QString, MoveType> SmartMaxLair::m_abilityImmunity;
 
 SmartMaxLair::SmartMaxLair
 (
@@ -53,6 +54,18 @@ SmartMaxLair::SmartMaxLair
             setState_error("Unable to rental ocr entries");
             return;
         }
+    }
+
+    if (m_abilityImmunity.empty())
+    {
+        m_abilityImmunity["lightning-rod"] = MT_Electric;
+        m_abilityImmunity["volt-absorb"] = MT_Electric;
+        m_abilityImmunity["water-absorb"] = MT_Water;
+        m_abilityImmunity["storm-drain"] = MT_Water;
+        m_abilityImmunity["dry-skin"] = MT_Water;
+        m_abilityImmunity["levitate"] = MT_Ground;
+        m_abilityImmunity["flash-fire"] = MT_Fire;
+        m_abilityImmunity["sap-sipper"] = MT_Grass;
     }
 }
 
@@ -157,6 +170,7 @@ void SmartMaxLair::runNextState()
     }
     case SS_Start:
     {
+        // TODO: average time
         // Press A until "Yes, Please!"
         if (state == S_CommandFinished)
         {
@@ -1036,7 +1050,7 @@ void SmartMaxLair::runNextState()
                         emit printLog("Catching Boss with " + PokemonDatabase::getList_Pokeballs().at(type) + " Ball");
 
                         m_substage = (m_battleCount == 4) ? SS_Result : SS_RentalSwap;
-                        setState_runCommand("ASpam,10,Nothing,200");
+                        setState_runCommand("ASpam,10,Nothing,300");
 
                         m_bossNames.push_back(m_bossCurrent.m_name);
                         m_videoManager->clearCaptures();
@@ -1317,12 +1331,22 @@ void SmartMaxLair::calculateBestMove()
                 score *= 1.5;
             }
 
+            // Immunity
+            if (m_abilityImmunity.count(m_bossCurrent.m_ability) && moveData.m_type == m_abilityImmunity[m_bossCurrent.m_ability])
+            {
+                score = 0;
+            }
+
             moveScore.m_moveIndex = i;
             moveScore.m_score = score;
             m_moveScoreList.push_back(moveScore);
 
             // TODO: handle exceptions, wide guard on Zygarde etc.
-            // TODO: ability immune, Levitate, Dry Skin, Water Absorb, Lightling Rod etc.
+            // TODO: handle Morkepo Hunger Switch
+            // TODO: Fur Coat halves physical damage
+            // TODO: No Guard changes accuracy
+            // TODO: Iron Fist, Thick Fat, Scrappy, Adaptability, Technician, Huge Power, Tough Claws, Refrigerate, Corrosion
+            // TODO: Dry Skin (fire attack), Strong Jaw, Ice Scales, Sheer Force
         }
     };
 
