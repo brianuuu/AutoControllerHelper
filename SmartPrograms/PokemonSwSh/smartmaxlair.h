@@ -45,12 +45,14 @@ private:
     HSVRange const C_Color_Black = HSVRange(0,0,0,359,30,120); // >180
     HSVRange const C_Color_TextB = HSVRange(0,0,0,359,30,150); // for black text OCR
     HSVRange const C_Color_TextW = HSVRange(0,0,150,359,30,255); // for white text OCR
+    HSVRange const C_Color_TextOre = HSVRange(0,0,150,359,130,255); // for Dynite Ore OCR
     HSVRange const C_Color_RStick = HSVRange(0,0,180,359,30,255);
     HSVRange const C_Color_Fight = HSVRange(300,100,100,355,255,255); // >80
     HSVRange const C_Color_Cheer = HSVRange(160,100,100,220,255,255); // >60
     HSVRange const C_Color_Dynamax = HSVRange(0,0,220,359,100,255);
     HSVRange const C_Color_Caught = HSVRange(280,200,130,340,255,190); // >230
     HSVRange const C_Color_Shiny = HSVRange(300,100,150,359,255,255); // >30
+    HSVRange const C_Color_Ore = HSVRange(15,220,180,75,255,255); // >190
 
     // List of test point/area
     CaptureArea const A_SelectionBase = CaptureArea(886,549,148,12);
@@ -138,6 +140,7 @@ private:
     };
     CaptureArea const A_Person = CaptureArea(431,689,410,10,QColor(255,0,0));
     CaptureArea const A_Backpacker = CaptureArea(1066,366,100,100);
+    CaptureArea const A_Ore = CaptureArea(1170,0,110,48);
 
     // Substages
     enum Substage

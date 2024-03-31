@@ -184,13 +184,17 @@ void SmartMaxLair::runNextState()
             else
             {
                 setState_frameAnalyzeRequest();
-                m_videoManager->setAreas({A_SelectionBase, A_Selection[1]});
+                m_videoManager->setAreas({A_SelectionBase, A_Selection[1], A_Ore});
             }
         }
         else if (state == S_CaptureReady)
         {
-            // TODO: detect ore count
-            if (checkAverageColorMatch(A_SelectionBase.m_rect, QColor(253,253,253)) && checkBrightnessMeanTarget(A_Selection[1].m_rect, C_Color_Black, 180))
+            if (checkBrightnessMeanTarget(A_Ore.m_rect, C_Color_Ore, 190))
+            {
+                setState_ocrRequest(A_Ore.m_rect, C_Color_TextOre);
+                break;
+            }
+            else if (checkAverageColorMatch(A_SelectionBase.m_rect, QColor(253,253,253)) && checkBrightnessMeanTarget(A_Selection[1].m_rect, C_Color_Black, 180))
             {
                 resetBattleParams(true);
                 m_substage = SS_BossSelect;
@@ -198,6 +202,27 @@ void SmartMaxLair::runNextState()
             }
 
             setState_runCommand("A,42");
+        }
+        else if (state == S_OCRReady)
+        {
+            int oreCount = 0;
+            if (getOCRNumber(oreCount))
+            {
+                if (oreCount < 20)
+                {
+                    emit printLog("Stopping program, less than 20 Dynite Ores", LOG_WARNING);
+                    setState_completed();
+                    break;
+                }
+
+                emit printLog("Dynite Ore left: " + QString::number(oreCount) + ", paying...");
+            }
+            else
+            {
+                emit printLog("Unable to detect ore count, attempting to pay anyway...", LOG_WARNING);
+            }
+
+            setState_runCommand("A,42,Nothing,1,Loop,2");
         }
         break;
     }
@@ -741,7 +766,7 @@ void SmartMaxLair::runNextState()
                         m_bufferDetection = 0;
                     }
 
-                    emit printLog("You've lost...", LOG_WARNING);
+                    emit printLog("You've lost...");
 
                     m_substage = SS_Result;
                     setState_runCommand("Nothing,20");
