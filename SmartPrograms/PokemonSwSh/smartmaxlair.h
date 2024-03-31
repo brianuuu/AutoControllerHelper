@@ -201,6 +201,7 @@ private:
     QImage m_imageMatch_RStick;
     QImage m_imageMatch_Dynamax;
     int m_bufferDetection;
+    int m_runCount;
 
     struct RentalSearch
     {

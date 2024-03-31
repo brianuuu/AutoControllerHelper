@@ -83,6 +83,7 @@ void SmartMaxLair::reset()
     setImageMatchFromResource("SwSh_Dynamax", m_imageMatch_Dynamax);
 
     m_bufferDetection = 0;
+    m_runCount = 0;
     resetBattleParams(true);
 }
 
@@ -172,7 +173,6 @@ void SmartMaxLair::runNextState()
     }
     case SS_Start:
     {
-        // TODO: average time
         // Press A until "Yes, Please!"
         if (state == S_CommandFinished)
         {
@@ -1238,6 +1238,14 @@ void SmartMaxLair::runNextState()
             }
             else if (checkAverageColorMatch(A_Caught[0].m_rect, QColor(0,0,0)) && checkBrightnessMeanTarget(A_Caught[1].m_rect, C_Color_Caught, 230))
             {
+                // Display average time
+                m_runCount++;
+                qint64 secs = m_programStartDateTime.secsTo(QDateTime::currentDateTime()) / m_runCount;
+                qint64 mins = secs / 60;
+                mins %= 60;
+                secs %= 60;
+                emit printLog("Average Time per Run: " + QString::number(mins) + " minutes " + QString::number(secs) + " seconds");
+
                 m_videoManager->clearCaptures();
                 if (m_bossNames.empty())
                 {
