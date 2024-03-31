@@ -97,6 +97,8 @@ void SmartMaxLair::resetBattleParams(bool isBeginning)
     m_moveScoreList.clear();
     m_moveUsable.resize(4);
 
+    m_hungerSwitch = false;
+
     if (isBeginning)
     {
         m_battleCount = 0;
@@ -460,8 +462,6 @@ void SmartMaxLair::runNextState()
         }
         else if (state == S_CaptureReady)
         {
-            // TODO: detect battle start here
-            // TODO: detect berries, scientist, backpacker
             if (m_timer.elapsed() > 60000)
             {
                 incrementStat(m_statError);
@@ -631,6 +631,20 @@ void SmartMaxLair::runNextState()
                     {
                         m_videoManager->setAreas({A_MoveUsable[0],A_MoveUsable[1],A_MoveUsable[2],A_MoveUsable[3],A_Dynamax});
                     }
+
+                    // Hunger Switch changes Aura Wheel typing
+                    if (m_rentalCurrent.m_name == "Morpeko" && m_hungerSwitch)
+                    {
+                        m_moveData[783].m_type = MT_Dark;
+                        m_moveData[759140].m_type = MT_Dark;
+                        m_moveData[759140].m_name = "Max Darkness";
+                    }
+                    else
+                    {
+                        m_moveData[759140].m_type = MT_Electric;
+                        m_moveData[759140].m_name = "Max Lightning";
+                    }
+
                     break;
                 }
 
@@ -662,6 +676,9 @@ void SmartMaxLair::runNextState()
                         m_dynamaxCount = 0;
                         m_cursorPos = 0;
                     }
+
+                    // Back to normal Morpeko form
+                    m_hungerSwitch = false;
 
                     m_videoManager->clearCaptures();
                     break;
@@ -881,7 +898,6 @@ void SmartMaxLair::runNextState()
                     setState_runCommand("ASpam,10,BSpam,100");
 
                     // grab data to print...
-                    // TODO: 2 turn moves
                     m_turnCount++;
                     int const moveID = m_moveScoreList.front().m_isMaxMove ? m_rentalCurrent.m_maxMoves[m_cursorPos] : m_rentalCurrent.m_moves[m_cursorPos];
                     MoveData const& moveData = m_moveData[moveID];
@@ -889,6 +905,7 @@ void SmartMaxLair::runNextState()
 
                     // used move successfully
                     m_moveScoreList.clear();
+                    m_hungerSwitch = !m_hungerSwitch;
                 }
                 else
                 {
@@ -1221,10 +1238,20 @@ void SmartMaxLair::runNextState()
             }
             else if (checkAverageColorMatch(A_Caught[0].m_rect, QColor(0,0,0)) && checkBrightnessMeanTarget(A_Caught[1].m_rect, C_Color_Caught, 230))
             {
+                m_videoManager->clearCaptures();
+                if (m_bossNames.empty())
+                {
+                    emit printLog("No caught Pokemon to check...");
+                    m_substage = SS_Start;
+                    setState_runCommand("ASpam,100");
+
+                    m_timer.restart();
+                    break;
+                }
+
                 emit printLog("Checking shiny for caught Pokemon");
                 m_substage = SS_CheckShiny;
                 setState_runCommand("Nothing,10,DUp,1,A,10,DDown,1,A,1,Nothing,70");
-                m_videoManager->clearCaptures();
             }
             else
             {
@@ -1254,7 +1281,6 @@ void SmartMaxLair::runNextState()
             }
             else
             {
-                // TODO: lost first battle
                 emit printLog(m_bossNames.back() + " is not shiny...");
                 m_bossNames.pop_back();
                 if (m_bossNames.empty())
@@ -1322,7 +1348,6 @@ void SmartMaxLair::calculateBestMove()
                 continue;
             }
 
-            // TODO: account for physical/special move and def
             double power = moveData.m_power;
             double accuracy = moveData.m_accuracy;
             double factor = moveData.m_factor;
@@ -1482,8 +1507,6 @@ void SmartMaxLair::calculateBestMove()
             moveScore.m_moveIndex = i;
             moveScore.m_score = score;
             m_moveScoreList.push_back(moveScore);
-
-            // TODO: handle Morpeko Hunger Switch
         }
     };
 

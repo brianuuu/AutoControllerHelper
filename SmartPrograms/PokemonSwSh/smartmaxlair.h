@@ -212,6 +212,7 @@ private:
     QVector<RentalSearch> m_rentalSearch;
     RentalData m_rentalCurrent;
     double m_rentalScore;
+    bool m_hungerSwitch;
 
     struct MoveScore
     {
