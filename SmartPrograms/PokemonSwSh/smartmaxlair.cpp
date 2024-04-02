@@ -666,6 +666,7 @@ void SmartMaxLair::runNextState()
                     }
                     else
                     {
+                        m_moveData[783].m_type = MT_Electric;
                         m_moveData[759140].m_type = MT_Electric;
                         m_moveData[759140].m_name = "Max Lightning";
                     }
@@ -1269,7 +1270,7 @@ void SmartMaxLair::runNextState()
                 qint64 mins = secs / 60;
                 mins %= 60;
                 secs %= 60;
-                emit printLog("Average Time per Run: " + QString::number(mins) + " minutes " + QString::number(secs) + " seconds");
+                emit printLog("Average Time per Run: " + QString::number(mins) + "m" + QString::number(secs) + "s");
 
                 m_videoManager->clearCaptures();
                 if (m_bossNames.empty())
