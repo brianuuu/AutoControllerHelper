@@ -1142,8 +1142,7 @@ void SmartMaxLair::runNextState()
                 if (result.isEmpty())
                 {
                     incrementStat(m_statError);
-                    setState_error("Rental Pokemon entry not found");
-                    break;
+                    emit printLog("Rental Pokemon entry not found", LOG_ERROR);
                 }
 
                 m_bossSearch.m_name = result;
@@ -1158,8 +1157,7 @@ void SmartMaxLair::runNextState()
                 if (result.isEmpty())
                 {
                     incrementStat(m_statError);
-                    setState_error("Ability entry not found");
-                    break;
+                    emit printLog("Ability entry not found", LOG_ERROR);
                 }
 
                 m_bossSearch.m_ability = result;
@@ -1174,11 +1172,12 @@ void SmartMaxLair::runNextState()
                 if (result.isEmpty())
                 {
                     incrementStat(m_statError);
-                    setState_error("Move entry not found");
-                    break;
+                    emit printLog("Move entry not found", LOG_ERROR);
                 }
-
-                m_bossSearch.m_firstMove = result.toInt();
+                else
+                {
+                    m_bossSearch.m_firstMove = result.toInt();
+                }
 
                 QString id;
                 m_bossCurrent = RentalData();
@@ -1195,18 +1194,16 @@ void SmartMaxLair::runNextState()
                     }
                 }
 
-                if (m_bossCurrent.m_name.isEmpty())
-                {
-                    incrementStat(m_statError);
-                    setState_error("Unable to find Rental Pokemon {" + m_bossSearch.m_name + ", " + m_bossSearch.m_ability + ", " + QString::number(m_bossSearch.m_firstMove) + "}");
-                    break;
-                }
-
                 m_timer.restart();
                 m_substage = SS_FindPath;
                 m_videoManager->clearCaptures();
 
-                if (!m_matchupData.contains(id))
+                if (m_bossCurrent.m_name.isEmpty())
+                {
+                    incrementStat(m_statError);
+                    emit printLog("Unable to find Rental Pokemon {" + m_bossSearch.m_name + ", " + m_bossSearch.m_ability + ", " + QString::number(m_bossSearch.m_firstMove) + "}", LOG_ERROR);
+                }
+                else if (!m_matchupData.contains(id))
                 {
                     incrementStat(m_statError);
                     emit printLog("Unable to find matchup data for '" + id + "'", LOG_ERROR);
