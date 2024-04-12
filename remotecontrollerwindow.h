@@ -80,6 +80,7 @@
 #include "SmartPrograms/PokemonSV/smartsveggoperation.h"
 #include "SmartPrograms/PokemonSV/smartsvgimmighoulfarmer.h"
 #include "SmartPrograms/PokemonSV/smartsvtradepartnerfinder.h"
+#include "SmartPrograms/PokemonSV/smartsvitemprinter.h"
 
 #include "SmartPrograms/ZeldaTOTK/smarttotkbowfuseduplication.h"
 

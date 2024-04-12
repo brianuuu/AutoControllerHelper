@@ -69,6 +69,7 @@ enum SmartProgram : uint32_t
     SP_SV_EggOperation,
     SP_SV_GimmighoulFarmer,
     SP_SV_TradePartnerFinder,
+    SP_SV_ItemPrinter,
 
     SP_TOTK_BowFuseDuplication,
     SP_TOTK_MineruDuplication,
@@ -194,6 +195,7 @@ public:
             case SP_SV_EggOperation:        return "Egg Operation (SV)";
             case SP_SV_GimmighoulFarmer:    return "Gimmighoul Farmer";
             case SP_SV_TradePartnerFinder:  return "Trade Partner Finder (SV)";
+            case SP_SV_ItemPrinter:         return "Item Printer Exploit";
 
             case SP_TOTK_BowFuseDuplication:    return "Bow Fuse Duplication";
             case SP_TOTK_MineruDuplication:     return "Mineru Duplication";
@@ -272,6 +274,7 @@ public:
             case SP_SV_EggOperation:        return "SmartSVEggOperation";
             case SP_SV_GimmighoulFarmer:    return "SmartSVGimmighoulFarmer";
             case SP_SV_TradePartnerFinder:  return "SmartSVTradePartnerFinder";
+            case SP_SV_ItemPrinter:         return "SmartSVItemPrinter";
 
             case SP_TOTK_BowFuseDuplication:    return "SmartTOTKBowFuseDuplication";
             case SP_TOTK_MineruDuplication:     return "SmartTOTKMineruDuplication";
@@ -338,6 +341,7 @@ public:
             case SP_SV_EggOperation:        return 9;
             case SP_SV_GimmighoulFarmer:    return 0;
             case SP_SV_TradePartnerFinder:  return 18;
+            case SP_SV_ItemPrinter:         return 22;
 
             case SP_TOTK_BowFuseDuplication:    return 4;
             case SP_TOTK_MineruDuplication:     return 4;

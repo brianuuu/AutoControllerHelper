@@ -239,6 +239,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
 
     SmartPLAStaticSpawn::populateStaticPokemon(ui->SP16_CB_StaticPokemon);
     SmartMaxLair::populateMaxLairBoss(ui->SP21_CB_Legend);
+    SmartSVItemPrinter::populatePresets(ui->SP22_CB_Presets);
     PokemonDatabase::populatePokeballs(ui->SP21_CB_LegendBall);
     PokemonDatabase::populatePokeballs(ui->SP21_CB_BossBall);
 
@@ -375,6 +376,7 @@ bool RemoteControllerWindow::eventFilter(QObject *object, QEvent *event)
             "QLineEdit",
             "CommandSender",
             "QSpinBox",
+            "QDoubleSpinBox",
             "PokemonAutofillLineEdit"
         };
         if (classNameToIgnore.contains(className))
@@ -2852,6 +2854,16 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     case SP_SV_TradePartnerFinder:
     {
         m_smartProgram = new SmartSVTradePartnerFinder(ui->SP18_LE_Name->text(), ui->SP18_CB_Spam->isChecked(), parameter);
+        break;
+    }
+    case SP_SV_ItemPrinter:
+    {
+        SmartSVItemPrinter::Settings settings;
+        settings.m_presetName = ui->SP22_CB_Presets->currentText();
+        settings.m_delay = ui->SP22_SP_Delay->value();
+        settings.m_useCount = ui->SP22_SB_Use->value();
+        settings.m_bonusType = (SmartSVItemPrinter::BonusType)ui->SP22_CB_Bonus->currentIndex();
+        m_smartProgram = new SmartSVItemPrinter(settings, parameter);
         break;
     }
     case SP_TOTK_BowFuseDuplication:
