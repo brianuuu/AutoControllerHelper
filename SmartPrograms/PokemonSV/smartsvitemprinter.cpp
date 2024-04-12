@@ -10,80 +10,12 @@ SmartSVItemPrinter::SmartSVItemPrinter
 {
     init();
 
-    if (!getPreset(m_programSettings.m_presetName, m_preset))
+    // convert index to actual job counts
+    switch (m_programSettings.m_jobs)
     {
-        setState_error("Unable to load preset " + m_programSettings.m_presetName);
-        return;
-    }
-
-    if (m_programSettings.m_bonusType == BonusType::Double && !getPreset("*Double Bonus*", m_bonusPreset))
-    {
-        setState_error("Unable to load preset *Double Bonus*");
-        return;
-    }
-
-    if (m_programSettings.m_bonusType == BonusType::Lotto && !getPreset("*Ball Lotto*", m_bonusPreset))
-    {
-        setState_error("Unable to load preset *Ball Lotto*");
-        return;
-    }
-}
-
-bool SmartSVItemPrinter::getPreset(const QString &presetName, Preset &preset)
-{
-    QSettings settings(SMART_COMMAND_PATH + QString("SmartSVItemPrinter.ini"), QSettings::IniFormat);
-    QStringList names = settings.childGroups();
-    if (presetName.isEmpty() || !names.contains(presetName))
-    {
-        return false;
-    }
-
-    settings.beginGroup(presetName);
-    preset.m_name = presetName;
-
-    QStringList const date = settings.value("Date", "").toString().split("-");
-    if (date.size() != 3)
-    {
-        return false;
-    }
-
-    bool ok = false;
-    int year = date[0].toInt(&ok);  if (!ok) return false;
-    int month = date[1].toInt(&ok); if (!ok) return false;
-    int day = date[2].toInt(&ok);   if (!ok) return false;
-
-    QStringList const time = settings.value("Time", "").toString().split("-");
-    if (time.size() != 3)
-    {
-        return false;
-    }
-
-    int hour = time[0].toInt(&ok);  if (!ok) return false;
-    int min = time[1].toInt(&ok);   if (!ok) return false;
-    int sec = time[2].toInt(&ok);   if (!ok) return false;
-    preset.m_dateTime = QDateTime(QDate(year, month, day), QTime(hour, min, sec));
-    preset.m_seed = QDateTime(QDate(1970,1,1), QTime(0,0)).secsTo(preset.m_dateTime) + 3600;
-
-    preset.m_jobs = settings.value("Jobs", 1).toInt();
-    if (preset.m_jobs != 1 && preset.m_jobs != 5 && preset.m_jobs != 10)
-    {
-        return false;
-    }
-
-    preset.m_rewards = settings.value("Rewards", "").toString();
-    return true;
-}
-
-void SmartSVItemPrinter::populatePresets(QComboBox *cb)
-{
-    QSettings settings(SMART_COMMAND_PATH + QString("SmartSVItemPrinter.ini"), QSettings::IniFormat);
-    QStringList names = settings.childGroups();
-    names.sort();
-
-    cb->clear();
-    for (QString const& name : names)
-    {
-        cb->addItem(name);
+        case 0: m_programSettings.m_jobs = 1; break;
+        case 1: m_programSettings.m_jobs = 5; break;
+        case 2: m_programSettings.m_jobs = 10; break;
     }
 }
 
@@ -99,9 +31,12 @@ void SmartSVItemPrinter::reset()
 
     m_substage = SS_Init;
 
+    m_targetDateTime.setTimeSpec(Qt::UTC);
+    m_targetDateTime.setDate(QDate(1970,1,1));
+    m_targetDateTime.setTime(QTime(0,0));
+
     m_addMinute = false;
     m_bonusActive = false;
-    m_useCount = 0;
 }
 
 void SmartSVItemPrinter::runNextState()
@@ -111,7 +46,9 @@ void SmartSVItemPrinter::runNextState()
     {
     case SS_Init:
     {
-        emit printLog("Use left: " + QString::number(m_programSettings.m_useCount));
+        m_targetDateTime = m_targetDateTime.addSecs(m_programSettings.m_seed);
+        emit printLog("Seed = " + QString::number(m_programSettings.m_seed) + ", Date Time = " + m_targetDateTime.toString("yyyy-MM-dd hh:mm:ss"));
+
         m_substage = SS_Talk;
         setState_runCommand(C_Talk);
         break;
@@ -120,19 +57,6 @@ void SmartSVItemPrinter::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            if (m_programSettings.m_bonusType != BonusType::None && !m_bonusActive)
-            {
-                // need to active bonus first
-                emit printLog("Seed = " + QString::number(m_bonusPreset.m_seed));
-                m_targetDateTime = m_bonusPreset.m_dateTime;
-                m_targetJobs = m_bonusPreset.m_jobs;
-            }
-            else
-            {
-                emit printLog("Seed = " + QString::number(m_preset.m_seed));
-                m_targetDateTime = m_preset.m_dateTime;
-                m_targetJobs = m_preset.m_jobs;
-            }
 
             // Not enough time from pressing OK to accepting NPC
             if (m_targetDateTime.time().second() <= 3)
@@ -164,26 +88,16 @@ void SmartSVItemPrinter::runNextState()
             }
             else
             {
-                emit printLog("Syncing time");
-                m_substage = SS_SyncTime;
+                emit printLog("Syncing time...");
                 setState_runCommand(C_SyncTime);
+
+                switch (m_settings->getDateArrangement())
+                {
+                    case DA_JP: m_substage = SS_ChangeYear; break;
+                    case DA_EU: m_substage = SS_ChangeMonth; break; // TODO:
+                    case DA_US: m_substage = SS_ChangeMonth; break; // TODO:
+                }
             }
-        }
-        break;
-    }
-    case SS_SyncTime:
-    {
-        if (state == S_CommandFinished)
-        {
-            emit printLog("Current time: " + m_currentDateTime.toString("yyyy-MM-dd hh:mm"));
-            emit printLog("Setting date time to: " + m_targetDateTime.toString("yyyy-MM-dd hh:mm"));
-            switch (m_settings->getDateArrangement())
-            {
-                case DA_JP: m_substage = SS_ChangeYear; break;
-                case DA_EU: m_substage = SS_ChangeMonth; break; // TODO:
-                case DA_US: m_substage = SS_ChangeMonth; break; // TODO:
-            }
-            runNextStateContinue();
         }
         break;
     }
@@ -286,7 +200,7 @@ void SmartSVItemPrinter::runNextState()
         {
             m_timer.restart();
             setState_frameAnalyzeRequest();
-            m_videoManager->setAreas({A_Blue,(m_bonusActive ? A_JobsBonus : A_Jobs)});
+            m_videoManager->setAreas({A_Blue,A_Jobs});
         }
         else if (state == S_CaptureReady)
         {
@@ -328,21 +242,13 @@ void SmartSVItemPrinter::runNextState()
             {
                 if (!m_bonusActive)
                 {
-                    // bonus may already be active, skip to next date
+                    // bonus may already be active
                     m_bonusActive = true;
-                    emit printLog("Bonus may already be active, tryinig again", LOG_WARNING);
+                    m_programSettings.m_jobs = 10;
+                    emit printLog("Bonus maybe active, forcing 10 jobs", LOG_WARNING);
 
-                    if (m_programSettings.m_bonusType == BonusType::None)
-                    {
-                        setState_runCommand("Nothing,10");
-                        m_videoManager->setAreas({A_Blue,(m_bonusActive ? A_JobsBonus : A_Jobs)});
-                    }
-                    else
-                    {
-                        m_substage = SS_Talk;
-                        setState_runCommand("BSpam,10,Nothing,80," + m_commands[C_Talk]);
-                        m_videoManager->clearCaptures();
-                    }
+                    setState_runCommand("Nothing,10");
+                    m_videoManager->setAreas({A_Blue,A_JobsBonus});
                     break;
                 }
 
@@ -350,39 +256,17 @@ void SmartSVItemPrinter::runNextState()
                 break;
             }
 
-            if (jobs != m_targetJobs)
+            if (jobs != m_programSettings.m_jobs)
             {
                 setState_runCommand("L,1,Nothing,20");
             }
             else
             {
-                // TODO: same seed
-                if (m_programSettings.m_bonusType == BonusType::None)
-                {
-                    m_useCount++;
-                }
-                else
-                {
-                    if (m_bonusActive)
-                    {
-                        m_useCount++;
-                    }
-
-                    // expecting bonus to be toggled
-                    m_bonusActive = !m_bonusActive;
-                }
-
-                emit printLog("Jobs count set to " + QString::number(m_targetJobs) + ", now printing items!");
-                QString command = m_commands[C_Print];
-                if (m_useCount < m_programSettings.m_useCount)
-                {
-                    // return to selection menu
-                    command += ",ASpam,240";
-                }
+                emit printLog("Jobs count set to " + QString::number(m_programSettings.m_jobs) + ", now printing items!");
+                m_videoManager->clearCaptures();
 
                 m_substage = SS_Print;
-                setState_runCommand(command);
-                m_videoManager->clearCaptures();
+                setState_runCommand(C_Print);
             }
         }
         break;
@@ -391,117 +275,24 @@ void SmartSVItemPrinter::runNextState()
     {
         if (state == S_CommandFinished)
         {
-            if (m_useCount >= m_programSettings.m_useCount)
+            if (m_programSettings.m_syncTime)
+            {
+                emit printLog("Syncing time...");
+                m_substage = SS_Finish;
+                setState_runCommand(m_commands[C_ToTime] + ",A,2,Nothing,1,A,6,Nothing,1,Home,1,Nothing,26,Home,1");
+            }
+            else
             {
                 setState_completed();
             }
-            else
-            {
-                m_timer.restart();
-                if (!m_bonusActive)
-                {
-                    emit printLog("Use left: " + QString::number(m_programSettings.m_useCount - m_useCount));
-                }
-
-                setState_frameAnalyzeRequest();
-                m_videoManager->setAreas({A_Blue});
-            }
-        }
-        else if (state == S_CaptureReady)
-        {
-            if (m_timer.elapsed() > 30000)
-            {
-                setState_error("Unable to detect material screen for too long");
-            }
-            else if (checkBrightnessMeanTarget(A_Blue.m_rect, C_Color_Blue, 230))
-            {
-                m_substage = SS_Talk;
-                setState_runCommand("BSpam,10,Nothing,80," + m_commands[C_Talk]);
-                m_videoManager->clearCaptures();
-            }
-            else
-            {
-                setState_frameAnalyzeRequest();
-            }
         }
         break;
     }
-    case SS_Restart:
+    case SS_Finish:
     {
         if (state == S_CommandFinished)
         {
-            setState_frameAnalyzeRequest();
-            m_videoManager->setAreas({A_Title});
-            m_timer.restart();
-        }
-        else if (state == S_CaptureReady)
-        {
-            if (m_timer.elapsed() > 5000)
-            {
-                emit printLog("Unable to detect black screen after restarting, attempting restart again...", LOG_ERROR);
-                setState_runCommand(C_Restart);
-            }
-            else if (checkAverageColorMatch(A_Title.m_rect, QColor(0,0,0)))
-            {
-                m_substage = SS_Title;
-                setState_frameAnalyzeRequest();
-                m_timer.restart();
-            }
-            else
-            {
-                setState_frameAnalyzeRequest();
-            }
-        }
-        break;
-    }
-    case SS_Title:
-    {
-        if (state == S_CaptureReady)
-        {
-            if (m_timer.elapsed() > 30000)
-            {
-                emit printLog("Unable to detect title screen, attempting restart again...", LOG_ERROR);
-                setState_runCommand(C_Restart);
-            }
-            else if (!checkAverageColorMatch(A_Title.m_rect, QColor(0,0,0)))
-            {
-                emit printLog("Title detected!");
-                m_substage = SS_GameStart;
-                setState_runCommand("ASpam,310");
-                m_videoManager->clearCaptures();
-            }
-            else
-            {
-                setState_frameAnalyzeRequest();
-            }
-        }
-        break;
-    }
-    case SS_GameStart:
-    {
-        if (state == S_CommandFinished)
-        {
-            setState_frameAnalyzeRequest();
-            m_videoManager->setAreas({A_Title});
-            m_timer.restart();
-        }
-        else if (state == S_CaptureReady)
-        {
-            if (m_timer.elapsed() > 30000)
-            {
-                emit printLog("Unable to detect game start, attempting restart again...", LOG_ERROR);
-                setState_runCommand(C_Restart);
-            }
-            else if (!checkAverageColorMatch(A_Title.m_rect, QColor(0,0,0)))
-            {
-                m_substage = SS_Talk;
-                setState_runCommand(C_Talk);
-                m_videoManager->clearCaptures();
-            }
-            else
-            {
-                setState_frameAnalyzeRequest();
-            }
+            setState_completed();
         }
         break;
     }

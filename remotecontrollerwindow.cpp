@@ -239,7 +239,6 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
 
     SmartPLAStaticSpawn::populateStaticPokemon(ui->SP16_CB_StaticPokemon);
     SmartMaxLair::populateMaxLairBoss(ui->SP21_CB_Legend);
-    SmartSVItemPrinter::populatePresets(ui->SP22_CB_Presets);
     PokemonDatabase::populatePokeballs(ui->SP21_CB_LegendBall);
     PokemonDatabase::populatePokeballs(ui->SP21_CB_BossBall);
 
@@ -2859,10 +2858,10 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     case SP_SV_ItemPrinter:
     {
         SmartSVItemPrinter::Settings settings;
-        settings.m_presetName = ui->SP22_CB_Presets->currentText();
-        settings.m_delay = ui->SP22_SP_Delay->value();
-        settings.m_useCount = ui->SP22_SB_Use->value();
-        settings.m_bonusType = (SmartSVItemPrinter::BonusType)ui->SP22_CB_Bonus->currentIndex();
+        settings.m_seed = static_cast<qint64>(ui->SP22_SB_Seed->value());
+        settings.m_delay = ui->SP22_SB_Delay->value();
+        settings.m_jobs = ui->SP22_CB_Jobs->currentIndex();
+        settings.m_syncTime = ui->SP22_CB_Sync->isChecked();
         m_smartProgram = new SmartSVItemPrinter(settings, parameter);
         break;
     }

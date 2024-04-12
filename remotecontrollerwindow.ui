@@ -5353,14 +5353,64 @@ Enter Trade Partner Name:</string>
                       <item>
                        <layout class="QHBoxLayout" name="horizontalLayout_59">
                         <item>
-                         <widget class="QLabel" name="label_96">
+                         <widget class="QLabel" name="label_95">
                           <property name="text">
-                           <string>Fade to Black Delay:</string>
+                           <string>Seed:</string>
                           </property>
                          </widget>
                         </item>
                         <item>
-                         <widget class="QDoubleSpinBox" name="SP22_SP_Delay">
+                         <widget class="QDoubleSpinBox" name="SP22_SB_Seed">
+                          <property name="decimals">
+                           <number>0</number>
+                          </property>
+                          <property name="minimum">
+                           <double>946684800.000000000000000</double>
+                          </property>
+                          <property name="maximum">
+                           <double>2871763199.000000000000000</double>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_97">
+                          <property name="text">
+                           <string>Print Jobs:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QComboBox" name="SP22_CB_Jobs">
+                          <item>
+                           <property name="text">
+                            <string>1</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>5</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>10</string>
+                           </property>
+                          </item>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_58">
+                        <item>
+                         <widget class="QLabel" name="label_96">
+                          <property name="text">
+                           <string>Calibrated Fade to Black Delay:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QDoubleSpinBox" name="SP22_SB_Delay">
                           <property name="minimum">
                            <double>0.000000000000000</double>
                           </property>
@@ -5375,104 +5425,15 @@ Enter Trade Partner Name:</string>
                           </property>
                          </widget>
                         </item>
-                        <item>
-                         <widget class="QLabel" name="label_95">
-                          <property name="text">
-                           <string>No. of Use:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QSpinBox" name="SP22_SB_Use">
-                          <property name="minimum">
-                           <number>1</number>
-                          </property>
-                          <property name="maximum">
-                           <number>999</number>
-                          </property>
-                         </widget>
-                        </item>
                        </layout>
                       </item>
                       <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_60">
-                        <item>
-                         <widget class="QLabel" name="label_97">
-                          <property name="text">
-                           <string>Presets:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QComboBox" name="SP22_CB_Presets">
-                          <property name="maximumSize">
-                           <size>
-                            <width>200</width>
-                            <height>16777215</height>
-                           </size>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_98">
-                          <property name="text">
-                           <string>Bonus Type:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QComboBox" name="SP22_CB_Bonus">
-                          <item>
-                           <property name="text">
-                            <string>None</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>Double Item</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>Poke Ball Lotto</string>
-                           </property>
-                          </item>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
-                      <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_61">
-                        <item>
-                         <widget class="QPushButton" name="SP22_PB_Edit">
-                          <property name="text">
-                           <string>Edit Presets</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QPushButton" name="SP22_PB_Reload">
-                          <property name="text">
-                           <string>Reload Presets</string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
-                      <item>
-                       <widget class="Line" name="line_5">
-                        <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QLabel" name="SP22_L_Rewards">
+                       <widget class="QCheckBox" name="SP22_CB_Sync">
                         <property name="text">
-                         <string>Date Time:
-Jobs:
-Rewards:
-Seed:</string>
+                         <string>Resync Date Time when Complete</string>
+                        </property>
+                        <property name="checked">
+                         <bool>true</bool>
                         </property>
                        </widget>
                       </item>
