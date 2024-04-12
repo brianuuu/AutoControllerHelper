@@ -94,8 +94,8 @@ void SmartSVItemPrinter::runNextState()
                 switch (m_settings->getDateArrangement())
                 {
                     case DA_JP: m_substage = SS_ChangeYear; break;
-                    case DA_EU: m_substage = SS_ChangeMonth; break; // TODO:
-                    case DA_US: m_substage = SS_ChangeMonth; break; // TODO:
+                    case DA_EU: m_substage = SS_ChangeDay; break;
+                    case DA_US: m_substage = SS_ChangeMonth; break;
                 }
             }
         }
@@ -110,8 +110,8 @@ void SmartSVItemPrinter::runNextState()
             switch (m_settings->getDateArrangement())
             {
                 case DA_JP: m_substage = SS_ChangeMonth; break;
-                case DA_EU: m_substage = SS_ChangeMonth; break; // TODO:
-                case DA_US: m_substage = SS_ChangeMonth; break; // TODO:
+                case DA_EU: m_substage = SS_ChangeHour; break;
+                case DA_US: m_substage = SS_ChangeHour; break;
             }
         }
         break;
@@ -125,8 +125,8 @@ void SmartSVItemPrinter::runNextState()
             switch (m_settings->getDateArrangement())
             {
                 case DA_JP: m_substage = SS_ChangeDay; break;
-                case DA_EU: m_substage = SS_ChangeMonth; break; // TODO:
-                case DA_US: m_substage = SS_ChangeMonth; break; // TODO:
+                case DA_EU: m_substage = SS_ChangeYear; break;
+                case DA_US: m_substage = SS_ChangeDay; break;
             }
         }
         break;
@@ -140,8 +140,8 @@ void SmartSVItemPrinter::runNextState()
             switch (m_settings->getDateArrangement())
             {
                 case DA_JP: m_substage = SS_ChangeHour; break;
-                case DA_EU: m_substage = SS_ChangeMonth; break; // TODO:
-                case DA_US: m_substage = SS_ChangeMonth; break; // TODO:
+                case DA_EU: m_substage = SS_ChangeMonth; break;
+                case DA_US: m_substage = SS_ChangeYear; break;
             }
         }
         break;
@@ -151,13 +151,20 @@ void SmartSVItemPrinter::runNextState()
         if (state == S_CommandFinished)
         {
             int diff = m_targetDateTime.time().hour() - m_currentDateTime.time().hour();
-            setState_runCommand(getCommandFromDiff(diff));
-            switch (m_settings->getDateArrangement())
+            if (m_settings->getDateArrangement() == DA_US)
             {
-                case DA_JP: m_substage = SS_ChangeMin; break;
-                case DA_EU: m_substage = SS_ChangeMonth; break; // TODO:
-                case DA_US: m_substage = SS_ChangeMonth; break; // TODO:
+                if (diff > 12)
+                {
+                    diff -= 12;
+                }
+                else if (diff <= -12)
+                {
+                    diff += 12;
+                }
             }
+
+            m_substage = SS_ChangeMin;
+            setState_runCommand(getCommandFromDiff(diff));
         }
         break;
     }
@@ -170,8 +177,26 @@ void SmartSVItemPrinter::runNextState()
             switch (m_settings->getDateArrangement())
             {
             case DA_JP: m_substage = SS_Delay; break;
-            case DA_EU: m_substage = SS_ChangeMonth; break; // TODO:
-            case DA_US: m_substage = SS_ChangeMonth; break; // TODO:
+            case DA_EU: m_substage = SS_Delay; break;
+            case DA_US: m_substage = SS_ChangeAP; break;
+            }
+        }
+        break;
+    }
+    case SS_ChangeAP:
+    {
+        if (state == S_CommandFinished)
+        {
+            m_substage = SS_Delay;
+
+            if ((m_targetDateTime.time().hour() >= 12 && m_currentDateTime.time().minute() < 12)
+             || (m_targetDateTime.time().hour() < 12 && m_currentDateTime.time().minute() >= 12))
+            {
+                setState_runCommand(getCommandFromDiff(1));
+            }
+            else
+            {
+                setState_runCommand(getCommandFromDiff(0));
             }
         }
         break;
