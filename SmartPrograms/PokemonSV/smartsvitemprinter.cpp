@@ -225,7 +225,7 @@ void SmartSVItemPrinter::runNextState()
         {
             m_timer.restart();
             setState_frameAnalyzeRequest();
-            m_videoManager->setAreas({A_Blue,A_Jobs});
+            m_videoManager->setAreas({A_Blue});
         }
         else if (state == S_CaptureReady)
         {
@@ -237,6 +237,7 @@ void SmartSVItemPrinter::runNextState()
             {
                 m_substage = SS_JobsStart;
                 setState_runCommand("Nothing,20");
+                m_videoManager->setAreas({A_Jobs});
             }
             else
             {
@@ -273,7 +274,7 @@ void SmartSVItemPrinter::runNextState()
                     emit printLog("Bonus maybe active, forcing 10 jobs", LOG_WARNING);
 
                     setState_runCommand("Nothing,10");
-                    m_videoManager->setAreas({A_Blue,A_JobsBonus});
+                    m_videoManager->setAreas({A_JobsBonus});
                     break;
                 }
 
