@@ -5351,35 +5351,15 @@ Enter Trade Partner Name:</string>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_55">
                       <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_59">
-                        <item>
-                         <widget class="QLabel" name="label_95">
-                          <property name="text">
-                           <string>Seed:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QDoubleSpinBox" name="SP22_SB_Seed">
-                          <property name="decimals">
-                           <number>0</number>
-                          </property>
-                          <property name="minimum">
-                           <double>946684800.000000000000000</double>
-                          </property>
-                          <property name="maximum">
-                           <double>2871763199.000000000000000</double>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
+                       <layout class="QGridLayout" name="gridLayout_3">
+                        <item row="1" column="0">
                          <widget class="QLabel" name="label_97">
                           <property name="text">
                            <string>Print Jobs:</string>
                           </property>
                          </widget>
                         </item>
-                        <item>
+                        <item row="1" column="1">
                          <widget class="QComboBox" name="SP22_CB_Jobs">
                           <item>
                            <property name="text">
@@ -5398,18 +5378,41 @@ Enter Trade Partner Name:</string>
                           </item>
                          </widget>
                         </item>
-                       </layout>
-                      </item>
-                      <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_58">
-                        <item>
-                         <widget class="QLabel" name="label_96">
+                        <item row="0" column="2">
+                         <widget class="QLabel" name="label_98">
                           <property name="text">
-                           <string>Calibrated Fade to Black Delay:</string>
+                           <string/>
                           </property>
                          </widget>
                         </item>
-                        <item>
+                        <item row="0" column="0">
+                         <widget class="QLabel" name="label_95">
+                          <property name="text">
+                           <string>Seed:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="0" column="1">
+                         <widget class="QDoubleSpinBox" name="SP22_SB_Seed">
+                          <property name="decimals">
+                           <number>0</number>
+                          </property>
+                          <property name="minimum">
+                           <double>946684800.000000000000000</double>
+                          </property>
+                          <property name="maximum">
+                           <double>2871763199.000000000000000</double>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="2" column="0">
+                         <widget class="QLabel" name="label_96">
+                          <property name="text">
+                           <string>Fade to Black Delay:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="2" column="1">
                          <widget class="QDoubleSpinBox" name="SP22_SB_Delay">
                           <property name="minimum">
                            <double>0.000000000000000</double>
