@@ -78,13 +78,13 @@ private:
     // List of test color
     HSVRange const C_Color_Empty = HSVRange(0,0,220,359,40,255); // >250
     HSVRange const C_Color_Summary = HSVRange(150,130,170,190,255,210); // >180, (list) >230
-    HSVRange const C_Color_Text = HSVRange(0,0,210,359,255,255);
+    HSVRange const C_Color_Text = HSVRange(0,0,200,359,140,255);
     HSVRange const C_Color_Shiny = HSVRange(0,0,50,359,70,220); // >50
 
     // List of test point/area
     CaptureArea const A_ListStat = CaptureArea(904,574,350,30, QColor(255,0,0));
     CaptureArea const A_Summary = CaptureArea(513,176,274,36, QColor(255,0,0));
-    CaptureArea const A_Number = CaptureArea(575,183,51,20, QColor(255,0,0));
+    CaptureArea const A_Number = CaptureArea(575,183,62,20, QColor(255,0,0));
     CaptureArea const A_Shiny = CaptureArea(912,73,26,28, QColor(255,0,0));
 
     // Substages
