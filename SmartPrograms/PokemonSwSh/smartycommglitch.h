@@ -1,6 +1,7 @@
 #ifndef SMARTYCOMMGLITCH_H
 #define SMARTYCOMMGLITCH_H
 
+#include <QElapsedTimer>
 #include <QWidget>
 #include "../smartprogrambase.h"
 
@@ -46,6 +47,7 @@ private:
     Substage m_substage;
 
     // Members
+    QElapsedTimer m_timer;
     bool m_internetConnected;
 };
 

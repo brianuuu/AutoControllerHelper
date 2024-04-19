@@ -124,12 +124,17 @@ void SmartYCommGlitch::runNextState()
     {
         if (state == S_CommandFinished)
         {
+            m_timer.restart();
             setState_frameAnalyzeRequest();
         }
         else if (state == S_CaptureReady)
         {
-            bool opponentFound = checkAverageColorMatch(A_Dialog, C_Color_Dialog);
-            if (opponentFound)
+            if (m_timer.elapsed() > 10000)
+            {
+                // prevent screen dim
+                setState_runCommand("B,1,Nothing,5");
+            }
+            else if (checkAverageColorMatch(A_Dialog, C_Color_Dialog))
             {
                 m_substage = SS_Disconnect;
                 setState_runCommand(C_Disconnect);
