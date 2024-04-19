@@ -5352,13 +5352,6 @@ Enter Trade Partner Name:</string>
                      <layout class="QVBoxLayout" name="verticalLayout_55">
                       <item>
                        <layout class="QGridLayout" name="gridLayout_3">
-                        <item row="1" column="0">
-                         <widget class="QLabel" name="label_97">
-                          <property name="text">
-                           <string>Print Jobs:</string>
-                          </property>
-                         </widget>
-                        </item>
                         <item row="1" column="1">
                          <widget class="QComboBox" name="SP22_CB_Jobs">
                           <item>
@@ -5378,17 +5371,57 @@ Enter Trade Partner Name:</string>
                           </item>
                          </widget>
                         </item>
-                        <item row="0" column="2">
-                         <widget class="QLabel" name="label_98">
-                          <property name="text">
-                           <string/>
+                        <item row="2" column="1">
+                         <widget class="QDoubleSpinBox" name="SP22_SB_Delay">
+                          <property name="minimum">
+                           <double>0.000000000000000</double>
+                          </property>
+                          <property name="maximum">
+                           <double>10.000000000000000</double>
+                          </property>
+                          <property name="singleStep">
+                           <double>0.100000000000000</double>
+                          </property>
+                          <property name="value">
+                           <double>1.400000000000000</double>
                           </property>
                          </widget>
                         </item>
                         <item row="0" column="0">
                          <widget class="QLabel" name="label_95">
                           <property name="text">
-                           <string>Seed:</string>
+                           <string>Seed/Date &amp; Time:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="0" column="2">
+                         <widget class="QDateTimeEdit" name="SP22_DateTime">
+                          <property name="date">
+                           <date>
+                            <year>2000</year>
+                            <month>1</month>
+                            <day>1</day>
+                           </date>
+                          </property>
+                          <property name="maximumDate">
+                           <date>
+                            <year>2060</year>
+                            <month>12</month>
+                            <day>31</day>
+                           </date>
+                          </property>
+                          <property name="minimumDate">
+                           <date>
+                            <year>2000</year>
+                            <month>1</month>
+                            <day>1</day>
+                           </date>
+                          </property>
+                          <property name="displayFormat">
+                           <string>yyyy/MM/dd hh:mm:ss</string>
+                          </property>
+                          <property name="calendarPopup">
+                           <bool>true</bool>
                           </property>
                          </widget>
                         </item>
@@ -5412,19 +5445,10 @@ Enter Trade Partner Name:</string>
                           </property>
                          </widget>
                         </item>
-                        <item row="2" column="1">
-                         <widget class="QDoubleSpinBox" name="SP22_SB_Delay">
-                          <property name="minimum">
-                           <double>0.000000000000000</double>
-                          </property>
-                          <property name="maximum">
-                           <double>10.000000000000000</double>
-                          </property>
-                          <property name="singleStep">
-                           <double>0.100000000000000</double>
-                          </property>
-                          <property name="value">
-                           <double>1.400000000000000</double>
+                        <item row="1" column="0">
+                         <widget class="QLabel" name="label_97">
+                          <property name="text">
+                           <string>Print Jobs:</string>
                           </property>
                          </widget>
                         </item>

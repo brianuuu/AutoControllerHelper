@@ -270,8 +270,7 @@ void SmartSVItemPrinter::runNextState()
                 {
                     // bonus may already be active
                     m_bonusActive = true;
-                    m_programSettings.m_jobs = 10;
-                    emit printLog("Bonus maybe active, forcing 10 jobs", LOG_WARNING);
+                    emit printLog("Bonus maybe active, trying again", LOG_WARNING);
 
                     setState_runCommand("Nothing,10");
                     m_videoManager->setAreas({A_JobsBonus});

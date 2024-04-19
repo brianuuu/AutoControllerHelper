@@ -2008,6 +2008,28 @@ void RemoteControllerWindow::on_SP20_CB_Mode_currentIndexChanged(int index)
     }
 }
 
+void RemoteControllerWindow::on_SP22_SB_Seed_valueChanged(const QString &arg1)
+{
+    QDateTime temp;
+    temp.setTimeSpec(Qt::UTC);
+    temp.setDate(QDate(1970,1,1));
+    temp.setTime(QTime(0,0));
+    temp = temp.addSecs(arg1.toLongLong());
+    ui->SP22_DateTime->setDateTime(temp);
+}
+
+void RemoteControllerWindow::on_SP22_DateTime_dateTimeChanged(const QDateTime &dateTime)
+{
+    QDateTime from, to;
+    from.setTimeSpec(Qt::UTC);
+    from.setDate(QDate(1970,1,1));
+    from.setTime(QTime(0,0));
+    to.setTimeSpec(Qt::UTC);
+    to.setDate(dateTime.date());
+    to.setTime(dateTime.time());
+    ui->SP22_SB_Seed->setValue(static_cast<double>(from.secsTo(to)));
+}
+
 void RemoteControllerWindow::on_SoundDetection_required(int min, int max)
 {
     ui->CB_AudioDisplayMode->setCurrentIndex(ADM_Spectrogram);

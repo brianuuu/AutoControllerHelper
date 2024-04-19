@@ -186,6 +186,9 @@ private slots:
 
     void on_SP20_CB_Mode_currentIndexChanged(int index);
 
+    void on_SP22_SB_Seed_valueChanged(const QString &arg1);
+    void on_SP22_DateTime_dateTimeChanged(const QDateTime &dateTime);
+
     void on_SoundDetection_required(int min, int max);
     void on_SmartProgram_printLog(QString const log, QColor color);
     void on_SmartProgram_completed();
