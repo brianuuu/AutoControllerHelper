@@ -171,7 +171,7 @@ void SmartBDSPEggOperation::runNextState()
         }
         else if (state == S_CaptureReady)
         {
-            if (!checkAverageColorMatch(A_Watch.m_rect, C_Color_Watch))
+            if (!checkBrightnessMeanTarget(A_Watch.m_rect, C_Color_Watch, 230))
             {
                 if (m_watchEnabled)
                 {
@@ -229,7 +229,7 @@ void SmartBDSPEggOperation::runNextState()
                     m_videoManager->clearCaptures();
                     break;
                 }
-                else if (!checkAverageColorMatch(A_Watch.m_rect, C_Color_Watch))
+                else if (!checkBrightnessMeanTarget(A_Watch.m_rect, C_Color_Watch, 230))
                 {
                     m_substage = SS_CollectSuccess;
                     setState_runCommand("ASpam,60,Loop,1,BSpam,2,Loop,0", true);
@@ -265,7 +265,7 @@ void SmartBDSPEggOperation::runNextState()
                 incrementStat(m_error);
                 setState_error("Unable to detect finish collecting egg");
             }
-            else if (checkAverageColorMatch(A_Watch.m_rect, C_Color_Watch))
+            else if (checkBrightnessMeanTarget(A_Watch.m_rect, C_Color_Watch, 230))
             {
                 m_substage = SS_Start;
                 setState_runCommand(C_CycleReturn);

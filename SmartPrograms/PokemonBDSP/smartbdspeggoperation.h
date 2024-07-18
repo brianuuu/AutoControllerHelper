@@ -66,7 +66,7 @@ private:
     // List of test color
     HSVRange const C_Color_Dialog = HSVRange(0,0,230,359,30,255); // >150
     HSVRange const C_Color_Shiny = HSVRange(320,0,150,20,255,255); // >60
-    QColor const C_Color_Watch = QColor(147,0,49);
+    HSVRange const C_Color_Watch = HSVRange(310,220,110,10,255,255); // >230
 
     // List of test point/area
     CaptureArea const A_Title = CaptureArea(400,380,520,100);
