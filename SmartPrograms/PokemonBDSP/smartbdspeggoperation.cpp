@@ -213,7 +213,8 @@ void SmartBDSPEggOperation::runNextState()
         if (state == S_CommandFinished)
         {
             incrementStat(m_error);
-            setState_error("Unable to detect dialog when attempting to collect egg");
+            emit printLog("Unable to detect dialog when attempting to collect egg, restarting game", LOG_ERROR);
+            restartGame();
         }
         else if (state == S_CaptureReady)
         {
@@ -306,18 +307,10 @@ void SmartBDSPEggOperation::runNextState()
 
             // hatched 50 eggs, restart game
             m_loopDone++;
-            if (m_loopDone >= 10 && !m_shinyWasFound)
+            if (m_loopDone >= 20 && !m_shinyWasFound)
             {
-                m_watchEnabled = false;
-                m_loopDone = 0;
-
-                m_isStatView = false;
                 emit printLog("It's been over 50 eggs, restarting game to prevent crash", LOG_WARNING);
-
-                m_substage = SS_Restart;
-                setState_runCommand(m_settings->isPreventUpdate() ? C_RestartNoUpdate : C_Restart);
-
-                m_videoManager->clearCaptures();
+                restartGame();
                 break;
             }
 
@@ -505,7 +498,8 @@ void SmartBDSPEggOperation::runNextState()
                 if (!checkBrightnessMeanTarget(A_Pokemon.m_rect, C_Color_Dialog, 230))
                 {
                     incrementStat(m_error);
-                    setState_error("Only excepting eggs in party");
+                    emit printLog("Only expecting eggs in party, restarting game", LOG_ERROR);
+                    restartGame();
                     break;
                 }
 
@@ -661,8 +655,7 @@ void SmartBDSPEggOperation::runNextState()
             {
                 incrementStat(m_error);
                 emit printLog("Unable to detect game start after title screen, the game might have froze or crashed. restarting...", LOG_ERROR);
-                m_substage = SS_Restart;
-                setState_runCommand(m_settings->isPreventUpdate() ? C_RestartNoUpdate : C_Restart);
+                restartGame();
             }
             else if (!checkAverageColorMatch(A_Title.m_rect, QColor(0,0,0)))
             {
@@ -696,6 +689,18 @@ void SmartBDSPEggOperation::runNextState()
     }
 
     SmartProgramBase::runNextState();
+}
+
+void SmartBDSPEggOperation::restartGame()
+{
+    m_watchEnabled = false;
+    m_loopDone = 0;
+    m_isStatView = false;
+
+    m_substage = SS_Restart;
+    setState_runCommand(m_settings->isPreventUpdate() ? C_RestartNoUpdate : C_Restart);
+
+    m_videoManager->clearCaptures();
 }
 
 void SmartBDSPEggOperation::soundDetected(int id)

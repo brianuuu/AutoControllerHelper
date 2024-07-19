@@ -48,6 +48,8 @@ private:
     virtual void reset();
     virtual void runNextState();
 
+    void restartGame();
+
     // Command indices
     Command const C_Restart             = 0;
     Command const C_RestartNoUpdate     = 1;
