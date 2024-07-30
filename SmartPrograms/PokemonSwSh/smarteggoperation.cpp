@@ -1321,6 +1321,14 @@ void SmartEggOperation::runNextState()
             }
             else if (isShiny)
             {
+                // send discord message
+                if (m_programSettings.m_shinyDetection == ShinyDetectionType::SDT_Disable)
+                {
+                    QImage frame;
+                    m_videoManager->getFrame(frame);
+                    sendDiscordMessage("Unmatched Shiny Found!", false, QColor(255,255,0), &frame);
+                }
+
                 emit printLog(log + " is SHINY!!! Moving it to Keep Box!", LOG_SUCCESS);
                 runKeepPokemonCommand();
                 break;
