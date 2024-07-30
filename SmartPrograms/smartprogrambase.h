@@ -551,6 +551,9 @@ public:
     void sendDiscordError(QString const& title, QColor color = QColor(0,0,0), QImage const* img = nullptr, QList<Discord::EmbedField> const& fields = {});
 
 protected:
+    void sendDiscordMessage(QString const& title, bool isMention, bool isError, QColor color = QColor(0,0,0), QImage const* img = nullptr, QList<Discord::EmbedField> const& fields = {});
+
+protected:
     AudioManager*           m_audioManager;
     VideoManager*           m_videoManager;
     DiscordSettings*        m_discordSettings;
