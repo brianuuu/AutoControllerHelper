@@ -50,6 +50,7 @@ public:
     // senders
     bool canSendMessage();
     void sendMessage(Discord::Embed const& embed, bool isMention, QImage const* img = nullptr);
+    void sendError(const Discord::Embed &embed, const QImage *img = nullptr);
 
     void sendMessage(snowflake_t channelId, QString const& content);
     void sendImageMessage(snowflake_t channelId, QImage const& img);

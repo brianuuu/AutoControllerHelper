@@ -994,7 +994,7 @@ void SmartProgramBase::runNextState()
             Discord::EmbedField embedField("Error Message", m_errorMsg, false);
             QImage frame;
             m_videoManager->getFrame(frame);
-            sendDiscordMessage("Error Occured", false, LOG_ERROR, &frame, {embedField});
+            sendDiscordError("Error Occured", LOG_ERROR, &frame, {embedField});
         }
 
         stop();
@@ -1164,6 +1164,16 @@ void SmartProgramBase::updateStats()
 
 void SmartProgramBase::sendDiscordMessage(const QString &title, bool isMention, QColor color, const QImage *img, const QList<Discord::EmbedField> &fields)
 {
+    sendDiscordMessage(title, isMention, false, color, img, fields);
+}
+
+void SmartProgramBase::sendDiscordError(const QString &title, QColor color, const QImage *img, const QList<Discord::EmbedField> &fields)
+{
+    sendDiscordMessage(title, false, true, color, img, fields);
+}
+
+void SmartProgramBase::sendDiscordMessage(const QString &title, bool isMention, bool isError, QColor color, const QImage *img, const QList<Discord::EmbedField> &fields)
+{
     if (!m_discordSettings->canSendMessage()) return;
 
     Discord::Embed embed = m_discordSettings->getEmbedTemplate(title);
@@ -1191,6 +1201,13 @@ void SmartProgramBase::sendDiscordMessage(const QString &title, bool isMention, 
     embed.addField(Discord::EmbedField("Smart Program Stats", fieldMsg, false));
 
     // send message
-    m_discordSettings->sendMessage(embed, isMention, img);
+    if (isError)
+    {
+        m_discordSettings->sendError(embed, img);
+    }
+    else
+    {
+        m_discordSettings->sendMessage(embed, isMention, img);
+    }
     m_hadDiscordMessage = true;
 }
