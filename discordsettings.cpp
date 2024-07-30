@@ -187,7 +187,7 @@ void DiscordSettings::sendMessage(const Discord::Embed &embed, bool isMention, c
 
 void DiscordSettings::sendError(const Discord::Embed &embed, const QImage *img)
 {
-    isMention = ui->CB_MentionError->isChecked();
+    bool isMention = ui->CB_MentionError->isChecked();
     sendMessage(embed, isMention, img);
 }
 
