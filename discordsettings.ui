@@ -166,6 +166,16 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="CB_MentionError">
+     <property name="text">
+      <string>Mention Owner on Error</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
       <widget class="QPushButton" name="PB_Channel">
