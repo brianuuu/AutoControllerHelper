@@ -2642,7 +2642,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     {
         SmartHomeSorter::Settings settings;
         settings.m_count = ui->SP14_SB_Count->value();
-        settings.m_livingDex = ui->SP14_CB_Shiny->isChecked();
+        settings.m_livingDex = ui->SP14_CB_LivingDex->isChecked();
         settings.m_livingDexShiny = ui->SP14_CB_Shiny->isChecked();
         m_smartProgram = new SmartHomeSorter(settings, parameter);
         break;
