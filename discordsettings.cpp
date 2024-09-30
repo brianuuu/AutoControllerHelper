@@ -21,6 +21,7 @@ DiscordSettings::DiscordSettings(QWidget *parent) :
     ui->LE_Owner->setText(m_settings->value("DiscordOwner", "").toString());
     ui->CB_Launch->setChecked(m_settings->value("DiscordStart", false).toBool());
     ui->CB_StatusDM->setChecked(m_settings->value("DiscordStatusDM", true).toBool());
+    ui->CB_MentionError->setChecked(m_settings->value("DiscordMentionError", true).toBool());
     if (ui->CB_Launch->isChecked())
     {
         on_PB_Connect_clicked();
@@ -41,6 +42,7 @@ void DiscordSettings::closeEvent(QCloseEvent *event)
     m_settings->setValue("DiscordOwner", ui->LE_Owner->text());
     m_settings->setValue("DiscordStart", ui->CB_Launch->isChecked());
     m_settings->setValue("DiscordStatusDM", ui->CB_StatusDM->isChecked());
+    m_settings->setValue("DiscordMentionError", ui->CB_MentionError->isChecked());
 }
 
 void DiscordSettings::on_LE_Token_textChanged(const QString &arg1)
@@ -181,6 +183,12 @@ void DiscordSettings::sendMessage(const Discord::Embed &embed, bool isMention, c
             }
         );
     }
+}
+
+void DiscordSettings::sendError(const Discord::Embed &embed, const QImage *img)
+{
+    bool isMention = ui->CB_MentionError->isChecked();
+    sendMessage(embed, isMention, img);
 }
 
 void DiscordSettings::sendMessage(snowflake_t channelId, const QString &content)
