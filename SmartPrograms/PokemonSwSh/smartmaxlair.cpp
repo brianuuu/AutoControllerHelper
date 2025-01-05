@@ -582,6 +582,13 @@ void SmartMaxLair::runNextState()
         }
         else if (state == S_CaptureReady)
         {
+            if (m_turnCount > 10)
+            {
+                incrementStat(m_statError);
+                setState_error("Turn is not expected to be more than 10");
+                break;
+            }
+
             if (m_timer.elapsed() > 120000)
             {
                 incrementStat(m_statError);
