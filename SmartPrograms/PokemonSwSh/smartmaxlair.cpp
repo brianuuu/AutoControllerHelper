@@ -487,7 +487,7 @@ void SmartMaxLair::runNextState()
         }
         else if (state == S_CaptureReady)
         {
-            if (m_timer.elapsed() > 60000)
+            if (m_timer.elapsed() > 90000)
             {
                 incrementStat(m_statError);
                 setState_error("Unable to detect pick path sequence");
