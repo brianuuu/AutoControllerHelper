@@ -1542,6 +1542,13 @@ void SmartMaxLair::calculateBestMove()
                 score = 99999;
             }
 
+            // Spread moves from legendaries
+            // Discharge, Surf, Earthquake, Lava Plume, Sludge Wave, Bulldoze
+            if (moves.at(i) == 435 || moves.at(i) == 57 || moves.at(i) == 89 || moves.at(i) == 436 || moves.at(i) == 482 || moves.at(i) == 523)
+            {
+                score = 0;
+            }
+
             moveScore.m_moveIndex = i;
             moveScore.m_score = score;
             m_moveScoreList.push_back(moveScore);
