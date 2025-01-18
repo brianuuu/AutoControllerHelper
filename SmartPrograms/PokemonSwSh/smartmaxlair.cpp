@@ -1350,6 +1350,20 @@ void SmartMaxLair::runNextState()
             }
             else
             {
+                // stay on same winning path
+                if (m_battleCount == 4 && m_programSettings.m_samePath)
+                {
+                    emit printLog(m_bossNames.back() + " is not shiny, restarting game to stay on same winning path...", LOG_IMPORTANT);
+                    m_bossNames.clear();
+
+                    m_substage = SS_RestartGame;
+                    setState_runCommand("Home,1,Nothing,36,X,4,ASpam,200");
+
+                    m_videoManager->clearCaptures();
+                    m_videoManager->setPoints({P_Center});
+                    break;
+                }
+
                 emit printLog(m_bossNames.back() + " is not shiny...");
                 m_bossNames.pop_back();
                 if (m_bossNames.empty())
@@ -1393,6 +1407,72 @@ void SmartMaxLair::runNextState()
                 m_timer.restart();
             }
         }
+        break;
+    }
+    case SS_RestartGame:
+    {
+        if (state == S_CommandFinished)
+        {
+            m_videoManager->getFrame(m_capture);
+
+            // Wait until screen is not black anymore (intro plays)
+            bool introStarted = !checkPixelColorMatch(P_Center.m_point, QColor(0,0,0));
+            if (introStarted)
+            {
+                m_substage = SS_StartGame;
+                setState_runCommand("Nothing,21,ASpam,4,Nothing,40");
+                emit printLog("Intro started, entering game...");
+            }
+            else
+            {
+                runNextStateContinue();
+            }
+        }
+        break;
+    }
+    case SS_StartGame:
+    {
+        if (state == S_CommandFinished)
+        {
+            m_videoManager->getFrame(m_capture);
+
+            // Wait until screen to be black
+            bool enteredBlackScreen = checkPixelColorMatch(P_Center.m_point, QColor(0,0,0));
+            if (enteredBlackScreen)
+            {
+                m_substage = SS_EnterGame;
+
+                m_videoManager->clearCaptures();
+                m_videoManager->setAreas({A_EnterGame});
+            }
+
+            runNextStateContinue();
+        }
+
+        break;
+    }
+    case SS_EnterGame:
+    {
+        if (state == S_CommandFinished)
+        {
+            m_videoManager->getFrame(m_capture);
+
+            // Wait until screen to be not black anymore
+            bool enteredGame = !checkAverageColorMatch(A_EnterGame.m_rect, QColor(0,0,0));
+            if (enteredGame)
+            {
+                m_substage = SS_Start;
+                setState_runCommand("Nothing,5");
+
+                m_timer.restart();
+                m_videoManager->clearCaptures();
+            }
+            else
+            {
+                runNextStateContinue();
+            }
+        }
+
         break;
     }
     }

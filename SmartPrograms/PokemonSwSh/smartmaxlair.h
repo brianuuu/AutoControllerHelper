@@ -16,6 +16,7 @@ public:
         BallType m_legendBall;
         BallType m_bossBall;
         bool m_wideGuard;
+        bool m_samePath;
     };
 
 public:
@@ -142,6 +143,8 @@ private:
     CaptureArea const A_Person = CaptureArea(431,689,410,10,QColor(255,0,0));
     CaptureArea const A_Backpacker = CaptureArea(1066,366,100,100);
     CaptureArea const A_Ore = CaptureArea(1170,0,110,48);
+    CapturePoint const P_Center = CapturePoint(640,0);
+    CaptureArea const A_EnterGame = CaptureArea(600,0,80,80);
 
     // Substages
     enum Substage
@@ -166,6 +169,10 @@ private:
         SS_Result,
         SS_CheckShiny,
         SS_TakeReward,
+
+        SS_RestartGame,   // Close and launch game
+        SS_StartGame,   // Press A when intro starts
+        SS_EnterGame    // Wait until black screen goes away
     };
     Substage m_substage;
 

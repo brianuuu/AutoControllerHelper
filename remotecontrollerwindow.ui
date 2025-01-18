@@ -3800,7 +3800,7 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                        <x>0</x>
                        <y>0</y>
                        <width>274</width>
-                       <height>70</height>
+                       <height>186</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_31">
@@ -5286,7 +5286,14 @@ Enter Trade Partner Name:</string>
                       <item>
                        <widget class="QCheckBox" name="SP21_CB_WideGuard">
                         <property name="text">
-                         <string>Prioritize Wide Guard on Legendary if Available</string>
+                         <string>Prioritize Wide Guard on Legendary if Available (Recommend: Zygarde)</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="SP21_CB_SamePath">
+                        <property name="text">
+                         <string>Stay on the Same Winning Path (Ignores Non-Legendary Shiny)</string>
                         </property>
                        </widget>
                       </item>
