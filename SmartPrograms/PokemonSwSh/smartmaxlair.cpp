@@ -552,9 +552,9 @@ void SmartMaxLair::runNextState()
             }
             else if (checkAverageColorMatch(A_Backpacker.m_rect, QColor(12,178,247)))
             {
-                emit printLog("Encountered a Backpacker!");
+                emit printLog("Encountered a Backpacker! Picking first item");
                 m_substage = SS_FindPath;
-                setState_runCommand("BSpam,100");
+                setState_runCommand("ASpam,10,BSpam,100");
                 m_videoManager->clearCaptures();
             }
             else if (checkAverageColorMatch(A_SelectionBase.m_rect, QColor(253,253,253)))
