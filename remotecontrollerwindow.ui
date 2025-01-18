@@ -1914,7 +1914,7 @@
                  </sizepolicy>
                 </property>
                 <property name="currentIndex">
-                 <number>20</number>
+                 <number>21</number>
                 </property>
                 <widget class="QWidget" name="page">
                  <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -3800,7 +3800,7 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                        <x>0</x>
                        <y>0</y>
                        <width>274</width>
-                       <height>186</height>
+                       <height>70</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_31">
@@ -4883,7 +4883,7 @@ Enter Trade Partner Name:</string>
                      <property name="geometry">
                       <rect>
                        <x>0</x>
-                       <y>-31</y>
+                       <y>0</y>
                        <width>488</width>
                        <height>241</height>
                       </rect>
@@ -5284,6 +5284,13 @@ Enter Trade Partner Name:</string>
                        </layout>
                       </item>
                       <item>
+                       <widget class="QCheckBox" name="SP21_CB_WideGuard">
+                        <property name="text">
+                         <string>Prioritize Wide Guard on Legendary if Available</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
                        <spacer name="verticalSpacer_20">
                         <property name="orientation">
                          <enum>Qt::Vertical</enum>
@@ -5332,8 +5339,8 @@ Enter Trade Partner Name:</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>498</width>
-                       <height>210</height>
+                       <width>300</width>
+                       <height>113</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_55">

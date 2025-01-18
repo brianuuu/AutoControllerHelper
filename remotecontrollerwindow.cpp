@@ -2734,6 +2734,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         settings.m_legendDownPress = ui->SP21_SB_Slot->value() - 1;
         settings.m_legendBall = (BallType)ui->SP21_CB_LegendBall->currentIndex();
         settings.m_bossBall = (BallType)ui->SP21_CB_BossBall->currentIndex();
+        settings.m_wideGuard = ui->SP21_CB_WideGuard->isChecked();
         m_smartProgram = new SmartMaxLair(settings, parameter);
         break;
     }

@@ -15,6 +15,7 @@ public:
         int m_legendDownPress;
         BallType m_legendBall;
         BallType m_bossBall;
+        bool m_wideGuard;
     };
 
 public:

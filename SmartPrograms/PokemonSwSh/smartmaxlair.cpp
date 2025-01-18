@@ -438,6 +438,22 @@ void SmartMaxLair::runNextState()
                         }
 
                         double score = m_matchupData[id].at(m_programSettings.m_legendIndex);
+
+                        // add to score it pokemon has wide guard
+                        if (m_programSettings.m_wideGuard)
+                        {
+                            RentalData const& rentalData = m_rentalData[ rentalIndices[i] ].second;
+                            for (int moveID : rentalData.m_moves)
+                            {
+                                if (moveID == 469)
+                                {
+                                    emit printLog("Rental Pokemon '" + id + "' has Wide Guard, adding 1000 score");
+                                    score += 1000;
+                                    break;
+                                }
+                            }
+                        }
+
                         emit printLog("Rental Pokemon '" + id + "' VS '" + m_bossData[m_programSettings.m_legendIndex].first + "' score: " + QString::number(score));
                         if (score > m_rentalScore)
                         {
@@ -1218,6 +1234,21 @@ void SmartMaxLair::runNextState()
                 else
                 {
                     double score = m_matchupData[id].at(m_programSettings.m_legendIndex);
+
+                    // add to score it pokemon has wide guard
+                    if (m_programSettings.m_wideGuard)
+                    {
+                        for (int moveID : m_bossCurrent.m_moves)
+                        {
+                            if (moveID == 469)
+                            {
+                                emit printLog("Rental Pokemon '" + id + "' has Wide Guard, adding 1000 score");
+                                score += 1000;
+                                break;
+                            }
+                        }
+                    }
+
                     emit printLog("Rental Pokemon '" + id + "' VS '" + m_bossData[m_programSettings.m_legendIndex].first + "' score: " + QString::number(score));
                     if (score > m_rentalScore)
                     {
@@ -1536,8 +1567,8 @@ void SmartMaxLair::calculateBestMove()
                 score *= PokemonDatabase::typeMatchupMultiplier(moveData.m_type, m_bossCurrent.m_types[0], m_bossCurrent.m_types[1]);
             }
 
-            // Zygarde & Wide Guard
-            if (moves.at(i) == 469 && m_bossCurrent.m_name == "Zygarde")
+            // Prioritize Wide Guard on legendary
+            if (m_programSettings.m_wideGuard && m_battleCount == 4 && moves.at(i) == 469)
             {
                 score = 99999;
             }
