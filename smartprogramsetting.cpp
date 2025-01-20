@@ -16,7 +16,10 @@ SmartProgramSetting::SmartProgramSetting(QWidget *parent) :
     ui->CB_PreventUpdate->setChecked(m_settings->value("PreventUpdate", false).toBool());
     ui->CB_DateArrangement->setCurrentIndex(m_settings->value("DateArrangement", 0).toInt());
     ui->CurrentDate->setDate(QDate::currentDate());
-    ui->CB_GameLanguage->setCurrentIndex(m_settings->value("GameLanguage", 0).toInt());
+
+    int gameLanguageIndex = m_settings->value("GameLanguage", 0).toInt();
+    m_ignoreLanguageWarning = (gameLanguageIndex != 0);
+    ui->CB_GameLanguage->setCurrentIndex(gameLanguageIndex);
 
     // Sound
     m_defaultPlayer.setMedia(QUrl("qrc:/resources/Sounds/06-caught-a-pokemon.mp3"));
@@ -187,10 +190,12 @@ void SmartProgramSetting::on_CB_GameLanguage_currentIndexChanged(int index)
         QString languageName = PokemonDatabase::getGameLanguageName(getGameLanguage());
         QMessageBox::warning(this, "Warning", "Language trained data for '" + languageName + "' for Tesseract is missing, please goto 'Resources/Tesseract' folder and follow the instructions in README.md. You MUST restart Smart Program Manager after.", QMessageBox::Ok);
     }
-    else
+    else if (!m_ignoreLanguageWarning)
     {
         QMessageBox::warning(this, "Warning", "You MUST restart Smart Program Manager after switching Language.", QMessageBox::Ok);
     }
+
+    m_ignoreLanguageWarning = false;
 }
 
 void SmartProgramSetting::on_PB_CurrentDate_clicked()

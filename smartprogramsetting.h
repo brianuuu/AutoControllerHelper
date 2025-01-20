@@ -79,6 +79,7 @@ private:
 
     QMediaPlayer m_defaultPlayer;
     QSound* m_customSound = Q_NULLPTR;
+    bool m_ignoreLanguageWarning;
 };
 
 #endif // SMARTPROGRAMSETTING_H
