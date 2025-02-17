@@ -189,8 +189,8 @@ void SmartSVItemPrinter::runNextState()
         {
             m_substage = SS_Delay;
 
-            if ((m_targetDateTime.time().hour() >= 12 && m_currentDateTime.time().minute() < 12)
-             || (m_targetDateTime.time().hour() < 12 && m_currentDateTime.time().minute() >= 12))
+            if ((m_targetDateTime.time().hour() >= 12 && m_currentDateTime.time().hour() < 12)
+             || (m_targetDateTime.time().hour() < 12 && m_currentDateTime.time().hour() >= 12))
             {
                 setState_runCommand(getCommandFromDiff(1));
             }
