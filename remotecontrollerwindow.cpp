@@ -2318,6 +2318,9 @@ void RemoteControllerWindow::on_LW_SmartProgram_currentTextChanged(const QString
 
     m_vlcWrapper->getVideoManager()->setDefaultAreaEnabled(useArea);
     UpdateStats(sp);
+
+    bool canRun = CanRunSmartProgram();
+    ui->PB_StartSmartProgram->setEnabled(canRun);
 }
 
 void RemoteControllerWindow::on_CB_SmartProgram_currentIndexChanged(int index)
@@ -2547,8 +2550,10 @@ void RemoteControllerWindow::EnableSmartProgram()
 
 bool RemoteControllerWindow::CanRunSmartProgram()
 {
-    return m_serialPort.isOpen()
-        && m_serialState == SS_Connect
+    QString name = ui->LW_SmartProgram->currentItem()->text();
+    SmartProgram const sp = SmartProgramBase::getProgramEnumFromName(name);
+
+    return ((m_serialPort.isOpen() && m_serialState == SS_Connect) || SmartProgramBase::getProgramRunWithoutSerial(sp))
         && m_vlcWrapper->isPlaying();
 }
 

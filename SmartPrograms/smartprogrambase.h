@@ -381,6 +381,18 @@ public:
         }
     }
 
+    static bool getProgramRunWithoutSerial(SmartProgram sp)
+    {
+        switch (sp)
+        {
+        case SP_BrightnessMeanFinder:
+        case SP_SoundDetection:
+            return true;
+        default:
+            return false;
+        }
+    }
+
     static bool getProgramExportLog(SmartProgram sp)
     {
         switch (sp)
