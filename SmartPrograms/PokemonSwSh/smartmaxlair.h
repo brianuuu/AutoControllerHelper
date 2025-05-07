@@ -45,8 +45,8 @@ private:
 
     // List of test color
     HSVRange const C_Color_Black = HSVRange(0,0,0,359,30,120); // >180
-    HSVRange const C_Color_TextB = HSVRange(0,0,0,359,30,150); // for black text OCR
-    HSVRange const C_Color_TextW = HSVRange(0,0,150,359,30,255); // for white text OCR
+    HSVRange const C_Color_TextB = HSVRange(0,0,0,359,130,150); // for black text OCR
+    HSVRange const C_Color_TextW = HSVRange(0,0,150,359,130,255); // for white text OCR
     HSVRange const C_Color_TextOre = HSVRange(0,0,150,359,130,255); // for Dynite Ore OCR
     HSVRange const C_Color_RStick = HSVRange(0,0,180,359,30,255);
     HSVRange const C_Color_Fight = HSVRange(300,100,100,355,255,255); // >80
