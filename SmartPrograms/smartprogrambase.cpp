@@ -718,7 +718,14 @@ bool SmartProgramBase::startOCR(QRect rectPos, HSVRange hsvRange, bool isNumber)
     QString command = QString(RESOURCES_PATH) + "Tesseract/tesseract.exe ";
     command += "./capture.png ./output --tessdata-dir . ";
     command += "-l " + PokemonDatabase::getGameLanguagePrefix(gameLanguage);
-    command += " --psm 7 --oem 2 -c tessedit_create_txt=1";
+    if (gameLanguage == GL_ChineseSimplified || gameLanguage == GL_ChineseTraditional || gameLanguage == GL_Korean)
+    {
+        command += " --psm 7 --oem 0 -c tessedit_create_txt=1";
+    }
+    else
+    {
+        command += " --psm 7 --oem 2 -c tessedit_create_txt=1";
+    }
     m_ocrProcess.setWorkingDirectory(QString(RESOURCES_PATH) + "Tesseract/");
     m_ocrProcess.start(command);
 
