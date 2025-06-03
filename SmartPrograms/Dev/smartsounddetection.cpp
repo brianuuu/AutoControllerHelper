@@ -43,7 +43,7 @@ void SmartSoundDetection::runNextState()
         {
             m_audioManager->startDetection(id);
             m_substage = SS_Loop;
-            setState_runCommand("Nothing,5");
+            setState_frameAnalyzeRequest();
         }
         break;
     }
