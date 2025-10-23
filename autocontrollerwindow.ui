@@ -73,6 +73,11 @@
         </item>
         <item>
          <property name="text">
+          <string>Pokemon Legends: Z-A</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
           <string>Pokemon Scarlet/Violet</string>
          </property>
         </item>

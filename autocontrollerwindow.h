@@ -207,6 +207,10 @@ private:
         // Splatoon 3 Programs
         P_S3_TableturfSkip,
 
+        // ZA Programs
+        P_ZA_BenchReset,
+        P_ZA_ShinyLitwick,
+
         P_INVALID
     };
     QMap<QString, Program> m_programEnumMap;

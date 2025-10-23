@@ -65,6 +65,9 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
 
     m_programEnumMap["S3_TableturfSkip"]    = P_S3_TableturfSkip;
 
+    m_programEnumMap["ZA_BenchReset"]       = P_ZA_BenchReset;
+    m_programEnumMap["ZA_ShinyLitwick"]     = P_ZA_ShinyLitwick;
+
     m_tabID[P_DaySkipper]           = 1;
     m_tabID[P_DaySkipper_Unlimited] = 2;
     m_tabID[P_WattFarmer]           = 17; // 3 now use for error
@@ -117,6 +120,9 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
     m_tabID[P_TOTK_ZonaiDeviceDuplication]  = 7;
 
     m_tabID[P_S3_TableturfSkip]     = 0;
+
+    m_tabID[P_ZA_BenchReset]      = 0;
+    m_tabID[P_ZA_ShinyLitwick]      = 0;
 
     if (!QDir(HEX_PATH).exists())
     {
@@ -607,6 +613,10 @@ void autocontrollerwindow::on_CB_Bots_currentIndexChanged(int index)
         else if (item->text().startsWith("S3"))
         {
             item->setHidden(ui->CB_Bots->currentText() != "Splatoon 3");
+        }
+        else if (item->text().startsWith("ZA"))
+        {
+            item->setHidden(ui->CB_Bots->currentText() != "Pokemon Legends: Z-A");
         }
         else
         {
