@@ -67,9 +67,9 @@ private:
     };
     CaptureArea const A_RaidStart[3] =
     {
-        CaptureArea(1166,497,32,32),
-        CaptureArea(1166,554,32,32),
-        CaptureArea(1166,611,32,32)
+        CaptureArea(1200,497,16,32),
+        CaptureArea(1200,554,16,32),
+        CaptureArea(1200,611,16,32)
     };
     CaptureArea const A_RentalSelect[3] =
     {

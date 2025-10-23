@@ -1351,7 +1351,7 @@ void SmartMaxLair::runNextState()
             else
             {
                 // stay on same winning path
-                if (m_battleCount == 4 && m_programSettings.m_samePath)
+                if (m_bossNames.size() == 4 && m_programSettings.m_samePath)
                 {
                     emit printLog(m_bossNames.back() + " is not shiny, restarting game to stay on same winning path...", LOG_IMPORTANT);
                     m_bossNames.clear();
