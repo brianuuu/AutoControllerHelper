@@ -208,8 +208,8 @@ private:
         P_S3_TableturfSkip,
 
         // ZA Programs
-        P_ZA_BenchReset,
-        P_ZA_ShinyLitwick,
+        P_PLZA_BenchReset,
+        P_PLZA_ShinyLitwick,
 
         P_INVALID
     };

@@ -65,8 +65,8 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
 
     m_programEnumMap["S3_TableturfSkip"]    = P_S3_TableturfSkip;
 
-    m_programEnumMap["ZA_BenchReset"]       = P_ZA_BenchReset;
-    m_programEnumMap["ZA_ShinyLitwick"]     = P_ZA_ShinyLitwick;
+    m_programEnumMap["PLZA_BenchReset"]     = P_PLZA_BenchReset;
+    m_programEnumMap["PLZA_ShinyLitwick"]   = P_PLZA_ShinyLitwick;
 
     m_tabID[P_DaySkipper]           = 1;
     m_tabID[P_DaySkipper_Unlimited] = 2;
@@ -121,8 +121,8 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
 
     m_tabID[P_S3_TableturfSkip]     = 0;
 
-    m_tabID[P_ZA_BenchReset]      = 0;
-    m_tabID[P_ZA_ShinyLitwick]      = 0;
+    m_tabID[P_PLZA_BenchReset]      = 0;
+    m_tabID[P_PLZA_ShinyLitwick]    = 0;
 
     if (!QDir(HEX_PATH).exists())
     {
@@ -614,7 +614,7 @@ void autocontrollerwindow::on_CB_Bots_currentIndexChanged(int index)
         {
             item->setHidden(ui->CB_Bots->currentText() != "Splatoon 3");
         }
-        else if (item->text().startsWith("ZA"))
+        else if (item->text().startsWith("PLZA"))
         {
             item->setHidden(ui->CB_Bots->currentText() != "Pokemon Legends: Z-A");
         }
