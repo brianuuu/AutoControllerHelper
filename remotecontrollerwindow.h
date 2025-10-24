@@ -86,6 +86,8 @@
 
 #include "SmartPrograms/Splatoon3/smarts3tableturfclonejelly.h"
 
+#include "SmartPrograms/PokemonPLZA/smartplzarespawnreset.h"
+
 #include "SmartPrograms/Widgets/pokemonautofilllineedit.h"
 #include "SmartPrograms/Widgets/selectorwidget.h"
 

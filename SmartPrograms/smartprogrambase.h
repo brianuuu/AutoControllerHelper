@@ -79,6 +79,8 @@ enum SmartProgram : uint32_t
     SP_S3_TableturfSkip,
     SP_S3_TableturfCloneJelly,
 
+    SP_PLZA_RespawnReset,
+
     SP_COUNT
 };
 
@@ -205,6 +207,8 @@ public:
             case SP_S3_TableturfSkip:       return "Tableturf Skipper";
             case SP_S3_TableturfCloneJelly: return "Tableturf Clone Jelly";
 
+            case SP_PLZA_RespawnReset:      return "Respawn Reset (PLZA)";
+
             default:                        return "Invalid";
         }
     }
@@ -284,6 +288,8 @@ public:
             case SP_S3_TableturfSkip:       return "SmartS3TableturfSkip";
             case SP_S3_TableturfCloneJelly: return "SmartS3TableturfCloneJelly";
 
+            case SP_PLZA_RespawnReset:      return "SmartPLZARespawnReset";
+
             case SP_COUNT:                  return "Invalid";
         }
         return "Invalid";
@@ -350,6 +356,8 @@ public:
 
             case SP_S3_TableturfSkip:       return 0;
             case SP_S3_TableturfCloneJelly: return 0;
+
+            case SP_PLZA_RespawnReset:      return 0;
 
             case SP_COUNT:                  return -1;
         }
@@ -424,6 +432,11 @@ public:
 
     static QString getProgramGamePrefix(SmartProgram sp)
     {
+        if (sp >= SP_PLZA_RespawnReset)
+        {
+            return "Pokemon Legends: Z-A";
+        }
+
         if (sp >= SP_S3_TableturfSkip)
         {
             return "Splatoon 3";

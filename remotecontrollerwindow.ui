@@ -1851,6 +1851,11 @@
                   </item>
                   <item>
                    <property name="text">
+                    <string>Pokemon Legends: Z-A</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
                     <string>Pokemon Scarlet/Violet</string>
                    </property>
                   </item>
@@ -3800,7 +3805,7 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                        <x>0</x>
                        <y>0</y>
                        <width>274</width>
-                       <height>186</height>
+                       <height>70</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_31">
@@ -4884,7 +4889,7 @@ Enter Trade Partner Name:</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>488</width>
+                       <width>371</width>
                        <height>241</height>
                       </rect>
                      </property>
