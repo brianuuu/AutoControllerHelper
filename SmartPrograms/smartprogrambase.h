@@ -80,6 +80,7 @@ enum SmartProgram : uint32_t
     SP_S3_TableturfCloneJelly,
 
     SP_PLZA_RespawnReset,
+    SP_PLZA_BenchReset,
 
     SP_COUNT
 };
@@ -208,6 +209,7 @@ public:
             case SP_S3_TableturfCloneJelly: return "Tableturf Clone Jelly";
 
             case SP_PLZA_RespawnReset:      return "Respawn Reset (PLZA)";
+            case SP_PLZA_BenchReset:        return "Bench Reset";
 
             default:                        return "Invalid";
         }
@@ -289,6 +291,7 @@ public:
             case SP_S3_TableturfCloneJelly: return "SmartS3TableturfCloneJelly";
 
             case SP_PLZA_RespawnReset:      return "SmartPLZARespawnReset";
+            case SP_PLZA_BenchReset:        return "SmartPLZABenchReset";
 
             case SP_COUNT:                  return "Invalid";
         }
@@ -358,6 +361,7 @@ public:
             case SP_S3_TableturfCloneJelly: return 0;
 
             case SP_PLZA_RespawnReset:      return 0;
+            case SP_PLZA_BenchReset:        return 0;
 
             case SP_COUNT:                  return -1;
         }
