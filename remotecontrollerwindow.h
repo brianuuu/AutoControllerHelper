@@ -156,8 +156,6 @@ private slots:
     void on_PB_ClearLog_clicked();
 
     // Camera
-    void on_RB_DetectedDevice_clicked();
-    void on_RB_CustomDevice_clicked();
     void on_PB_RefreshCamera_clicked();
     void on_PB_StartCamera_clicked();
     void on_PB_Screenshot_clicked();

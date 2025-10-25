@@ -1306,40 +1306,6 @@
    <item>
     <layout class="QVBoxLayout" name="VL_Camera">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_17">
-       <item>
-        <widget class="QRadioButton" name="RB_DetectedDevice">
-         <property name="text">
-          <string>Detected Capture Devices</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="RB_CustomDevice">
-         <property name="text">
-          <string>Custom Capture Device Name</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </item>
-     <item>
       <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
         <widget class="QFrame" name="GB_DetectedDevice">
@@ -1389,61 +1355,26 @@
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="label_29">
+            <property name="text">
+             <string>Audio Inputs:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="CB_AudioInputs">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="PB_RefreshCamera">
             <property name="text">
              <string>Refresh</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QFrame" name="GB_CustomDevice">
-         <layout class="QHBoxLayout" name="horizontalLayout_16">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QLabel" name="label_30">
-            <property name="text">
-             <string>Video:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="LE_CustomVideo">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>0</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_29">
-            <property name="text">
-             <string>Audio:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="LE_CustomAudio">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>0</height>
-             </size>
             </property>
            </widget>
           </item>
@@ -1638,7 +1569,7 @@
           <x>0</x>
           <y>0</y>
           <width>678</width>
-          <height>701</height>
+          <height>727</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_39">
@@ -3805,7 +3736,7 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                        <x>0</x>
                        <y>0</y>
                        <width>274</width>
-                       <height>70</height>
+                       <height>186</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_31">
@@ -5176,7 +5107,7 @@ Enter Trade Partner Name:</string>
                        <x>0</x>
                        <y>0</y>
                        <width>498</width>
-                       <height>210</height>
+                       <height>236</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_53">

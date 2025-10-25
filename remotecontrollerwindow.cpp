@@ -253,19 +253,7 @@ RemoteControllerWindow::RemoteControllerWindow(QWidget *parent) :
     // Set last used serial and camera
     ui->CB_SerialPorts->setCurrentText(m_settings->value("SerialName", "").toString());
     ui->CB_Cameras->setCurrentText(m_settings->value("CameraName", "").toString());
-
-    ui->LE_CustomVideo->setText(m_settings->value("CustomVideo", "").toString());
-    ui->LE_CustomAudio->setText(m_settings->value("CustomAudio", "").toString());
-    if (m_settings->value("UseDetectedDevice", true).toBool())
-    {
-        ui->RB_DetectedDevice->setChecked(true);
-        on_RB_DetectedDevice_clicked();
-    }
-    else
-    {
-        ui->RB_CustomDevice->setChecked(true);
-        on_RB_CustomDevice_clicked();
-    }
+    ui->CB_AudioInputs->setCurrentText(m_settings->value("AudioName", "").toString());
 
     // Set last used audio settings
     ui->L_AudioFreq->setHidden(true);
@@ -433,10 +421,7 @@ void RemoteControllerWindow::closeEvent(QCloseEvent *event)
     // Save last used serial and camera
     m_settings->setValue("SerialName", ui->CB_Cameras->currentText());
     m_settings->setValue("CameraName", ui->CB_Cameras->currentText());
-
-    m_settings->setValue("CustomVideo", ui->LE_CustomVideo->text());
-    m_settings->setValue("CustomAudio", ui->LE_CustomAudio->text());
-    m_settings->setValue("UseDetectedDevice", ui->RB_DetectedDevice->isChecked());
+    m_settings->setValue("AudioName", ui->CB_AudioInputs->currentText());
 
     // Save audio settings
     m_settings->setValue("Volume", ui->S_Volume->value());
@@ -1524,24 +1509,18 @@ bool RemoteControllerWindow::SendCommand(const QString &commands)
 //---------------------------------------------------------------------------
 // Camera slots
 //---------------------------------------------------------------------------
-void RemoteControllerWindow::on_RB_DetectedDevice_clicked()
-{
-    ui->GB_DetectedDevice->setHidden(false);
-    ui->GB_CustomDevice->setHidden(true);
-}
-
-void RemoteControllerWindow::on_RB_CustomDevice_clicked()
-{
-    ui->GB_DetectedDevice->setHidden(true);
-    ui->GB_CustomDevice->setHidden(false);
-}
-
 void RemoteControllerWindow::on_PB_RefreshCamera_clicked()
 {
     ui->CB_Cameras->clear();
     for (QCameraInfo const& info : QCameraInfo::availableCameras())
     {
         ui->CB_Cameras->addItem(info.description());
+    }
+
+    ui->CB_AudioInputs->clear();
+    for (QAudioDeviceInfo const& info : QAudioDeviceInfo::availableDevices(QAudio::AudioInput))
+    {
+        ui->CB_AudioInputs->addItem(info.deviceName());
     }
 
     ui->PB_StartCamera->setEnabled(ui->CB_Cameras->count() > 0);
@@ -1553,8 +1532,7 @@ void RemoteControllerWindow::on_PB_StartCamera_clicked()
     {
         CameraToggle(false);
     }
-    else if ((ui->RB_DetectedDevice->isChecked() && ui->CB_Cameras->currentIndex() != -1)
-          || (ui->RB_CustomDevice->isChecked() && !ui->LE_CustomVideo->text().isEmpty()))
+    else if (ui->CB_Cameras->currentIndex() != -1)
     {
         CameraToggle(true);
     }
@@ -1631,11 +1609,11 @@ void RemoteControllerWindow::on_CB_AudioDisplayMode_currentIndexChanged(int inde
     {
         if (ui->CB_AudioDisplayMode->currentIndex() == ADM_None)
         {
-            setFixedSize(700,560);
+            setFixedSize(700,540);
         }
         else
         {
-            setFixedSize(700,670);
+            setFixedSize(700,644);
         }
     }
 }
@@ -1657,26 +1635,14 @@ void RemoteControllerWindow::CameraToggle(bool on)
 {
     if (on)
     {
-        bool enabled = false;
-        if (ui->RB_DetectedDevice->isChecked())
-        {
-            QString const device = ui->CB_Cameras->currentText();
-            enabled = m_vlcWrapper->start(device, device);
-        }
-        else if (ui->RB_CustomDevice->isChecked())
-        {
-            enabled = m_vlcWrapper->start(ui->LE_CustomVideo->text(), ui->LE_CustomAudio->text());
-        }
-
-        if (enabled)
+        QString const camera = ui->CB_Cameras->currentText();
+        QString const audio = ui->CB_AudioInputs->currentText();
+        if (m_vlcWrapper->start(camera, audio))
         {
             ui->PB_StartCamera->setText("Starting...");
             ui->PB_StartCamera->setEnabled(false);
 
-            ui->RB_DetectedDevice->setEnabled(false);
-            ui->RB_CustomDevice->setEnabled(false);
             ui->GB_DetectedDevice->setEnabled(false);
-            ui->GB_CustomDevice->setEnabled(false);
             ui->PB_Screenshot->setEnabled(true);
             ui->PB_AdjustVideo->setEnabled(true);
             ui->L_NoVideo->setHidden(true);
@@ -1702,10 +1668,7 @@ void RemoteControllerWindow::CameraToggle(bool on)
         ui->PB_StartCamera->setText("Start Camera");
         ui->PB_StartCamera->setEnabled(true);
 
-        ui->RB_DetectedDevice->setEnabled(true);
-        ui->RB_CustomDevice->setEnabled(true);
         ui->GB_DetectedDevice->setEnabled(true);
-        ui->GB_CustomDevice->setEnabled(true);
         ui->PB_Screenshot->setEnabled(false);
         ui->PB_AdjustVideo->setEnabled(false);
         ui->L_NoVideo->setHidden(false);
@@ -1749,7 +1712,7 @@ void RemoteControllerWindow::PopOut()
         ui->GB_SmartProgram->setTitle("");
         QVBoxLayout* vBoxLayout = new QVBoxLayout();
         vBoxLayout->addItem(ui->scrollAreaWidgetContents_16->layout()->takeAt(1));
-        vBoxLayout->addItem(ui->VL_Camera->takeAt(4));
+        vBoxLayout->addItem(ui->VL_Camera->takeAt(3));
         m_popOutSmartProgram->setLayout(vBoxLayout);
         ActionSmartProgram_triggered();
         m_popOutSmartProgram->move(m_settings->value("PopOutSmartProgramPos", m_popOutSmartProgram->pos()).toPoint());
@@ -1799,11 +1762,11 @@ void RemoteControllerWindow::PopOut()
     delete ui->frame;
     if (ui->CB_AudioDisplayMode->currentIndex() == ADM_None)
     {
-        setFixedSize(700,560);
+        setFixedSize(700,540);
     }
     else
     {
-        setFixedSize(700,670);
+        setFixedSize(700,644);
     }
 }
 
