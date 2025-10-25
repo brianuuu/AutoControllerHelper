@@ -2638,6 +2638,7 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
     case SP_BattleTower:
     case SP_S3_TableturfSkip:
     case SP_PLZA_BenchReset:
+    case SP_PLZA_RestaurantBattler:
     {
         m_smartProgram = new SmartSimpleProgram(sp, -1, parameter);
         break;

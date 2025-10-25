@@ -210,6 +210,7 @@ private:
         // ZA Programs
         P_PLZA_BenchReset,
         P_PLZA_ShinyLitwick,
+        P_PLZA_RestaurantBattler,
 
         P_INVALID
     };

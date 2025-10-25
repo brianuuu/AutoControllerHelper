@@ -65,8 +65,9 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
 
     m_programEnumMap["S3_TableturfSkip"]    = P_S3_TableturfSkip;
 
-    m_programEnumMap["PLZA_BenchReset"]     = P_PLZA_BenchReset;
-    m_programEnumMap["PLZA_ShinyLitwick"]   = P_PLZA_ShinyLitwick;
+    m_programEnumMap["PLZA_BenchReset"]         = P_PLZA_BenchReset;
+    m_programEnumMap["PLZA_ShinyLitwick"]       = P_PLZA_ShinyLitwick;
+    m_programEnumMap["PLZA_RestaurantBattler"]  = P_PLZA_RestaurantBattler;
 
     m_tabID[P_DaySkipper]           = 1;
     m_tabID[P_DaySkipper_Unlimited] = 2;
@@ -121,8 +122,9 @@ autocontrollerwindow::autocontrollerwindow(QWidget *parent)
 
     m_tabID[P_S3_TableturfSkip]     = 0;
 
-    m_tabID[P_PLZA_BenchReset]      = 0;
-    m_tabID[P_PLZA_ShinyLitwick]    = 0;
+    m_tabID[P_PLZA_BenchReset]          = 0;
+    m_tabID[P_PLZA_ShinyLitwick]        = 0;
+    m_tabID[P_PLZA_RestaurantBattler]   = 0;
 
     if (!QDir(HEX_PATH).exists())
     {
