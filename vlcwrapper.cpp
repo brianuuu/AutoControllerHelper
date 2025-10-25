@@ -79,6 +79,8 @@ bool VLCWrapper::start(const QString &vdev, const QString &adev)
     libvlc_media_add_option(m_media, adevOption.toStdString().c_str());
 
     // Aspect ratio, resolution
+    QString dshowSize = ":dshow-size=" + QString::number(VIDEO_WIDTH) + "x" + QString::number(VIDEO_HEIGHT);
+    libvlc_media_add_option(m_media, dshowSize.toStdString().c_str());
     libvlc_media_add_option(m_media, ":dshow-aspect-ratio=16:9");
 
     // Audio samples
