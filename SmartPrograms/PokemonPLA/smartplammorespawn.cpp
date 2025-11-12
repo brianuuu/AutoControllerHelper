@@ -33,7 +33,6 @@ void SmartPLAMMORespawn::runNextState()
         m_shinyDetected = false;
         connect(m_audioManager, &AudioManager::soundDetected, this, &SmartPLAMMORespawn::soundDetected);
 
-        m_substage = SS_Restart;
         runRestartCommand();
         break;
     }
@@ -109,8 +108,6 @@ void SmartPLAMMORespawn::runNextState()
         if (state == S_CommandFinished)
         {
             emit printLog("No shiny found, restarting...", LOG_WARNING);
-
-            m_substage = SS_Restart;
             runRestartCommand();
 
             m_audioManager->stopDetection(m_shinySoundID);
@@ -137,6 +134,7 @@ void SmartPLAMMORespawn::runNextState()
 
 void SmartPLAMMORespawn::runRestartCommand()
 {
+    m_substage = SS_Restart;
     setState_runCommand("Home,1,Nothing,21,X,1,ASpam,240");
 }
 

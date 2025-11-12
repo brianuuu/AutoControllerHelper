@@ -34,7 +34,6 @@ void SmartPLZARespawnReset::runNextState()
         m_shinyDetected = false;
         connect(m_audioManager, &AudioManager::soundDetected, this, &SmartPLZARespawnReset::soundDetected);
 
-        m_substage = SS_Restart;
         runRestartCommand();
         break;
     }
@@ -84,7 +83,7 @@ void SmartPLZARespawnReset::runNextState()
                 if (m_substage == SS_Title)
                 {
                     emit printLog("Title detected!");
-                    setState_runCommand("ASpam,60,Nothing,30");
+                    setState_runCommand("ASpam,20,Nothing,30");
                     m_substage = SS_GameStart;
                 }
                 else
@@ -110,8 +109,6 @@ void SmartPLZARespawnReset::runNextState()
         if (state == S_CommandFinished)
         {
             emit printLog("No shiny found, restarting...", LOG_WARNING);
-
-            m_substage = SS_Restart;
             runRestartCommand();
 
             m_audioManager->stopDetection(m_shinySoundID);
@@ -138,6 +135,7 @@ void SmartPLZARespawnReset::runNextState()
 
 void SmartPLZARespawnReset::runRestartCommand()
 {
+    m_substage = SS_Restart;
     setState_runCommand(C_Restart);
 }
 
