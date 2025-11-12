@@ -137,11 +137,11 @@ void SmartBrightnessMeanFinder::runNextState()
                     emit printLog("Capture dimension too small", LOG_WARNING);
                     m_imageMatchStarted = false;
                 }
-                else if (image.width() < m_spinBoxes[2]->value() / 2 || image.height() < m_spinBoxes[3]->value() / 2)
-                {
-                    emit printLog("Image is too small, less than half size of capture area", LOG_WARNING);
-                    m_imageMatchStarted = false;
-                }
+                //else if (image.width() < m_spinBoxes[2]->value() / 2 || image.height() < m_spinBoxes[3]->value() / 2)
+                //{
+                //    emit printLog("Image is too small, less than half size of capture area", LOG_WARNING);
+                //    m_imageMatchStarted = false;
+                //}
                 else
                 {
                     double maxRatio = 0;
