@@ -85,6 +85,7 @@ SOURCES += \
     SmartPrograms/PokemonPLA/smartplapasturesorter.cpp \
     SmartPrograms/PokemonPLA/smartplaresetalphapokemon.cpp \
     SmartPrograms/PokemonPLA/smartplastaticspawn.cpp \
+    SmartPrograms/PokemonPLZA/smartplzafossil.cpp \
     SmartPrograms/PokemonPLZA/smartplzarespawnreset.cpp \
     SmartPrograms/PokemonSV/smartsvboxrelease.cpp \
     SmartPrograms/PokemonSV/smartsvboxreleasesafe.cpp \
@@ -193,6 +194,7 @@ HEADERS += \
     SmartPrograms/PokemonPLA/smartplapasturesorter.h \
     SmartPrograms/PokemonPLA/smartplaresetalphapokemon.h \
     SmartPrograms/PokemonPLA/smartplastaticspawn.h \
+    SmartPrograms/PokemonPLZA/smartplzafossil.h \
     SmartPrograms/PokemonPLZA/smartplzarespawnreset.h \
     SmartPrograms/PokemonSV/smartsvboxrelease.h \
     SmartPrograms/PokemonSV/smartsvboxreleasesafe.h \

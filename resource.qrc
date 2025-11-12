@@ -9,5 +9,7 @@
         <file>ImageMatch/PLA_Shiny.bmp</file>
         <file>ImageMatch/SwSh_RStick.bmp</file>
         <file>ImageMatch/SwSh_Dynamax.bmp</file>
+        <file>ImageMatch/PLZA_Alpha.bmp</file>
+        <file>ImageMatch/PLZA_Shiny.bmp</file>
     </qresource>
 </RCC>

@@ -1841,7 +1841,7 @@
                  </sizepolicy>
                 </property>
                 <property name="currentIndex">
-                 <number>21</number>
+                 <number>23</number>
                 </property>
                 <widget class="QWidget" name="page">
                  <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -3570,8 +3570,8 @@ Then go to Adjust Video Effects and adjust the colors until all detections retur
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>262</width>
-                       <height>84</height>
+                       <width>498</width>
+                       <height>236</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_29">
@@ -4811,7 +4811,7 @@ Enter Trade Partner Name:</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>371</width>
+                       <width>488</width>
                        <height>241</height>
                       </rect>
                      </property>
@@ -5273,8 +5273,8 @@ Enter Trade Partner Name:</string>
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>300</width>
-                       <height>113</height>
+                       <width>498</width>
+                       <height>236</height>
                       </rect>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_55">
@@ -5394,6 +5394,126 @@ Enter Trade Partner Name:</string>
                       </item>
                       <item>
                        <spacer name="verticalSpacer_21">
+                        <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>20</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </widget>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+                <widget class="QWidget" name="page_23">
+                 <layout class="QVBoxLayout" name="verticalLayout_57">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QScrollArea" name="scrollArea_25">
+                    <property name="frameShape">
+                     <enum>QFrame::Panel</enum>
+                    </property>
+                    <property name="lineWidth">
+                     <number>2</number>
+                    </property>
+                    <property name="widgetResizable">
+                     <bool>true</bool>
+                    </property>
+                    <widget class="QWidget" name="scrollAreaWidgetContents_25">
+                     <property name="geometry">
+                      <rect>
+                       <x>0</x>
+                       <y>0</y>
+                       <width>498</width>
+                       <height>236</height>
+                      </rect>
+                     </property>
+                     <layout class="QVBoxLayout" name="verticalLayout_56">
+                      <item>
+                       <layout class="QGridLayout" name="gridLayout_4">
+                        <item row="0" column="0">
+                         <widget class="QLabel" name="label_98">
+                          <property name="text">
+                           <string>Fossil Slot:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="2" column="1">
+                         <widget class="QComboBox" name="SP23_CB_Target">
+                          <item>
+                           <property name="text">
+                            <string>Shiny Only</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>Alpha Only</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>Shiny OR Alpha</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>Shiny AND Alpha</string>
+                           </property>
+                          </item>
+                         </widget>
+                        </item>
+                        <item row="2" column="0">
+                         <widget class="QLabel" name="label_100">
+                          <property name="text">
+                           <string>Target:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="0" column="1">
+                         <widget class="QSpinBox" name="SP23_SB_Slot">
+                          <property name="maximum">
+                           <number>2</number>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="1" column="0">
+                         <widget class="QLabel" name="label_99">
+                          <property name="text">
+                           <string>Fossil Count</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="1" column="1">
+                         <widget class="QSpinBox" name="SP23_SB_Count">
+                          <property name="minimum">
+                           <number>1</number>
+                          </property>
+                          <property name="maximum">
+                           <number>300</number>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <spacer name="verticalSpacer_22">
                         <property name="orientation">
                          <enum>Qt::Vertical</enum>
                         </property>

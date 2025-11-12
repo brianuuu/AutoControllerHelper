@@ -2883,6 +2883,15 @@ void RemoteControllerWindow::RunSmartProgram(SmartProgram sp)
         m_smartProgram = new SmartPLZARespawnReset(parameter);
         break;
     }
+    case SP_PLZA_Fossil:
+    {
+        SmartPLZAFossil::Settings settings;
+        settings.m_fossilType = SmartPLZAFossil::FossilType(ui->SP23_CB_Target->currentIndex());
+        settings.m_count = ui->SP23_SB_Count->value();
+        settings.m_index = ui->SP23_SB_Slot->value();
+        m_smartProgram = new SmartPLZAFossil(settings, parameter);
+        break;
+    }
     default:
     {
         QMessageBox::critical(this, "Error", "No code exist for this Smart Program!");
