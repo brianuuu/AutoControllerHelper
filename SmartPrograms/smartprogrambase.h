@@ -436,8 +436,6 @@ public:
         case SP_SV_EggOperation:
 
         case SP_S3_TableturfCloneJelly:
-
-        case SP_PLZA_Fossil:
             return true;
         default:
             return false;
