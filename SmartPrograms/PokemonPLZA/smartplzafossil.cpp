@@ -170,12 +170,12 @@ void SmartPLZAFossil::runNextState()
             bool found = false;
             switch (m_programSettings.m_fossilType)
             {
-            case FossilType::FT_AlphaOnly:
+            case FossilType::FT_ShinyOnly:
             {
                 found = detect(A_Detect, m_imageMatch_Shiny, C_Color_Shiny);
                 break;
             }
-            case FossilType::FT_ShinyOnly:
+            case FossilType::FT_AlphaOnly:
             {
                 found = detect(A_Detect, m_imageMatch_Alpha, C_Color_Alpha);
                 break;
