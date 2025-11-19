@@ -27,6 +27,7 @@ void SmartPLZAFossil::reset()
 
     m_boxIndex = 0;
     m_fossilCount = 0;
+    m_pressCount = 0;
 }
 
 void SmartPLZAFossil::runNextState()
@@ -97,16 +98,56 @@ void SmartPLZAFossil::runNextState()
                 {
                     m_boxIndex = 0;
                     m_fossilCount = 0;
+                    m_pressCount = 0;
 
-                    m_substage = SS_GetFossil;
-                    setState_runCommand("Nothing,20");
-
-                    m_videoManager->clearCaptures();
+                    m_substage = SS_Talk;
+                    setState_runCommand("Nothing,20,A,20,Nothing,1");
+                    m_videoManager->setAreas({A_Selection[0], A_Selection[1], A_Selection[2]});
                 }
             }
             else
             {
                 setState_frameAnalyzeRequest();
+            }
+        }
+        break;
+    }
+    case SS_Talk:
+    {
+        if (state == S_CommandFinished)
+        {
+            setState_frameAnalyzeRequest();
+        }
+        else if (state == S_CaptureReady)
+        {
+            if (checkBrightnessMeanTarget(A_Selection[0].m_rect, C_Color_White, 240)
+             || checkBrightnessMeanTarget(A_Selection[1].m_rect, C_Color_White, 240)
+             || checkBrightnessMeanTarget(A_Selection[2].m_rect, C_Color_White, 240))
+            {
+                incrementStat(m_statFossils);
+                m_fossilCount++;
+                emit printLog("Collecting fossil #" + QString::number(m_statFossils.first));
+
+                QString command;
+                if (m_programSettings.m_index > 0)
+                {
+                    command += "LDown,1,Nothing,1,Loop," + QString::number(m_programSettings.m_index) + ",";
+                }
+                command += "A,1,BSpam,270";
+
+                m_substage = SS_GetFossil;
+                setState_runCommand(command);
+                m_videoManager->clearCaptures();
+            }
+            else if (m_pressCount < 10)
+            {
+                m_pressCount++;
+                setState_runCommand("A,20,Nothing,1");
+            }
+            else
+            {
+                incrementStat(m_statError);
+                setState_error("Unable to detect selection box after 10 A-presses");
             }
         }
         break;
@@ -123,17 +164,10 @@ void SmartPLZAFossil::runNextState()
             }
             else
             {
-                incrementStat(m_statFossils);
-                m_fossilCount++;
-                emit printLog("Collecting fossil #" + QString::number(m_statFossils.first));
-
-                QString command = "A,20,Nothing,1,Loop,4,";
-                if (m_programSettings.m_index > 0)
-                {
-                    command += "LDown,1,Nothing,1,Loop," + QString::number(m_programSettings.m_index) + ",";
-                }
-                command += "A,1,BSpam,270";
-                setState_runCommand(command);
+                m_pressCount = 0;
+                m_substage = SS_Talk;
+                setState_runCommand("Nothing,20,A,20,Nothing,1");
+                m_videoManager->setAreas({A_Selection[0], A_Selection[1], A_Selection[2]});
             }
         }
         break;
